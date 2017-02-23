@@ -1,0 +1,10 @@
+# Number of  products followed by the number of times
+2 5
+# Demands for each products
+0 1 0 0 1
+1 0 0 0 1
+# Stocking costs for each products
+2 2
+# Change-over costs matrix from a given product to another one
+0 5
+3 0
