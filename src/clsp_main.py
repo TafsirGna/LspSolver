@@ -26,18 +26,21 @@ print("-------	Step 1 : Initialization of the population	-------")
 
 # I create an instance of the genetic algorithm to be used
 genAlgo = GeneticAlgorithm(instance)
-c1 = ['10', '1', '0', '1', '10']
-c2 = ['1', '10', '0', '1', '10']
+#c = [2, 1, 0, 1, 2]
+c = [1, 3, 2, 1, 0, 0, 2, 0]
 
 print("-------	Step 2 : Processing the genetic algorithm	--------")
 
 genAlgo.initPopulation()
 genAlgo.process()
+#print("Feasible : ", genAlgo.makeItFeasible(c))
+#print("Feasible : ", genAlgo.isFeasible(c))
+#print("Feasible : ", 1.0/genAlgo.getChromosomeFitness(c))
 
 endTime = time.clock()
 
 print("-------	Step 3 : Statistics	-------")
-print("time : " + str((endTime - startTime)) + " seconds")
-genAlgo.printResults()
+print("time : " + str((endTime - startTime)) + " second(s)")
+#genAlgo.printResults()
 
 #print(int(str(bin(8))[2:]))

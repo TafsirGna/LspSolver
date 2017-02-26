@@ -31,7 +31,7 @@ def getManufactPeriods(chromosome,item):
 	j = 0
 	while j < len(chromosome):
 
-		if (int(chromosome[j],2) == item):
+		if (chromosome[j] == item):
 			itemManufactPeriods.append(j)
 
 		j+=1
