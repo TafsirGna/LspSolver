@@ -41,6 +41,6 @@ endTime = time.clock()
 
 print("-------	Step 3 : Statistics	-------")
 print("time : " + str((endTime - startTime)) + " second(s)")
-#genAlgo.printResults()
+genAlgo.printResults()
 
 #print(int(str(bin(8))[2:]))
