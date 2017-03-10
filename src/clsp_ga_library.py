@@ -12,6 +12,11 @@ from itertools import *
 
 #---	First part:  The functions
 
+def getMax(n1,n2):
+	if n1 > n2 :
+		return n1
+	else:
+		return n2
 
 def switchGenes(chromosome,indice_gene1,indice_gene2):
 	c = list(chromosome)

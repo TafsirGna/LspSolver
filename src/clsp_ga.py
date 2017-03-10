@@ -8,49 +8,29 @@ from random import *
 #--------------------
 # Class : GeneticAlgorithm
 # author : Tafsir GNA
-# purpose : Describing the structure of the kind of genetic algorithm used in the programm
+# purpose : Describing the structure of the kind of genetic algorithm used in the program
 #--------------------
 
 class GeneticAlgorithm:
 
 	#	Class' variables
 	NbPopulation = 0
-	mutationRate = 0.20
+	mutationRate = 0.10
 	crossOverRate = 0.70
-	nbIterations = 100
-	nbInitIterations = 100
+	nbIterations = 20
+	nbInitIterations = 20
 
 	# Builder
 	def __init__(self,inst):
 		self.instance = inst
 		self.population = [] 
-
-	def decrement(self, list_compteurs, noManufactPeriods):
-		
-		i = len(list_compteurs)-1
-		while i >=0 :
-
-			if i == (len(list_compteurs)-1):
-				
-				compteur = list_compteurs[i]
-				del list_compteurs[i]
-				compteur-=1
-				if (compteur < 0):
-					compteur = len(noManufactPeriods[i])-1
-				list_compteurs.insert(i,compteur)
-
-			else:
-				if list_compteurs[i+1] == 0:
-
-					compteur = list_compteurs[i]
-					del list_compteurs[i]
-					compteur-=1
-					if (compteur < 0):
-						compteur = len(noManufactPeriods[i])-1
-					list_compteurs.insert(i,compteur)
-
-			i-=1
 	
+	#--------------------
+	# function : getChromosomeFitness
+	# Class : GeneticAlgorithm
+	# purpose : Returning the fitness of a given chromosome
+	#--------------------
+
 	def getChromosomeFitness(self,chromosome):
 
 		fitness = 0
@@ -107,7 +87,12 @@ class GeneticAlgorithm:
 		return (1.0/fitness)
 	
 
-	
+	#--------------------
+	# function : applyMutationto
+	# Class : GeneticAlgorithm
+	# purpose : Applying mutation to a given chromosome and returning the resulting one
+	#--------------------
+
 	def applyMutationto(self,chromosome):
 
 		#print("M Start : ", chromosome)
@@ -164,7 +149,11 @@ class GeneticAlgorithm:
 			return chromosome
 
 
-
+	#--------------------
+	# function : applyMutationto
+	# Class : GeneticAlgorithm
+	# purpose : Applying cross-over to two chromosomes given as parameters and returning the resulting chromosomes
+	#--------------------
 	def applyCrossOverto(self, chromosome1, chromosome2):
 
 		chromosome3 = []
@@ -196,31 +185,33 @@ class GeneticAlgorithm:
 
 		return chromosome3,chromosome4
 
+
 	def makeItFeasible(self, chromosome):
 
-		while self.isFeasible(chromosome) is False:
+		if self.isFeasible(chromosome) is False:
 			#print("F Start : ", chromosome)
-			# i make sure that the number of goods producted aren't more than the number expected
+			# i make sure that the number of goods producted isn't superior to the number expected
 			i = 0
 			while i < self.instance.nbItems:
 
-				itemDemandPeriods =  getDemandPeriods(self.instance.demandsGrid[i])
+				itemDemandPeriods = getDemandPeriods(self.instance.demandsGrid[i])
 
 				j = 0
-				while j < len(itemDemandPeriods):
+				nb = 0
+				while j <= itemDemandPeriods[len(itemDemandPeriods)-1]:
 
-					period = itemDemandPeriods[j]
+					if chromosome[j] == i+1 :
 
-					k = 0
-					indice_periods = []
-					while k <= period:
-						if chromosome[k] == (i+1):
-							indice_periods.append(k)
-						k+=1
+						nb += 1
+						if nb > len(itemDemandPeriods):
 
-					if len(indice_periods) > j+1:
-						del chromosome[indice_periods[len(indice_periods)-1]]
-						chromosome.insert(indice_periods[len(indice_periods)-1], 0)
+							del chromosome[j]
+							chromosome.insert(j,0)
+
+						else:
+							if j > itemDemandPeriods[nb-1]:
+								del chromosome[j]
+								chromosome.insert(j,0)
 
 					j+=1
 
@@ -228,44 +219,53 @@ class GeneticAlgorithm:
 
 			#print(chromosome)
 			
-			# i make sure that the number of goods producted aren't less than the number expected
+			# i make sure that the number of items producted isn't inferior to the number expected
 			i = 0
 			while i < self.instance.nbItems:
 
 				itemDemandPeriods =  getDemandPeriods(self.instance.demandsGrid[i])
 
+				#print("item : ", i+1)
+
+				nb = 0
 				j = 0
-				while j < len(itemDemandPeriods):
+				while nb < len(itemDemandPeriods) and j < len(chromosome):
 
-					period = itemDemandPeriods[j]
-
-					k = 0
+					contain = False
 					zeroperiods = []
-					nbItemPeriods = 0
-					while k <= period:
-						if chromosome[k] == 0:
-							zeroperiods.append(k)
-						if chromosome[k] == (i+1):
-							nbItemPeriods+=1
-						k+=1
+					#print(" item nb : ", itemDemandPeriods[nb], " , ", nb)
+					while j <= itemDemandPeriods[nb]:
 
-					if nbItemPeriods < j+1 and len(zeroperiods) > 0:
-						del chromosome[zeroperiods[len(zeroperiods)-1]]
-						chromosome.insert(zeroperiods[len(zeroperiods)-1], i+1)
+						if chromosome[j] == 0:
+							zeroperiods.append(j)
 
-					j+=1
+						if chromosome[j] == i+1 :
+							#print("Yes : ", j)
+							nb += 1	
+							contain = True
+							j += 1
+							break
 
-				itemManufactPeriods = getManufactPeriods(chromosome, i+1)
-				if len(itemManufactPeriods) > len(itemDemandPeriods):
-					del chromosome[itemManufactPeriods[len(itemManufactPeriods)-1]]
-					chromosome.insert(itemManufactPeriods[len(itemManufactPeriods)-1], 0)
+						j += 1
+
+					#print("nb : ", nb, " j : ", j, " bool : ", contain, " zeroperiods : ", zeroperiods)
+
+					if contain is False:
+						if len(zeroperiods) > 0:
+							del chromosome[zeroperiods[0]]
+							chromosome.insert(zeroperiods[0], i+1)
+							nb += 1
+							j = zeroperiods[0]+1
+
+				#print("Inter : ", chromosome)
 
 				i+=1
 
-				# i check the chromosome before returning it
+			#print("F End : ", chromosome)
 
 		return chromosome
 
+	
 	def isFeasible(self,chromosome):
 
 		# i check first that there's not shortage or backlogging
@@ -302,13 +302,13 @@ class GeneticAlgorithm:
 		while it < GeneticAlgorithm.nbIterations:
 			# i select the two chromosomes that'll be mated to produce offsprings
 
-			#print("Population {0} : ".format(it), self.population )
-			#print(" ")
+			print("Population {0} : ".format(it), self.population )
 
 			sum_fitness, list_fitnesses1 = self.getPopulationFitness()
 			list_fitnesses2 = self.getRouletteWheel(list_fitnesses1, sum_fitness)
 
-			#print("LIST FITNESS : ", list_fitnesses2)
+			print("LIST FITNESS : ", list_fitnesses1)
+			print(" ")
 
 			#then, i perform the roulette-wheel method to select the parents
 			population = []
@@ -331,6 +331,9 @@ class GeneticAlgorithm:
 				#print("CrossOver : ", random_chrom1, " and : " , random_chrom2)
 
 				chromosome3,chromosome4 = self.applyCrossOverto(chromosome1,chromosome2)
+
+				#if self.isFeasible(chromosome3) is False or self.isFeasible(chromosome4) is False:
+				#	print("c3 : ", c3, " c4 : ", c4)
 
 				population.append(chromosome3)
 				i += 1
@@ -364,6 +367,8 @@ class GeneticAlgorithm:
 	def printResults(self):
 
 		sum_fitness, list_fitness = self.getPopulationFitness()
+
+		#print(self.population)
 		chromosome = self.population[0]
 		best_fitness = 1.0/list_fitness[0]
 		inv_fitness = list_fitness[0]
@@ -411,6 +416,12 @@ class GeneticAlgorithm:
 			wheel.append(cumul_percentage)
 			i+=1
 		return wheel
+
+	#--------------------
+	# function : initPopulation
+	# Class : GeneticAlgorithm
+	# purpose : Initializing le population of chromosomes to be processed during the first iteration
+	#--------------------
 
 	def initPopulation(self):
 
@@ -483,20 +494,9 @@ class GeneticAlgorithm:
 
 				j+=1
 
-				if qual_chrom is True:
+				if qual_chrom is True and chromosome not in self.population:
 					self.population.append(chromosome)
 
-			i+=1
-
-		population = list(self.population)
-		self.population = []
-
-		i=0
-		while i < len(population):
-			chromosome = population[i]
-			if (chromosome not in self.population):
-				self.population.append(chromosome)
-				#print(chromosome)
 			i+=1
 
 		GeneticAlgorithm.NbPopulation = len(self.population)
