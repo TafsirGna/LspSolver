@@ -27,18 +27,21 @@ print("-------	Step 1 : Initialization of the population	-------")
 
 # I create an instance of the genetic algorithm to be used
 genAlgo = GeneticAlgorithm(instance)
-c1 = [2, 1, 1, 2, 2]
+c1 = [2, 1, 0, 1, 2]
 c2 = [2, 1, 2, 0, 1]
-c = [3, 2, 1, 3, 0, 1, 2, 1]
+#c = [3, 2, 1, 3, 0, 1, 2, 1]
+c = [1, 1, 2, 2, 2, 0, 3, 0]
 
 print("-------	Step 2 : Processing the genetic algorithm	--------")
 
 genAlgo.initPopulation()
+#print(genAlgo.popObjValues)
 genAlgo.process()
 #print("Feasible : ", genAlgo.makeItFeasible(c))
 #print("Feasible : ", genAlgo.isFeasible(c))
 #print("Cross-Over", genAlgo.applyCrossOverto(c1,c2))
-#print("Feasible : ", 1.0/genAlgo.getChromosomeFitness(c))
+#print("Obj Value : ", genAlgo.getObjectiveValue(c2))
+#print(genAlgo.applyMutationto(c2))
 
 endTime = time.clock()
 
