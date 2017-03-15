@@ -1,0 +1,10 @@
+*.aux
+*.log
+*.synctex.gz
+Research Report/Report.pdf
+*.toc
+*.out
+*.lof
+*.lot
+Thesis Paper/main.pdf
+*.pyc

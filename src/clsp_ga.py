@@ -18,7 +18,7 @@ class GeneticAlgorithm:
 	NbPopulation = 0
 	mutationRate = 0.15
 	crossOverRate = 0.70
-	nbIterations = 30
+	nbIterations = 50
 	nbInitIterations = 20
 	MAX_FITNESS = 0
 	FITNESS_PADDING = 1
