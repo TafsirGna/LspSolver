@@ -13,6 +13,8 @@ import sys
 filename = sys.argv[1]
 instance = readFile(filename)
 
+print(instance)
+
 print("-------	Step 0 : Instance of Pigment Sequencing Problem to be used	-------")
 
 print(instance)
@@ -35,11 +37,10 @@ c = [1, 1, 2, 2, 2, 0, 3, 0]
 print("-------	Step 2 : Processing the genetic algorithm	--------")
 
 genAlgo.initPopulation()
-#print(genAlgo.popObjValues)
 genAlgo.process()
 #print("Feasible : ", genAlgo.makeItFeasible(c))
 #print("Feasible : ", genAlgo.isFeasible(c))
-#print("Cross-Over", genAlgo.applyCrossOverto(c1,c2))
+#genAlgo.applyCrossOverto(c1,c2)
 #print("Obj Value : ", genAlgo.getObjectiveValue(c2))
 #print(genAlgo.applyMutationto(c2))
 
