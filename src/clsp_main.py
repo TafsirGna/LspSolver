@@ -4,8 +4,8 @@
 #--- importation of the modules
 
 from clsp_ga import *
-from clsp_ga_library import *
 import sys
+import time
 
 #---	Start 
 
