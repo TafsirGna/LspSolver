@@ -13,11 +13,9 @@ import time
 filename = sys.argv[1]
 instance = readFile(filename)
 
-print(instance)
-
 print("-------	Step 0 : Instance of Pigment Sequencing Problem to be used	-------")
 
-print(instance)
+#print(instance)
 
 # i store the time of the beginning of the process
 startTime = time.clock()
@@ -37,7 +35,7 @@ c = [1, 1, 2, 2, 2, 0, 3, 0]
 print("-------	Step 2 : Processing the genetic algorithm	--------")
 
 genAlgo.initPopulation()
-genAlgo.process()
+#genAlgo.process()
 #print("Feasible : ", genAlgo.makeItFeasible(c))
 #print("Feasible : ", genAlgo.isFeasible(c))
 #genAlgo.applyCrossOverto(c1,c2)
@@ -48,6 +46,6 @@ endTime = time.clock()
 
 print("-------	Step 3 : Statistics	-------")
 print("time : " + str((endTime - startTime)) + " second(s)")
-genAlgo.printResults()
+#genAlgo.printResults()
 
 #---	End

@@ -1,14 +1,17 @@
-\documentclass[10pt,a4paper]{article}
+\documentclass[12pt,a4paper]{article}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage[french]{babel}
 \usepackage{amssymb}
 \usepackage{graphicx}
+\usepackage{palatino}
 \usepackage{sectsty}
+%\usepackage{fancyhdr}
 \usepackage[colorlinks=true,linkcolor=black]{hyperref}
 \usepackage{color}
-\pagestyle{headings}
+\usepackage[top=3cm, bottom=3cm, left=3cm, right=3cm]{geometry}
+\pagestyle{plain}
 \author{Tafsir GNA}
 
 %\allsectionsfont{\sf}
@@ -43,11 +46,27 @@
 		\vspace{1.5cm}{\huge\bfseries Résolution de "Pigment Sequencing Problem" avec les algorithmes génétiques\par}
 		\vspace{2cm}{\scshape \Large\textbf{Présenté par} \\ Tafsir GNA \par}
 		\vfill
-		\Large\textbf{Supervisé par}\par Dr. Norbert \textsc{Hounkonnou} \\ \& \\ Ir. Ratheil Vinasétan \textsc{Houndji}, PhD Student
+		\Large\textbf{Supervisé par}\par Pr. Norbert \textsc{Hounkonnou} \\ \& \\ Ir. Ratheil Vinasétan \textsc{Houndji}, PhD Student
 		\vfill
 		{\large \scshape Année Académique 2016-2017 \par}
 	\end{titlepage}
 
+	\newpage % Page de remerciement
+	
+	\section*{Remerciements}
+	\addcontentsline{toc}{section}{Remerciements}	
+	
+	\vspace{2.5cm}
+	
+	Je tiens à remercier tous ceux qui ont aidé et participé à la réalisation de ce travail à travers leurs différents apports et soutiens. \\
+	\hspace*{.5cm}Je remercie particulièrement : \\
+	\begin{itemize}
+		\item[•] Pr. Eugène EZIN, Directeur de l'Institut de Formation et de Recherche en Informatique (IFRI) ainsi que tous les membres du corps enseignant et administratif de l'IFRI
+		\item[•] Pr. Norbert HOUNKONNOU, pour avoir accepté de superviser mes travaux ainsi que Ir. Ratheil HOUNDJI, PhD student pour l'encadrement et les conseils apportés.
+		\item[•] Mon père, ma mère et par extension toute ma famille pour leur soutien et leurs encouragements  
+	\end{itemize}
+	
+	\newpage
 	% Tables des matières
 	\tableofcontents
 	
@@ -55,20 +74,56 @@
 	
 	%Liste des figures
 	\listoffigures
+	\addcontentsline{toc}{section}{Liste des figures}
 	
 	\newpage
 	
 	%Liste des Tableaux
 	\listoftables
+	\addcontentsline{toc}{section}{Liste des tableaux}
+	
+	\newpage % Page du résumé en français
+	
+	\section*{Résumé:}
+	\addcontentsline{toc}{section}{Résumé}	
+	
+	\vspace{1cm}
+	
+	Le dimensionnement de lot est une des tâches les plus difficiles et les plus importantes dans les problèmes de planification de production en industrie. Il consiste à identifier, sur un horizon de planification, le nombre (et le type) d’articles à produire et à quel moment produire de façon à minimiser le coût total de production. De récentes recherches ont expérimenté une variante NP-Difficile du problème de dimensionnement de lot : le “Pigment Sequencing Problem” (PSP). Aussi, les algorithmes génétiques ont montré leur efficacité sur des problèmes d’optimisation difficiles en trouvant de relatives bonnes solutions par rapport aux solutions optimales. Ce travail vise à donc travers l'application d'une approche heuristique basée sur les algorithmes génétiques au “Pigment Sequencing Problem”, à identifier un plan de production qui respecte les capacités de production des machines tout en minimisant les coûts de stockage et de transition d’une production à une autre. \\
+	\\
+	\hspace*{.5cm}\textsl{\textbf{Mots clés :}} Algorithme génétique, planification de production, pigment sequencing problem, dimensionnement de lot.
+	
+	\newpage % Page du résumé en anglais
+	
+	\section*{Abstract:}
+	\addcontentsline{toc}{section}{Abstract}
+	
+	\vspace{1cm}
+	
+	The lot sizing is one of the most difficult and most important task in production planning problems in industry field. It involves determining through a planning horizon the number (and the type) of the items to manufacture and when to manufacture these items in order to minimize the overall cost of manufacturing. Some recent researches have experienced a NP-hard variant of lot sizing problem called Pigment Sequencing Problem (PSP). Besides, Genetic Algorithms (GA) have shown how effecient they are, in finding some relatively good solutions in comparison to the optimal ones. Thus, This work aims to apply heuristic approach based on genetic algorithms to the Pigment Sequencing Problem, to find a solution that fits into the machine capacity restrictions and that minimizes the stocking costs and change-over costs from one item to another one.\\
+	\\
+	\hspace*{.5cm}\textsl{\textbf{Key words :}} Genetic algorithm, production planning, pigment sequencing problem, lot sizing.
+	
+	  
 	
 	\newpage
 	
 	\part*{Introduction}
 	\addcontentsline{toc}{part}{Introduction}
 	
+	Le dimensionnement de lot est un problème de planification de production qui consiste à déterminer l'ordre de production à coût minimal dans lequel les contraintes liées aux capacités de production sont respectées et la demande de tous les articles satisfaites. L'horizon de planification est discret et fini. Différentes versions de dimensionnement de lot ont été proposées dans le littérature, chacune étant spécifique à leur domaine d'application. Récemment,
+(Houndji et al., “The stockingCost constraint”, 2014) et (Ceschia et al., opthub.uniud.it, 2016) ont expérimenté une variante NP-Difficile du problème de dimensionnement de lots. Cette version est connue comme le “Pigment Sequencing Problem” (Pochet et Wolsey 2006, §14.4) et a été récemment inclue à la bibliothèque CSPlib (Gent and Walsh, 1999, prob058) . Il s'agit de produire plusieurs articles avec une seule machine dont la capacité de production est limitée à un article par période. Il y a des coûts de stockage et des coûts de transition d'une production à une autre. Par ailleurs, les demandes sont normalisées et donc binaires.
+	
+	\section*{Notre contribution}
+	
+	\section*{Organisation du travail}
+
+	Le travail effectué est organisé dans ce document en 3 parties. Le première partie présente une revue de littérature des problèmes de planification de production et particulier celui nous concernant, le "Pigment Sequencing Problem" (PSP). Nous présentons également dans cette partie les algorithmes génétiques, leur origine, leurs étapes ainsi leurs fondements. Dans le deuxième chapitre, nous présentons dans un premier temps le modèle ainsi que la formulation utilisée afin de résoudre le problème. Puis dans un second temps, nous explicitons l'approche heuristique utilisé. Dans le chapitre 4, nous expérimentons  notre solution, présentons les résultats obtenus et comparons ces résultats à l'état de l'art en la matière. Pour finir, nous tirons une conclusion du travail effectué et dressons les perspectives possibles en vue d'améliorer ce qui a été fait.
+	
 	\newpage
 	
 	\part{Etat de l'art}
+	%\newpage
 		\section*{Introduction}
 		\addcontentsline{toc}{section}{Introduction}
 		\section*{Conclusion}
@@ -77,12 +132,14 @@
 	\newpage
 	
 	\part{Modèles, Formulations et Implémentation}
+	%\newpage
 		\section*{Introduction}
 		\section*{Conclusion}
 		
 	\newpage
 	
 	\part{Expérimentations et Analyse des résultats}
+	%\newpage
 		\section*{Introduction}
 		\section*{Conclusion}
 		

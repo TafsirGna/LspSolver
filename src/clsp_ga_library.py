@@ -101,7 +101,7 @@ def getGeneBits(number):
 #-------------------- 
 
 def readFile(filename):
-	''' Input data's initialization '''
+	# Input data's initialization 
 	nbItems = 0
 	nbTimes = 0
 	demandsGrid = []
@@ -109,59 +109,115 @@ def readFile(filename):
 	chanOverGrid = []
 	i = 0
 
-	formatGood = True
-
-	''' Opening and reading of the file '''
+	# Opening and reading of the file 
+	fileContent = ""
 	with open(filename, 'rt') as instance:
 		for line in instance:
-			data = []
-			data = line.split(" ")
+			fileContent += line
 
-			# I read the first line to retrieve the first inputs
-			if i==1 :
-				if len(data) != 2:
-					formatGood = False
-					break
-				else:
-					nbItems=int(data[0])
-					nbTimes=int(data[1])
+		#print(len(fileContent))
+		nb = 1
+		i = 0
+		while i < len(fileContent):
 
-			# Once, the nbItems and nbTimes have been retrieved, i read the following lines 
-			if i>2 and i<=nbItems+2:
-				if len(data) != nbTimes:
-					formatGood = False
-					break
-				else:
-					demandsGrid.append(data)
+			character = fileContent[i]
+			if character == '=':
+				string = ""
+				j = i+1
+				while fileContent[j] != ';' and j < len(fileContent):
+					string += fileContent[j]
+					j+=1
 
-			if i==(nbItems+4):
-				if len(data) != nbItems:
-					formatGood = False
-					print("phrack")
-					break
-				else:
-					holdingGrid = data
-			
-			if i>=nbItems+6 and i <= (2*nbItems)+6 :
-				if len(data) != nbItems:
-					formatGood = False
-					break
-				else:
-					chanOverGrid.append(data)
-			
-			i+=1
+				if nb == 1:
+					nbTimes = int(string)
 
-		inst = 0
-		if formatGood is False:
-			print("Bad instance format")
-		else:
-			#print("instance read")
-			inst = Instance(nbItems,nbTimes,demandsGrid,holdingGrid,chanOverGrid)
-			#print(inst)
+				if nb == 2:
+					nbItems = int(string)
+
+				if nb == 3:
+					demandsGrid = string
+
+				if nb == 4:
+					holdingGrid = string
+
+				if nb == 5:
+					chanOverGrid = string
+
+				nb += 1
+
+				i = j
+
+			else:
+
+				i+=1
+
+		# The variables (demandGrid, holdingGrid, chanOverGrid) aren't yet in the right format, then, i'll make it right
+		# demandGrid
+
+		i = 0
+		grid = []
+		while i < len(demandsGrid):
+			if demandsGrid[i] == '|':
+				string = ""
+				j = i+1
+				while j < len(demandsGrid) and (demandsGrid[j] != '\n' and demandsGrid[j] != '|') :
+					string += demandsGrid[j]
+					j+=1 
+
+				i = j-1
+
+				tab = string.split(",")
+				if len(tab) == nbTimes :
+					grid.append(tab)
+			else:
+				i+=1
+
+		demandsGrid = list(grid)
+
+		# holdingCosts
+		i = 0
+		while i < len(holdingGrid):
+			if holdingGrid[i] == '[':
+				string = ""
+				j = i+1
+				while j < len(holdingGrid) and holdingGrid[j] != ']':
+					string += holdingGrid[j]
+					j+=1
+
+				holdingGrid = list(string.split(","))
+
+				i = j
+
+			else:
+				i+=1
+
+		# chanOverGrid
+		i = 0
+		grid = []
+		while i < len(chanOverGrid):
+			if chanOverGrid[i] == '|':
+				string = ""
+				j = i+1
+				while j < len(chanOverGrid) and (chanOverGrid[j] != '\n' and chanOverGrid[j] != '|') :
+					string += chanOverGrid[j]
+					j+=1 
+
+				i = j-1
+
+				tab = string.split(",")
+				if len(tab) == nbItems :
+					grid.append(tab)
+			else:
+				i+=1
+
+		chanOverGrid = list(grid)
+
+		#print(str(nbItems) + ", " + str(nbTimes) + ", " + str(demandsGrid) + ", " + str(holdingGrid) + ", " + str(chanOverGrid))
+
+		inst = Instance(nbItems,nbTimes,demandsGrid,holdingGrid,chanOverGrid)
+
 		return inst
 
-#def readFile():
-#	pass
 
 #---	Second part:	The classes 
 
@@ -187,4 +243,4 @@ class Instance:
 		"Number of Times is : {} \n".format(self.nbTimes) + \
 		"Demands for each item are : {} \n".format(self.demandsGrid) + \
 		"Holding costs for each item are : {} \n".format(self.holdingGrid) + \
-		"Changeover costs from one item to another one are : {} \n".format(self.chanOverGrid)		
+		"Changeover costs from one item to another one are : {} \n".format(self.chanOverGrid)
