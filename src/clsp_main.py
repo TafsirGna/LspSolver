@@ -15,7 +15,7 @@ instance = readFile(filename)
 
 print("-------	Step 0 : Instance of Pigment Sequencing Problem to be used	-------")
 
-#print(instance)
+print(instance)
 
 # i store the time of the beginning of the process
 startTime = time.clock()
@@ -29,23 +29,21 @@ print("-------	Step 1 : Initialization of the population	-------")
 genAlgo = GeneticAlgorithm(instance)
 c1 = [2, 1, 0, 1, 2]
 c2 = [2, 1, 2, 0, 1]
+
 #c = [3, 2, 1, 3, 0, 1, 2, 1]
 c = [1, 1, 2, 2, 2, 0, 3, 0]
 
 print("-------	Step 2 : Processing the genetic algorithm	--------")
 
 genAlgo.initPopulation()
-#genAlgo.process()
-#print("Feasible : ", genAlgo.makeItFeasible(c))
-#print("Feasible : ", genAlgo.isFeasible(c))
-#genAlgo.applyCrossOverto(c1,c2)
-#print("Obj Value : ", genAlgo.getObjectiveValue(c2))
-#print(genAlgo.applyMutationto(c2))
+genAlgo.process()
+#print(genAlgo.population.getCostof(1,1,1,c2))
+#genAlgo.population.applyCrossOverto(Chromosome(c1) ,Chromosome(c2))
 
 endTime = time.clock()
 
 print("-------	Step 3 : Statistics	-------")
 print("time : " + str((endTime - startTime)) + " second(s)")
-#genAlgo.printResults()
+genAlgo.printResults()
 
 #---	End

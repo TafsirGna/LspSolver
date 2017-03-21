@@ -27,6 +27,30 @@ class GeneticAlgorithm:
 		self.instance = inst
 		self.population = [] 
 
+		# i initialize a list of counters
+		self.ItemsCounters = []
+		i = 0
+		while i < self.instance.nbItems:
+			self.ItemsCounters.append(1)
+			i+=1
+
+		#
+		self.ManufactItemsPeriods = []
+		i = 0
+		while i < self.instance.nbItems:
+
+			tempNb = len(self.instance.deadlineDemandPeriods[i])
+			tempGrid = []
+			j = 0
+			while j < tempNb:
+				tempGrid.append(-1)
+				j+=1
+
+			self.ManufactItemsPeriods.append(tempGrid)
+
+			i+=1 
+		#print(self.ManufactItemsPeriods)
+
 	#--------------------
 	# function : initPopulation
 	# Class : GeneticAlgorithm
@@ -46,8 +70,19 @@ class GeneticAlgorithm:
 		Population.FITNESS_PADDING = GeneticAlgorithm.FITNESS_PADDING
 		Population.crossOverRate = GeneticAlgorithm.crossOverRate
 
+		Chromosome.ManufactItemsPeriods = self.ManufactItemsPeriods
+		Chromosome.ItemsCounters = self.ItemsCounters
+
 		# i create a new population from scratch
-		self.population = Population(0)
+		self.population = Population()
+		#print(self.population)
+
+		'''
+		c3 = [2, 1, 0, 0, 2]
+		c = Chromosome(c3)
+		c.getFeasible()
+		print(c)
+		'''		
 	
 	#--------------------
 	# function : process

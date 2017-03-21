@@ -13,28 +13,6 @@ from random import *
 
 #---	First part:  The functions
 
-def getItemsRanks(chromosome, counters):
-
-	ranks = []
-
-	i = 0 
-	while i < len(chromosome):
-		if chromosome[i] != 0:
-
-			item = chromosome[i]
-			counter = counters[item-1]
-			ranks.append(counter)
-
-			# then, i increment the counter of this item
-			del counters[item-1]
-			counters.insert(item-1,(counter+1))
-
-		else:
-			ranks.append(0)
-		i+=1
-
-	return ranks
-
 def getMax(n1,n2):
 	if n1 > n2 :
 		return n1
@@ -236,6 +214,15 @@ class Instance:
 		self.demandsGrid = demandsGrid
 		self.holdingGrid = holdingGrid
 		self.chanOverGrid = chanOverGrid
+
+		# then, i perform a process over the 'demandsGrid' to obtain a grid with all the deadlines corresponding to all the demands of items
+		self.deadlineDemandPeriods = []
+		i = 0
+		while i < nbItems:
+			self.deadlineDemandPeriods.append(getDemandPeriods(demandsGrid[i]))
+			i+=1
+		#print(" deadlines : ", str(self.deadlineDemandPeriods))
+
 
 	#	implementation of the function called when an object is printed to the screen
 	def __repr__(self):

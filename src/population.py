@@ -11,8 +11,10 @@ class Population:
 	NbMaxPopulation = 0
 	FITNESS_PADDING = 0
 	crossOverRate = 0
+	ManufactItemsPeriods = []
+
 	# builder 
-	def __init__(self, previousPopulation):
+	def __init__(self, previousPopulation = []):
 		
 		self.chromosomes = []
 		self.bestChromosome = 0
@@ -21,7 +23,7 @@ class Population:
 		self.min_fitness = math.pow(10,6)
 
 		# i explicit the case where there's no previous population before this one
-		if previousPopulation == 0 :
+		if previousPopulation == [] :
 
 			listItems = []
 
@@ -56,8 +58,7 @@ class Population:
 					while k < len(permutationJ):
 
 						itemK = permutationJ[k]
-						itemKDemands = Chromosome.problem.demandsGrid[itemK-1]
-						itemKDemandPeriods = getDemandPeriods(itemKDemands)
+						itemKDemandPeriods = Chromosome.problem.deadlineDemandPeriods[itemK-1]
 
 						l = 0
 						while l < len(itemKDemandPeriods):
@@ -89,9 +90,9 @@ class Population:
 							break
 
 					j+=1
-
 					c = Chromosome(solution)
 					if qual_sol is True and c not in self.chromosomes:
+						c.getFeasible()
 						self.chromosomes.append(c)
 
 						# i store the value of the highest value of the objective function
@@ -113,7 +114,7 @@ class Population:
 
 			self.NbPopulation = len(self.chromosomes)
 
-			#print(len(self.population))
+			#print(len(self.chromosomes))
 
 		else:
 
@@ -204,11 +205,13 @@ class Population:
 				if (i == self.NbPopulation):
 					break
 
-			#print("Population INter {0} : ".format(it), population )
-			#print(" ")
+			print("Population inter : ", chromosomes)
+			print(" ")
 
 			self.chromosomes = []
 			self.max_fitness = 0
+			self.min_fitness = math.pow(10,6)
+
 			i = 0
 			while i < len(chromosomes):
 				chromosome = chromosomes[i]
@@ -237,30 +240,22 @@ class Population:
 	# Class : GeneticAlgorithm
 	# purpose : Applying cross-over to two chromosomes given as parameters and returning the resulting chromosomes
 	#--------------------
-	'''
+
 	def applyCrossOverto(self, chromosome1, chromosome2):
 
-		chromosome3 = []
-		chromosome4 = []
+		solution3 = []
+		solution4 = []
 
-		if (randint(0,100) < (GeneticAlgorithm.crossOverRate*100)):
-
-			# i create and initialize a table of counters
-			counters = []
-			i = 0
-			while i < self.instance.nbItems:
-				counters.append(1)
-				i+=1
+		if (randint(0,100) < (Population.crossOverRate*100)):
 
 			# i retrieve a table that stores the period each item has been manufactered for
-			ranks1 = getItemsRanks(chromosome1, list(counters))
-			ranks2 = getItemsRanks(chromosome2, list(counters))
+			ranks1 = chromosome1.itemsRank
+			ranks2 = chromosome2.itemsRank
 
 			ranks3 = []
 			ranks4 = []
 
-			randomIndice = randint(1,len(chromosome1)-1)
-
+			randomIndice = randint(1,len(chromosome1.solution)-1)
 
 			#print(" ")
 			#print(" chromosome1 : ", chromosome1, " chromosome2 : ", chromosome2)
@@ -268,54 +263,46 @@ class Population:
 			#print(" ranks1 : ", ranks1, " ranks2 : ", ranks2)
 
 			i = 0
-			while i < len(chromosome1):
+			while i < len(chromosome1.solution):
 
 				if i < randomIndice:
 
-					chromosome3.append(chromosome1[i])
-					chromosome4.append(chromosome2[i])
+					solution3.append(chromosome1.solution[i])
+					solution4.append(chromosome2.solution[i])
 
 					ranks3.append(ranks1[i])
 					ranks4.append(ranks2[i])
 
 				else:
 
-					chromosome3.append(chromosome2[i])
-					chromosome4.append(chromosome1[i])
+					solution3.append(chromosome2.solution[i])
+					solution4.append(chromosome1.solution[i])
 
 					ranks3.append(ranks2[i])
 					ranks4.append(ranks1[i])
 
 				i+=1
 
-			#print(" ranks3 : ", ranks3, " ranks4 : ", ranks4)
-			#print(" chromosome3 : ", chromosome3, " chromosome4 : ", chromosome4)
-
 			# Once, the two resulting chromosomes have been formed, i make each of them feasible with regards of the constraints
 
-			manufactMatrix = []
-			i = 0
-			while i < self.instance.nbItems:
+			#print(" randomIndice : ", randomIndice)
+			#print(" 1 - solution3 : ", solution3, " ranks3 : ", ranks3, " solution4 : ", solution4, " ranks4 : ", ranks4)
 
-				#j = 0
-				#while
+			chromosome3 = Chromosome(solution3, ranks3)
+			chromosome3.getFeasible()
 
-				i+=1
+			chromosome4 = Chromosome(solution4, ranks4)
+			chromosome4.getFeasible()
 
-			chromosome3 = self.makeItFeasible(chromosome3)
-
-			chromosome4 = self.makeItFeasible(chromosome4)
+			#print(" 2 - solution3 : ", chromosome3.solution, " ranks3 : ", ranks3, " solution4 : ", chromosome3.solution, " ranks4 : ", ranks4)
 
 		else:
-			chromosome3 = list(chromosome1)
-			chromosome4 = list(chromosome2)
+			chromosome3 = Chromosome(chromosome1.solution)
+			chromosome4 = Chromosome(chromosome2.solution)
 
 		return chromosome3,chromosome4
 
-	def makeItFeasible(chromosome, ranks):
-		pass
 	'''
-
 	def applyCrossOverto(self, chromosome1, chromosome2):
 
 		solution3 = []
@@ -348,6 +335,7 @@ class Population:
 			chromosome4 = Chromosome(chromosome2.solution)
 
 		return chromosome3,chromosome4
+	'''
 
 
 	def __repr__(self):
