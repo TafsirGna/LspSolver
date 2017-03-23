@@ -13,6 +13,35 @@ from random import *
 
 #---	First part:  The functions
 
+def getManufactPeriodsGrid(nbItems, deadlineDemandPeriods):
+
+	resultGrid = []
+	i = 0
+	while i < nbItems:
+
+		tempNb = len(deadlineDemandPeriods[i])
+		tempGrid = []
+		j = 0
+		while j < tempNb:
+			tempGrid.append(-1)
+			j+=1
+
+		resultGrid.append(tempGrid)
+
+		i+=1 
+		
+	return resultGrid
+
+def getListCounters(nbItems):
+
+	ItemsCounters = []
+	i = 0
+	while i < nbItems:
+		ItemsCounters.append(1)
+		i+=1
+
+	return ItemsCounters
+
 def getMax(n1,n2):
 	if n1 > n2 :
 		return n1

@@ -11,7 +11,6 @@ class Population:
 	NbMaxPopulation = 0
 	FITNESS_PADDING = 0
 	crossOverRate = 0
-	ManufactItemsPeriods = []
 
 	# builder 
 	def __init__(self, previousPopulation = []):
@@ -205,8 +204,8 @@ class Population:
 				if (i == self.NbPopulation):
 					break
 
-			print("Population inter : ", chromosomes)
-			print(" ")
+			#print("Population inter : ", chromosomes)
+			#print(" ")
 
 			self.chromosomes = []
 			self.max_fitness = 0
@@ -258,7 +257,8 @@ class Population:
 			randomIndice = randint(1,len(chromosome1.solution)-1)
 
 			#print(" ")
-			#print(" chromosome1 : ", chromosome1, " chromosome2 : ", chromosome2)
+
+			#print(" 2 - solution1 : ", chromosome1.solution, " ranks1 : ", chromosome1.itemsRank, " solution2 : ", chromosome2.solution, " ranks2 : ", chromosome2.itemsRank)
 			#print(" randomIndice : ", randomIndice)
 			#print(" ranks1 : ", ranks1, " ranks2 : ", ranks2)
 
@@ -294,49 +294,13 @@ class Population:
 			chromosome4 = Chromosome(solution4, ranks4)
 			chromosome4.getFeasible()
 
-			#print(" 2 - solution3 : ", chromosome3.solution, " ranks3 : ", ranks3, " solution4 : ", chromosome3.solution, " ranks4 : ", ranks4)
+			#print(" 2 - solution3 : ", chromosome3.solution, " ranks3 : ", ranks3, " solution4 : ", chromosome4.solution, " ranks4 : ", ranks4)
 
 		else:
 			chromosome3 = Chromosome(chromosome1.solution)
 			chromosome4 = Chromosome(chromosome2.solution)
 
 		return chromosome3,chromosome4
-
-	'''
-	def applyCrossOverto(self, chromosome1, chromosome2):
-
-		solution3 = []
-		solution4 = []
-
-		if (randint(0,100) < (Population.crossOverRate*100)):
-
-			randomIndice = randint(0,len(chromosome1.solution))
-
-			i = 0
-			while i < randomIndice:
-				solution3.append(chromosome1.solution[i])
-				solution4.append(chromosome2.solution[i])
-				i+=1
-
-			i = randomIndice
-			while i < len(chromosome1.solution):
-				solution3.append(chromosome2.solution[i])
-				solution4.append(chromosome1.solution[i])
-				i+=1
-
-			chromosome3 = Chromosome(solution3)
-			chromosome3.getFeasible()
-
-			chromosome4 = Chromosome(solution4)
-			chromosome4.getFeasible()
-
-		else:
-			chromosome3 = Chromosome(chromosome1.solution)
-			chromosome4 = Chromosome(chromosome2.solution)
-
-		return chromosome3,chromosome4
-	'''
-
 
 	def __repr__(self):
 		
@@ -345,7 +309,7 @@ class Population:
 		while i < len(self.chromosomes):
 
 			c = self.chromosomes[i]
-			result += str(c.solution) + " : " + str(c.valueFitness) + " , "
+			result += str(c.solution) + " : " + str(c.valueFitness) + ","
 
 			i+=1
 

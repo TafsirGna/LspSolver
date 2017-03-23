@@ -17,9 +17,10 @@ class GeneticAlgorithm:
 	mutationRate = 0.15
 	crossOverRate = 0.70
 	nbIterations = 50
-	nbInitIterations = 20
+	nbInitIterations = 25
 	MAX_FITNESS = 0
 	FITNESS_PADDING = 1
+	nbLackDiversity = 0
 	#SUM_FITNESS = 0
 
 	# Builder
@@ -28,27 +29,11 @@ class GeneticAlgorithm:
 		self.population = [] 
 
 		# i initialize a list of counters
-		self.ItemsCounters = []
-		i = 0
-		while i < self.instance.nbItems:
-			self.ItemsCounters.append(1)
-			i+=1
+		self.ItemsCounters = getListCounters(self.instance.nbItems)
 
 		#
-		self.ManufactItemsPeriods = []
-		i = 0
-		while i < self.instance.nbItems:
-
-			tempNb = len(self.instance.deadlineDemandPeriods[i])
-			tempGrid = []
-			j = 0
-			while j < tempNb:
-				tempGrid.append(-1)
-				j+=1
-
-			self.ManufactItemsPeriods.append(tempGrid)
-
-			i+=1 
+		self.ManufactItemsPeriods = getManufactPeriodsGrid(self.instance.nbItems, self.instance.deadlineDemandPeriods)
+		
 		#print(self.ManufactItemsPeriods)
 
 	#--------------------
@@ -74,15 +59,17 @@ class GeneticAlgorithm:
 		Chromosome.ItemsCounters = self.ItemsCounters
 
 		# i create a new population from scratch
-		self.population = Population()
+		#self.population = Population()
 		#print(self.population)
 
 		'''
-		c3 = [2, 1, 0, 0, 2]
-		c = Chromosome(c3)
+		c = Chromosome([0, 0, 2, 2, 1, 1, 3, 0])
+		c = Chromosome([0, 0, 2, 0, 1, 1, 3, 0])
 		c.getFeasible()
-		print(c)
-		'''		
+		print(" c : ", c)
+		'''
+		
+		# [0, 0, 2, 0, 1, 1, 3, 0]
 	
 	#--------------------
 	# function : process
