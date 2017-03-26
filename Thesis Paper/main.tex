@@ -61,9 +61,9 @@
 	Je tiens à remercier tous ceux qui ont aidé et participé à la réalisation de ce travail à travers leurs différents apports et soutiens. \\
 	\hspace*{.5cm}Je remercie particulièrement : \\
 	\begin{itemize}
-		\item[•] Pr. Eugène EZIN, Directeur de l'Institut de Formation et de Recherche en Informatique (IFRI) ainsi que tous les membres du corps enseignant et administratif de l'IFRI
-		\item[•] Pr. Norbert HOUNKONNOU, pour avoir accepté de superviser mes travaux ainsi que Ir. Ratheil HOUNDJI, PhD student pour l'encadrement et les conseils apportés.
-		\item[•] Mon père, ma mère et par extension toute ma famille pour leur soutien et leurs encouragements  
+		\item[•] Pr. Eugène EZIN, Directeur de l'Institut de Formation et de Recherche en Informatique (IFRI) ainsi que tous les membres du corps enseignant et administratif de l'IFRI;
+		\item[•] Pr. Norbert HOUNKONNOU, pour avoir accepté de superviser mes travaux ainsi que Ir. Ratheil HOUNDJI, PhD student pour l'encadrement et les conseils apportés;
+		\item[•] Mon père, ma mère et par extension toute ma famille pour leur soutien et leurs encouragements. 
 	\end{itemize}
 	
 	\newpage
@@ -89,7 +89,7 @@
 	
 	\vspace{1cm}
 	
-	Le dimensionnement de lot est une des tâches les plus difficiles et les plus importantes dans les problèmes de planification de production en industrie. Il consiste à identifier, sur un horizon de planification, le nombre (et le type) d’articles à produire et à quel moment produire de façon à minimiser le coût total de production. De récentes recherches ont expérimenté une variante NP-Difficile du problème de dimensionnement de lot : le “Pigment Sequencing Problem” (PSP). Aussi, les algorithmes génétiques ont montré leur efficacité sur des problèmes d’optimisation difficiles en trouvant de relatives bonnes solutions par rapport aux solutions optimales. Ce travail vise à donc travers l'application d'une approche heuristique basée sur les algorithmes génétiques au “Pigment Sequencing Problem”, à identifier un plan de production qui respecte les capacités de production des machines tout en minimisant les coûts de stockage et de transition d’une production à une autre. \\
+	Le dimensionnement de lot est la tâche la plus difficile et la plus importante dans les problèmes de planification de production en industrie. Il consiste à identifier, sur un horizon de planification, le nombre (et le type) d’articles à produire et à quel moment produire de façon à minimiser le coût total de production. De récentes recherches ont expérimenté une variante NP-Difficile du problème de dimensionnement de lot : le “Pigment Sequencing Problem” (PSP). Aussi, les algorithmes génétiques ont montré leur efficacité sur des problèmes d’optimisation difficiles en trouvant de relatives bonnes solutions par rapport aux solutions optimales. Ce travail vise à donc travers l'application d'une approche heuristique basée sur les algorithmes génétiques au “Pigment Sequencing Problem”, à identifier un plan de production qui respecte les capacités de production des machines tout en minimisant les coûts de stockage et de transition d’une production à une autre. \\
 	\\
 	\hspace*{.5cm}\textsl{\textbf{Mots clés :}} Algorithme génétique, planification de production, pigment sequencing problem, dimensionnement de lot.
 	
@@ -100,7 +100,7 @@
 	
 	\vspace{1cm}
 	
-	The lot sizing is one of the most difficult and most important task in production planning problems in industry field. It involves determining through a planning horizon the number (and the type) of the items to manufacture and when to manufacture these items in order to minimize the overall cost of manufacturing. Some recent researches have experienced a NP-hard variant of lot sizing problem called Pigment Sequencing Problem (PSP). Besides, Genetic Algorithms (GA) have shown how effecient they are, in finding some relatively good solutions in comparison to the optimal ones. Thus, This work aims to apply heuristic approach based on genetic algorithms to the Pigment Sequencing Problem, to find a solution that fits into the machine capacity restrictions and that minimizes the stocking costs and change-over costs from one item to another one.\\
+	The lot sizing is the most difficult and important task in production planning problems in industry field. It involves determining through a planning horizon the number (and the type) of the items to manufacture and when to manufacture these items in order to minimize the overall cost of manufacturing. Some recent researches have experienced a NP-hard variant of lot sizing problem called "Pigment Sequencing Problem" (PSP). Besides, Genetic Algorithms (GA) have shown how effecient they are, in finding some relatively good solutions in comparison to the optimal ones. Thus, This work aims to apply heuristic approach based on genetic algorithms to the Pigment Sequencing Problem, to find a solution that fits into the machine capacity restrictions and that minimizes the stocking costs and change-over costs from one item to another one.\\
 	\\
 	\hspace*{.5cm}\textsl{\textbf{Key words :}} Genetic algorithm, production planning, pigment sequencing problem, lot sizing.
 	
@@ -111,14 +111,22 @@
 	\part*{Introduction}
 	\addcontentsline{toc}{part}{Introduction}
 	
-	Le dimensionnement de lot est un problème de planification de production qui consiste à déterminer l'ordre de production à coût minimal dans lequel les contraintes liées aux capacités de production sont respectées et la demande de tous les articles satisfaites. L'horizon de planification est discret et fini. Différentes versions de dimensionnement de lot ont été proposées dans le littérature, chacune étant spécifique à leur domaine d'application. Récemment,
-(Houndji et al., “The stockingCost constraint”, 2014) et (Ceschia et al., opthub.uniud.it, 2016) ont expérimenté une variante NP-Difficile du problème de dimensionnement de lots. Cette version est connue comme le “Pigment Sequencing Problem” (Pochet et Wolsey 2006, §14.4) et a été récemment inclue à la bibliothèque CSPlib (Gent and Walsh, 1999, prob058) . Il s'agit de produire plusieurs articles avec une seule machine dont la capacité de production est limitée à un article par période. Il y a des coûts de stockage et des coûts de transition d'une production à une autre. Par ailleurs, les demandes sont normalisées et donc binaires.
+	Dans un processus de planification de production, le dimensionnement
+de lots (lot sizing) qui consiste à identifier les articles à produire, quand il
+faut les produire et sur quelle machine de façon à satisfaire les demandes
+tout en considérant les objectifs financiers, est l’activité la plus importante
+et la plus difficile. En effet, de la qualité des décisions qui seront prises
+dépendent la performance et la compétitivité de l’entreprise. Connu dans la
+littérature sous le nom de problème de lot sizing, il a été beaucoup étudié
+ces dernières décennies depuis les travaux de Wagner et Within en 1958. \\
+	\hspace*{.5cm} Différentes versions de dimensionnement de lots ont été proposées dans le littérature, chacune étant spécifique à leur domaine d'application. Récemment, (Houndji et al., “The stockingCost constraint”, 2014) et (Ceschia et al., opthub.uniud.it, 2016) ont expérimenté une variante NP-Difficile du problème de dimensionnement de lots. Cette version est connue comme le “Pigment Sequencing Problem” (Pochet et Wolsey 2006, §14.4) et a été récemment inclue à la bibliothèque CSPlib (Gent and Walsh, 1999, prob058) . Il s'agit de produire plusieurs articles avec une seule machine dont la capacité de production est limitée à un article par période. L'horizon de planification est discret et fini, et il y a des coûts de stockage et des coûts de transition d'une production à une autre. Par ailleurs, les demandes sont normalisées et donc binaires. \\
+	\hspace*{.5cm} Dans la plupart des cas, un problème d’optimisation tel que le problème de dimensionnement de lots se divise naturellement en deux phases : recherche des solutions admissibles puis recherche de la solution à coût optimal parmi ces dernières. Suivant la méthode employée, ce découpage est plus ou moins apparent dans la résolution. L’usage d’un algorithme génétique est adapté à une exploration rapide et globale d’un espace de recherche de taille importante et est capable de fournir plusieurs solutions. Des calculs effectués ont révélé que l'utilisation des algorithmes génétiques pour des problèmes de dimensionnement de lots semble raisonnable dans le cas de grands problèmes où trouver la solution avec d'autres algorithmes reste encore problématique en temps. Ainsi, Il est possible qu'un algorithme génétique convenablement construit et paramétré puisse trouver de bien meilleurs résultats comparativement à ceux trouvés par d'autres algorithmes tels que le programmation en nombre entier et cela pour un même laps de temps considéré.
 	
 	\section*{Notre contribution}
 	
 	\section*{Organisation du travail}
 
-	Le travail effectué est organisé dans ce document en 3 parties. Le première partie présente une revue de littérature des problèmes de planification de production, en particulier celui nous concernant, le "Pigment Sequencing Problem" (PSP). Nous présentons également dans cette partie les algorithmes génétiques, leur origine, leurs étapes ainsi que leurs fondements. Dans le deuxième chapitre, nous présentons dans un premier temps le modèle ainsi que la formulation utilisée afin de résoudre le problème. Puis dans un second temps, nous explicitons l'approche heuristique utilisée. Dans le chapitre 4, nous expérimentons  notre solution, présentons les résultats obtenus et comparons ces résultats à l'état de l'art en la matière. Pour finir, nous tirons une conclusion du travail effectué et dressons les perspectives possibles en vue d'améliorer ce qui a été fait.
+	Le travail effectué est organisé dans ce document en 3 parties. Le première partie présente une revue de littérature des problèmes de planification de production, en particulier celui nous concernant, le "Pigment Sequencing Problem" (PSP). Nous présentons également dans cette partie les algorithmes génétiques, leur origine, leurs étapes ainsi que leurs fondements. Dans le deuxième partie, nous présentons dans un premier temps, le modèle ainsi que la formulation utilisée afin de résoudre le problème. Puis dans un second temps, nous explicitons l'approche heuristique utilisée. Dans le chapitre 4, nous expérimentons  notre solution, présentons les résultats obtenus et comparons ces résultats à l'état de l'art en la matière. Pour finir, nous tirons une conclusion du travail effectué et dressons les perspectives possibles en vue d'améliorer ce qui a été fait.
 	
 	\newpage
 	
@@ -131,22 +139,88 @@
 		
 	\newpage
 	
-	\part{Modèles, Formulations et Implémentation}
+	\part{Modèle, Formulation et Implémentation}
 	%\newpage
 		\section*{Introduction}
+		\addcontentsline{toc}{section}{Introduction}
+		L'étude des problèmes de dimensionnement de lots au cours de décennies de recherche a permis de développer différents modèles et formulations correspondant à différents problèmes spécifiques. L'étude du "Pigment Sequencing Problem" (PSP) n'échappe à la règle. Dans ce chapitre, nous présentons le modèle mathématique utilisé afin de représenter le problème. Aussi présentons-nous la formulation qui nous a servi à développer notre solution ainsi que la logique qui nous a guidé tout au long de l'implémentation.
+		
+		\section{Description du problème}
+		
+		Le Pigment Sequencing Problem consiste à trouver un plan de production
+de plusieurs articles à partir d’une machine avec des côuts de changeover . Les
+coûts de changeover sont les coûts encourus lors du passage de la production
+de l’article i à celui de l’article j avec $i \neq j$. Le plan de production doit
+satisfaire les demandes des clients tout en :
+	\begin{itemize}
+		\item[•] respectant la capacité de production de la machine;
+		\item[•] minimisant les coûts de stockage et de changeover.
+	\end{itemize}
+	\hspace*{.5cm} On suppose que la période de production est suffisamment courte pour ne
+produire qu’au plus un article par période et que les demandes sont normalisées : la capacité de production de la machine est limitée à un article par
+période et d(i, t) $ \in $ {0, 1} avec i l’article et t la période.\\
+	\hspace*{.5cm} Il s’agit d’un problème de planification de production ayant les caractéristiques suivantes : un horizon de planification discret et fini ; des contraintes de
+capacité ; une demande statique et déterministe ; multi-item et small bucket,
+des coûts de changeover; un seul niveau; sans shortage.\\
+
+	\hspace*{.5cm} \textbf{\textsl{Illustration}} : Soit un problème avec les données ci-dessous : \\
+	\begin{itemize}
+		\item[•] Nombre d’articles : $NI = 2$;
+		\item[•] Nombre d’articles : $NI = 2$;
+		\item[•] Demande par période. Soit d(i, t) la demande de l’article i à la période t : $d(1, t) = (0, 1, 0, 0, 1) et d(2, t) = (1, 0, 0, 0, 1)$;
+		\item[•] Coût de stockage. Soit h(i) le coût de stockage de l’article i : $h(1) = h(2) = 2$;
+	\end{itemize}
+	Soit \emph{xT} le plan de production qui représente une solution potentielle du problème. Il s’agit d’un tableau de dimension \emph{NT} , contenant à son indice t (avec $t  \in  {1...NT}$) l’article i à produire. Une solution admissible du problème est : $ xT = (2, 1, 2, 0, 1)$ avec un coût de $ q(2, 1) + q(1, 2) + q(2, 1) + 2 * h(2) = 15 $. La solution optimale est : $ xT = (2, 1, 0, 1, 2)$ avec un coût de $q(2, 1) + q(1, 2) + h(1) = 10$.
+		
+		\section{Modèle et formulation}
+		
+		\section{Description de l'approche heuristique}
+			\subsection{Représentation génétique}
+
+			\subsection{Opérateurs génétiques}
+				\subsubsection*{Initialisation}
+				\subsubsection*{Séléction}
+				\subsubsection*{Mutation}
+				\subsection*{Terminaison}
+			\subsection*{Fonction objectif}
+
+		
 		\section*{Conclusion}
+		\addcontentsline{toc}{section}{Conclusion}
 		
 	\newpage
 	
 	\part{Expérimentations et Analyse des résultats}
+	\setcounter{section}{0}
 	%\newpage
 		\section*{Introduction}
+		\addcontentsline{toc}{section}{Introduction}
+		L'expérimentation lors d'une étude est une étape importante du travail de recherche. Il s'agit le plus souvent donc de tester les théories émises et d'analyser les résultats obtenus de tests afin de valider notre approche de solution du problème énoncée. Dans cette partie, nous présentons d'abord l'environnement de test, les instances utilisées. Ensuite, nous expérimentons notre solution et à partir des résultats obtenus, nous comparons notre approche heuristique basée sur les algorithmes génétiques à celles déjà appliquées à ce problème.
+		
+		\section{Environnement de test} 
+		\addcontentsline{toc}{section}{Environnement de test}
+		
+		\subsection{Matériel}
+		Pour l'implémentation de nos tests, nous avons travaillé sur un ordinateur présentant les caractéristiques suivantes :\\
+		\begin{itemize}
+			\item[•] Système d'exploitation: Linux Ubuntu 16.04 LTS 64bits; \\
+			\item[•] Processeur: Intel®  Core \up{\textsc{TM}} i7 CPU L 640 @ 2.13GHz x 4; \\
+			\item[•] Mémoire: 3,7 Gio;\\
+			\item[•] Type du système d'exploitation: 64 bits.\\
+		\end{itemize}
+		\subsection{Langage de programmation}
+		Le langage de programmation utilisée afin de d'implémenter notre solution est le langage \emph{Python} dans sa version Python 3.5. \emph{Python} est un puissant langage de programmation interprété qui apparait de plus en plus comme une alternative crédile et intéressante dans le domaine de l'intelligence artificielle, tant il présente des qualités quant à sa robustesse, sa rapidité, sa portabilité, sa facilité de prise en main, sa rigueur et sa caractéristique de langage Open source.  
+		\subsection{Données de test}
 		\section*{Conclusion}
+		\addcontentsline{toc}{section}{Conclusion}
 		
 	\newpage
 		
-	\part*{Conclusion}
-	\addcontentsline{toc}{part}{Conclusion}
+	\part*{Conclusion et Perspectives}
+	\addcontentsline{toc}{part}{Conclusion et Perspectives}
 	
 	\part*{Bibliographie}
+	\addcontentsline{toc}{part}{Bibliographie}
+	\part*{Annexes}
+	\addcontentsline{toc}{part}{Annexes}
 \end{document}
