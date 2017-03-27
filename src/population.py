@@ -145,7 +145,7 @@ class Population:
 				# TODO
 				chromosome = previousPopulation.chromosomes[0]
 				del previousPopulation.chromosomes[0]
-				chromosome.mutate()
+				chromosome.advmutate()
 				previousPopulation.chromosomes.insert(0, chromosome)
 
 			#print ("Fitness 1 : ", listFitness)

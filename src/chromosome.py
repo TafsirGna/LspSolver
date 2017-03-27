@@ -69,15 +69,16 @@ class Chromosome(object):
 
 	def mutate(self):
 
-		#print("M Start : ", chromosome)
+		#print("M Start : ", self._solution)
 
-		if (randint(0,100) < (Chromosome.mutationRate*100)):
+		if (randint(0,100) < (Chromosome.mutationRate*100)): # then the chromsome has been selected for mutation 
 
 			mutated = False
 			# i make sure that the returned chromosome's been actually mutated
-			while mutated is False:
+			while  mutated is False:
 
 				randomIndice = randint(0,(len(self._solution)-1))
+				#print(" randomIndice : ", randomIndice)
 				item1 = self._solution[randomIndice]
 
 				# i make sure that the randomIndice variable never corresponds to a zero indice
@@ -86,35 +87,27 @@ class Chromosome(object):
 					# i get the item corresponding the gene to be flipped
 					item1 = self._solution[randomIndice]
 
-				item1DemandPeriods = Chromosome.problem.deadlineDemandPeriods[item1-1]
-
-				i = 0
-				nbItem1 = 0
-				while i <= randomIndice:
-					if self._solution[i] == item1:
-						nbItem1 += 1
-					i+=1
-
-				deadlineItem1 = item1DemandPeriods[nbItem1-1]
-
 				# i make sure that the second item chosen to replace the first one won't be the same with the item 1.
 				item2 = randint(1, Chromosome.problem.nbItems)
 				while item2 == item1:
 					item2 = randint(1, Chromosome.problem.nbItems)
 
-				item2ManufactPeriods = getManufactPeriods(self._solution, item2)
-
 				item2DemandPeriods = Chromosome.problem.deadlineDemandPeriods[item2-1]
 
-				#print(" item1 : ", item1, " item2 : ", item2, " randomIndice : ", randomIndice)
-				#print(item2DemandPeriods)
-				i = 0
-				while i < len(item2DemandPeriods):
-					if item2DemandPeriods[i] >= randomIndice and deadlineItem1 > item2ManufactPeriods[i]:
-						self._solution = switchGenes(self._solution, randomIndice, item2ManufactPeriods[i])
-						mutated = True
-						break
-					i += 1
+				i = randomIndice
+				itemsRank = self.itemsRank
+				while i >= 0:
+					if self._solution[i] == item2:
+
+						if item2DemandPeriods[itemsRank[i]-1] >= randomIndice:
+							print(i, randomIndice)
+							self._solution = switchGenes(self._solution, randomIndice, i)
+							self._itemsRank = switchGenes(itemsRank, randomIndice, i)
+							mutated = True
+							break
+					i-=1
+
+		#print("F Start : ", self._solution)
 
 
 	def _get_valueFitness(self):
@@ -216,12 +209,50 @@ class Chromosome(object):
 	itemsRank = property(_getItemsRanks, _setItemsRanks)
 
 
-	def advMutate(self):
+	def advmutate(self):
 
-		
+		solution = list(self._solution)
+		itemsRank = self.itemsRank
 
-		pass
-		
+		i = 0
+		while i < len(solution):
+
+			if solution[i] != 0:
+
+				item1 = solution[i]
+
+				item2 = 1
+
+				while item2 <= Chromosome.problem.nbItems :
+					
+					if item2 != item1:
+
+						item2DemandPeriods = Chromosome.problem.deadlineDemandPeriods[item2-1]
+
+						#print(" i : ", i," item2 : ", item2, " item2DemandPeriods : ", item2DemandPeriods)
+						j = i
+						while j >= 0:
+							if solution[j] == item2:
+								#print(" item's rank value : ", itemsRank[j], " j : ", j)
+								if item2DemandPeriods[itemsRank[j]-1] >= i:
+									solution = switchGenes(solution, j, i)
+									itemsRank = switchGenes(itemsRank, j, i)
+									break
+							j-=1
+
+						# i check if the resulting chromosome would have a better fitness than the current's fitness
+						c = Chromosome(solution)
+						#print(c.solution,c.valueFitness, self.valueFitness)
+						if c.valueFitness < self.valueFitness:
+							self._solution = c.solution
+							self._itemsRank = c.itemsRank
+
+						solution = list(self._solution)
+						itemsRank = self.itemsRank
+
+					item2 += 1
+
+			i+=1
 
 	
 	def getFeasible(self):

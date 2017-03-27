@@ -20,7 +20,7 @@ class GeneticAlgorithm:
 	nbInitIterations = 25
 	MAX_FITNESS = 0
 	FITNESS_PADDING = 1
-	nbLackDiversity = 0
+	#nbLackDiversity = 0
 	#SUM_FITNESS = 0
 
 	# Builder
@@ -59,17 +59,14 @@ class GeneticAlgorithm:
 		Chromosome.ItemsCounters = self.ItemsCounters
 
 		# i create a new population from scratch
-		#self.population = Population()
+		self.population = Population()
 		#print(self.population)
 
 		'''
-		c = Chromosome([0, 0, 2, 2, 1, 1, 3, 0])
-		c = Chromosome([0, 0, 2, 0, 1, 1, 3, 0])
-		c.getFeasible()
-		print(" c : ", c)
+		c = Chromosome([2, 2, 2, 1, 0, 1, 3, 0])
+		c.advmutate()
+		print(" c : ", c, c.valueFitness)
 		'''
-		
-		# [0, 0, 2, 0, 1, 1, 3, 0]
 	
 	#--------------------
 	# function : process
