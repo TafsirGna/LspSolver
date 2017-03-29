@@ -1,6 +1,12 @@
 #!/usr/bin/python
 # -*-coding: utf-8 -*
 
+
+# TODO 
+# - when the genetic algorithm reaches a point where there's no diversity in the population, then it memorizes this local
+#   optimum and restart the search
+# - give some updates to the implementation of the insertion of the new population into the the former one
+
 #--- importation of the modules
 
 from clsp_ga import *
@@ -27,18 +33,15 @@ print("-------	Step 1 : Initialization of the population	-------")
 
 # I create an instance of the genetic algorithm to be used
 genAlgo = GeneticAlgorithm(instance)
-c1 = [2, 1, 0, 1, 2]
-c2 = [2, 1, 2, 0, 1]
 
 #c = [3, 2, 1, 3, 0, 1, 2, 1]
-c = [1, 1, 2, 2, 2, 0, 3, 0]
+#c = [1, 1, 2, 2, 2, 0, 3, 0]
 
 print("-------	Step 2 : Processing the genetic algorithm	--------")
 
 genAlgo.initPopulation()
+
 genAlgo.process()
-#print(genAlgo.population.getCostof(1,1,1,c2))
-#genAlgo.population.applyCrossOverto(Chromosome(c1) ,Chromosome(c2))
 
 endTime = time.clock()
 

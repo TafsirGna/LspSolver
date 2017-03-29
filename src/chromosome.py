@@ -7,8 +7,8 @@ class Chromosome(object):
 
 	mutationRate = 0
 	problem = 0
-	ManufactItemsPeriods = []
 	ItemsCounters = []
+	hashTable = {}
 
 	# Builder 
 	def __init__(self, solution=[], itemsRank = []):
@@ -16,6 +16,8 @@ class Chromosome(object):
 		self._solution = []
 		self._valueFitness = 0
 		self._itemsRank = []
+		self.itemsRankFlag = False
+		self.manufactItemsPeriods = getManufactPeriodsGrid(Chromosome.problem.nbItems, Chromosome.problem.deadlineDemandPeriods) #Chromosome.problem.manufactItemsPeriods 
 
 		if solution != []:
 			self._solution = list(solution)
@@ -100,7 +102,7 @@ class Chromosome(object):
 					if self._solution[i] == item2:
 
 						if item2DemandPeriods[itemsRank[i]-1] >= randomIndice:
-							print(i, randomIndice)
+							#print(i, randomIndice)
 							self._solution = switchGenes(self._solution, randomIndice, i)
 							self._itemsRank = switchGenes(itemsRank, randomIndice, i)
 							mutated = True
@@ -176,6 +178,8 @@ class Chromosome(object):
 
 	def _getItemsRanks(self):
 
+		#if self.itemsRankFlag is False:
+
 		self._itemsRank = []
 		gridCounters = list(Chromosome.ItemsCounters)
 		#print("grid : ", gridCounters)
@@ -197,6 +201,8 @@ class Chromosome(object):
 				self._itemsRank.append(0)
 
 			i+=1
+
+			#self.itemsRankFlag = True
 
 		return self._itemsRank
 
@@ -261,8 +267,6 @@ class Chromosome(object):
 
 		if self.isFeasible() is False:
 
-			grid = getManufactPeriodsGrid(Chromosome.problem.nbItems, Chromosome.problem.deadlineDemandPeriods)
-
 			#print(" grid : ", grid)
 
 			# i make sure that the number of goods producted isn't superior to the number expected
@@ -275,10 +279,10 @@ class Chromosome(object):
 					#print(" ok : ", self._solution, self._itemsRank)
 					rank = self._itemsRank[i]
 					#print(i, item-1, rank-1, grid)
-					value = grid[item-1][rank-1]
+					value = self.manufactItemsPeriods[item-1][rank-1]
 
 					if value == -1:
-						itemDemandPeriods = grid[item-1]
+						itemDemandPeriods = self.manufactItemsPeriods[item-1]
 						del itemDemandPeriods[rank-1]
 						itemDemandPeriods.insert(rank-1, i)
 
@@ -293,7 +297,7 @@ class Chromosome(object):
 
 						#print(" cost 1 : ", cost1, " cost2 : ", cost2)
 						if cost2 < cost1 :
-							itemDemandPeriods = grid[item-1]
+							itemDemandPeriods = self.manufactItemsPeriods[item-1]
 							del itemDemandPeriods[rank-1]
 							itemDemandPeriods.insert(rank-1, i)
 
@@ -313,13 +317,13 @@ class Chromosome(object):
 			while i < Chromosome.problem.nbItems:
 
 				j = 0
-				while j < len(grid[i]):
+				while j < len(self.manufactItemsPeriods[i]):
 
-					if grid[i][j] == -1:
+					if self.manufactItemsPeriods[i][j] == -1:
 						if j == 0:
 							lbound = 0
 						else:
-							lbound = grid[i][j-1]
+							lbound = self.manufactItemsPeriods[i][j-1]
 						
 						zeroperiods = []
 						k = lbound
@@ -347,7 +351,7 @@ class Chromosome(object):
 							del self._solution[indice]
 							self._solution.insert(indice, i+1)
 
-							itemDemandPeriods = grid[i]
+							itemDemandPeriods = self.manufactItemsPeriods[i]
 							del itemDemandPeriods[j]
 							itemDemandPeriods.insert(j, indice)
 
@@ -382,18 +386,21 @@ class Chromosome(object):
 								del self._solution[indice]
 								self._solution.insert(indice, i+1)
 
-								itemDemandPeriods = grid[i]
+								itemDemandPeriods = self.manufactItemsPeriods[i]
 								del itemDemandPeriods[j]
 								itemDemandPeriods.insert(j, indice)
 
 					j+=1
 				i+=1
 
-		#print(" solution 1 : ", self._solution)
-		self._get_valueFitness()
-		#print(" solution 2 : ", self._solution)
+		hashSol = self.hashSolution()
+		if hashSol not in Chromosome.hashTable:
+			self._get_valueFitness()
+			Chromosome.hashTable[hashSol] = self._valueFitness
+		else:
+			self.valueFitness = Chromosome.hashTable[hashSol]
+
 		#self._itemsRank = self.getItemsRanks()
-		#print(" eh oh : ", self._solution, self._valueFitness)
 	
 	def getCostof(self, indice, item, rank,solution, secondIndice=0):
 
@@ -422,3 +429,13 @@ class Chromosome(object):
 						break
 					j+=1
 		return cost
+
+	def hashSolution(self):
+
+		hashSol = ""
+		i = 0
+		while i < len(self._solution):
+			hashSol += str(self._solution[i])
+			i+=1
+		
+		return hashSol

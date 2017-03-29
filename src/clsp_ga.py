@@ -12,29 +12,27 @@ from population import *
 class GeneticAlgorithm:
 
 	#	Class' variables
-	NbMaxPopulation = 10
+	NbMaxPopulation = 100
 	NbPopulation = 0
-	mutationRate = 0.15
+	mutationRate = 0.10
 	crossOverRate = 0.70
-	nbIterations = 50
-	nbInitIterations = 25
+	nbIterations = 20
+	nbInitIterations = 50
 	MAX_FITNESS = 0
 	FITNESS_PADDING = 1
-	#nbLackDiversity = 0
-	#SUM_FITNESS = 0
 
 	# Builder
 	def __init__(self,inst):
+
 		self.instance = inst
 		self.population = [] 
+		self.ga_memory = []
+		self.hashTable = {}
 
 		# i initialize a list of counters
 		self.ItemsCounters = getListCounters(self.instance.nbItems)
 
-		#
 		self.ManufactItemsPeriods = getManufactPeriodsGrid(self.instance.nbItems, self.instance.deadlineDemandPeriods)
-		
-		#print(self.ManufactItemsPeriods)
 
 	#--------------------
 	# function : initPopulation
@@ -50,23 +48,17 @@ class GeneticAlgorithm:
 
 		# i set some class' properties of Population class
 		Population.nbInitIterations = GeneticAlgorithm.nbInitIterations
-		Population.nbIterations = GeneticAlgorithm.nbIterations
 		Population.NbMaxPopulation = GeneticAlgorithm.NbMaxPopulation
 		Population.FITNESS_PADDING = GeneticAlgorithm.FITNESS_PADDING
 		Population.crossOverRate = GeneticAlgorithm.crossOverRate
 
 		Chromosome.ManufactItemsPeriods = self.ManufactItemsPeriods
 		Chromosome.ItemsCounters = self.ItemsCounters
+		Chromosome.hashTable = self.hashTable
 
 		# i create a new population from scratch
 		self.population = Population()
 		#print(self.population)
-
-		'''
-		c = Chromosome([2, 2, 2, 1, 0, 1, 3, 0])
-		c.advmutate()
-		print(" c : ", c, c.valueFitness)
-		'''
 	
 	#--------------------
 	# function : process
@@ -78,9 +70,14 @@ class GeneticAlgorithm:
 		it = 0
 		while it < GeneticAlgorithm.nbIterations:
 
-			self.population = Population(self.population)
-			
+			if len(self.ga_memory) == 2:
+				break
+
+			self.population = Population(self.population, self.ga_memory)
+
 			it +=1
+
+		#print(" the search stopped at the {} iteration ".format(it))
 
 	#--------------------
 	# function : printResults
@@ -93,3 +90,4 @@ class GeneticAlgorithm:
 		print("The best solution found so far is : ", bestChromosome.solution)
 		print(self.population)
 		print("The fitness of this solution is : ", bestChromosome.valueFitness)
+		#print(" Memory : ", self.hashTable)

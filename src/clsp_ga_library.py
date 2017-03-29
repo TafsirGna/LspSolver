@@ -4,6 +4,7 @@
 import math
 from itertools import *
 from random import *
+import copy
 
 #--------------------
 # file : clsp_ga_library
@@ -12,6 +13,33 @@ from random import *
 #--------------------
 
 #---	First part:  The functions
+
+def getBestChroms(chromosomes):
+	
+	chromosome1 = chromosomes[0]
+
+	i = 1
+	it = 0
+	while i < len(chromosomes):
+		c = chromosomes[i]
+		if c.valueFitness < chromosome1.valueFitness:
+			chromosome1 = c
+			it = i
+		i+=1
+
+	del chromosomes[it]
+
+	chromosome2 = chromosomes[0]
+
+	i = 1
+	while i < len(chromosomes):
+		c = chromosomes[i]
+		if c.valueFitness < chromosome2.valueFitness:
+			chromosome2 = c
+		i+=1
+
+	return chromosome1, chromosome2
+
 
 def getManufactPeriodsGrid(nbItems, deadlineDemandPeriods):
 
@@ -250,8 +278,9 @@ class Instance:
 		while i < nbItems:
 			self.deadlineDemandPeriods.append(getDemandPeriods(demandsGrid[i]))
 			i+=1
-		#print(" deadlines : ", str(self.deadlineDemandPeriods))
 
+		# Additionnal variables
+		#self.manufactItemsPeriods = getManufactPeriodsGrid(nbItems, self.deadlineDemandPeriods)
 
 	#	implementation of the function called when an object is printed to the screen
 	def __repr__(self):

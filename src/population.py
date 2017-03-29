@@ -7,13 +7,12 @@ from chromosome import *
 class Population:
 
 	nbInitIterations = 0
-	nbIterations = 0
 	NbMaxPopulation = 0
 	FITNESS_PADDING = 0
 	crossOverRate = 0
 
 	# builder 
-	def __init__(self, previousPopulation = []):
+	def __init__(self, previousPopulation = [], ga_memory = []):
 		
 		self.chromosomes = []
 		self.bestChromosome = 0
@@ -90,9 +89,11 @@ class Population:
 
 					j+=1
 					c = Chromosome(solution)
-					if qual_sol is True and c not in self.chromosomes:
+					if qual_sol is True:
 						c.getFeasible()
-						self.chromosomes.append(c)
+						#c.advmutate() # i want to get the best chromosome out of this one by apply a slight mutation to this
+						if c not in self.chromosomes:
+							self.chromosomes.append(c)
 
 						# i store the value of the highest value of the objective function
 						value = c.valueFitness
@@ -118,13 +119,13 @@ class Population:
 		else:
 
 			# i select the two chromosomes that'll be mated to produce offsprings
-			print("Population : ", previousPopulation)
-			print(" ")
+			#print("Population : ", previousPopulation)
+			#print(" ")
 
 			self.NbPopulation = previousPopulation.NbPopulation
 
 			sumFitness = 0
-			tempSumFitness = 0 # variable used to quantify the lack of diversity in the population
+			tempSumFitness = 0 #variable used to quantify the lack of diversity in the population
 			listFitness = []
 			i = 0
 			while i < len(previousPopulation.chromosomes):
@@ -142,11 +143,16 @@ class Population:
 
 			# In the case where there's a lack of diversity, i introduce a bit of diversity by flipping a gene of one chromosome in the population
 			if tempSumFitness == 0:
-				# TODO
+
 				chromosome = previousPopulation.chromosomes[0]
+
+				# i store this local optima in the genetic algorithm's memory to remind it that it's already visit the solution
+				if chromosome not in ga_memory:
+					ga_memory.append(chromosome)
+
 				del previousPopulation.chromosomes[0]
 				chromosome.advmutate()
-				previousPopulation.chromosomes.insert(0, chromosome)
+				previousPopulation.chromosomes.insert(0, chromosome)  
 
 			#print ("Fitness 1 : ", listFitness)
 			#print(" ")
@@ -189,15 +195,26 @@ class Population:
 
 				chromosome3,chromosome4 = self.applyCrossOverto(chromosome1,chromosome2)
 
+				# In the following lines, i intend to select the best two chromosomes out of both the parents and the generated offsprings
+				tempList = []
+				tempList.append(chromosome1)  
+				tempList.append(chromosome2)
+				tempList.append(chromosome3)
+				tempList.append(chromosome4)
+
+				chromosome3, chromosome4 = getBestChroms(tempList)
+
 				#if self.isFeasible(chromosome3) is False or self.isFeasible(chromosome4) is False:
 				#	print("c3 : ", c3, " c4 : ", c4)
 
+				#if chromosome3 not in ga_memory:
 				chromosomes.append(chromosome3)
 				i += 1
 
 				if (i == self.NbPopulation):
 					break
 
+				#if chromosome4 not in ga_memory:
 				chromosomes.append(chromosome4)
 				i += 1
 
@@ -290,9 +307,11 @@ class Population:
 
 			chromosome3 = Chromosome(solution3, ranks3)
 			chromosome3.getFeasible()
+			#chromosome3.advmutate()
 
 			chromosome4 = Chromosome(solution4, ranks4)
 			chromosome4.getFeasible()
+			#chromosome4.advmutate()
 
 			#print(" 2 - solution3 : ", chromosome3.solution, " ranks3 : ", ranks3, " solution4 : ", chromosome4.solution, " ranks4 : ", ranks4)
 
