@@ -34,9 +34,6 @@ print("-------	Step 1 : Initialization of the population	-------")
 # I create an instance of the genetic algorithm to be used
 genAlgo = GeneticAlgorithm(instance)
 
-#c = [3, 2, 1, 3, 0, 1, 2, 1]
-#c = [1, 1, 2, 2, 2, 0, 3, 0]
-
 print("-------	Step 2 : Processing the genetic algorithm	--------")
 
 genAlgo.initPopulation()

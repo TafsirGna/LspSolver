@@ -13,12 +13,9 @@ class GeneticAlgorithm:
 
 	#	Class' variables
 	NbMaxPopulation = 100
-	NbPopulation = 0
 	mutationRate = 0.10
 	crossOverRate = 0.70
-	nbIterations = 20
 	nbInitIterations = 50
-	MAX_FITNESS = 0
 	FITNESS_PADDING = 1
 
 	# Builder
@@ -27,12 +24,13 @@ class GeneticAlgorithm:
 		self.instance = inst
 		self.population = [] 
 		self.ga_memory = []
-		self.hashTable = {}
+		self.hashTable = {} # hashTable is a dictionnary
 
 		# i initialize a list of counters
 		self.ItemsCounters = getListCounters(self.instance.nbItems)
 
-		self.ManufactItemsPeriods = getManufactPeriodsGrid(self.instance.nbItems, self.instance.deadlineDemandPeriods)
+		#self.ManufactItemsPeriods = getManufactPeriodsGrid(self.instance.nbItems, self.instance.deadlineDemandPeriods)
+		self.stopFlag = [False] # flag that indicates if it's time to stop searching.
 
 	#--------------------
 	# function : initPopulation
@@ -45,19 +43,22 @@ class GeneticAlgorithm:
 		# i set some class' properties of Chromosome class
 		Chromosome.mutationRate = GeneticAlgorithm.mutationRate
 		Chromosome.problem = self.instance
+		#Chromosome.ManufactItemsPeriods = self.ManufactItemsPeriods
+		Chromosome.ItemsCounters = self.ItemsCounters
+		Chromosome.hashTable = self.hashTable
 
 		# i set some class' properties of Population class
 		Population.nbInitIterations = GeneticAlgorithm.nbInitIterations
 		Population.NbMaxPopulation = GeneticAlgorithm.NbMaxPopulation
 		Population.FITNESS_PADDING = GeneticAlgorithm.FITNESS_PADDING
 		Population.crossOverRate = GeneticAlgorithm.crossOverRate
-
-		Chromosome.ManufactItemsPeriods = self.ManufactItemsPeriods
-		Chromosome.ItemsCounters = self.ItemsCounters
-		Chromosome.hashTable = self.hashTable
+		Population.ga_memory = self.ga_memory
+		Population.stopFlag = self.stopFlag
 
 		# i create a new population from scratch
 		self.population = Population()
+		Population.startingPopulation = self.population
+		#print(" Fitness Data : ", self.population.listFitnessData)
 		#print(self.population)
 	
 	#--------------------
@@ -67,17 +68,9 @@ class GeneticAlgorithm:
 	#--------------------
 	def process(self):
 
-		it = 0
-		while it < GeneticAlgorithm.nbIterations:
+		while len(self.ga_memory) < 7 and self.stopFlag[0] is False:
 
-			if len(self.ga_memory) == 2:
-				break
-
-			self.population = Population(self.population, self.ga_memory)
-
-			it +=1
-
-		#print(" the search stopped at the {} iteration ".format(it))
+			self.population = Population(self.population)
 
 	#--------------------
 	# function : printResults
@@ -86,8 +79,17 @@ class GeneticAlgorithm:
 	#--------------------
 	def printResults(self):
 
-		bestChromosome = self.population.bestChromosome
-		print("The best solution found so far is : ", bestChromosome.solution)
-		print(self.population)
-		print("The fitness of this solution is : ", bestChromosome.valueFitness)
-		#print(" Memory : ", self.hashTable)
+		#print(self.ga_memory)
+		self.bestSolution = self.ga_memory[0] # varaible that holds the best solution found so far in the search
+
+		for chromosome in self.ga_memory:
+			if chromosome.valueFitness < self.bestSolution.valueFitness:
+				self.bestSolution = chromosome
+
+		print("The best solution found so far is : ", self.bestSolution.valueFitness)
+		#print(self.population)
+		print("The fitness of this solution is : ", self.bestSolution.valueFitness)
+
+		#print(" Memory : ", self.ga_memory)
+		#print(self.population)
+	

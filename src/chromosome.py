@@ -48,7 +48,8 @@ class Chromosome(object):
 				return False
 			else:
 				j = 0
-				while j < len(itemManufactPeriods):
+				nbitemManufactPeriods = len(itemManufactPeriods)
+				while j < nbitemManufactPeriods:
 
 					if (itemManufactPeriods[j] > itemDemandPeriods[j]):
 						return False
@@ -79,13 +80,13 @@ class Chromosome(object):
 			# i make sure that the returned chromosome's been actually mutated
 			while  mutated is False:
 
-				randomIndice = randint(0,(len(self._solution)-1))
+				randomIndice = randint(0,(Chromosome.problem.nbTimes-1))
 				#print(" randomIndice : ", randomIndice)
 				item1 = self._solution[randomIndice]
 
 				# i make sure that the randomIndice variable never corresponds to a zero indice
 				while item1 == 0:
-					randomIndice = randint(0,(len(self._solution)-1))
+					randomIndice = randint(0,(Chromosome.problem.nbTimes-1))
 					# i get the item corresponding the gene to be flipped
 					item1 = self._solution[randomIndice]
 
@@ -125,7 +126,7 @@ class Chromosome(object):
 			
 			i = 1
 			tmp = self._solution[0]
-			while i < len(self._solution) :
+			while i < Chromosome.problem.nbTimes :
 
 				n = self._solution[i]
 
@@ -142,7 +143,7 @@ class Chromosome(object):
 						tmp = self._solution[i-1]
 
 						j=i
-						while j < len(self._solution) and self._solution[j] == 0:
+						while j < Chromosome.problem.nbTimes and self._solution[j] == 0:
 							j+=1
 						i=j-1
 					
@@ -158,7 +159,8 @@ class Chromosome(object):
 				itemManufactPeriods = getManufactPeriods(self._solution, i+1)
 
 				j = 0
-				while j < len(itemDemandPeriods):
+				nbitemDemandPeriods = len(itemDemandPeriods)
+				while j < nbitemDemandPeriods:
 					self._valueFitness += int(Chromosome.problem.holdingGrid[i])*(itemDemandPeriods[j]-itemManufactPeriods[j])
 					j+=1
 
@@ -185,7 +187,7 @@ class Chromosome(object):
 		#print("grid : ", gridCounters)
 
 		i = 0 
-		while i < len(self._solution):
+		while i < Chromosome.problem.nbTimes:
 
 			if self._solution[i] != 0:
 
@@ -221,7 +223,7 @@ class Chromosome(object):
 		itemsRank = self.itemsRank
 
 		i = 0
-		while i < len(solution):
+		while i < Chromosome.problem.nbTimes:
 
 			if solution[i] != 0:
 
@@ -271,7 +273,7 @@ class Chromosome(object):
 
 			# i make sure that the number of goods producted isn't superior to the number expected
 			i = 0
-			while i < len(self._solution):
+			while i < Chromosome.problem.nbTimes:
 
 				if self._solution[i] != 0:
 
@@ -317,7 +319,8 @@ class Chromosome(object):
 			while i < Chromosome.problem.nbItems:
 
 				j = 0
-				while j < len(self.manufactItemsPeriods[i]):
+				nbmanufactItemsPeriods = len(self.manufactItemsPeriods[i])
+				while j < nbmanufactItemsPeriods:
 
 					if self.manufactItemsPeriods[i][j] == -1:
 						if j == 0:
@@ -333,14 +336,15 @@ class Chromosome(object):
 							k+=1
 
 						#print("zeroperiods : ", zeroperiods)
-						if len(zeroperiods) > 0:
+						nbZeroPeriods = len(zeroperiods)
+						if nbZeroPeriods > 0:
 
 							cost1 = self.getCostof(zeroperiods[0], i+1, j+1, self._solution)
 							#print(" cost1 : ", cost1 )
 
 							k = 1 
 							indice = zeroperiods[0]
-							while k < len(zeroperiods):
+							while k < nbZeroPeriods:
 								cost2 = self.getCostof(zeroperiods[k], i+1, j+1, self._solution)
 								#print(" cost2 : ", cost2 , zeroperiods[k])
 								if cost2 < cost1:
@@ -368,14 +372,15 @@ class Chromosome(object):
 									zeroperiods.append(k)
 								k+=1
 
-							if len(zeroperiods) > 0:
+							nbZeroPeriods = len(zeroperiods)
+							if nbZeroPeriods > 0:
 
 								cost1 = self.getCostof(zeroperiods[0], i+1, j+1, self._solution)
 								#print(" cost1 : ", cost1 )
 
 								k = 1 
 								indice = zeroperiods[0]
-								while k < len(zeroperiods):
+								while k < nbZeroPeriods:
 									cost2 = self.getCostof(zeroperiods[k], i+1, j+1, self._solution)
 									#print(" cost2 : ", cost2 , zeroperiods[k])
 									if cost2 < cost1:
@@ -418,12 +423,12 @@ class Chromosome(object):
 		#print(" stock : ", cost)
 
 		# change-over cost 
-		if indice < len(solution)-1:
+		if indice < Chromosome.problem.nbTimes-1:
 			if solution[indice+1] != 0:
 				cost += int(Chromosome.problem.chanOverGrid[item-1][solution[indice+1]-1])
 			else:
 				j = indice+1
-				while j < len(solution):
+				while j < Chromosome.problem.nbTimes:
 					if solution[j] != 0:
 						cost += int(Chromosome.problem.chanOverGrid[item-1][solution[j]-1])
 						break
@@ -434,7 +439,7 @@ class Chromosome(object):
 
 		hashSol = ""
 		i = 0
-		while i < len(self._solution):
+		while i < Chromosome.problem.nbTimes:
 			hashSol += str(self._solution[i])
 			i+=1
 		

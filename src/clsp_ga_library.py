@@ -20,7 +20,7 @@ def getBestChroms(chromosomes):
 
 	i = 1
 	it = 0
-	while i < len(chromosomes):
+	while i < 4:
 		c = chromosomes[i]
 		if c.valueFitness < chromosome1.valueFitness:
 			chromosome1 = c
@@ -32,7 +32,7 @@ def getBestChroms(chromosomes):
 	chromosome2 = chromosomes[0]
 
 	i = 1
-	while i < len(chromosomes):
+	while i < 3:
 		c = chromosomes[i]
 		if c.valueFitness < chromosome2.valueFitness:
 			chromosome2 = c
@@ -92,7 +92,8 @@ def getManufactPeriods(chromosome,item):
 	itemManufactPeriods = []
 
 	j = 0
-	while j < len(chromosome):
+	size_chromosome = len(chromosome)
+	while j < size_chromosome:
 
 		if (chromosome[j] == item):
 			itemManufactPeriods.append(j)
@@ -111,7 +112,8 @@ def getDemandPeriods(demand):
 
 	i=0
 	result = []
-	while i<len(demand):
+	size_demand = len(demand)
+	while i< size_demand:
 		if int(demand[i]) == 1:
 			result.append(i)
 		i+=1 

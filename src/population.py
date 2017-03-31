@@ -10,20 +10,25 @@ class Population:
 	NbMaxPopulation = 0
 	FITNESS_PADDING = 0
 	crossOverRate = 0
+	ga_memory = []
+	startingPopulation = []
+	stopFlag = []
 
 	# builder 
-	def __init__(self, previousPopulation = [], ga_memory = []):
+	def __init__(self, previousPopulation = []):
 		
 		self.chromosomes = []
-		self.bestChromosome = 0
 		self.max_fitness = 0
 		self.NbPopulation = 0
-		self.min_fitness = math.pow(10,6)
+		self.listFitnessData = []
+		self.sumAllFitnessValues = 0
+		self.lacksDiversity = False
 
 		# i explicit the case where there's no previous population before this one
 		if previousPopulation == [] :
 
 			listItems = []
+			self.NbPopulation = 0
 
 			# i fill the listItem object with the number of the different items
 			i = 0
@@ -38,7 +43,8 @@ class Population:
 			while i < Population.nbInitIterations:
 
 				j = 0
-				while j < len(list_permutations):
+				nb_permutations = len(list_permutations)
+				while j < nb_permutations:
 
 					permutationJ = list_permutations[j] 
 					#print(" - ", i, " permutation : ", permutationJ)
@@ -53,13 +59,14 @@ class Population:
 					qual_sol = True # boolean variable that determines if the chromosome being formed is good or not
 
 					k = 0
-					while k < len(permutationJ):
+					while k < Chromosome.problem.nbItems:
 
 						itemK = permutationJ[k]
 						itemKDemandPeriods = Chromosome.problem.deadlineDemandPeriods[itemK-1]
 
 						l = 0
-						while l < len(itemKDemandPeriods):
+						size_itemKDemandPeriods = len(itemKDemandPeriods)
+						while l < size_itemKDemandPeriods:
 
 							periodL = itemKDemandPeriods[l]
 
@@ -72,11 +79,12 @@ class Population:
 
 								m+=1
 
-							if len(zeroperiods) == 0:
+							nbZeroPeriods = len(zeroperiods)
+							if nbZeroPeriods == 0:
 								qual_sol = False
 								break
 							else:
-								random_indice = randint(0, len(zeroperiods)-1)
+								random_indice = randint(0, nbZeroPeriods-1)
 								del solution[zeroperiods[random_indice]]
 								solution.insert(zeroperiods[random_indice],itemK)
 
@@ -88,89 +96,82 @@ class Population:
 							break
 
 					j+=1
+
 					c = Chromosome(solution)
 					if qual_sol is True:
+
 						c.getFeasible()
-						#c.advmutate() # i want to get the best chromosome out of this one by apply a slight mutation to this
+						c.advmutate() # i want to get the best chromosome out of this one by applying a slight mutation to this
+
 						if c not in self.chromosomes:
 							self.chromosomes.append(c)
+							self.NbPopulation += 1
 
 						# i store the value of the highest value of the objective function
 						value = c.valueFitness
 						if value > self.max_fitness:
 							self.max_fitness = value
 
-						# i store the best chromosome from this population
-						if value < self.min_fitness:
-							self.bestChromosome = c
-							self.min_fitness = value
-
 						# i check that the size of the population don't exceed the maximum number of population retained
-						if len(self.chromosomes)>=Population.NbMaxPopulation:
-							self.NbPopulation = len(self.chromosomes)
+						if self.NbPopulation >=Population.NbMaxPopulation:
+
+							self.getFitnessData()	
+
 							return
 
 				i+=1
-
-			self.NbPopulation = len(self.chromosomes)
 
 			#print(len(self.chromosomes))
 
 		else:
 
 			# i select the two chromosomes that'll be mated to produce offsprings
-			#print("Population : ", previousPopulation)
-			#print(" ")
-
-			self.NbPopulation = previousPopulation.NbPopulation
-
-			sumFitness = 0
-			tempSumFitness = 0 #variable used to quantify the lack of diversity in the population
-			listFitness = []
-			i = 0
-			while i < len(previousPopulation.chromosomes):
-				#print(" i : ", i)
-				chromosome = previousPopulation.chromosomes[i]
-				temp = chromosome.valueFitness
-
-				value = (previousPopulation.max_fitness-temp)
-				tempSumFitness += value
-
-				value += Population.FITNESS_PADDING
-				listFitness.append(value)
-				sumFitness += value
-				i += 1
+			print("Population : ", previousPopulation)
+			print(" ")
 
 			# In the case where there's a lack of diversity, i introduce a bit of diversity by flipping a gene of one chromosome in the population
-			if tempSumFitness == 0:
+			
+			if previousPopulation.NbPopulation == 0:
+				del Population.stopFlag[0]
+				Population.stopFlag.insert(0, True)
+				return
+
+			if previousPopulation.lacksDiversity:
 
 				chromosome = previousPopulation.chromosomes[0]
-
+				
 				# i store this local optima in the genetic algorithm's memory to remind it that it's already visit the solution
-				if chromosome not in ga_memory:
-					ga_memory.append(chromosome)
+				if chromosome not in Population.ga_memory:
+					Population.ga_memory.append(chromosome)
 
-				del previousPopulation.chromosomes[0]
 				chromosome.advmutate()
-				previousPopulation.chromosomes.insert(0, chromosome)  
 
-			#print ("Fitness 1 : ", listFitness)
-			#print(" ")
+				if chromosome != previousPopulation.chromosomes[0]:
 
-			i = 0
-			percentage = 0
-			while i < len(previousPopulation.chromosomes):
-				temp = listFitness[i]
-				del listFitness[i]
-				percentage += (float(temp)/float(sumFitness))*100
-				#print (" FOO : temp : ", temp, " sumFitness : ", sumFitness, " percentage : ", percentage)
-				listFitness.insert(i, percentage)
-				i += 1
+					del previousPopulation.chromosomes[0]
+					previousPopulation.chromosomes.insert(0, chromosome)
 
-			#print ("Fitness 2 : ", listFitness, " MAX_FITNESS : ", GeneticAlgorithm.MAX_FITNESS)
-			#print(" ")
+				else:  
 
-			#print(listFitness)
+					print(" from start to now!")
+					#print(" prevpop 1-b : ", previousPopulation)
+					i = 0
+					while i < Population.startingPopulation.NbPopulation:
+
+						if chromosome == Population.startingPopulation.chromosomes[i]:
+							del Population.startingPopulation.chromosomes[i]
+
+							# i decrease the number of the chromosomes of the population
+							Population.startingPopulation.NbPopulation -= 1
+
+							break
+						i+=1
+
+					Population.startingPopulation.getFitnessData()
+					previousPopulation = Population.startingPopulation
+					print(" prevpop 2 : ", previousPopulation, " nb : ", previousPopulation.NbPopulation)
+				
+			self.NbPopulation = previousPopulation.NbPopulation
 
 			# i perform the roulette-wheel method to select the parents
 			chromosomes = []
@@ -183,12 +184,12 @@ class Population:
 				#print(" rand 1 : ", rand_prob1, " rand_prob2 : ", rand_prob2)
 				j = 0
 				lbound = 0
-				while j < len(listFitness):
-					if (rand_prob1 >= lbound and rand_prob1 <= listFitness[j]):
+				while j < previousPopulation.NbPopulation:
+					if (rand_prob1 >= lbound and rand_prob1 <= previousPopulation.listFitnessData[j]):
 						chromosome1 = previousPopulation.chromosomes[j]
-					if (rand_prob2 >= lbound and rand_prob2 <= listFitness[j]):
+					if (rand_prob2 >= lbound and rand_prob2 <= previousPopulation.listFitnessData[j]):
 						chromosome2 = previousPopulation.chromosomes[j]
-					lbound = listFitness[j]
+					lbound = previousPopulation.listFitnessData[j]
 					j += 1
 
 				#print("CrossOver : ", random_chrom1, " and : " , random_chrom2)
@@ -207,16 +208,16 @@ class Population:
 				#if self.isFeasible(chromosome3) is False or self.isFeasible(chromosome4) is False:
 				#	print("c3 : ", c3, " c4 : ", c4)
 
-				#if chromosome3 not in ga_memory:
-				chromosomes.append(chromosome3)
-				i += 1
+				if chromosome3 not in Population.ga_memory:
+					chromosomes.append(chromosome3)
+					i += 1
 
 				if (i == self.NbPopulation):
 					break
 
-				#if chromosome4 not in ga_memory:
-				chromosomes.append(chromosome4)
-				i += 1
+				if chromosome4 not in Population.ga_memory:
+					chromosomes.append(chromosome4)
+					i += 1
 
 				if (i == self.NbPopulation):
 					break
@@ -226,30 +227,26 @@ class Population:
 
 			self.chromosomes = []
 			self.max_fitness = 0
-			self.min_fitness = math.pow(10,6)
 
 			i = 0
-			while i < len(chromosomes):
+			while i < self.NbPopulation:
 				chromosome = chromosomes[i]
 				chromosome.mutate()
+				#if chromosome not in Population.ga_memory:
 				self.chromosomes.append(chromosome)
 
 				value = chromosome.valueFitness
 				if value > self.max_fitness:
 					self.max_fitness = value
 
-				# i store the best chromosome from this population
-				if value < self.min_fitness:
-					self.bestChromosome = chromosome
-					self.min_fitness = value
-
 				#print("Population {0} :".format(i), self.population[i], " Iteration : ", it)
-				i+=1		
+				i+=1	
+
+		# When the entire population has been formed, then i compute some statistic data on the given popualation
+		self.getFitnessData()	
 
 			#print("Population Suite {0} : ".format(it), self.population )
 			#print(" ")
-
-			#print("C1 : ",chromosome1," C2 : ",chromosome2)
 
 	#--------------------
 	# function : applyCrossOverto
@@ -271,7 +268,7 @@ class Population:
 			ranks3 = []
 			ranks4 = []
 
-			randomIndice = randint(1,len(chromosome1.solution)-1)
+			randomIndice = randint(1,Chromosome.problem.nbTimes-1)
 
 			#print(" ")
 
@@ -280,7 +277,7 @@ class Population:
 			#print(" ranks1 : ", ranks1, " ranks2 : ", ranks2)
 
 			i = 0
-			while i < len(chromosome1.solution):
+			while i < Chromosome.problem.nbTimes:
 
 				if i < randomIndice:
 
@@ -325,7 +322,7 @@ class Population:
 		
 		result = ""
 		i = 0
-		while i < len(self.chromosomes):
+		while i < self.NbPopulation:
 
 			c = self.chromosomes[i]
 			result += str(c.solution) + " : " + str(c.valueFitness) + ","
@@ -333,3 +330,41 @@ class Population:
 			i+=1
 
 		return result
+
+	def getFitnessData(self):
+
+		self.sumAllFitnessValues = 0
+		tmpSumFitness = 0 #variable used to quantify the lack of diversity in the population
+		self.listFitnessData = []
+
+		i = 0
+		while i < self.NbPopulation:
+			#print(" i : ", i)
+			chromosome = self.chromosomes[i]
+			temp = chromosome.valueFitness
+
+			value = (self.max_fitness-temp)
+			tmpSumFitness += value
+
+			value += Population.FITNESS_PADDING
+			self.listFitnessData.append(value)
+			self.sumAllFitnessValues += value
+
+			i += 1
+
+		#print(" Fitness Data 1 : ", self.listFitnessData)
+
+		if tmpSumFitness == 0:
+			self.lacksDiversity = True
+
+		i = 0
+		percentage = 0
+		while i < self.NbPopulation:
+			temp = self.listFitnessData[i]
+			del self.listFitnessData[i]
+			percentage += (float(temp)/float(self.sumAllFitnessValues))*100
+			#print (" FOO : temp : ", temp, " sumFitness : ", sumFitness, " percentage : ", percentage)
+			self.listFitnessData.insert(i, percentage)
+			i += 1
+
+		#print(" Fitness Data 2 : ", self.listFitnessData)
