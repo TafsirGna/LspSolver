@@ -5,6 +5,7 @@ import math
 from itertools import *
 from random import *
 import copy
+import math
 
 #--------------------
 # file : clsp_ga_library
@@ -13,6 +14,41 @@ import copy
 #--------------------
 
 #---	First part:  The functions
+
+def nextPeriodItemOf(indice, solution):
+	
+	nbTimes = len(solution)
+	if indice < nbTimes-1:
+
+		if solution[indice+1] != 0:
+				return solution[indice+1], indice+1
+		else:
+			j = indice+1
+			while j < nbTimes:
+				if solution[j] != 0:
+					return solution[j], j
+				j+=1
+			return 0,0
+	else:
+		# The case where the variable indice corresponds to the last period and then, there's no next period's item
+		return 0,0
+
+def previousPeriodItemOf(indice, solution):
+
+	if indice > 0:
+		if solution[indice-1] != 0:
+			return solution[indice-1], indice-1 
+		else:
+			j = indice-1
+			while j >= 0:
+				if solution[j] != 0:
+					return solution[j], j
+				j-=1
+			return 0,0
+	else:
+		# The case where the variable indice corresponds to the first period and then, there's no previous period's item
+		return 0,0
+
 
 def getBestChroms(chromosomes):
 	
@@ -70,12 +106,6 @@ def getListCounters(nbItems):
 
 	return ItemsCounters
 
-def getMax(n1,n2):
-	if n1 > n2 :
-		return n1
-	else:
-		return n2
-
 def switchGenes(chromosome,indice_gene1,indice_gene2):
 	c = list(chromosome)
 
@@ -118,18 +148,6 @@ def getDemandPeriods(demand):
 			result.append(i)
 		i+=1 
 	return result
-
-#--------------------
-# function : getGeneBits
-# author : Tafsir GNA
-# purpose : allowing to determine the number of bits on which a gene can be represented 
-#--------------------
-
-def getGeneBits(number):
-	i = 0
-	while math.pow(2,i) < number :
-		i+=1
-	return i
 
 #--------------------
 # function : readFile

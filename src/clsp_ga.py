@@ -59,7 +59,14 @@ class GeneticAlgorithm:
 		self.population = Population()
 		Population.startingPopulation = self.population
 		#print(" Fitness Data : ", self.population.listFitnessData)
-		#print(self.population)
+		
+		
+		#c = Chromosome([0, 2, 2, 1, 2, 3, 0, 1])
+		#c = Chromosome([2, 1, 2, 1, 0])
+		#print(Chromosome.getCostof(1, 1, 1, [2, 1, 2, 1, 0]))
+		#c.mutate()
+		#print(c, c.hashSolution)
+		
 	
 	#--------------------
 	# function : process
@@ -68,7 +75,7 @@ class GeneticAlgorithm:
 	#--------------------
 	def process(self):
 
-		while len(self.ga_memory) < 7 and self.stopFlag[0] is False:
+		while len(self.ga_memory) < 2 and self.stopFlag[0] is False:
 
 			self.population = Population(self.population)
 
@@ -86,7 +93,7 @@ class GeneticAlgorithm:
 			if chromosome.valueFitness < self.bestSolution.valueFitness:
 				self.bestSolution = chromosome
 
-		print("The best solution found so far is : ", self.bestSolution.valueFitness)
+		print("The best solution found so far is : ", self.bestSolution.solution)
 		#print(self.population)
 		print("The fitness of this solution is : ", self.bestSolution.valueFitness)
 

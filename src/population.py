@@ -113,7 +113,7 @@ class Population:
 							self.max_fitness = value
 
 						# i check that the size of the population don't exceed the maximum number of population retained
-						if self.NbPopulation >=Population.NbMaxPopulation:
+						if self.NbPopulation >= Population.NbMaxPopulation:
 
 							self.getFitnessData()	
 
@@ -126,8 +126,8 @@ class Population:
 		else:
 
 			# i select the two chromosomes that'll be mated to produce offsprings
-			print("Population : ", previousPopulation)
-			print(" ")
+			#print("Population : ", previousPopulation)
+			#print(" ")
 
 			# In the case where there's a lack of diversity, i introduce a bit of diversity by flipping a gene of one chromosome in the population
 			
@@ -153,7 +153,7 @@ class Population:
 
 				else:  
 
-					print(" from start to now!")
+					#print(" from start to now!")
 					#print(" prevpop 1-b : ", previousPopulation)
 					i = 0
 					while i < Population.startingPopulation.NbPopulation:
@@ -169,7 +169,12 @@ class Population:
 
 					Population.startingPopulation.getFitnessData()
 					previousPopulation = Population.startingPopulation
-					print(" prevpop 2 : ", previousPopulation, " nb : ", previousPopulation.NbPopulation)
+					#print(" prevpop 2 : ", previousPopulation, " nb : ", previousPopulation.NbPopulation)
+
+				#print(" Memory : ", Population.ga_memory)
+
+				#print("Population after : ", previousPopulation)
+				#print(" ")
 				
 			self.NbPopulation = previousPopulation.NbPopulation
 
@@ -232,8 +237,13 @@ class Population:
 			while i < self.NbPopulation:
 				chromosome = chromosomes[i]
 				chromosome.mutate()
-				#if chromosome not in Population.ga_memory:
-				self.chromosomes.append(chromosome)
+				if chromosome not in Population.ga_memory:
+					self.chromosomes.append(chromosome)
+				else:
+					self.chromosomes.append(chromosomes[i])
+
+				#if chromosome.valueFitness == 375 and chromosome.solution != [0, 2, 2, 2, 3, 1, 0, 1]:
+				#	print("1 : ", chromosome.solution, chromosome.valueFitness )
 
 				value = chromosome.valueFitness
 				if value > self.max_fitness:
@@ -272,7 +282,7 @@ class Population:
 
 			#print(" ")
 
-			#print(" 2 - solution1 : ", chromosome1.solution, " ranks1 : ", chromosome1.itemsRank, " solution2 : ", chromosome2.solution, " ranks2 : ", chromosome2.itemsRank)
+			#print(" 1 - solution1 : ", chromosome1.solution, " ranks1 : ", chromosome1.itemsRank, " solution2 : ", chromosome2.solution, " ranks2 : ", chromosome2.itemsRank)
 			#print(" randomIndice : ", randomIndice)
 			#print(" ranks1 : ", ranks1, " ranks2 : ", ranks2)
 
@@ -300,7 +310,7 @@ class Population:
 			# Once, the two resulting chromosomes have been formed, i make each of them feasible with regards of the constraints
 
 			#print(" randomIndice : ", randomIndice)
-			#print(" 1 - solution3 : ", solution3, " ranks3 : ", ranks3, " solution4 : ", solution4, " ranks4 : ", ranks4)
+			#print(" 2 - solution3 : ", solution3, " ranks3 : ", ranks3, " solution4 : ", solution4, " ranks4 : ", ranks4)
 
 			chromosome3 = Chromosome(solution3, ranks3)
 			chromosome3.getFeasible()
