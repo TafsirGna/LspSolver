@@ -102,13 +102,15 @@ class Population:
 
 						c.getFeasible()
 						c.advmutate() # i want to get the best chromosome out of this one by applying a slight mutation to this
+						# TODO get back to advmutate()
+						#c.mutate()
 
 						if c not in self.chromosomes:
 							self.chromosomes.append(c)
 							self.NbPopulation += 1
 
 						# i store the value of the highest value of the objective function
-						value = c.valueFitness
+						value = c.fitnessValue
 						if value > self.max_fitness:
 							self.max_fitness = value
 
@@ -178,8 +180,16 @@ class Population:
 				
 			self.NbPopulation = previousPopulation.NbPopulation
 
+			#print(" Sum : ", previousPopulation.listFitnessData)
+
+			if previousPopulation.NbPopulation == 1:
+				del Population.stopFlag[0]
+				Population.stopFlag.insert(0, True)
+				return
+
 			# i perform the roulette-wheel method to select the parents
 			chromosomes = []
+
 			i = 0
 			while i < previousPopulation.NbPopulation:
 
@@ -242,10 +252,10 @@ class Population:
 				else:
 					self.chromosomes.append(chromosomes[i])
 
-				#if chromosome.valueFitness == 375 and chromosome.solution != [0, 2, 2, 2, 3, 1, 0, 1]:
-				#	print("1 : ", chromosome.solution, chromosome.valueFitness )
+				#if chromosome.fitnessValue == 375 and chromosome.solution != [0, 2, 2, 2, 3, 1, 0, 1]:
+				#	print("1 : ", chromosome.solution, chromosome.fitnessValue )
 
-				value = chromosome.valueFitness
+				value = chromosome.fitnessValue
 				if value > self.max_fitness:
 					self.max_fitness = value
 
@@ -286,26 +296,19 @@ class Population:
 			#print(" randomIndice : ", randomIndice)
 			#print(" ranks1 : ", ranks1, " ranks2 : ", ranks2)
 
-			i = 0
-			while i < Chromosome.problem.nbTimes:
+			
+			solution3 = chromosome1.solution[:randomIndice]
+			solution4 = chromosome2.solution[:randomIndice]
 
-				if i < randomIndice:
+			ranks3 = ranks1[:randomIndice]
+			ranks4 = ranks2[:randomIndice]
 
-					solution3.append(chromosome1.solution[i])
-					solution4.append(chromosome2.solution[i])
 
-					ranks3.append(ranks1[i])
-					ranks4.append(ranks2[i])
+			solution3 += chromosome2.solution[randomIndice:]
+			solution4 += chromosome1.solution[randomIndice:]
 
-				else:
-
-					solution3.append(chromosome2.solution[i])
-					solution4.append(chromosome1.solution[i])
-
-					ranks3.append(ranks2[i])
-					ranks4.append(ranks1[i])
-
-				i+=1
+			ranks3 += ranks2[randomIndice:]
+			ranks4 += ranks1[randomIndice:]
 
 			# Once, the two resulting chromosomes have been formed, i make each of them feasible with regards of the constraints
 
@@ -335,7 +338,7 @@ class Population:
 		while i < self.NbPopulation:
 
 			c = self.chromosomes[i]
-			result += str(c.solution) + " : " + str(c.valueFitness) + ","
+			result += str(c.solution) + " : " + str(c.fitnessValue) + ","
 
 			i+=1
 
@@ -351,7 +354,7 @@ class Population:
 		while i < self.NbPopulation:
 			#print(" i : ", i)
 			chromosome = self.chromosomes[i]
-			temp = chromosome.valueFitness
+			temp = chromosome.fitnessValue
 
 			value = (self.max_fitness-temp)
 			tmpSumFitness += value
@@ -372,7 +375,10 @@ class Population:
 		while i < self.NbPopulation:
 			temp = self.listFitnessData[i]
 			del self.listFitnessData[i]
-			percentage += (float(temp)/float(self.sumAllFitnessValues))*100
+			if self.sumAllFitnessValues == 0:
+				percentage = 0
+			else:
+				percentage += (float(temp)/float(self.sumAllFitnessValues))*100
 			#print (" FOO : temp : ", temp, " sumFitness : ", sumFitness, " percentage : ", percentage)
 			self.listFitnessData.insert(i, percentage)
 			i += 1

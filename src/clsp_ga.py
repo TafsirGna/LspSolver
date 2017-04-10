@@ -12,8 +12,8 @@ from population import *
 class GeneticAlgorithm:
 
 	#	Class' variables
-	NbMaxPopulation = 100
-	mutationRate = 0.10
+	NbMaxPopulation = 30
+	mutationRate = 0.15
 	crossOverRate = 0.70
 	nbInitIterations = 50
 	FITNESS_PADDING = 1
@@ -61,9 +61,7 @@ class GeneticAlgorithm:
 		#print(" Fitness Data : ", self.population.listFitnessData)
 		
 		
-		#c = Chromosome([0, 2, 2, 1, 2, 3, 0, 1])
-		#c = Chromosome([2, 1, 2, 1, 0])
-		#print(Chromosome.getCostof(1, 1, 1, [2, 1, 2, 1, 0]))
+		#c = Chromosome([3, 1, 1, 2, 2, 0, 2, 0])
 		#c.mutate()
 		#print(c, c.hashSolution)
 		
@@ -75,9 +73,14 @@ class GeneticAlgorithm:
 	#--------------------
 	def process(self):
 
-		while len(self.ga_memory) < 2 and self.stopFlag[0] is False:
+		#i = 0
+		while len(self.ga_memory) < 3 and self.stopFlag[0] is False:
+
+		#	if i == 2:
+		#		break 
 
 			self.population = Population(self.population)
+		#	i+=1
 
 	#--------------------
 	# function : printResults
@@ -90,12 +93,12 @@ class GeneticAlgorithm:
 		self.bestSolution = self.ga_memory[0] # varaible that holds the best solution found so far in the search
 
 		for chromosome in self.ga_memory:
-			if chromosome.valueFitness < self.bestSolution.valueFitness:
+			if chromosome.fitnessValue < self.bestSolution.fitnessValue:
 				self.bestSolution = chromosome
 
 		print("The best solution found so far is : ", self.bestSolution.solution)
 		#print(self.population)
-		print("The fitness of this solution is : ", self.bestSolution.valueFitness)
+		print("The fitness of this solution is : ", self.bestSolution.fitnessValue)
 
 		#print(" Memory : ", self.ga_memory)
 		#print(self.population)

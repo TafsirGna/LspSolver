@@ -58,7 +58,7 @@ def getBestChroms(chromosomes):
 	it = 0
 	while i < 4:
 		c = chromosomes[i]
-		if c.valueFitness < chromosome1.valueFitness:
+		if c.fitnessValue < chromosome1.fitnessValue:
 			chromosome1 = c
 			it = i
 		i+=1
@@ -70,7 +70,7 @@ def getBestChroms(chromosomes):
 	i = 1
 	while i < 3:
 		c = chromosomes[i]
-		if c.valueFitness < chromosome2.valueFitness:
+		if c.fitnessValue < chromosome2.fitnessValue:
 			chromosome2 = c
 		i+=1
 

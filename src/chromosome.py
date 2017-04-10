@@ -11,32 +11,184 @@ class Chromosome(object):
 	hashTable = {}
 
 	# Builder 
-	def __init__(self, solution=[], itemsRank = []):
+	def __init__(self, solution = [], itemsRank = []):
 
+		# Variables
 		self._solution = []
 		self._itemsRank = []
-		self._valueFitness = 0
+		self._fitnessValue = 0
 		self.itemsRankFlag = False
 		self._hashSolution = ""
 		self.manufactItemsPeriods = getManufactPeriodsGrid(Chromosome.problem.nbItems, Chromosome.problem.deadlineDemandPeriods) #Chromosome.problem.manufactItemsPeriods 
 
 		if solution != []:
+
 			self._solution = list(solution)
-			self._get_hashSolution()
-			self._getItemsRanks()
+
+			if itemsRank == []:
+				self._get_itemsRanks()
 
 			if self.isFeasible():
-				self._get_valueFitness()
+				self._get_hashSolution()
+				self._get_fitnessValue()
 
 		if itemsRank != []:
 			self._itemsRank = list(itemsRank)
 
+	# Getters
+
+	def _get_fitnessValue(self):
+
+		if self.isFeasible() is False:
+			self._fitnessValue = 0
+			return self._fitnessValue
+
+		if self._fitnessValue == 0:
+
+			if self.hashSolution not in Chromosome.hashTable:
+				
+				grid = Chromosome.problem.chanOverGrid
+
+				# Calculation of all the change-over costs
+				
+				i = 1
+				tmp = self._solution[0]
+				while i < Chromosome.problem.nbTimes :
+
+					n = self._solution[i]
+
+					if (tmp == 0):
+						i+=1
+						tmp = n
+					else:
+						
+						if (n != 0):
+							if (n != tmp):
+								self._fitnessValue += int((grid[tmp-1])[n-1])
+								tmp = n
+						else:
+							tmp = self._solution[i-1]
+
+							j=i
+							while j < Chromosome.problem.nbTimes and self._solution[j] == 0:
+								j+=1
+							i=j-1
+						
+						i+=1
+
+				#print(" intermediary cost : ", self._fitnessValue)
+				# Calculation of the sum of holding costs
+
+				i=0
+				while i < Chromosome.problem.nbItems:
+
+					itemDemandPeriods = Chromosome.problem.deadlineDemandPeriods[i]
+
+					itemManufactPeriods = getManufactPeriods(self._solution, i+1)
+
+					j = 0
+					nbitemDemandPeriods = len(itemDemandPeriods)
+					while j < nbitemDemandPeriods:
+						self._fitnessValue += int(Chromosome.problem.holdingGrid[i])*(itemDemandPeriods[j]-itemManufactPeriods[j])
+						j+=1
+
+					i+=1
+
+				hashTableData = []
+				hashTableData.append(self._fitnessValue)
+				hashTableData.append(self.itemsRank)
+				Chromosome.hashTable[self.hashSolution] = list(hashTableData)
+
+			else:
+				hashTableData = Chromosome.hashTable[self.hashSolution]
+				self._fitnessValue = hashTableData[0]
+
+		#if self._fitnessValue < 375:
+		#	print(self._solution, self._fitnessValue)
+
+		return self._fitnessValue
+
+	def _get_solution(self):
+		return self._solution
+
+	def _get_itemsRanks(self):
+
+		#if self.itemsRankFlag is False:
+
+		if self.hashSolution not in Chromosome.hashTable:
+
+			if self.itemsRankFlag is False:
+
+				self._itemsRank = []
+				gridCounters = list(Chromosome.ItemsCounters)
+				#print("grid : ", gridCounters)
+
+				i = 0 
+				while i < Chromosome.problem.nbTimes:
+
+					if self._solution[i] != 0:
+
+						item = self._solution[i]
+						counter = gridCounters[item-1]
+						self._itemsRank.append(counter)
+
+						# then, i increment the counter of this item
+						del gridCounters[item-1]
+						gridCounters.insert(item-1,(counter+1))
+
+					else:
+						self._itemsRank.append(0)
+
+					i+=1
+
+				self.itemsRankFlag = True
+
+				hashTableData = []
+				hashTableData.append(self.fitnessValue)
+				hashTableData.append(self._itemsRank)
+				Chromosome.hashTable[self.hashSolution] = list(hashTableData)
+
+		else:
+
+			hashTableData = Chromosome.hashTable[self.hashSolution]
+			self._itemsRank = hashTableData[1]
+
+		return self._itemsRank
+
+	def _get_hashSolution(self):
+
+		if self._hashSolution == "":
+
+			i = 0
+			while i < Chromosome.problem.nbTimes:
+				self._hashSolution += str(self._solution[i])
+				i+=1
+			
+		return self._hashSolution
+
+
+	# Setters
+
+	def _set_hashSolution(self, new_value):
+		self._hashSolution = new_value
+
+	def _set_itemsRanks(self, new_value):
+		self._itemsRank = new_value
+
+	def _set_solution(self, new_solution):
+		self._solution = new_solution
+
+	def _set_fitnessValue(self, new_value):
+		self._fitnessValue = new_value
+
 	def __repr__(self):
-		return " {} : {} ".format(self._solution,self.valueFitness)
+		return " {} : {} ".format(self._solution,self.fitnessValue)
 
 	def __eq__(self, chromosome):
 		return self._solution == chromosome.solution
 	
+	# Genetic operators and other function
+
 	def isFeasible(self):
 
 		# i check first that there's not shortage or backlogging
@@ -65,7 +217,9 @@ class Chromosome(object):
 			i+=1
 
 		if (feasible is True):
+			#print("Feasible True")
 			return True
+		#print("Feasible False")
 		return False
 
 	#--------------------
@@ -77,15 +231,17 @@ class Chromosome(object):
 	def mutate(self):
 
 		#print("M Start : ", self._solution)
+		saved_solution = self._solution
+		saved_fitnessValue = self._fitnessValue
 
 		if (randint(0,100) < (Chromosome.mutationRate*100)): # then the chromsome has been selected for mutation 
 
 			mutated = False
-			# i make sure that the returned chromosome's been actually mutated
-			if mutated is False:
+
+			while mutated is False:
 
 				randomIndice = randint(0,(Chromosome.problem.nbTimes-1))
-				#print(" randomIndice : ", randomIndice)
+
 				item1 = self._solution[randomIndice]
 
 				# i make sure that the randomIndice variable never corresponds to a zero indice
@@ -93,6 +249,8 @@ class Chromosome(object):
 					randomIndice = randint(0,(Chromosome.problem.nbTimes-1))
 					# i get the item corresponding the gene to be flipped
 					item1 = self._solution[randomIndice]
+
+				#print(" randomIndice : ", randomIndice)
 
 				visitedItems = []
 
@@ -112,11 +270,13 @@ class Chromosome(object):
 
 							if item2DemandPeriod >= randomIndice:
 								#print(i, randomIndice)
-								formerSolution = self._solution
-								self._solution = switchGenes(self._solution, randomIndice, i)
-								self.updateHashSolution(self._hashSolution, randomIndice, i)
-								self.updateFitnessValue(formerSolution, randomIndice, i)
-								self._itemsRank = switchGenes(itemsRank, randomIndice, i)
+								solution = switchGenes(self._solution, randomIndice, i)
+								c = Chromosome(solution)
+								self._solution = c.solution
+								self._fitnessValue = c.fitnessValue
+								self._hashSolution = c.hashSolution
+								self._itemsRank = c.itemsRank
+								self.manufactItemsPeriods = list(c.manufactItemsPeriods)
 								mutated = True
 								break
 					i-=1
@@ -140,149 +300,22 @@ class Chromosome(object):
 
 								if item1DemandPeriod >= i:
 									#print(i, randomIndice)
-									formerSolution = self._solution
-									self._solution = switchGenes(self._solution, randomIndice, i)
-									self.updateHashSolution(self._hashSolution, randomIndice, i)
-									self.updateFitnessValue(formerSolution, randomIndice, i)
-									self._itemsRank = switchGenes(itemsRank, randomIndice, i)
+									solution = switchGenes(self._solution, randomIndice, i)
+									c = Chromosome(solution)
+									self._solution = c.solution
+									self._fitnessValue = c.fitnessValue
+									self._hashSolution = c.hashSolution
+									self._itemsRank = c.itemsRank
+									self.manufactItemsPeriods = list(c.manufactItemsPeriods)
 									mutated = True
 									break					
 
 						i += 1
-
+			
 
 		#print("F Start : ", self._solution)
 
-
-	def _get_valueFitness(self):
-		
-		#val1 = self._valueFitness
-		#print(self._solution)
-
-		if self._valueFitness == 0:
-
-			if self.hashSolution not in Chromosome.hashTable:
-				
-				grid = Chromosome.problem.chanOverGrid
-
-				# Calculation of all the change-over costs
-				
-				i = 1
-				tmp = self._solution[0]
-				while i < Chromosome.problem.nbTimes :
-
-					n = self._solution[i]
-
-					if (tmp == 0):
-						i+=1
-						tmp = n
-					else:
-						
-						if (n != 0):
-							if (n != tmp):
-								self._valueFitness += int((grid[tmp-1])[n-1])
-								tmp = n
-						else:
-							tmp = self._solution[i-1]
-
-							j=i
-							while j < Chromosome.problem.nbTimes and self._solution[j] == 0:
-								j+=1
-							i=j-1
-						
-						i+=1
-
-				#print(" intermediary cost : ", self._valueFitness)
-				# Calculation of the sum of holding costs
-
-				i=0
-				while i < Chromosome.problem.nbItems:
-
-					itemDemandPeriods = Chromosome.problem.deadlineDemandPeriods[i]
-
-					itemManufactPeriods = getManufactPeriods(self._solution, i+1)
-
-					j = 0
-					nbitemDemandPeriods = len(itemDemandPeriods)
-					while j < nbitemDemandPeriods:
-						self._valueFitness += int(Chromosome.problem.holdingGrid[i])*(itemDemandPeriods[j]-itemManufactPeriods[j])
-						j+=1
-
-					i+=1
-
-				Chromosome.hashTable[self.hashSolution] = self._valueFitness
-
-			else:
-				self._valueFitness = Chromosome.hashTable[self.hashSolution]
-
-		return self._valueFitness
-
-	def _get_solution(self):
-		return self._solution
-
-	def _set_solution(self, new_solution):
-		self._solution = new_solution
-
-		if self.isFeasible():
-			self._get_valueFitness()
-
-	def _set_valueFitness(self, new_value):
-		self._valueFitness = new_value
-
-
-	def _getItemsRanks(self):
-
-		#if self.itemsRankFlag is False:
-
-		self._itemsRank = []
-		gridCounters = list(Chromosome.ItemsCounters)
-		#print("grid : ", gridCounters)
-
-		i = 0 
-		while i < Chromosome.problem.nbTimes:
-
-			if self._solution[i] != 0:
-
-				item = self._solution[i]
-				counter = gridCounters[item-1]
-				self._itemsRank.append(counter)
-
-				# then, i increment the counter of this item
-				del gridCounters[item-1]
-				gridCounters.insert(item-1,(counter+1))
-
-			else:
-				self._itemsRank.append(0)
-
-			i+=1
-
-			#self.itemsRankFlag = True
-
-		return self._itemsRank
-
-	def _setItemsRanks(self, new_value):
-		self._itemsRank = new_value
-
-	def _get_hashSolution(self):
-
-		if self._hashSolution == "":
-
-			i = 0
-			while i < Chromosome.problem.nbTimes:
-				self._hashSolution += str(self._solution[i])
-				i+=1
-			
-		return self._hashSolution
-
-	def _set_hashSolution(self, new_value):
-		self._hashSolution = new_value
-
-	# Definition of the properties
-	solution = property(_get_solution,_set_solution)
-	valueFitness = property(_get_valueFitness,_set_valueFitness)
-	itemsRank = property(_getItemsRanks, _setItemsRanks)
-	hashSolution = property(_get_hashSolution, _set_hashSolution) 
-
+	# TODO Revamp advmutate function as function mutate is
 
 	def advmutate(self):
 
@@ -320,11 +353,10 @@ class Chromosome(object):
 						if solution2 != []:
 
 							c = Chromosome(solution2)
-							#print(c.solution,c.valueFitness, self.valueFitness)
-							if c.valueFitness < self.valueFitness:
+							if c.fitnessValue < self.fitnessValue:
 								self._solution = c.solution
 								self._itemsRank = c.itemsRank
-								self._valueFitness = c.valueFitness
+								self._fitnessValue = c.fitnessValue
 								self._hashSolution = c.hashSolution
 
 					item2 += 1
@@ -350,7 +382,7 @@ class Chromosome(object):
 					item = self._solution[i]
 					#print(" ok : ", self._solution, self._itemsRank)
 					rank = self._itemsRank[i]
-					#print(i, item-1, rank-1)
+					#print(i, item-1, rank-1, self.manufactItemsPeriods)
 					value = self.manufactItemsPeriods[item-1][rank-1]
 
 					if value == -1:
@@ -479,9 +511,8 @@ class Chromosome(object):
 				i+=1
 
 		#print("at the end of getFeasible : ", self._solution)
-		self._get_valueFitness()
-
-		#self._itemsRank = self.getItemsRanks()
+		self._get_fitnessValue()
+		self._get_itemsRanks()
 
 	def getCostof(cls, indice, item, rank,solution, secondIndice = -1):
 
@@ -527,92 +558,11 @@ class Chromosome(object):
 
 		return cost
 
+	# Class' methods
 	getCostof = classmethod(getCostof)
 
-	def updateFitnessValue(self, solution, indice1, indice2):
-
-		# i chop from this chromosome fitness value, the changeover costs of the moved items
-
-		if self.hashSolution not in Chromosome.hashTable:
-
-			item1 = solution[indice1]
-			item2 = solution[indice2]
-			
-			#print("indice 2 : ", indice2, " solution : ", solution)
-			nItem1, nIndice1 = nextPeriodItemOf(indice1, solution)
-			#print(" indice 1 : ", indice1, " nIndice 1 : ", nIndice1 )
-			nItem2, nIndice2 = nextPeriodItemOf(indice2, solution)
-			#print(" indice 2 : ", indice2, " nIndice 2 : ", nIndice2 )
-			pItem1, pIndice1 = previousPeriodItemOf(indice1, solution)
-			#print(" indice 1 : ", indice1, " pIndice 1 : ", pIndice1 )
-			pItem2, pIndice2 = previousPeriodItemOf(indice2, solution)
-			#print(" indice 2 : ", indice2, " pIndice 2 : ", pIndice2 )
-
-			if nIndice1 == indice2 or pIndice2 == indice1:
-
-				#print("i1 : ", item1, " i2 : ", item2)
-				self._valueFitness -= int(Chromosome.problem.chanOverGrid[item1-1][item2-1])
-				self._valueFitness += int(Chromosome.problem.chanOverGrid[item2-1][item1-1])
-
-				if pIndice1 != 0:
-					self._valueFitness -= int(Chromosome.problem.chanOverGrid[pItem1-1][item1-1])
-					self._valueFitness += int(Chromosome.problem.chanOverGrid[pItem1-1][item2-1])
-
-				if nIndice2 != 0:
-					self._valueFitness -= int(Chromosome.problem.chanOverGrid[item2-1][nItem2-1])
-					self._valueFitness += int(Chromosome.problem.chanOverGrid[item1-1][nItem2-1])
-
-			elif nIndice2 == indice1 or pIndice1 == indice2:
-
-				self._valueFitness -= int(Chromosome.problem.chanOverGrid[item2-1][item1-1])
-				self._valueFitness += int(Chromosome.problem.chanOverGrid[item1-1][item2-1])
-
-				if pIndice2 != 0:
-					self._valueFitness -= int(Chromosome.problem.chanOverGrid[pItem2-1][item2-1])
-					self._valueFitness += int(Chromosome.problem.chanOverGrid[pItem2-1][item1-1])
-
-				if nIndice1 != 0:
-					#print(item1, nIndice1)
-					self._valueFitness -= int(Chromosome.problem.chanOverGrid[item1-1][nItem1-1])
-					self._valueFitness += int(Chromosome.problem.chanOverGrid[item2-1][nItem1-1])
-
-			else:
-
-				# i chop from the fitness value the changeover costs of the previous solution 
-				if nItem1 != 0:
-					self._valueFitness -= int(Chromosome.problem.chanOverGrid[item1-1][nItem1-1])
-					self._valueFitness += int(Chromosome.problem.chanOverGrid[item2-1][nItem1-1])
-
-				if pItem1 != 0:
-					self._valueFitness -= int(Chromosome.problem.chanOverGrid[pItem1-1][item1-1])
-					self._valueFitness += int(Chromosome.problem.chanOverGrid[pItem1-1][item2-1])
-
-				if nItem2 != 0:
-					self._valueFitness -= int(Chromosome.problem.chanOverGrid[item2-1][nItem2-1])
-					self._valueFitness += int(Chromosome.problem.chanOverGrid[item1-1][nItem2-1])
-
-				if pItem2 != 0:
-					self._valueFitness -= int(Chromosome.problem.chanOverGrid[pItem2-1][item2-1])
-					self._valueFitness += int(Chromosome.problem.chanOverGrid[pItem2-1][item1-1])
-
-
-			#Once, i've handled the changeover costs, i tackle the stocking costs' issue
-			if indice2 > indice1:
-				self._valueFitness += int(Chromosome.problem.holdingGrid[item2-1]) * (indice2-indice1)
-				self._valueFitness -= int(Chromosome.problem.holdingGrid[item1-1]) * (indice2-indice1)
-			else:
-				self._valueFitness -= int(Chromosome.problem.holdingGrid[item2-1]) * (indice1-indice2)
-				self._valueFitness += int(Chromosome.problem.holdingGrid[item1-1]) * (indice1-indice2)
-
-		else:
-			self._valueFitness = Chromosome.hashTable[self.hashSolution]
-
-
-	def updateHashSolution(self, solution, indice1, indice2):
-
-		item1 = solution[indice1]
-		item2 = solution[indice2]
-
-		self._hashSolution = solution[:(indice1)] + str(item2) + solution[(indice1+1):]
-		self._hashSolution = self._hashSolution[:(indice2)] + str(item1) + self._hashSolution[(indice2+1):]
-
+	# Properties
+	solution = property(_get_solution,_set_solution)
+	fitnessValue = property(_get_fitnessValue,_set_fitnessValue)
+	itemsRank = property(_get_itemsRanks, _set_itemsRanks)
+	hashSolution = property(_get_hashSolution, _set_hashSolution) 
