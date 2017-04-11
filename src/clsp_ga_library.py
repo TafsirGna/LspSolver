@@ -149,23 +149,18 @@ def getDemandPeriods(demand):
 		i+=1 
 	return result
 
-#--------------------
-# function : readFile
-# author : Tafsir GNA
-# purpose : Reading the given file in order to extract input data
-#-------------------- 
 
-def readFile(filename):
+def formatOneReading(filename):
+
 	# Input data's initialization 
 	nbItems = 0
 	nbTimes = 0
 	demandsGrid = []
 	holdingGrid = []
 	chanOverGrid = []
-	i = 0
 
-	# Opening and reading of the file 
 	fileContent = ""
+	# Here's the first way of reading that i apply to the input file, if it doesn't work, i'm gonna try a second way of reading using another format
 	with open(filename, 'rt') as instance:
 		for line in instance:
 			fileContent += line
@@ -263,15 +258,72 @@ def readFile(filename):
 				if len(tab) == nbItems :
 					grid.append(tab)
 			else:
-				i+=1
+				i += 1
 
 		chanOverGrid = list(grid)
 
 		#print(str(nbItems) + ", " + str(nbTimes) + ", " + str(demandsGrid) + ", " + str(holdingGrid) + ", " + str(chanOverGrid))
 
-		inst = Instance(nbItems,nbTimes,demandsGrid,holdingGrid,chanOverGrid)
+		if nbItems != 0 and nbTimes != 0 and demandsGrid != [] and holdingGrid != [] and chanOverGrid != []:
+			return Instance(nbItems,nbTimes,demandsGrid,holdingGrid,chanOverGrid)
+		return 0
 
-		return inst
+
+def formatTwoReading(filename):
+
+	# Input data's initialization 
+	nbItems = 0
+	nbTimes = 0
+	demandsGrid = []
+	holdingGrid = []
+	chanOverGrid = []
+
+	with open(filename, 'rt') as instance:
+
+		i = 1
+		for line in instance:
+			
+			if i == 1:
+				nbTimes = int(line)
+
+			if i == 2:
+				nbItems = int(line)
+
+			if i >= 5 and i < (5 + nbItems):
+				data = []
+				data = line.split(" ")
+				chanOverGrid.append(data)
+
+			if i == (5 + nbItems + 1):
+				holdingGrid = line.split(" ")
+
+			if i >= (5 + nbItems + 3) and i < (5 + nbItems*2 + 3):
+				data = []
+				data = line.split(" ")
+				demandsGrid.append(data)
+
+			i += 1
+
+		if nbItems != 0 and nbTimes != 0 and demandsGrid != [] and holdingGrid != [] and chanOverGrid != []:
+			return Instance(nbItems,nbTimes,demandsGrid,holdingGrid,chanOverGrid)
+		return 0	
+	
+#--------------------
+# function : readFile
+# author : Tafsir GNA
+# purpose : Reading the given file in order to extract input data
+#-------------------- 
+
+def readFile(filename):
+
+	# Opening and reading of the file 
+	inst = formatOneReading(filename)
+
+	# i test if the reading has been successfull, if no then, i try again to read it using another format
+	if inst == 0:
+		inst = formatTwoReading(filename)
+
+	return inst
 
 
 #---	Second part:	The classes 

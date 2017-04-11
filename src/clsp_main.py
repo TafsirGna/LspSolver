@@ -1,10 +1,7 @@
 #!/usr/bin/python
 # -*-coding: utf-8 -*
 
-
 # TODO 
-# - when the genetic algorithm reaches a point where there's no diversity in the population, then it memorizes this local
-#   optimum and restart the search
 # - give some updates to the implementation of the insertion of the new population into the the former one
 
 #--- importation of the modules
