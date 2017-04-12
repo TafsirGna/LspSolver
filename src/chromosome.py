@@ -186,6 +186,9 @@ class Chromosome(object):
 
 	def __eq__(self, chromosome):
 		return self._solution == chromosome.solution
+
+	def __ne__(self, chromosome):
+		return self._solution != chromosome.solution
 	
 	# Genetic operators and other function
 
@@ -372,6 +375,7 @@ class Chromosome(object):
 		if self.isFeasible() is False:
 
 			#print(" grid : ", grid)
+			copy_solution = list(self._solution)
 
 			# i make sure that the number of goods producted isn't superior to the number expected
 			i = 0
@@ -381,6 +385,7 @@ class Chromosome(object):
 
 					item = self._solution[i]
 					#print(" ok : ", self._solution, self._itemsRank)
+					#print(" item picked : ", item)
 					rank = self._itemsRank[i]
 					#print(i, item-1, rank-1, self.manufactItemsPeriods)
 					value = self.manufactItemsPeriods[item-1][rank-1]
@@ -389,15 +394,15 @@ class Chromosome(object):
 						itemDemandPeriods = self.manufactItemsPeriods[item-1]
 						del itemDemandPeriods[rank-1]
 						itemDemandPeriods.insert(rank-1, i)
-
+						#print(" It isn't yet in the tab")
 						#print(" == -1 ", item, i, rank)
 
 					else:
 
 						#print(" != -1 ", item, i, rank)
-
-						cost1 = Chromosome.getCostof(value, item, rank, self._solution, i)
-						cost2 = Chromosome.getCostof(i, item, rank, self._solution, value)
+						#print(" It is already in the tab")
+						cost1 = Chromosome.getCostof(value, item, rank, copy_solution, i)
+						cost2 = Chromosome.getCostof(i, item, rank, copy_solution, value)
 
 						#print(" cost 1 : ", cost1, " cost2 : ", cost2)
 						if cost2 < cost1 :
@@ -442,13 +447,13 @@ class Chromosome(object):
 
 						if nbZeroPeriods > 0:
 
-							cost1 = Chromosome.getCostof(zeroperiods[0], i+1, j+1, self._solution)
+							cost1 = Chromosome.getCostof(zeroperiods[0], i+1, j+1, copy_solution)
 							#print(" cost1 : ", cost1 )
 
 							k = 1 
 							indice = zeroperiods[0]
 							while k < nbZeroPeriods:
-								cost2 = Chromosome.getCostof(zeroperiods[k], i+1, j+1, self._solution)
+								cost2 = Chromosome.getCostof(zeroperiods[k], i+1, j+1, copy_solution)
 								#print(" cost2 : ", cost2 , zeroperiods[k])
 								if cost2 < cost1:
 									#print(" cost2 < cost1 : ", cost1 , cost2 )
@@ -483,13 +488,13 @@ class Chromosome(object):
 								nbZeroPeriods = len(zeroperiods)
 								if nbZeroPeriods > 0:
 
-									cost1 = Chromosome.getCostof(zeroperiods[0], i+1, p, self._solution)
+									cost1 = Chromosome.getCostof(zeroperiods[0], i+1, p, copy_solution)
 									#print(" cost1 : ", cost1 )
 
 									k = 1 
 									indice = zeroperiods[0]
 									while k < nbZeroPeriods:
-										cost2 = Chromosome.getCostof(zeroperiods[k], i+1, p, self._solution)
+										cost2 = Chromosome.getCostof(zeroperiods[k], i+1, p, copy_solution)
 										#print(" cost2 : ", cost2 , zeroperiods[k])
 										if cost2 < cost1:
 											#print(" cost2 < cost1 : ", cost1 , cost2 )
@@ -530,29 +535,17 @@ class Chromosome(object):
 		#print(" cost 1 : ", cost)
 
 		# change-over cost 
-		if indice < cls.problem.nbTimes-1:
-			if solution[indice+1] != 0:
-				cost += int(Chromosome.problem.chanOverGrid[item-1][solution[indice+1]-1])
-			else:
-				j = indice+1
-				while j < cls.problem.nbTimes:
-					if solution[j] != 0:
-						cost += int(Chromosome.problem.chanOverGrid[item-1][solution[j]-1])
-						break
-					j+=1
+		nItem, nIndice = nextPeriodItemOf(indice, solution)
+		#print(" nItem : ", nItem, " nIndice : ", nIndice)
+		if nItem != 0:
+			cost += int(Chromosome.problem.chanOverGrid[item-1][nItem-1])
 
 		#print(" cost 2 : ", cost)
 
-		if indice > 0:
-			if solution[indice-1] != 0:
-				cost += int(cls.problem.chanOverGrid[solution[indice-1]-1][item-1])
-			else:
-				j = indice-1
-				while j >= 0:
-					if solution[j] != 0:
-						cost += int(Chromosome.problem.chanOverGrid[solution[j]-1][item-1])
-						break
-					j-=1
+		pItem, pIndice = previousPeriodItemOf(indice, solution)
+		#print(" pItem : ", pItem, " pIndice : ", pIndice, " solution : ", solution)
+		if pItem != 0:
+			cost += int(Chromosome.problem.chanOverGrid[pItem-1][item-1])
 
 		#print(" cost 3 : ", cost)
 
@@ -566,3 +559,4 @@ class Chromosome(object):
 	fitnessValue = property(_get_fitnessValue,_set_fitnessValue)
 	itemsRank = property(_get_itemsRanks, _set_itemsRanks)
 	hashSolution = property(_get_hashSolution, _set_hashSolution) 
+

@@ -128,8 +128,7 @@ class Population:
 		else:
 
 			# i select the two chromosomes that'll be mated to produce offsprings
-			#print("Population : ", previousPopulation)
-			#print(" ")
+			print " population 1 : ", previousPopulation#, " starting with :", Population.startingPopulation
 
 			# In the case where there's a lack of diversity, i introduce a bit of diversity by flipping a gene of one chromosome in the population
 			
@@ -140,23 +139,25 @@ class Population:
 
 			if previousPopulation.lacksDiversity:
 
-				chromosome = previousPopulation.chromosomes[0]
+				print(" CONVERGENCE !!!")
+				chromosome = copy.deepcopy(previousPopulation.chromosomes[0])
 				
 				# i store this local optima in the genetic algorithm's memory to remind it that it's already visit the solution
 				if chromosome not in Population.ga_memory:
-					Population.ga_memory.append(chromosome)
+					Population.ga_memory.append(copy.deepcopy(chromosome))
 
 				chromosome.advmutate()
-
+				
 				if chromosome != previousPopulation.chromosomes[0]:
-
 					del previousPopulation.chromosomes[0]
 					previousPopulation.chromosomes.insert(0, chromosome)
+					previousPopulation.getFitnessData() # i make calculations over the resulting population
+					print (" different !")
 
 				else:  
 
 					#print(" from start to now!")
-					#print(" prevpop 1-b : ", previousPopulation)
+					print " not different ! 1 ", Population.startingPopulation 
 					i = 0
 					while i < Population.startingPopulation.NbPopulation:
 
@@ -169,23 +170,22 @@ class Population:
 							break
 						i+=1
 
+					print " not different ! 2 ", Population.startingPopulation
+
 					Population.startingPopulation.getFitnessData()
-					previousPopulation = Population.startingPopulation
-					#print(" prevpop 2 : ", previousPopulation, " nb : ", previousPopulation.NbPopulation)
+					previousPopulation = copy.deepcopy(Population.startingPopulation)
 
-				#print(" Memory : ", Population.ga_memory)
-
-				#print("Population after : ", previousPopulation)
-				#print(" ")
+			#print(" Memory : ", Population.ga_memory)
 				
 			self.NbPopulation = previousPopulation.NbPopulation
-
-			#print(" Sum : ", previousPopulation.listFitnessData)
 
 			if previousPopulation.NbPopulation == 1:
 				del Population.stopFlag[0]
 				Population.stopFlag.insert(0, True)
 				return
+
+			print " population 2 : ", previousPopulation#, " starting with :", Population.startingPopulation
+			print " Percentage : ", previousPopulation.listFitnessData
 
 			# i perform the roulette-wheel method to select the parents
 			chromosomes = []
@@ -247,6 +247,10 @@ class Population:
 			while i < self.NbPopulation:
 				chromosome = chromosomes[i]
 				chromosome.mutate()
+
+				#if chromosome.fitnessValue == 0:
+				#	print(" Chromosome : ", chromosome.solution, chromosome.itemsRank)
+
 				if chromosome not in Population.ga_memory:
 					self.chromosomes.append(chromosome)
 				else:
@@ -262,7 +266,9 @@ class Population:
 				#print("Population {0} :".format(i), self.population[i], " Iteration : ", it)
 				i+=1	
 
-		# When the entire population has been formed, then i compute some statistic data on the given popualation
+			print " population 3 : ", self#, " starting with :", Population.startingPopulation
+			print " "
+		# When the entire population has been formed, then i compute some statistic data on the given population
 		self.getFitnessData()	
 
 			#print("Population Suite {0} : ".format(it), self.population )
@@ -319,9 +325,25 @@ class Population:
 			chromosome3.getFeasible()
 			#chromosome3.advmutate()
 
+			'''
+			if chromosome3.fitnessValue == 0:
+				print(" 1 - solution1 : ", chromosome1.solution, " ranks1 : ", chromosome1.itemsRank, " solution2 : ", chromosome2.solution, " ranks2 : ", chromosome2.itemsRank)
+				print(" randomIndice : ", randomIndice)
+				print(" 2 - solution3 : ", solution3, " ranks3 : ", ranks3)
+				print(" result 3 :", chromosome3.solution)
+			'''
+
 			chromosome4 = Chromosome(solution4, ranks4)
 			chromosome4.getFeasible()
 			#chromosome4.advmutate()
+
+			'''
+			if chromosome4.fitnessValue == 0:
+				print(" 1 - solution1 : ", chromosome1.solution, " ranks1 : ", chromosome1.itemsRank, " solution2 : ", chromosome2.solution, " ranks2 : ", chromosome2.itemsRank)
+				print(" randomIndice : ", randomIndice)
+				print(" solution4 : ", solution4, " ranks4 : ", ranks4)
+				print(" result 4 :", chromosome4.solution)
+			'''
 
 			#print(" 2 - solution3 : ", chromosome3.solution, " ranks3 : ", ranks3, " solution4 : ", chromosome4.solution, " ranks4 : ", ranks4)
 
@@ -333,6 +355,7 @@ class Population:
 
 	def __repr__(self):
 		
+		#print("Nb : ", self.NbPopulation, self.chromosomes)
 		result = ""
 		i = 0
 		while i < self.NbPopulation:
@@ -384,3 +407,4 @@ class Population:
 			i += 1
 
 		#print(" Fitness Data 2 : ", self.listFitnessData)
+		

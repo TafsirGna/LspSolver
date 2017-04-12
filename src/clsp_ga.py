@@ -12,7 +12,7 @@ from population import *
 class GeneticAlgorithm:
 
 	#	Class' variables
-	NbMaxPopulation = 30
+	NbMaxPopulation = 35
 	mutationRate = 0.15
 	crossOverRate = 0.70
 	nbInitIterations = 50
@@ -57,12 +57,13 @@ class GeneticAlgorithm:
 
 		# i create a new population from scratch
 		self.population = Population()
-		Population.startingPopulation = self.population
+		Population.startingPopulation = copy.deepcopy(self.population)
 		#print(" Fitness Data : ", self.population.listFitnessData)
 		
 		
-		#c = Chromosome([3, 1, 1, 2, 2, 0, 2, 0])
+		#c = Chromosome([1, 1, 2, 3, 2, 1, 1, 0], [1, 2, 1, 1, 3, 1, 2, 0])
 		#c.mutate()
+		#c.getFeasible()
 		#print(c, c.hashSolution)
 		
 	
@@ -73,14 +74,18 @@ class GeneticAlgorithm:
 	#--------------------
 	def process(self):
 
-		#i = 0
-		while len(self.ga_memory) < 3 and self.stopFlag[0] is False:
+		#print "startingPopulation : ", Population.startingPopulation
+		i = 0
+		while len(self.ga_memory) < 2 and self.stopFlag[0] is False:
 
-		#	if i == 2:
-		#		break 
+			#if i == 2:
+			#	break 
 
-			self.population = Population(self.population)
-		#	i+=1
+			self.population = Population(copy.deepcopy(self.population))
+
+			#print "Current population : ", self.population.chromosomes , self.population.NbPopulation
+
+			i += 1
 
 	#--------------------
 	# function : printResults
@@ -90,7 +95,7 @@ class GeneticAlgorithm:
 	def printResults(self):
 
 		#print(self.ga_memory)
-		self.bestSolution = self.ga_memory[0] # varaible that holds the best solution found so far in the search
+		self.bestSolution = self.ga_memory[0] # variable that holds the best solution found so far in the search
 
 		for chromosome in self.ga_memory:
 			if chromosome.fitnessValue < self.bestSolution.fitnessValue:
