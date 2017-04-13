@@ -128,7 +128,7 @@ class Population:
 		else:
 
 			# i select the two chromosomes that'll be mated to produce offsprings
-			print " population 1 : ", previousPopulation#, " starting with :", Population.startingPopulation
+			#print " population 1 : ", previousPopulation#, " starting with :", Population.startingPopulation
 
 			# In the case where there's a lack of diversity, i introduce a bit of diversity by flipping a gene of one chromosome in the population
 			
@@ -139,7 +139,7 @@ class Population:
 
 			if previousPopulation.lacksDiversity:
 
-				print(" CONVERGENCE !!!")
+				#print(" CONVERGENCE !!!")
 				chromosome = copy.deepcopy(previousPopulation.chromosomes[0])
 				
 				# i store this local optima in the genetic algorithm's memory to remind it that it's already visit the solution
@@ -152,12 +152,12 @@ class Population:
 					del previousPopulation.chromosomes[0]
 					previousPopulation.chromosomes.insert(0, chromosome)
 					previousPopulation.getFitnessData() # i make calculations over the resulting population
-					print (" different !")
+					#print (" different !")
 
 				else:  
 
 					#print(" from start to now!")
-					print " not different ! 1 ", Population.startingPopulation 
+					#print " not different ! 1 ", Population.startingPopulation 
 					i = 0
 					while i < Population.startingPopulation.NbPopulation:
 
@@ -170,7 +170,7 @@ class Population:
 							break
 						i+=1
 
-					print " not different ! 2 ", Population.startingPopulation
+					#print " not different ! 2 ", Population.startingPopulation
 
 					Population.startingPopulation.getFitnessData()
 					previousPopulation = copy.deepcopy(Population.startingPopulation)
@@ -184,8 +184,8 @@ class Population:
 				Population.stopFlag.insert(0, True)
 				return
 
-			print " population 2 : ", previousPopulation#, " starting with :", Population.startingPopulation
-			print " Percentage : ", previousPopulation.listFitnessData
+			#print " population 2 : ", previousPopulation#, " starting with :", Population.startingPopulation
+			#print " Percentage : ", previousPopulation.listFitnessData
 
 			# i perform the roulette-wheel method to select the parents
 			chromosomes = []
@@ -266,8 +266,8 @@ class Population:
 				#print("Population {0} :".format(i), self.population[i], " Iteration : ", it)
 				i+=1	
 
-			print " population 3 : ", self#, " starting with :", Population.startingPopulation
-			print " "
+			#print " population 3 : ", self#, " starting with :", Population.startingPopulation
+			#print " "
 		# When the entire population has been formed, then i compute some statistic data on the given population
 		self.getFitnessData()	
 
