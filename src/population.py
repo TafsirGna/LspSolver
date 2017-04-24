@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3.5
 # -*-coding: utf-8 -*
 
 from clsp_ga_library import *
@@ -6,22 +6,25 @@ from chromosome import *
 
 class Population:
 
-	nbInitIterations = 0
 	NbMaxPopulation = 0
 	FITNESS_PADDING = 0
 	crossOverRate = 0
 	ga_memory = []
 	startingPopulation = []
 	stopFlag = []
+	limitNbConsecutiveBadChromosomes = 0
+	NbPopInitializerThreads = 1
 
 	# builder 
 	def __init__(self, previousPopulation = []):
 		
 		self.chromosomes = []
 		self.max_fitness = 0
+		self.min_fitness = pow(10,6)
 		self.NbPopulation = 0
 		self.listFitnessData = []
 		self.sumAllFitnessValues = 0
+		self.elite = []
 		self.lacksDiversity = False
 
 		# i explicit the case where there's no previous population before this one
@@ -30,101 +33,43 @@ class Population:
 			listItems = []
 			self.NbPopulation = 0
 
-			# i fill the listItem object with the number of the different items
-			i = 0
-			while i < Chromosome.problem.nbItems:
-				listItems.append(i+1)
-				i+=1
+			item = 1
+			period = Chromosome.problem.deadlineDemandPeriods[item-1][0]
 
-			# i generate the differents permutations out of the list of items, this will determine the order in which the items will be placed in the chromosome
-			list_permutations = list(permutations(listItems))
-
+			listThreads = []
+			initializerThreadsLock = threading.Lock()
 			i = 0
-			while i < Population.nbInitIterations:
+			while i <= period:
+
+				# i initialize the node from which the search of each thread will start
+				root = Node()
+				root.currentItem = 1
+				root.currentPeriod = 1
 
 				j = 0
-				nb_permutations = len(list_permutations)
-				while j < nb_permutations:
+				while j < Chromosome.problem.nbTimes:
+					if j == i:
+						root.solution.append(1)
+					else:
+						root.solution.append(0)
+					j += 1
 
-					permutationJ = list_permutations[j] 
-					#print(" - ", i, " permutation : ", permutationJ)
+				#print(root)
 
-					# i create a chromosome and fill it with some zeros
-					solution = []
-					k = 0
-					while k < Chromosome.problem.nbTimes:
-						solution.append(0)
-						k+=1
+				# i initialize the thread and put it into a list of threads created for this purpose
+				initializerThread = PopInitializerThread(i,copy.copy(root), self, initializerThreadsLock)
+				listThreads.append(copy.copy(initializerThread))
+				(listThreads[i]).start()
 
-					qual_sol = True # boolean variable that determines if the chromosome being formed is good or not
+				i += 1
 
-					k = 0
-					while k < Chromosome.problem.nbItems:
-
-						itemK = permutationJ[k]
-						itemKDemandPeriods = Chromosome.problem.deadlineDemandPeriods[itemK-1]
-
-						l = 0
-						size_itemKDemandPeriods = len(itemKDemandPeriods)
-						while l < size_itemKDemandPeriods:
-
-							periodL = itemKDemandPeriods[l]
-
-							m = 0
-							zeroperiods = []
-							while m <= periodL:
-
-								if solution[m] == 0 : 
-									zeroperiods.append(m)
-
-								m+=1
-
-							nbZeroPeriods = len(zeroperiods)
-							if nbZeroPeriods == 0:
-								qual_sol = False
-								break
-							else:
-								random_indice = randint(0, nbZeroPeriods-1)
-								del solution[zeroperiods[random_indice]]
-								solution.insert(zeroperiods[random_indice],itemK)
-
-							l+=1
-
-						k+=1
-
-						if qual_sol is False:
-							break
-
-					j+=1
-
-					c = Chromosome(solution)
-					if qual_sol is True:
-
-						c.getFeasible()
-						c.advmutate() # i want to get the best chromosome out of this one by applying a slight mutation to this
-						# TODO get back to advmutate()
-						#c.mutate()
-
-						if c not in self.chromosomes:
-							self.chromosomes.append(c)
-							self.NbPopulation += 1
-
-						# i store the value of the highest value of the objective function
-						value = c.fitnessValue
-						if value > self.max_fitness:
-							self.max_fitness = value
-
-						# i check that the size of the population don't exceed the maximum number of population retained
-						if self.NbPopulation >= Population.NbMaxPopulation:
-
-							self.getFitnessData()	
-
-							return
-
-				i+=1
-
-			#print(len(self.chromosomes))
-
+			
+			# Wait for all threads to complete
+			for thread in listThreads:
+				thread.join()
+			
+			self.getFitnessData()
+			
 		else:
 
 			# i select the two chromosomes that'll be mated to produce offsprings
@@ -151,7 +96,6 @@ class Population:
 				if chromosome != previousPopulation.chromosomes[0]:
 					del previousPopulation.chromosomes[0]
 					previousPopulation.chromosomes.insert(0, chromosome)
-					previousPopulation.getFitnessData() # i make calculations over the resulting population
 					#print (" different !")
 
 				else:  
@@ -171,9 +115,10 @@ class Population:
 						i+=1
 
 					#print " not different ! 2 ", Population.startingPopulation
-
-					Population.startingPopulation.getFitnessData()
 					previousPopulation = copy.deepcopy(Population.startingPopulation)
+
+				previousPopulation.getFitnessData() # i make calculations over the resulting population
+				previousPopulation.getElite()
 
 			#print(" Memory : ", Population.ga_memory)
 				
@@ -184,13 +129,14 @@ class Population:
 				Population.stopFlag.insert(0, True)
 				return
 
-			#print " population 2 : ", previousPopulation#, " starting with :", Population.startingPopulation
+			#print " population 2 : ", previousPopulation #, " starting with :", Population.startingPopulation
 			#print " Percentage : ", previousPopulation.listFitnessData
 
 			# i perform the roulette-wheel method to select the parents
 			chromosomes = []
+			chromosomes.append(previousPopulation.elite) # i add the best chromosome of the previous population to the current population
 
-			i = 0
+			i = 1
 			while i < previousPopulation.NbPopulation:
 
 				rand_prob1 = randint(1,99)
@@ -207,9 +153,11 @@ class Population:
 					lbound = previousPopulation.listFitnessData[j]
 					j += 1
 
-				#print("CrossOver : ", random_chrom1, " and : " , random_chrom2)
+				#print("Parent 1 : ", chromosome1, "Parent 2 : ", chromosome2)
 
 				chromosome3,chromosome4 = self.applyCrossOverto(chromosome1,chromosome2)
+
+				#print("Child 3 : ", chromosome3, " Child 4 : ", chromosome4)
 
 				# In the following lines, i intend to select the best two chromosomes out of both the parents and the generated offsprings
 				tempList = []
@@ -219,6 +167,8 @@ class Population:
 				tempList.append(chromosome4)
 
 				chromosome3, chromosome4 = getBestChroms(tempList)
+
+				#print(" Resulting Child 3 : ", chromosome3, " Resulting Child 4 : ", chromosome4)
 
 				#if self.isFeasible(chromosome3) is False or self.isFeasible(chromosome4) is False:
 				#	print("c3 : ", c3, " c4 : ", c4)
@@ -263,10 +213,15 @@ class Population:
 				if value > self.max_fitness:
 					self.max_fitness = value
 
+				# i want to store the best chromosome of the population
+				if value < self.min_fitness:
+					self.min_fitness = value
+					self.elite = copy.deepcopy(chromosome)
+
 				#print("Population {0} :".format(i), self.population[i], " Iteration : ", it)
 				i+=1	
 
-			#print " population 3 : ", self#, " starting with :", Population.startingPopulation
+			#print " population 3 : ", self #, " starting with :", Population.startingPopulation
 			#print " "
 		# When the entire population has been formed, then i compute some statistic data on the given population
 		self.getFitnessData()	
@@ -408,3 +363,256 @@ class Population:
 
 		#print(" Fitness Data 2 : ", self.listFitnessData)
 		
+	def getElite(self):
+		
+		self.min_fitness = pow(10,6)
+		for chromosome in self.chromosomes:
+			value = chromosome.fitnessValue
+			if value < self.min_fitness:
+				self.min_fitness = value
+				self.elite = chromosome
+
+	
+	def searchEachPermutation(self, listPermutations, initializerThreadsLock):
+
+		nbConsecutiveBadChromosomes = 0
+		while True:
+
+			j = 0
+			nbPermutations = len(listPermutations)
+			while j < nbPermutations:
+
+				permutationJ = listPermutations[j] 
+				#print(" - ", i, " permutation : ", permutationJ)
+
+				# i create a chromosome and fill it with some zeros
+				solution = []
+				k = 0
+				while k < Chromosome.problem.nbTimes:
+					solution.append(0)
+					k+=1
+
+				qual_sol = True # boolean variable that determines if the chromosome being formed is good or not
+
+				k = 0
+				while k < Chromosome.problem.nbItems:
+
+					itemK = permutationJ[k]
+					itemKDemandPeriods = Chromosome.problem.deadlineDemandPeriods[itemK-1]
+
+					l = 0
+					size_itemKDemandPeriods = len(itemKDemandPeriods)
+					while l < size_itemKDemandPeriods:
+
+						periodL = itemKDemandPeriods[l]
+
+						m = 0
+						zeroperiods = []
+						while m <= periodL:
+
+							if solution[m] == 0 : 
+								zeroperiods.append(m)
+
+							m+=1
+
+						nbZeroPeriods = len(zeroperiods)
+						if nbZeroPeriods == 0:
+							qual_sol = False
+							break
+						else:
+							random_indice = randint(0, nbZeroPeriods-1)
+							del solution[zeroperiods[random_indice]]
+							solution.insert(zeroperiods[random_indice],itemK)
+
+						l+=1
+
+					k+=1
+
+					if qual_sol is False:
+						break
+
+				j+=1
+
+				c = Chromosome(solution)
+				if qual_sol is True:
+
+					nbConsecutiveBadChromosomes = 0
+
+					c.getFeasible()
+					c.advmutate() # i want to get the best chromosome out of this one by applying a slight mutation to this
+					# TODO get back to advmutate()
+					#c.mutate()
+
+					# Get lock to synchronize threads
+					initializerThreadsLock.acquire()
+
+					if c not in self.chromosomes:
+						self.chromosomes.append(c)
+						self.NbPopulation += 1
+
+					# Free lock to release next thread
+					initializerThreadsLock.release()
+
+					# i store the value of the highest value of the objective function
+					value = c.fitnessValue
+					if value > self.max_fitness:
+						self.max_fitness = value
+
+					# i want to store the best chromosome of the population
+					if value < self.min_fitness:
+						self.min_fitness = value
+						self.elite = copy.deepcopy(c)
+
+					# i check that the size of the population don't exceed the maximum number of population retained
+					if self.NbPopulation >= Population.NbMaxPopulation:
+
+						self.getFitnessData()	
+
+						return
+
+				else:
+					# every time, we encounter a bad chromome with regards of our definition of bad chromosome, we increment the counter
+					# and after a given number of bad consecutive chromosomes, the program know that any further good chromosomes cans be found
+					nbConsecutiveBadChromosomes += 1
+
+					if nbConsecutiveBadChromosomes == self.limitNbConsecutiveBadChromosomes:
+						return
+
+class Node:
+
+	def __init__(self):
+
+		self.solution = []
+		self.currentItem = 0
+		self.currentPeriod = 0
+
+	def __repr__(self):
+		return " Chromosome : " + str(self.solution) + " Current Item : " + str(self.currentItem) + " Current Period : " + str(self.currentPeriod)
+
+	def isLeaf(self):
+		
+		if self.currentItem == Chromosome.problem.nbItems and self.currentPeriod == len(Chromosome.problem.deadlineDemandPeriods[self.currentItem-1]):
+			return True
+		return False
+		
+	
+#--------------------
+# Class : PopInitializerThread
+# author : Tafsir GNA
+# purpose : Describing the structure of an instance to the algorithm
+#--------------------
+
+class PopInitializerThread(Thread):
+
+	def __init__(self, threadId, root, population, initializerThreadsLock):
+		Thread.__init__(self)
+		self.threadId = threadId
+		self.root = root
+		self.initializerThreadsLock = initializerThreadsLock
+		self.population = population
+
+	def run(self):
+		
+		currentNode = copy.copy(self.root)
+		queue = []
+
+		while True:
+
+			if self.population.NbPopulation >= Population.NbMaxPopulation:
+				return
+
+			if currentNode.isLeaf():
+
+				c = Chromosome(list(currentNode.solution))
+				c.getFeasible()
+				c.advmutate()
+
+				#print("Leaf : ", c)
+
+				# Get lock to synchronize threads
+				self.initializerThreadsLock.acquire()
+
+				if c not in self.population.chromosomes:
+					self.population.chromosomes.append(c)
+					self.population.NbPopulation += 1
+
+				# i store the value of the highest value of the objective function
+				value = c.fitnessValue
+				if value > self.population.max_fitness:
+					self.population.max_fitness = value
+
+				# i want to store the best chromosome of the population
+				if value < self.population.min_fitness:
+					self.population.min_fitness = value
+					self.population.elite = copy.deepcopy(c)
+
+				# i check that the size of the population don't exceed the maximum number of population retained
+				if self.population.NbPopulation >= Population.NbMaxPopulation:
+					# Free lock to release next thread
+					self.initializerThreadsLock.release()	
+					return
+
+				# Free lock to release next thread
+				self.initializerThreadsLock.release()				
+
+			else:
+
+				#print ("current Node : ", currentNode)
+
+				nextItem = 0
+				nextPeriod = 0
+
+				# i produce the successors of this current node
+				if currentNode.currentPeriod < len(Chromosome.problem.deadlineDemandPeriods[currentNode.currentItem-1]):
+
+					nextItem = currentNode.currentItem
+					nextPeriod = currentNode.currentPeriod + 1
+
+				elif currentNode.currentItem < Chromosome.problem.nbItems:
+
+					nextItem = currentNode.currentItem + 1
+					nextPeriod = 1
+
+				if nextItem != 0:
+
+					period = Chromosome.problem.deadlineDemandPeriods[nextItem-1][nextPeriod-1]
+
+					#if self.threadId == 1:
+					#	print("p", nextItem, nextPeriod, period)
+
+					i = 0
+					zeroperiods = []
+					while i <= period:
+
+						if currentNode.solution[i] == 0 : 
+							zeroperiods.append(i)
+
+						i += 1
+
+					nbZeroPeriods = len(zeroperiods)
+
+					i = 0
+					while i < nbZeroPeriods:
+
+						solution = list(currentNode.solution)
+						del solution[zeroperiods[i]]
+						solution.insert(zeroperiods[i],nextItem)
+
+						nextNode = Node()
+						nextNode.currentItem = nextItem
+						nextNode.currentPeriod = nextPeriod
+						nextNode.solution = solution
+
+						#print ("childNode : ", nextNode)
+
+						queue.append(copy.copy(nextNode))
+
+						i += 1
+
+			sizeQueue = len(queue)
+			if sizeQueue == 0:
+				break
+
+			currentNode = copy.copy(queue[sizeQueue-1])
+			del queue[sizeQueue-1]
+			

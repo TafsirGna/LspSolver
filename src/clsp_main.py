@@ -1,8 +1,10 @@
-#!/usr/bin/python
+#!/usr/bin/python3.5
 # -*-coding: utf-8 -*
 
 # TODO 
-# - give some updates to the implementation of the insertion of the new population into the the former one
+# - give some updates to the implementation of the insertion of the new population into the the former one (test elistism)
+# - implement a dynamic values for the parameters depending on the evolution of the algorithm over time
+# - another one approach is to take into account the cost of each item to privilegiate a way of implementation of genetic operators 
 
 #--- importation of the modules
 
@@ -34,6 +36,8 @@ genAlgo = GeneticAlgorithm(instance)
 print("-------	Step 2 : Processing the genetic algorithm	--------")
 
 genAlgo.initPopulation()
+
+print(genAlgo.population)
 
 genAlgo.process()
 

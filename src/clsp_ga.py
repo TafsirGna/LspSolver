@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3.5
 # -*-coding: utf-8 -*
 
 from population import *
@@ -15,7 +15,6 @@ class GeneticAlgorithm:
 	NbMaxPopulation = 35
 	mutationRate = 0.15
 	crossOverRate = 0.70
-	nbInitIterations = 50
 	FITNESS_PADDING = 1
 
 	# Builder
@@ -48,7 +47,6 @@ class GeneticAlgorithm:
 		Chromosome.hashTable = self.hashTable
 
 		# i set some class' properties of Population class
-		Population.nbInitIterations = GeneticAlgorithm.nbInitIterations
 		Population.NbMaxPopulation = GeneticAlgorithm.NbMaxPopulation
 		Population.FITNESS_PADDING = GeneticAlgorithm.FITNESS_PADDING
 		Population.crossOverRate = GeneticAlgorithm.crossOverRate
