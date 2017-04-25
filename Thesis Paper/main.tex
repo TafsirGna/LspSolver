@@ -134,6 +134,7 @@ ces dernières décennies depuis les travaux de Wagner et Within en 1958. \\
 	%\newpage
 		\section*{Introduction}
 		\addcontentsline{toc}{section}{Introduction}
+		L'état de l'art revêt une grande importance dans la conduite d'un travail de recherche. Elle permet de fixer les idées quant au travail qui a été déjà fait dans le domaine. Il s'agira donc principalement dans cette première partie de présenter la revue de littérature des problèmes de planification de production, d'exposer les travaux sur les algorithmes génétiques et de montrer en quoi les algorithmes génétiques sont particulièrement adaptés à ces genres de problèmes.
 		\section*{Conclusion}
 		\addcontentsline{toc}{section}{Conclusion}
 		
@@ -156,24 +157,49 @@ satisfaire les demandes des clients tout en :
 		\item[•] respectant la capacité de production de la machine;
 		\item[•] minimisant les coûts de stockage et de changeover.
 	\end{itemize}
-	\hspace*{.5cm} On suppose que la période de production est suffisamment courte pour ne
-produire qu’au plus un article par période et que les demandes sont normalisées : la capacité de production de la machine est limitée à un article par
+	\hspace*{.5cm} On suppose que la période de production est suffisamment courte pour ne produire qu’au plus un article par période et que les demandes sont normalisées : la capacité de production de la machine est limitée à un article par
 période et d(i, t) $ \in $ {0, 1} avec i l’article et t la période.\\
-	\hspace*{.5cm} Il s’agit d’un problème de planification de production ayant les caractéristiques suivantes : un horizon de planification discret et fini ; des contraintes de
-capacité ; une demande statique et déterministe ; multi-item et small bucket,
-des coûts de changeover; un seul niveau; sans shortage.\\
+	\hspace*{.5cm} Il s’agit d’un problème de planification de production ayant les caractéristiques suivantes : un horizon de planification discret et fini ; des contraintes de capacité ; une demande statique et déterministe ; multi-item et small bucket, des coûts de changeover; un seul niveau; sans shortage.\\
 
-	\hspace*{.5cm} \textbf{\textsl{Illustration}} : Soit un problème avec les données ci-dessous : \\
+	\textbf{\textsl{Illustration}} : Soit un problème avec les données ci-dessous : \\
 	\begin{itemize}
 		\item[•] Nombre d’articles : $NI = 2$;
 		\item[•] Nombre d’articles : $NI = 2$;
-		\item[•] Demande par période. Soit d(i, t) la demande de l’article i à la période t : $d(1, t) = (0, 1, 0, 0, 1) et d(2, t) = (1, 0, 0, 0, 1)$;
+		\item[•] Demande par période. Soit d(i, t) la demande de l’article i à la période t : $d(1, t) = (0, 1, 0, 0, 1)$ et $d(2, t) = (1, 0, 0, 0, 1)$;
 		\item[•] Coût de stockage. Soit h(i) le coût de stockage de l’article i : $h(1) = h(2) = 2$;
 	\end{itemize}
 	Soit \emph{xT} le plan de production qui représente une solution potentielle du problème. Il s’agit d’un tableau de dimension \emph{NT} , contenant à son indice t (avec $t  \in  {1...NT}$) l’article i à produire. Une solution admissible du problème est : $ xT = (2, 1, 2, 0, 1)$ avec un coût de $ q(2, 1) + q(1, 2) + q(2, 1) + 2 * h(2) = 15 $. La solution optimale est : $ xT = (2, 1, 0, 1, 2)$ avec un coût de $q(2, 1) + q(1, 2) + h(1) = 10$.
 		
 		\section{Modèle et formulation}
+		Différents modèles ont été proposés afin de représenter les problèmes de planification de production. Suivant le niveau du problème (single-level ou multi-level), le nombre de ressources à considérer (single-resource ou multi-resource) ou que le problème soit encore \emph{small bucket} ou \emph{big bucket}, les modèles en planification de production se rangent dans différentes catégories.   Dans les modèles \emph{small bucket}, au plus un type d'article  peut être produit sur une ressource durant chaque période de temps. Ainsi, un unique article est affecté à chaque période de planification et la séquence d'affectation article-période qui en résulte, définit le plan de production. Aussi dans les modèles \emph{small bucket}, la production d'un lot peut s'étaler sur plusieurs périodes et les coûts de production ne sont pris en compte que s'il y a un nouveau lot à produire. Pour modéliser cela, de nouvelles variables encore appelées variables de \emph{setup} ou variables de \emph{change-over} dans le cas du PSP sont utilisées. \\
+		\hspace*{.5cm} Ainsi, le modèle suivant proposé par Pochet et Wolsey (2006, §14.4) s'avère à la fois intéressant et satisfaisant dans le cadre de notre étude.\\
+		\\
+		\textbf{\textsl{Modèle utilisé}} :
+		\begin{eqnarray}
+			min \sum_{i,j,t} q^{i,j}ch_{t}^{i,j} + \sum_{i,t} h^{i} s_{t}^{i} \\
+			s_{0}^{i} = 0, \forall i \\
+			x_{t}^{i} + s_{t-1}^{i} = d_{t}^{i} + s_{t}^{i}, \forall i,t \\
+			x_{t}^{i} \leq y_{t}^{i}, \forall i,t \\
+			\sum_{i} y_{t}^{i} = 1 , \forall t \\
+			ch_{t}^{i,j} = y_{t-1}^{i} + y_{t}^{j} - 1, \forall i,j,t \\
+			x,y,ch \in \{0,1\}, s \in N, i \in \{0..NI\}, t \in \{1..NT\}
+		\end{eqnarray}
 		
+		avec les variables de décisions suivantes: \\
+		\begin{itemize}
+			\item[-] $x_{t}^{i}$ : variable binaire de production qui vaut 1 si l’article i est produit à la période t et 0 sinon ;
+			\item[-] $y_{t}^{i}$ : variable binaire de setup qui vaut 1 si la machine est préparée pour la production de l’article i et 0 sinon ;
+			\item[-] $s_{t}^{i}$ : variable entière de stockage qui contient le nombre d’articles i stockés à la période t ; 
+			\item[-] $ch_{t}^{i,j}$ : variable binaire de changeover qui vaut 1 si à la période t, on est passé de la production de l’article i à l’article j et 0 sinon.
+		\end{itemize}
+		\vspace*{.3cm}
+		\textbf{\textsl{Formulation du modèle}} :\\
+		\\
+	\hspace*{.5cm} L'objectif est de minimiser la somme des coûts de stockage et des coûts de changeover et est exprimé par la contrainte (1). La contrainte (2) rappelle qu'il n'y a pas de stock initial. La contrainte (3) exprime la règle de la conservation de flot. La contrainte (4) vise à forcer la variable de setup $y_{t}^{i}$ à prendre la valeur 1 s’il y a production de l’article i à la période t. La contrainte (5) s'assure qu'il y a toujours un article qui est préparé. En accord avec la fonction objectif, $y_{t}^{i}$ va prendre la valeur qui minimise le coût de changeover. En général s’il n’y a pas de production à la période t,
+$y_{t}^{i} = y_{t-1}^{i}$ ou $y_{t}^{i} = y_{t+1}^{i}$
+mais parfois il peut être intéressant de préparer
+la machine pour un article intermédiaire sans le produire. La contrainte (6) assigne les valeurs aux variables de changeover.
+En effet, si $y_{t-1}^{i}$ et $y_{t}^{i}$ valent 1 alors $ch_{t}^{i,j}$ est obligé de prendre la valeur 1 et sinon $ch_{t}^{i,j}$ serait égale à 0 grâce à la fonction objectif qui minimise le coût de changeover.
 		\section{Description de l'approche heuristique}
 			\subsection{Représentation génétique}
 
@@ -187,6 +213,7 @@ des coûts de changeover; un seul niveau; sans shortage.\\
 		
 		\section*{Conclusion}
 		\addcontentsline{toc}{section}{Conclusion}
+		Cette deuxième partie a été l'occasion dans un premier temps d'expliciter le problème du Pigment Sequencing Problème (PSP), de présenter le modèle mathématique utilisé ainsi que sa formulation. Dans un second temps, nous avons présenté et détaillé l'approche heuristique basée sur les algorithmes génétiques utilisée afin de résoudre le problème. La troisième partie sera l'occasion de tester notre solution et d'analyser les résultats afin de les comparer à l'état de l'art en la matière.
 		
 	\newpage
 	
