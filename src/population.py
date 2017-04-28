@@ -327,12 +327,13 @@ class Node:
 		self.solution = []
 		self.currentItem = 0
 		self.currentPeriod = 0
+		self.itemCounter = 0
 
 	def __repr__(self):
-		return " Chromosome : " + str(self.solution) + " Current Item : " + str(self.currentItem) + " Current Period : " + str(self.currentPeriod)
+		return " Chromosome : " + str(self.solution) + " Current Item : " + str(self.currentItem) + " Current Period : " + str(self.currentPeriod) + " Item Counter : " + str(self.itemCounter)
 
 	def isLeaf(self):
 		
-		if self.currentItem == Chromosome.problem.nbItems and self.currentPeriod == len(Chromosome.problem.deadlineDemandPeriods[self.currentItem-1]):
+		if self.itemCounter == Chromosome.problem.nbItems and self.currentPeriod == len(Chromosome.problem.deadlineDemandPeriods[self.currentItem-1]):
 			return True
 		return False

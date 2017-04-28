@@ -11,18 +11,22 @@ from population import *
 
 class ClspThread(Thread):
 
-	def __init__(self, threadId, root):
+	def __init__(self, threadId, root, slaveThreadsManager):
 		Thread.__init__(self)
 		self.threadId = threadId
 		self.setName = "Thread - " + str(threadId)
 		self.root = root
 		self.population = Population()
 		self.thread_memory = []
-		self.locker = 0
+		self.slaveThreadsManager = slaveThreadsManager
+		self.locker = threading.Lock()
+
 
 	def run(self):
 
 		self.initPopulation()
+
+		'''
 		self.population.thread_memory = self.thread_memory
 
 		self.startingPopulation = copy.copy(self.population)
@@ -48,70 +52,51 @@ class ClspThread(Thread):
 			#print "Current population : ", self.population.chromosomes , self.population.NbPopulation
 
 			i += 1
+		'''
 
-		
 	def initPopulation(self):
 		
 		currentNode = copy.copy(self.root)
 		queue = []
 		#print(self.name)
+		#nbInitialPopulation = 0
 
 		while True:
 
 			if currentNode.isLeaf():
 
-				c = Chromosome(list(currentNode.solution))
-				#c.getFeasible()
-				c.advmutate()
-
-				#print("Leaf : ", c)
+				self.slaveThreadsManager.compute(self.population, self.locker, copy.copy(currentNode.solution))
 
 				# Get lock to synchronize threads
-				#self.initializerThreadsLock.acquire()
-
-				if c not in self.population.chromosomes:
-					self.population.chromosomes.append(c)
-					self.population.NbPopulation += 1
-
-				# i store the value of the highest value of the objective function
-				value = c.fitnessValue
-				if value > self.population.max_fitness:
-					self.population.max_fitness = value
-
-				# i want to store the best chromosome of the population
-				if value < self.population.min_fitness:
-					self.population.min_fitness = value
-					self.population.elite = copy.copy(c)
-
+				self.locker.acquire()	
 				# i check that the size of the population don't exceed the maximum number of population retained
 				if self.population.NbPopulation >= Population.NbMaxPopulation:
+					break	
 
-					# Free lock to release next thread
-					#self.initializerThreadsLock.release()	
-					self.population.getFitnessData()
-					#print ("End ", self.population)
-					return
-
-				# Free lock to release next thread
-				#self.initializerThreadsLock.release()				
+				# Free lock to release 
+				self.locker.release()
 
 			else:
-
 				#print ("current Node : ", currentNode)
 
 				nextItem = 0
 				nextPeriod = 0
+				nextItemCounter = 0
 
 				# i produce the successors of this current node
 				if currentNode.currentPeriod < len(Chromosome.problem.deadlineDemandPeriods[currentNode.currentItem-1]):
 
 					nextItem = currentNode.currentItem
 					nextPeriod = currentNode.currentPeriod + 1
+					nextItemCounter = currentNode.itemCounter
 
-				elif currentNode.currentItem < Chromosome.problem.nbItems:
+				elif currentNode.itemCounter < Chromosome.problem.nbItems:
 
 					nextItem = currentNode.currentItem + 1
+					if nextItem == Chromosome.problem.nbItems + 1:
+						nextItem = 1
 					nextPeriod = 1
+					nextItemCounter = currentNode.itemCounter + 1
 
 				if nextItem != 0:
 
@@ -142,6 +127,7 @@ class ClspThread(Thread):
 						nextNode.currentItem = nextItem
 						nextNode.currentPeriod = nextPeriod
 						nextNode.solution = solution
+						nextNode.itemCounter = nextItemCounter
 
 						#print ("childNode : ", nextNode)
 
@@ -151,12 +137,13 @@ class ClspThread(Thread):
 
 			sizeQueue = len(queue)
 			if sizeQueue == 0:
-				self.population.getFitnessData()
-				#print ("End ", self.population)
-				return
+				break
 
 			currentNode = copy.copy(queue[sizeQueue-1])
 			del queue[sizeQueue-1]
+
+		self.population.getFitnessData()
+		print ("End ", self.population)
 
 
 	#--------------------
