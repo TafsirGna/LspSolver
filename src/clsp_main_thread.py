@@ -19,22 +19,20 @@ class ClspThread(Thread):
 		self.population = Population()
 		self.thread_memory = []
 		self.slaveThreadsManager = slaveThreadsManager
-		self.locker = threading.Lock()
 
 
 	def run(self):
 
 		self.initPopulation()
 
-		'''
+		
 		self.population.thread_memory = self.thread_memory
-
-		self.startingPopulation = copy.copy(self.population)
-		self.population.startingPopulation = self.startingPopulation
+		self.population.slaveThreadsManager = self.slaveThreadsManager
+		self.population.startingPopulation = copy.copy(self.population)
 
 		# After the initial population has been created, i launch the search process
 		i = 0
-		while len(self.thread_memory) < 3 :
+		while len(self.thread_memory) < 7 :
 
 			#print ("Population : ", i, self.population)
 
@@ -42,20 +40,22 @@ class ClspThread(Thread):
 				print("the thread has exited !")
 				return
 
-			if i == 100:
+			if i == 50:
 				break 
 
 			population = Population()
-			population.initialize(copy.copy(self.population), self.locker)
+			population.initialize(copy.copy(self.population))
 			self.population = copy.copy(population)
+			#print ("yes", self.population)
 
 			#print "Current population : ", self.population.chromosomes , self.population.NbPopulation
 
 			i += 1
-		'''
+		
 
 	def initPopulation(self):
 		
+		locker = threading.Lock()
 		currentNode = copy.copy(self.root)
 		queue = []
 		#print(self.name)
@@ -65,16 +65,16 @@ class ClspThread(Thread):
 
 			if currentNode.isLeaf():
 
-				self.slaveThreadsManager.compute(self.population, self.locker, copy.copy(currentNode.solution))
+				self.slaveThreadsManager.compute(self.population, locker, copy.copy(currentNode.solution))
 
 				# Get lock to synchronize threads
-				self.locker.acquire()	
+				locker.acquire()	
 				# i check that the size of the population don't exceed the maximum number of population retained
 				if self.population.NbPopulation >= Population.NbMaxPopulation:
 					break	
 
 				# Free lock to release 
-				self.locker.release()
+				locker.release()
 
 			else:
 				#print ("current Node : ", currentNode)
@@ -100,40 +100,7 @@ class ClspThread(Thread):
 
 				if nextItem != 0:
 
-					period = Chromosome.problem.deadlineDemandPeriods[nextItem-1][nextPeriod-1]
-
-					#if self.threadId == 1:
-					#	print("p", nextItem, nextPeriod, period)
-
-					i = 0
-					zeroperiods = []
-					while i <= period:
-
-						if currentNode.solution[i] == 0 : 
-							zeroperiods.append(i)
-
-						i += 1
-
-					nbZeroPeriods = len(zeroperiods)
-
-					i = 0
-					while i < nbZeroPeriods:
-
-						solution = list(currentNode.solution)
-						del solution[zeroperiods[i]]
-						solution.insert(zeroperiods[i],nextItem)
-
-						nextNode = Node()
-						nextNode.currentItem = nextItem
-						nextNode.currentPeriod = nextPeriod
-						nextNode.solution = solution
-						nextNode.itemCounter = nextItemCounter
-
-						#print ("childNode : ", nextNode)
-
-						queue.append(copy.copy(nextNode))
-
-						i += 1
+					self.putNextItem(nextItem, nextPeriod, nextItemCounter, currentNode, queue)
 
 			sizeQueue = len(queue)
 			if sizeQueue == 0:
@@ -169,3 +136,68 @@ class ClspThread(Thread):
 
 	def sendMigrants():
 		pass
+
+	def putNextItem(self, nextItem, nextPeriod, nextItemCounter, currentNode, queue):
+
+		#print ("putNextItem : solution : ", currentNode.solution)
+
+		period = Chromosome.problem.deadlineDemandPeriods[nextItem-1][nextPeriod-1]
+
+		#if self.threadId == 1:
+		#	print("p", nextItem, nextPeriod, period)
+
+		i = 0
+		zeroperiods = []
+		zeroperiodsCostTab = []
+		while i <= period:
+
+
+			if currentNode.solution[i] == 0 : 
+
+				cost = Chromosome.getCostof(i, nextItem, nextPeriod, currentNode.solution)
+				if zeroperiodsCostTab == [] or zeroperiods == []:
+
+					zeroperiods.append(i)
+					zeroperiodsCostTab.append(cost)
+
+				else:
+				# i sort the list of zeroperiods from the most convenient place to the least convenient one
+					size = len(zeroperiodsCostTab)
+					prevCost = 0
+					j = 0
+					while j < size:
+
+						if cost >= prevCost and cost <= zeroperiodsCostTab[j]:
+
+							zeroperiods = zeroperiods[:j] + [i] + zeroperiods[j:]
+							zeroperiodsCostTab = zeroperiodsCostTab[:j] + [cost] + zeroperiodsCostTab[j:]
+							break
+
+						prevCost = zeroperiodsCostTab[j]
+
+						j += 1
+
+			i += 1
+
+		#print ("putNextItem : zeroperiods : ", zeroperiods , ", zeroperiodsCostTab : ", zeroperiodsCostTab)
+		nbZeroPeriods = len(zeroperiods)
+
+		i = nbZeroPeriods - 1
+		while i >= 0:
+
+			#print (" zeroperiods i : " , zeroperiods[i])
+			solution = list(currentNode.solution)
+			del solution[zeroperiods[i]]
+			solution.insert(zeroperiods[i],nextItem)
+
+			nextNode = Node()
+			nextNode.currentItem = nextItem
+			nextNode.currentPeriod = nextPeriod
+			nextNode.solution = solution
+			nextNode.itemCounter = nextItemCounter
+
+			#print ("childNode : ", nextNode)
+
+			queue.append(copy.copy(nextNode))
+
+			i -= 1

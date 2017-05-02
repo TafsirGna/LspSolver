@@ -6,6 +6,8 @@
 # - implement a dynamic values for the parameters depending on the evolution of the algorithm over time
 # - another one approach is to take into account the cost of each item to privilegiate a way of implementation of genetic operators 
 # - another good clue is to put all the parameters value in a file and pass it as a parameter to the program via this file
+# - after a given number of generations without a significative enhancement of the solutions yet found, the thread stops
+# - try another way to initialize the population
 
 #--- importation of the modules
 

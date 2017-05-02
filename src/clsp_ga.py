@@ -13,7 +13,7 @@ from clsp_slave_thread import *
 class GeneticAlgorithm:
 
 	#	Class' variables
-	NbMaxPopulation = 35
+	NbMaxPopulation = 25
 	mutationRate = 0.05
 	crossOverRate = 0.70
 	FITNESS_PADDING = 1
@@ -40,6 +40,9 @@ class GeneticAlgorithm:
 		Population.FITNESS_PADDING = GeneticAlgorithm.FITNESS_PADDING
 		Population.crossOverRate = GeneticAlgorithm.crossOverRate
 		Population.ga_memory = self.ga_memory
+		Population.gaMemoryLocker = threading.Lock()
+
+		SlaveThreadsManager.crossOverRate = GeneticAlgorithm.crossOverRate
 
 		self.listMainThreads = [] # i initialize a list that's intended to contain all the main threads of this genetic algorithm program
 		self.slaveThreadsManager = SlaveThreadsManager(GeneticAlgorithm.nbSlavesThread) # i initialize a list that's intended to contain all the population's initialization threads 
@@ -68,7 +71,7 @@ class GeneticAlgorithm:
 
 		# i initialize each thread and put it into the corresponding list 
 		i = 0
-		while i <= 0:#period:
+		while i <= 1:#period:
 
 			# i initialize the node from which the search of each thread will start
 			root = Node()
