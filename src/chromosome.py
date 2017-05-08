@@ -551,6 +551,52 @@ class Chromosome(object):
 
 		return cost
 
+	def listAllAdvMutations(cls, solution):
+
+		solution1 = list(self._solution)
+		itemsRank1 = self.itemsRank
+
+		i = 0
+		while i < Chromosome.problem.nbTimes:
+
+			if solution1[i] != 0:
+
+				item1 = solution1[i]
+
+				item2 = 1
+
+				while item2 <= Chromosome.problem.nbItems :
+					
+					if item2 != item1:
+
+						item2DemandPeriods = Chromosome.problem.deadlineDemandPeriods[item2-1]
+
+						#print(" i : ", i," item2 : ", item2, " item2DemandPeriods : ", item2DemandPeriods)
+						j = i
+						solution2 = []
+						while j >= 0:
+							if solution1[j] == item2:
+								#print(" item's rank value : ", itemsRank[j], " j : ", j)
+								if item2DemandPeriods[itemsRank1[j]-1] >= i:
+									solution2 = switchGenes(solution1, j, i)
+									itemsRank2 = switchGenes(itemsRank1, j, i)									
+									break
+							j-=1
+
+						# i check if the resulting chromosome would have a better fitness than the current's fitness
+						if solution2 != []:
+
+							c = Chromosome(solution2)
+							if c.fitnessValue < self.fitnessValue:
+								self._solution = c.solution
+								self._itemsRank = c.itemsRank
+								self._fitnessValue = c.fitnessValue
+								self._hashSolution = c.hashSolution
+
+					item2 += 1
+
+			i+=1
+
 	# Class' methods
 	getCostof = classmethod(getCostof)
 
@@ -559,4 +605,3 @@ class Chromosome(object):
 	fitnessValue = property(_get_fitnessValue,_set_fitnessValue)
 	itemsRank = property(_get_itemsRanks, _set_itemsRanks)
 	hashSolution = property(_get_hashSolution, _set_hashSolution) 
-

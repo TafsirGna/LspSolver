@@ -24,54 +24,60 @@ class SlaveThreadsManager:
 		while i < nbSlaveThreads:
 			
 			slaveThread = SlaveThread()
-			self.listSlaveThreads.append(copy.copy(slaveThread))
+			self.listSlaveThreads.append(slaveThread)
 			(self.listSlaveThreads[i]).start()
-			(self.listSlaveThreads[i]).join()
 
 			i += 1
+
+		for thread in self.listSlaveThreads:
+			thread.join()
 
 		self.nextSlaveThread = self.listSlaveThreads[0] # variable that holds a reference to the next thread to which the received solution will be affected
 
 
-	def compute(self, threadPopulation, popLocker, solution):
+	def compute(self, population, popLocker, solution):
 
 		#print("Solution found : ", solution)
 
-		param = [threadPopulation, popLocker, solution]
+		param = [population, popLocker, solution]
 
 		self.nextSlaveThread.queueLocker.acquire()
 		self.nextSlaveThread.queue.append(param)
-		self.nextSlaveThread.queueSize += 1
 		self.nextSlaveThread.queueLocker.release()
 		self.nextSlaveThread.run()
 
 		# then i compute the next thread which the next solution will be sent to
-		queueSize = pow(10,6)
+		minQueueSize = pow(10,6)
 		for slaveThread in self.listSlaveThreads:
 			slaveThread.queueLocker.acquire()
-			if slaveThread.queueSize < queueSize:
+			queueSize = len(slaveThread.queue) 
+			if queueSize < minQueueSize:
 				self.nextSlaveThread = slaveThread
-				queueSize = self.nextSlaveThread.queueSize
+				minQueueSize = queueSize
 			slaveThread.queueLocker.release()
 
 
-	def performCrossOver(self, previousPopulation, nextPopulation, popLocker, randValue1, randValue2):
+	def performCrossOver(self, prevPopData, nextPopulation, popLocker, randValue1, randValue2):
 		
+		previousPopulation = Population()
+		previousPopulation.chromosomes = prevPopData[0]
+		previousPopulation.listFitnessData = prevPopData[1]
+
 		param = [previousPopulation, nextPopulation, popLocker, randValue1, randValue2]
 
 		self.nextSlaveThread.queueLocker.acquire()
 		self.nextSlaveThread.queue.append(param)
-		self.nextSlaveThread.queueSize += 1
 		self.nextSlaveThread.queueLocker.release()
 		self.nextSlaveThread.run()
 
 		# then i compute the next thread which the next solution will be sent to
-		queueSize = pow(10,6)
+		minQueueSize = pow(10,6)
 		for slaveThread in self.listSlaveThreads:
 			slaveThread.queueLocker.acquire()
-			if slaveThread.queueSize < queueSize:
+			queueSize = len(slaveThread.queue) 
+			if queueSize < minQueueSize:
 				self.nextSlaveThread = slaveThread
-				queueSize = self.nextSlaveThread.queueSize
+				minQueueSize = queueSize
 			slaveThread.queueLocker.release()
 
 
@@ -81,36 +87,42 @@ class SlaveThread(Thread):
 
 		Thread.__init__(self)
 		self.queue = []
-		self.queueSize = 0
 		self.queueLocker = threading.Lock()
 
 	def run(self):
 		
-		#print ("queue's size : ", self.queueSize)
-		while self.queueSize > 0:
-
-			self.queueLocker.acquire()
+		param = []
+		self.queueLocker.acquire()
+		if len(self.queue) > 0:
 			param = self.queue[0]
 			del self.queue[0]
-			self.queueSize -= 1
-			self.queueLocker.release()
+		self.queueLocker.release()
+
+		while param != []:
 
 			if len(param) == 3:
 
-				c = Chromosome(copy.copy(param[2]))
+				c = Chromosome(param[2])
 				#c.getFeasible()
-				c.advmutate()
+				#c.advmutate()
 
-				self.insert(c, param[0], param[1], 0)
+				self.insert(c, param[0], param[1])
 
 			elif len(param) == 5:
 
 				self.applyCrossOver(param[0], param[1], param[2], param[3], param[4])
+
+			param = []
+			self.queueLocker.acquire()
+			if len(self.queue) > 0:
+				param = self.queue[0]
+				del self.queue[0]
+			self.queueLocker.release()
 				
 		
 	#--------------------
 	# function : mate
-	# Class : GeneticAlgorithm
+	# Class : SlaveThread
 	# purpose : Applying cross-over to two chromosomes given as parameters and returning the resulting chromosomes
 	#--------------------
 
@@ -176,9 +188,12 @@ class SlaveThread(Thread):
 
 	def applyCrossOver(self, previousPopulation, nextPopulation, popLocker, randValue1, randValue2):
 
+		#print("applyCrossOver 1 : ", randValue1, randValue2, len(previousPopulation.chromosomes), " Statistics : ", len(previousPopulation.listFitnessData))
+		#print("applyCrossOver 2 : ", randValue1, randValue2, previousPopulation.chromosomes, " Statistics : ", previousPopulation.listFitnessData)
+
 		j = 0
 		lbound = 0
-		while j < previousPopulation.NbPopulation:
+		while j < len(previousPopulation.listFitnessData):
 			if (randValue1 >= lbound and randValue1 <= previousPopulation.listFitnessData[j]):
 				chromosome1 = previousPopulation.chromosomes[j]
 			if (randValue2 >= lbound and randValue2 <= previousPopulation.listFitnessData[j]):
@@ -204,53 +219,86 @@ class SlaveThread(Thread):
 		#print("Finals : Child 3 : ", chromosome3, " Child 4 : ", chromosome4)
 
 		#print(" Resulting Child 3 : ", chromosome3, " Resulting Child 4 : ", chromosome4)
-
-		#if self.isFeasible(chromosome3) is False or self.isFeasible(chromosome4) is False:
-		#	print("c3 : ", c3, " c4 : ", c4)
-
-		Population.gaMemoryLocker.acquire()
-		isElement = chromosome3 not in Population.ga_memory
-		Population.gaMemoryLocker.release()
-
-		if isElement:
-			self.insert(chromosome3, nextPopulation, popLocker, 1)
-			#print( chromosome3, " pop State : ", nextPopulation.chromosomes)
-
-		Population.gaMemoryLocker.acquire()
-		isElement = chromosome4 not in Population.ga_memory
-		Population.gaMemoryLocker.release()
-
-		if isElement:
-			self.insert(chromosome4, nextPopulation, popLocker, 1)
-			#print( chromosome4, " pop State : ", nextPopulation.chromosomes)
+		
+		self.insert(chromosome3, nextPopulation, popLocker, previousPopulation)
+		self.insert(chromosome4, nextPopulation, popLocker, previousPopulation)
 
 		#print ("pop : ", nextPopulation.chromosomes)
 
-	def insert(self, chromosome, population, popLocker, state):
+	def insert(self, chromosome, population, popLocker, previousPopulation = 0):
 
 		# Get lock to synchronize threads
 		popLocker.acquire()
+		popSize = len(population.chromosomes)
 
-		if state == 0:
+		limit = Population.NbMaxPopulation
 
-			if chromosome not in population.chromosomes:
-				population.chromosomes.append(chromosome)
-				population.NbPopulation += 1
+		if previousPopulation != 0:
+			limit = len(previousPopulation.chromosomes)
+		
+		if popSize >= limit:
+			population.getFitnessData()
+			popLocker.release()
+			return 
 
-		elif state == 1:
-			
-			population.chromosomes.append(chromosome)
-			population.NbPopulation += 1
+		
+		if previousPopulation != 0:
+			chromosome.mutate()
+		else:
+			if chromosome in population.chromosomes:
+				#chromosome.advmutate()
+				popLocker.release()
+				return
 
-		# i store the value of the highest value of the objective function
-		value = chromosome.fitnessValue
-		if value > population.max_fitness:
-			population.max_fitness = value
+		#print("Insertion : ", chromosome)
+		if (population.chromosomes == []):
 
-		# i want to store the best chromosome of the population
-		if value < population.min_fitness:
-			population.min_fitness = value
-			population.elite = copy.copy(chromosome)
+			population.chromosomes.append(copy.deepcopy(chromosome))
+	
+		elif popSize == 1 and (population.chromosomes[0]).fitnessValue == 0:
 
+			population.chromosomes.append(copy.deepcopy(chromosome))
+
+		else:
+
+			# i sort the list of zeroperiods from the most convenient place to the least convenient one
+			prevValue = 0
+			j = 0
+			found = False
+			while j < popSize:
+
+				if chromosome.fitnessValue >= prevValue and chromosome.fitnessValue <= (population.chromosomes[j]).fitnessValue:
+					found = True
+
+					Population.gaMemoryLocker.acquire()
+					isElement = chromosome in Population.ga_memory
+					Population.gaMemoryLocker.release()
+
+					#print("in ga_memory : ", chromosome, " and ", Population.ga_memory, " and ", isElement)
+
+					if isElement is False:
+						population.chromosomes = population.chromosomes[:j] + [copy.deepcopy(chromosome)] + population.chromosomes[j:]
+					
+					break
+
+				prevValue = (population.chromosomes[j]).fitnessValue
+
+				j += 1
+
+			if found is False:
+
+				
+				Population.gaMemoryLocker.acquire()
+				isElement = chromosome in Population.ga_memory
+				Population.gaMemoryLocker.release()
+
+				#print("in ga_memory : ", chromosome, " and ", Population.ga_memory, " and ", isElement)
+
+				if isElement is False:
+					population.chromosomes.append(copy.deepcopy(chromosome))
+
+		#print("Yes ", population.chromosomes)
 		# Free lock to release next thread
 		popLocker.release()
+			
+			

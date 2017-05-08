@@ -13,7 +13,6 @@
 
 from clsp_ga import *
 import sys
-import time
 
 #---	Start 
 

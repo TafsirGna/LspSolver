@@ -15,11 +15,12 @@ class GeneticAlgorithm:
 	#	Class' variables
 	NbMaxPopulation = 25
 	mutationRate = 0.05
-	crossOverRate = 0.70
+	crossOverRate = 0.80
 	FITNESS_PADDING = 1
-	NbMigrants = 3
+	NbMigrants = 1
 	MigrationRate = 0
-	nbSlavesThread = 4
+	nbMainThreads = 3
+	nbSlavesThread = 3
 
 	# Builder
 	def __init__(self, inst):
@@ -38,7 +39,6 @@ class GeneticAlgorithm:
 		# i set some class' properties of Population class
 		Population.NbMaxPopulation = GeneticAlgorithm.NbMaxPopulation
 		Population.FITNESS_PADDING = GeneticAlgorithm.FITNESS_PADDING
-		Population.crossOverRate = GeneticAlgorithm.crossOverRate
 		Population.ga_memory = self.ga_memory
 		Population.gaMemoryLocker = threading.Lock()
 
@@ -55,23 +55,19 @@ class GeneticAlgorithm:
 
 	def start(self):
 
-		# i create a new population from scratch
 		# In order to create this new population, i use the deep first search(DFS) to create some potential good chromosomes
 
 		# i pick the item, i will start the scheduling with
-		item = 1
+		item = 2#randint(1, Chromosome.problem.nbItems)
 		period = Chromosome.problem.deadlineDemandPeriods[item-1][0]
-
-		i = 2
-		while i <= Chromosome.problem.nbItems:
-			if Chromosome.problem.deadlineDemandPeriods[i-1][0] < period:
-				period = Chromosome.problem.deadlineDemandPeriods[i-1][0]
-				item = i
-			i += 1
+		rootPerThread = math.ceil(period / GeneticAlgorithm.nbMainThreads)
 
 		# i initialize each thread and put it into the corresponding list 
-		i = 0
-		while i <= 1:#period:
+		i = period
+		threadQueue = []
+		threadCounter = 0
+
+		while i >= 0:
 
 			# i initialize the node from which the search of each thread will start
 			root = Node()
@@ -79,23 +75,61 @@ class GeneticAlgorithm:
 			root.currentPeriod = 1
 			root.itemCounter = 1
 
-			j = 0
-			while j < Chromosome.problem.nbTimes:
-				if j == i:
-					root.solution.append(item)
-				else:
-					root.solution.append(0)
-				j += 1
+			root.solution = [0] * Chromosome.problem.nbTimes
+			del root.solution[i]
+			root.solution.insert(i, item)
+			#print(root.solution)
 
-			#print(root)
+			root.fitnessValue = ClspThread.evaluate(root.solution)
+			
+			if (threadQueue == []):
 
-			# i initialize the thread and put it into a list of threads created for this purpose
-			clspThread = ClspThread(j, copy.copy(root), self.slaveThreadsManager)
-			self.listMainThreads.append(copy.copy(clspThread))
-			(self.listMainThreads[i]).start()
-			(self.listMainThreads[i]).join()
+				threadQueue.append(root)
+				#print(threadQueue)
+			
+			elif len(threadQueue) == 1 and (threadQueue[0]).fitnessValue == 0:
 
-			i += 1
+				threadQueue.append(root)
+				#print(threadQueue)
+
+			else:
+
+				# i sort the list of zeroperiods from the most convenient place to the least convenient one
+
+				size = len(threadQueue)
+				prevValue = 0
+				j = 0
+				found = False
+				while j < size:
+					
+					if root.fitnessValue >= prevValue and root.fitnessValue <= (threadQueue[j]).fitnessValue:
+						threadQueue = threadQueue[:j] + [root] + threadQueue[j:]
+						found = True
+						break
+					prevValue = (threadQueue[j]).fitnessValue
+					j += 1
+				if found is False:
+					threadQueue.append(root)
+
+
+			if  len(threadQueue) >= rootPerThread or i == 0:
+
+				# i initialize the thread and put it into a list of threads created for this purpose
+				clspThread = ClspThread(threadCounter, list(threadQueue), self.slaveThreadsManager, self.listMainThreads)
+				self.listMainThreads.append(clspThread)
+				(self.listMainThreads[threadCounter]).start()
+
+				threadQueue = []
+				threadCounter += 1
+
+				#if threadCounter == 1:
+				#	break
+
+			i -= 1
+
+		# want to make sure that the parent process will wait for the child threading before exiting
+		for thread in self.listMainThreads:
+			thread.join()
 
 		self.printResults()	
 	

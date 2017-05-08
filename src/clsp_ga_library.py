@@ -8,6 +8,7 @@ from threading import *
 import threading
 import copy
 import math
+import time
 
 #--------------------
 # file : clsp_ga_library
@@ -100,11 +101,7 @@ def getManufactPeriodsGrid(nbItems, deadlineDemandPeriods):
 
 def getListCounters(nbItems):
 
-	ItemsCounters = []
-	i = 0
-	while i < nbItems:
-		ItemsCounters.append(1)
-		i+=1
+	ItemsCounters = [1] * nbItems
 
 	return ItemsCounters
 
