@@ -133,8 +133,7 @@ class Chromosome(object):
 						self._itemsRank.append(counter)
 
 						# then, i increment the counter of this item
-						del gridCounters[item-1]
-						gridCounters.insert(item-1,(counter+1))
+						gridCounters[item-1] = (counter+1)
 
 					else:
 						self._itemsRank.append(0)
@@ -392,8 +391,7 @@ class Chromosome(object):
 
 					if value == -1:
 						itemDemandPeriods = self.manufactItemsPeriods[item-1]
-						del itemDemandPeriods[rank-1]
-						itemDemandPeriods.insert(rank-1, i)
+						itemDemandPeriods[rank-1] = i
 						#print(" It isn't yet in the tab")
 						#print(" == -1 ", item, i, rank)
 
@@ -407,16 +405,13 @@ class Chromosome(object):
 						#print(" cost 1 : ", cost1, " cost2 : ", cost2)
 						if cost2 < cost1 :
 							itemDemandPeriods = self.manufactItemsPeriods[item-1]
-							del itemDemandPeriods[rank-1]
-							itemDemandPeriods.insert(rank-1, i)
+							itemDemandPeriods[rank-1] = i
 
 							#print(" cost2 < cost1 : ", value, item)
-							del self._solution[value]
-							self._solution.insert(value, 0)
+							self._solution[value] = 0
 
 						else:
-							del self._solution[i]
-							self._solution.insert(i, 0)
+							self._solution[i] = 0
 				i+=1
 
 			#print(" in middle getFeasible : ", self._solution, ", ", self._itemsRank)
@@ -460,12 +455,10 @@ class Chromosome(object):
 									indice = zeroperiods[k]
 								k+=1
 
-							del self._solution[indice]
-							self._solution.insert(indice, i+1)
+							self._solution[indice] = i+1
 
 							itemDemandPeriods = self.manufactItemsPeriods[i]
-							del itemDemandPeriods[j]
-							itemDemandPeriods.insert(j, indice)
+							itemDemandPeriods[j] = indice
 
 						else:
 							
@@ -501,12 +494,10 @@ class Chromosome(object):
 											indice = zeroperiods[k]
 										k+=1
 
-									del self._solution[indice]
-									self._solution.insert(indice, i+1)
+									self._solution[indice] = i+1
 
 									itemDemandPeriods = self.manufactItemsPeriods[i]
-									del itemDemandPeriods[j]
-									itemDemandPeriods.insert(j, indice)
+									itemDemandPeriods[j] = indice
 
 									break
 								p += 1
@@ -524,8 +515,7 @@ class Chromosome(object):
 		solution = list(solution)
 
 		if secondIndice != -1:
-			del solution[secondIndice]
-			solution.insert(secondIndice,0)
+			solution[secondIndice] = 0
 
 		cost = 0
 		# stocking cost 
@@ -551,8 +541,10 @@ class Chromosome(object):
 
 		return cost
 
-	def listAllAdvMutations(cls, solution):
+	'''
+	def listAllAdvMutations(self):
 
+		results = []
 		solution1 = list(self._solution)
 		itemsRank1 = self.itemsRank
 
@@ -596,6 +588,7 @@ class Chromosome(object):
 					item2 += 1
 
 			i+=1
+	'''
 
 	# Class' methods
 	getCostof = classmethod(getCostof)

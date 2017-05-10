@@ -107,13 +107,8 @@ def getListCounters(nbItems):
 
 def switchGenes(chromosome,indice_gene1,indice_gene2):
 	c = list(chromosome)
-
-	del c[indice_gene1]
-	c.insert(indice_gene1, chromosome[indice_gene2])
-
-	del c[indice_gene2]
-	c.insert(indice_gene2, chromosome[indice_gene1])
-
+	c[indice_gene1] = chromosome[indice_gene2]
+	c[indice_gene2] = chromosome[indice_gene1]
 	return c
 
 def getManufactPeriods(chromosome,item):

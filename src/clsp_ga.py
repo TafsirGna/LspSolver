@@ -17,8 +17,8 @@ class GeneticAlgorithm:
 	mutationRate = 0.05
 	crossOverRate = 0.80
 	FITNESS_PADDING = 1
-	NbMigrants = 1
-	MigrationRate = 0
+	NumberOfMigrants = 1
+	MigrationRate = 0 # this variable holds the number of generations needed before a migration occurs during the search
 	nbMainThreads = 3
 	nbSlavesThread = 3
 
@@ -29,6 +29,9 @@ class GeneticAlgorithm:
 		self.hashTable = {} # hashTable is a dictionnary
 		self.ga_memory = []
 		self.ItemsCounters = getListCounters(self.instance.nbItems)
+		self.listMainThreads = [] # i initialize a list that's intended to contain all the main threads of this genetic algorithm program
+		self.slaveThreadsManager = SlaveThreadsManager(GeneticAlgorithm.nbSlavesThread) # i initialize a list that's intended to contain all the population's initialization threads 
+
 
 		# i impart some parameters to the chromosome class and population class
 		Chromosome.mutationRate = GeneticAlgorithm.mutationRate
@@ -41,11 +44,12 @@ class GeneticAlgorithm:
 		Population.FITNESS_PADDING = GeneticAlgorithm.FITNESS_PADDING
 		Population.ga_memory = self.ga_memory
 		Population.gaMemoryLocker = threading.Lock()
+		Population.MigrationRate = GeneticAlgorithm.MigrationRate
+		Population.slaveThreadsManager = self.slaveThreadsManager
 
 		SlaveThreadsManager.crossOverRate = GeneticAlgorithm.crossOverRate
-
-		self.listMainThreads = [] # i initialize a list that's intended to contain all the main threads of this genetic algorithm program
-		self.slaveThreadsManager = SlaveThreadsManager(GeneticAlgorithm.nbSlavesThread) # i initialize a list that's intended to contain all the population's initialization threads 
+		ClspThread.listMainThreads = self.listMainThreads
+		ClspThread.NumberOfMigrants = GeneticAlgorithm.NumberOfMigrants
 
 	#--------------------
 	# function : initPopulation
@@ -58,7 +62,7 @@ class GeneticAlgorithm:
 		# In order to create this new population, i use the deep first search(DFS) to create some potential good chromosomes
 
 		# i pick the item, i will start the scheduling with
-		item = 2#randint(1, Chromosome.problem.nbItems)
+		item = randint(1, Chromosome.problem.nbItems)
 		period = Chromosome.problem.deadlineDemandPeriods[item-1][0]
 		rootPerThread = math.ceil(period / GeneticAlgorithm.nbMainThreads)
 
@@ -76,8 +80,7 @@ class GeneticAlgorithm:
 			root.itemCounter = 1
 
 			root.solution = [0] * Chromosome.problem.nbTimes
-			del root.solution[i]
-			root.solution.insert(i, item)
+			root.solution[i] = item
 			#print(root.solution)
 
 			root.fitnessValue = ClspThread.evaluate(root.solution)
@@ -115,7 +118,7 @@ class GeneticAlgorithm:
 			if  len(threadQueue) >= rootPerThread or i == 0:
 
 				# i initialize the thread and put it into a list of threads created for this purpose
-				clspThread = ClspThread(threadCounter, list(threadQueue), self.slaveThreadsManager, self.listMainThreads)
+				clspThread = ClspThread(threadCounter, list(threadQueue))
 				self.listMainThreads.append(clspThread)
 				(self.listMainThreads[threadCounter]).start()
 

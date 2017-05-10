@@ -43,7 +43,13 @@ class SlaveThreadsManager:
 
 		self.nextSlaveThread.queueLocker.acquire()
 		self.nextSlaveThread.queue.append(param)
-		self.nextSlaveThread.queueLocker.release()
+
+		# weirdly, i have to check if the locker is locked before releasing it
+		if self.nextSlaveThread.queueLocker.locked:
+			try:
+				self.nextSlaveThread.queueLocker.release()
+			except:
+					print("DeadLock error : An unlocked thread can't be released")
 		self.nextSlaveThread.run()
 
 		# then i compute the next thread which the next solution will be sent to
@@ -67,7 +73,13 @@ class SlaveThreadsManager:
 
 		self.nextSlaveThread.queueLocker.acquire()
 		self.nextSlaveThread.queue.append(param)
-		self.nextSlaveThread.queueLocker.release()
+
+		# weirdly, i have to check if the locker is locked before releasing it
+		if self.nextSlaveThread.queueLocker.locked:
+			try:
+				self.nextSlaveThread.queueLocker.release()
+			except:
+					print("DeadLock error : An unlocked thread can't be released")
 		self.nextSlaveThread.run()
 
 		# then i compute the next thread which the next solution will be sent to

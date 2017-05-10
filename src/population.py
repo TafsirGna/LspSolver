@@ -12,6 +12,8 @@ class Population:
 	stopFlag = []
 	ga_memory = []
 	gaMemoryLocker = 0
+	MigrationRate = 0
+	slaveThreadsManager = 0
 
 	# builder 
 	def __init__(self):
@@ -20,18 +22,15 @@ class Population:
 		self.listFitnessData = []
 		self.lacksDiversity = False
 		self.thread_memory = []
-		self.slaveThreadsManager = 0
 
 
-	def initialize(self, previousPopulation):
+	def initialize(self, indiceMigration, previousPopulation):
 		
+		retVal = 0 # variable to be returned at the end
+
 		popLocker = threading.Lock()
 		self.startPopData = copy.deepcopy(previousPopulation.startPopData)
-
-		# i select the two chromosomes that'll be mated to produce offsprings
 		self.thread_memory = previousPopulation.thread_memory
-
-		self.slaveThreadsManager = previousPopulation.slaveThreadsManager
 
 		# In the case where there's a lack of diversity, i introduce a bit of diversity by flipping a gene of one chromosome in the population
 		if previousPopulation.lacksDiversity:
@@ -39,13 +38,13 @@ class Population:
 			#print(" CONVERGENCE : ", self.startingPopulation.chromosomes)
 			chromosome = copy.deepcopy(previousPopulation.chromosomes[0])
 			
-			# i store this local optima in the genetic algorithm's memory to remind it that it's already visit the solution
+			# i store this local optima in the genetic algorithm's memory to remind me that it's already been visited before
 			Population.gaMemoryLocker.acquire()
 
 			if chromosome not in Population.ga_memory:
 				Population.ga_memory.append(copy.deepcopy(chromosome))
 				self.thread_memory.append(copy.deepcopy(chromosome))
-
+				
 			Population.gaMemoryLocker.release()
 
 			chromosome.advmutate()
@@ -53,15 +52,16 @@ class Population:
 			if chromosome != previousPopulation.chromosomes[0]:
 				
 				if chromosome not in self.thread_memory:
-					del previousPopulation.chromosomes[0]
-					previousPopulation.chromosomes.insert(0, chromosome)
-					#print (" different !")
+					previousPopulation.chromosomes[0] = chromosome
+
+					retVal = 1 # this signals it's time for migration
+
 				else:
 
 					self.chromosomes = []
 					self.listFitnessData = []
 					self.lacksDiversity = False
-					return
+					return retVal
 
 			else:  
 
@@ -91,7 +91,7 @@ class Population:
 			self.chromosomes = []
 			self.listFitnessData = []
 			self.lacksDiversity = False
-			return
+			return retVal
 		
 		#print("Starting population : ", self.startPopData[0])
 		#print ("population inter : ", previousPopulation)
@@ -120,12 +120,17 @@ class Population:
 
 			#print(randValue1, randValue2, " memory : ", Population.ga_memory, " and ", self.chromosomes)
 
-			self.slaveThreadsManager.performCrossOver(copy.deepcopy(prevPopData), self, popLocker, randValue1, randValue2)
+			Population.slaveThreadsManager.performCrossOver(copy.deepcopy(prevPopData), self, popLocker, randValue1, randValue2)
 
 			#time.sleep(0.005)
-		#self.getFitnessData()
 
-		# When the entire population has been formed, then i compute some statistic data on the given population
+		indiceMigration += 1
+
+		if Population.MigrationRate != 0 and indiceMigration == Population.MigrationRate:
+			retVal = 1 # this signals it's time for migration
+			indiceMigration = 0
+
+		return retVal
 
 	def __repr__(self):
 		
@@ -140,6 +145,51 @@ class Population:
 			i+=1
 
 		return result
+
+	def insertChomosome(self, chromosome):
+
+		if chromosome not in self.chromosomes:
+
+			popSize = len(self.chromosomes)
+			if (self.chromosomes == []):
+
+				self.chromosomes.append(copy.deepcopy(chromosome))
+		
+			elif popSize == 1 and (self.chromosomes[0]).fitnessValue == 0:
+
+				self.chromosomes.append(copy.deepcopy(chromosome))
+
+			else:
+
+				# i sort the list of zeroperiods from the most convenient place to the least convenient one
+				prevValue = 0
+				j = 0
+				found = False
+				while j < popSize:
+
+					if chromosome.fitnessValue >= prevValue and chromosome.fitnessValue <= (self.chromosomes[j]).fitnessValue:
+						found = True
+						self.chromosomes = self.chromosomes[:j] + [copy.deepcopy(chromosome)] + self.chromosomes[j:]
+						break
+
+					prevValue = (self.chromosomes[j]).fitnessValue
+
+					j += 1
+
+				if found is False:
+					self.chromosomes.append(copy.deepcopy(chromosome))
+
+			# After inserting a new good chromosome into the population, i remove a bad one
+			del self.chromosomes[popSize-1]
+
+	def getImproved(self):
+
+		for chromosome in self.chromosomes:
+			c = copy.deepcopy(chromosome)
+			c.advmutate()
+
+			if c not in self.chromosomes:
+				self.insertChomosome(c)
 
 	def getFitnessData(self):
 

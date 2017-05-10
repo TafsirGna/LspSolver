@@ -11,32 +11,43 @@ from population import *
 
 class ClspThread(Thread):
 
-	def __init__(self, threadId, queue, slaveThreadsManager, neighbours):
+	listMainThreads = 0
+	NumberOfMigrants = 0
+
+	def __init__(self, threadId, queue):
 		Thread.__init__(self)
 		self.threadId = threadId
 		self.name = "Thread - " + str(threadId)
 		self.queue = queue
 		self.population = Population()
 		self.thread_memory = []
-		self.slaveThreadsManager = slaveThreadsManager
-		self.neighbours = neighbours
-		#print(self.queue)
+		self.migrants = []
 
 	def run(self):
 
 		self.initPopulation()
+
+		#self.population.getImproved()
 		
 		self.population.thread_memory = self.thread_memory
-		self.population.slaveThreadsManager = self.slaveThreadsManager
-
 		self.population.startPopData = []
 		self.population.startPopData.append(copy.deepcopy(self.population.chromosomes))
 		self.population.startPopData.append(copy.deepcopy(self.population.listFitnessData))
 
-		# After the initial population has been created, i launch the search process
-		i = 0
-		while len(self.thread_memory) <= 7:
+		# i send the best chromosomes of the population to its neighbors
+		self.sendMigrants()
 
+		# After the initial population has been created, i launch the search process
+		i = 1
+		indiceMigration = 0
+		while len(self.thread_memory) <= 5:
+
+			if self.migrants != []:
+				for chromosome in self.migrants:
+					self.population.insertChomosome(chromosome)
+				self.population.listFitnessData = []
+				self.population.getFitnessData()
+				pass
 			#print ("Thread : ", self.name, "Population : ", i, self.population.chromosomes, " and ", self.population.listFitnessData)
 
 			if len(self.population.chromosomes) <= 1:
@@ -47,14 +58,17 @@ class ClspThread(Thread):
 				break 
 
 			population = Population()
-			population.initialize(self.population)
+			retVal = population.initialize(indiceMigration, self.population)
+
+			if retVal == 1: # this signals it's time for migration
+				self.sendMigrants()
+
 			self.population = population
 			#print("yes", self.population)
 
 			#print ("Current population : ", self.population.chromosomes, " and ", self.population.listFitnessData)
 
 			i += 1
-		
 
 	def initPopulation(self):
 		
@@ -81,7 +95,7 @@ class ClspThread(Thread):
 				# Free lock to release 
 				locker.release()
 
-				self.slaveThreadsManager.compute(self.population, locker, list(currentNode.solution))
+				Population.slaveThreadsManager.compute(self.population, locker, list(currentNode.solution))
 
 			else:
 
@@ -124,8 +138,20 @@ class ClspThread(Thread):
 		print (self.name, " ", "Initial Population : ", self.population)
 
 
-	def sendMigrants():
-		pass
+	def sendMigrants(self):
+		chromosomes = []
+		i = 0
+		while i < ClspThread.NumberOfMigrants:
+			chromosomes.append(copy.deepcopy(self.population.chromosomes[i]))
+			i += 1
+
+		for thread in ClspThread.listMainThreads:
+			if thread.getName() != self.name:
+				thread.receiveMigrants(chromosomes)
+
+	def receiveMigrants(self, chromosomes):
+		self.migrants += chromosomes
+		#self.run()
 
 	def putNextItem(self, nextItem, nextPeriod, nextItemCounter, currentNode):
 
@@ -139,8 +165,7 @@ class ClspThread(Thread):
 			if currentNode.solution[i] == 0 : 
 
 				solution = list(currentNode.solution)
-				del solution[i]
-				solution.insert(i, nextItem)
+				solution[i] = nextItem
 
 				nextNode = Node()
 				nextNode.currentItem = nextItem
@@ -236,8 +261,7 @@ class ClspThread(Thread):
 			if item != 0:
 
 				counter = itemCounter[item - 1] + 1
-				del itemCounter[item - 1]
-				itemCounter.insert(item - 1, counter)
+				itemCounter[item - 1] = counter
 				fitnessValue += int(Chromosome.problem.holdingGrid[item-1]) * (Chromosome.problem.deadlineDemandPeriods[item-1][counter-1] - i)
 
 			i += 1
