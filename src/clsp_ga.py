@@ -21,12 +21,13 @@ class GeneticAlgorithm:
 	MigrationRate = 0 # this variable holds the number of generations needed before a migration occurs during the search
 	nbMainThreads = 3
 	nbSlavesThread = 3
+	NbGenToStop = 7
 
 	# Builder
 	def __init__(self, inst):
 
 		self.instance = inst
-		self.hashTable = {} # hashTable is a dictionnary
+		self.hashTable = {} #hashTable is a dictionnary
 		self.ga_memory = []
 		self.ItemsCounters = getListCounters(self.instance.nbItems)
 		self.listMainThreads = [] # i initialize a list that's intended to contain all the main threads of this genetic algorithm program
@@ -46,9 +47,10 @@ class GeneticAlgorithm:
 		Population.gaMemoryLocker = threading.Lock()
 		Population.MigrationRate = GeneticAlgorithm.MigrationRate
 		Population.slaveThreadsManager = self.slaveThreadsManager
+		Population.crossOverRate = GeneticAlgorithm.crossOverRate
 
-		SlaveThreadsManager.crossOverRate = GeneticAlgorithm.crossOverRate
 		ClspThread.listMainThreads = self.listMainThreads
+		ClspThread.NbGenToStop = GeneticAlgorithm.NbGenToStop
 		ClspThread.NumberOfMigrants = GeneticAlgorithm.NumberOfMigrants
 
 	#--------------------

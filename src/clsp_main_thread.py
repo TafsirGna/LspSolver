@@ -13,6 +13,7 @@ class ClspThread(Thread):
 
 	listMainThreads = 0
 	NumberOfMigrants = 0
+	NbGenToStop = 0
 
 	def __init__(self, threadId, queue):
 		Thread.__init__(self)
@@ -27,7 +28,10 @@ class ClspThread(Thread):
 
 		self.initPopulation()
 
-		#self.population.getImproved()
+		self.population.getImproved()
+		self.population.getFitnessData()
+
+		print (self.name, " ", "Initial Population : ", self.population)
 		
 		self.population.thread_memory = self.thread_memory
 		self.population.startPopData = []
@@ -37,18 +41,22 @@ class ClspThread(Thread):
 		# i send the best chromosomes of the population to its neighbors
 		self.sendMigrants()
 
+		nbGenB4Stop = 0
+		storedFitnessMean = 0
+
 		# After the initial population has been created, i launch the search process
 		i = 1
 		indiceMigration = 0
-		while len(self.thread_memory) <= 5:
+		while len(self.thread_memory) <= 7:
 
 			if self.migrants != []:
 				for chromosome in self.migrants:
-					self.population.insertChomosome(chromosome)
+					self.population.replace(chromosome)
 				self.population.listFitnessData = []
 				self.population.getFitnessData()
-				pass
+
 			#print ("Thread : ", self.name, "Population : ", i, self.population.chromosomes, " and ", self.population.listFitnessData)
+			#print("population : ", self.population.fitnessMean)
 
 			if len(self.population.chromosomes) <= 1:
 				#print("the thread ", self.name, " has exited!")
@@ -61,18 +69,18 @@ class ClspThread(Thread):
 			retVal = population.initialize(indiceMigration, self.population)
 
 			if retVal == 1: # this signals it's time for migration
+				#print("Yo")
 				self.sendMigrants()
 
 			self.population = population
-			#print("yes", self.population)
 
 			#print ("Current population : ", self.population.chromosomes, " and ", self.population.listFitnessData)
 
 			i += 1
+		
 
 	def initPopulation(self):
 		
-		locker = threading.Lock()
 		queueSize = len(self.queue)
 		currentNode = copy.copy(self.queue[queueSize-1])
 		del self.queue[queueSize-1]
@@ -82,20 +90,23 @@ class ClspThread(Thread):
 
 			if currentNode.isLeaf():
 
+				#print ("Leaf : ", currentNode.solution)
 				# Get lock to synchronize threads
-				locker.acquire()
+				self.population.locker.acquire()
+
 				# i check that the size of the population don't exceed the maximum number of population considered
 				if len(self.population.chromosomes) >= Population.NbMaxPopulation:
 					if self.population.listFitnessData == []:
-						#print("Hoo 1")
 						self.population.getFitnessData()	
-					locker.release()
+					self.population.locker.release()
 					break	
 
 				# Free lock to release 
-				locker.release()
+				self.population.locker.release()
 
-				Population.slaveThreadsManager.compute(self.population, locker, list(currentNode.solution))
+				Population.slaveThreadsManager.locker.acquire()
+				Population.slaveThreadsManager.handle(self.population, list(currentNode.solution))
+				Population.slaveThreadsManager.locker.release()
 
 			else:
 
@@ -135,23 +146,24 @@ class ClspThread(Thread):
 			currentNode = copy.copy(self.queue[queueSize-1])
 			del self.queue[queueSize-1]
 
-		print (self.name, " ", "Initial Population : ", self.population)
+		#print (self.name, " ", "Initial Population : ", self.population)
 
 
 	def sendMigrants(self):
-		chromosomes = []
-		i = 0
-		while i < ClspThread.NumberOfMigrants:
-			chromosomes.append(copy.deepcopy(self.population.chromosomes[i]))
-			i += 1
 
-		for thread in ClspThread.listMainThreads:
-			if thread.getName() != self.name:
-				thread.receiveMigrants(chromosomes)
+		if self.population.chromosomes != []:
+			chromosomes = []
+			i = 0
+			while i < ClspThread.NumberOfMigrants:
+				chromosomes.append(copy.deepcopy(self.population.chromosomes[i]))
+				i += 1
+
+			for thread in ClspThread.listMainThreads:
+				if thread.getName() != self.name:
+					thread.receiveMigrants(chromosomes)
 
 	def receiveMigrants(self, chromosomes):
 		self.migrants += chromosomes
-		#self.run()
 
 	def putNextItem(self, nextItem, nextPeriod, nextItemCounter, currentNode):
 
