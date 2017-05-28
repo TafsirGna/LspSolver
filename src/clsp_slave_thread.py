@@ -1,4 +1,4 @@
- #!/usr/bin/python3.5
+#!/usr/bin/python3.5
 # -*-coding: utf-8 -*
 
 from clsp_ga_library import *
@@ -13,127 +13,130 @@ from population import *
 class SlaveThreadsManager:
 
 	"""docstring for SlaveThreadsManager"""
-	def __init__(self, nbSlaveThreads):
+
+	def __init__(self, mainThread, nbSlaveThreads):
 
 		super(SlaveThreadsManager, self).__init__()
 		self.listSlaveThreads = []
-		self.locker = threading.Lock()
+		self.mainThread = mainThread
+		self.nbSlaveThreads = nbSlaveThreads
 
 		i = 0
 		while i < nbSlaveThreads:
 			
-			slaveThread = SlaveThread()
+			slaveThread = SlaveThread(i)
+			slaveThread.mainThread = self.mainThread
+
+			if i != 0:
+				slaveThread.mateDoneEvent = (self.listSlaveThreads[i-1]).doneEvent
+
 			self.listSlaveThreads.append(slaveThread)
-			(self.listSlaveThreads[i]).start()
 
 			i += 1
 
+	def initPop(self):
+		
+		# i share out between all the threads including the main one the nodes in the queue
+		queue = copy.deepcopy(self.mainThread.queue)
+		self.mainThread.queue = []
+
+		queueSize = len(queue)
+		nodePerSlave = math.ceil(queueSize / self.nbSlaveThreads)
+		#print(queueSize, " : ", nodePerSlave)
+		
+		i = 0
+		slaveQueue = []
+		counter = 0
+		for node in queue:
+			slaveQueue.append(node)
+			i += 1
+			if i == nodePerSlave:
+				(self.listSlaveThreads[counter]).queue = copy.deepcopy(slaveQueue)
+				slaveQueue = []
+				counter += 1
+				#print("ok")
+
+		if slaveQueue != []:
+			(self.listSlaveThreads[counter]).queue = copy.deepcopy(slaveQueue)
+			#print("ok")
+
 		for thread in self.listSlaveThreads:
-			thread.join()
+			thread.action = 0 # i want to make the initial population
+			thread.doneEvent.clear()
+			
+		for thread in self.listSlaveThreads:
+			thread.run()
+		
+		(self.listSlaveThreads[self.nbSlaveThreads-1]).doneEvent.wait()
 
-		self.nextSlaveThread = self.listSlaveThreads[0] # variable that holds a reference to the next thread to which the received solution will be affected
+	def improvePop(self, chromosomes):
 
+		popSize = len(chromosomes)
+		nodePerSlave = math.ceil(popSize / self.nbSlaveThreads)
 
-	def handle(self, population, solution):
+		i = 0
+		slaveQueue = []
+		counter = 0
+		for chromosome in chromosomes:
+			slaveQueue.append(chromosome)
+			i += 1
+			if i == nodePerSlave:
+				(self.listSlaveThreads[counter]).queue = copy.deepcopy(slaveQueue)
+				slaveQueue = []
+				counter += 1
 
-		param = [population, solution]
-		self.nextSlaveThread.queueLocker.acquire()
-		self.nextSlaveThread.queue.append(param)
+		if slaveQueue != []:
+			(self.listSlaveThreads[counter]).queue = copy.deepcopy(slaveQueue)
 
-		# weirdly, i have to check if the locker is locked before releasing it
-		#if self.nextSlaveThread.queueLocker.locked():
-		#	try:
-		self.nextSlaveThread.queueLocker.release()
-		#	except:
-		#		print("DeadLock error : An unlocked thread can't be released")
+		for thread in self.listSlaveThreads:
+			thread.action = 1 # i want to improve the quality of the initial population
+			thread.doneEvent.clear()
+			
+		for thread in self.listSlaveThreads:
+			thread.run()
+		
+		(self.listSlaveThreads[self.nbSlaveThreads-1]).doneEvent.wait()
 
-		self.nextSlaveThread.run()
+	def crossoverPop(self, population):
 
-		# then i compute the next thread which the next solution will be sent to
-		minQueueSize = pow(10,6)
-		for slaveThread in self.listSlaveThreads:
-			slaveThread.queueLocker.acquire()
-			queueSize = len(slaveThread.queue) 
-			if queueSize < minQueueSize:
-				self.nextSlaveThread = slaveThread
-				minQueueSize = queueSize
-			slaveThread.queueLocker.release()
-
-
-	def crossover(self, population, randValue1, randValue2):
-		'''
-		previousPopulation = Population()
-		previousPopulation.chromosomes = prevPopData[0]
-		previousPopulation.listFitnessData = prevPopData[1]
-		'''
-
-		param = [population, randValue1, randValue2]
-
-		self.nextSlaveThread.queueLocker.acquire()
-		self.nextSlaveThread.queue.append(param)
-
-		# weirdly, i have to check if the locker is locked before releasing it
-		#if self.nextSlaveThread.queueLocker.locked():
-		#	try:
-		self.nextSlaveThread.queueLocker.release()
-		#	except:
-		#		print("DeadLock error : An unlocked thread can't be released")
-		self.nextSlaveThread.run()
-
-		# then i compute the next thread which the next solution will be sent to
-		minQueueSize = pow(10,6)
-		for slaveThread in self.listSlaveThreads:
-			slaveThread.queueLocker.acquire()
-			queueSize = len(slaveThread.queue) 
-			if queueSize < minQueueSize:
-				self.nextSlaveThread = slaveThread
-				minQueueSize = queueSize
-			slaveThread.queueLocker.release()
+		for thread in self.listSlaveThreads:
+			thread.action = 2 # i want to perform cross over between chromosomes of the current population
+			thread.population = population
+			thread.doneEvent.clear()
+			
+		for thread in self.listSlaveThreads:
+			thread.run()
+		
+		(self.listSlaveThreads[self.nbSlaveThreads-1]).doneEvent.wait()		
 
 
 class SlaveThread(Thread):
 
-	def __init__(self):
+	def __init__(self, threadId):
 
 		Thread.__init__(self)
 		self.queue = []
-		self.queueLocker = threading.Lock()
+		self.threadId = threadId
+		self.mainThread = 0
+		self.action = -1
+		self.doneEvent = Event()
+		self.mateDoneEvent = 0
+		self.population = 0
 
 	def run(self):
 		
-		param = []
-		self.queueLocker.acquire()
-		if len(self.queue) > 0:
-			param = list(self.queue[0])
-			del self.queue[0]
-		self.queueLocker.release()
+		if self.action == 0 and self.queue != []: # if i want to initialize the first population
 
-		while param != []:
+			self.mainThread.initSearch(self.queue)
+		elif self.action == 1 and self.queue != []: # i want to improve the quality of the initial population
 
-			if len(param) == 2:
+			for chromosome in self.queue:
+				chromosome.advmutate()
+				self.mainThread.population.replace(chromosome)
 
-				population = param[0]
-				solution = param[1]
+		elif self.action == 2 and self.queue != []:
+			self.population.crossPopulation()
 
-				if isinstance(solution, list):
-					chromosome = Chromosome(param[1])
-					population.insert(chromosome)
-
-				elif isinstance(solution, Chromosome):
-					chromosome = copy.deepcopy(param[1])
-					chromosome.advmutate()
-					population.replace(chromosome)
-
-			elif len(param) == 3:
-				population = param[0]
-				randValue1 = param[1]
-				randValue2 = param[2]
-
-				population.crossover(randValue1, randValue2)
-
-			param = []
-			self.queueLocker.acquire()
-			if len(self.queue) > 0:
-				param = list(self.queue[0])
-				del self.queue[0]
-			self.queueLocker.release()			
+		if self.threadId != 0:
+			self.mateDoneEvent.wait()
+		self.doneEvent.set()

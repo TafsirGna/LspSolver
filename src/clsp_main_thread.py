@@ -2,6 +2,7 @@
 # -*-coding: utf-8 -*
 
 from population import *
+from clsp_slave_thread import *
 
 #--------------------
 # Class : ClspThread
@@ -14,20 +15,29 @@ class ClspThread(Thread):
 	listMainThreads = 0
 	NumberOfMigrants = 0
 	NbGenToStop = 0
+	nbSlavesThread = 0
 
 	def __init__(self, threadId, queue):
+
 		Thread.__init__(self)
 		self.threadId = threadId
 		self.name = "Thread - " + str(threadId)
 		self.queue = queue
-		self.population = Population()
+
 		self.thread_memory = []
 		self.migrants = []
+		self.slaveThreadsManager = SlaveThreadsManager(self, ClspThread.nbSlavesThread) # i initialize a list that's intended to contain all the population's initialization threads 
+
+		self.population = Population()
+		self.population.slaveThreadsManager = self.slaveThreadsManager
 
 	def run(self):
+		
+		self.slaveThreadsManager.initPop()
 
-		self.initPopulation()
+		#print (self.name, " ", "Initial Population : ", self.population)
 
+		
 		self.population.getImproved()
 		self.population.getFitnessData()
 
@@ -77,13 +87,30 @@ class ClspThread(Thread):
 			#print ("Current population : ", self.population.chromosomes, " and ", self.population.listFitnessData)
 
 			i += 1
-		
 
-	def initPopulation(self):
+
+	def sendMigrants(self):
+
+		if self.population.chromosomes != []:
+			chromosomes = []
+			i = 0
+			while i < ClspThread.NumberOfMigrants:
+				chromosomes.append(copy.deepcopy(self.population.chromosomes[i]))
+				i += 1
+
+			for thread in ClspThread.listMainThreads:
+				if thread.getName() != self.name:
+					thread.receiveMigrants(chromosomes)
+
+	def receiveMigrants(self, chromosomes):
+		self.migrants += chromosomes
+
+
+	def initSearch(self, queue):
 		
-		queueSize = len(self.queue)
-		currentNode = copy.copy(self.queue[queueSize-1])
-		del self.queue[queueSize-1]
+		queueSize = len(queue)
+		currentNode = copy.copy(queue[queueSize-1])
+		del queue[queueSize-1]
 		#print("Queue : ", self.queue)
 
 		while True:
@@ -91,6 +118,9 @@ class ClspThread(Thread):
 			if currentNode.isLeaf():
 
 				#print ("Leaf : ", currentNode.solution)
+				chromosome = Chromosome(list(currentNode.solution))
+				#advMutations = chromosome.listAllAdvMutations()
+
 				# Get lock to synchronize threads
 				self.population.locker.acquire()
 
@@ -101,12 +131,13 @@ class ClspThread(Thread):
 					self.population.locker.release()
 					break	
 
+				#for mutation in advMutations:
+
+				if chromosome not in self.population.chromosomes:
+					self.population.chromosomes.append(chromosome)
+
 				# Free lock to release 
 				self.population.locker.release()
-
-				Population.slaveThreadsManager.locker.acquire()
-				Population.slaveThreadsManager.handle(self.population, list(currentNode.solution))
-				Population.slaveThreadsManager.locker.release()
 
 			else:
 
@@ -133,39 +164,23 @@ class ClspThread(Thread):
 
 				if nextItem != 0:
 
-					self.putNextItem(nextItem, nextPeriod, nextItemCounter, currentNode)
+					self.putNextItem(nextItem, nextPeriod, nextItemCounter, currentNode, queue)
 					#print(self.queue)
 
 			#print("inter : ", self.queue)
-			queueSize = len(self.queue)
+			queueSize = len(queue)
 			if queueSize == 0:
 				if self.population.listFitnessData == []:
 					self.population.getFitnessData()
 				break
 	
-			currentNode = copy.copy(self.queue[queueSize-1])
-			del self.queue[queueSize-1]
+			currentNode = copy.deepcopy(queue[queueSize-1])
+			del queue[queueSize-1]
 
 		#print (self.name, " ", "Initial Population : ", self.population)
 
 
-	def sendMigrants(self):
-
-		if self.population.chromosomes != []:
-			chromosomes = []
-			i = 0
-			while i < ClspThread.NumberOfMigrants:
-				chromosomes.append(copy.deepcopy(self.population.chromosomes[i]))
-				i += 1
-
-			for thread in ClspThread.listMainThreads:
-				if thread.getName() != self.name:
-					thread.receiveMigrants(chromosomes)
-
-	def receiveMigrants(self, chromosomes):
-		self.migrants += chromosomes
-
-	def putNextItem(self, nextItem, nextPeriod, nextItemCounter, currentNode):
+	def putNextItem(self, nextItem, nextPeriod, nextItemCounter, currentNode, queue):
 
 		period = Chromosome.problem.deadlineDemandPeriods[nextItem-1][nextPeriod-1]
 
@@ -222,7 +237,7 @@ class ClspThread(Thread):
 			i -= 1
 
 		#print("childrenQueue : ", list(reversed(childrenQueue)), "---")
-		self.queue += list(reversed(childrenQueue))
+		queue += list(reversed(childrenQueue))
 		#print(self.queue, "---")
 
 	

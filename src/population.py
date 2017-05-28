@@ -13,7 +13,6 @@ class Population:
 	ga_memory = []
 	gaMemoryLocker = 0
 	MigrationRate = 0
-	slaveThreadsManager = 0
 	crossOverRate = 0
 
 	# builder 
@@ -26,6 +25,7 @@ class Population:
 		self.locker = threading.Lock()
 		self.previousPopulation = 0
 		self.fitnessMean = 0
+		self.slaveThreadsManager = 0
 
 	def initialize(self, indiceMigration, previousPopulation):
 		
@@ -33,6 +33,7 @@ class Population:
 
 		self.startPopData = copy.deepcopy(previousPopulation.startPopData)
 		self.thread_memory = previousPopulation.thread_memory
+		self.slaveThreadsManager = previousPopulation.slaveThreadsManager
 
 		self.previousPopulation = previousPopulation
 		# In the case where there's a lack of diversity, i introduce a bit of diversity by flipping a gene of one chromosome in the population
@@ -103,31 +104,11 @@ class Population:
 		self.chromosomes = []
 		self.chromosomes.append(copy.deepcopy(previousPopulation.chromosomes[0])) # i add the best chromosome of the previous population to the current population
 
-		prevPopData = []
-		prevPopData.append(copy.deepcopy(previousPopulation.chromosomes))
-		prevPopData.append(copy.deepcopy(previousPopulation.listFitnessData))
+		self.prevPopData = []
+		self.prevPopData.append(copy.deepcopy(previousPopulation.chromosomes))
+		self.prevPopData.append(copy.deepcopy(previousPopulation.listFitnessData))
 
-		while True:
-			
-			self.locker.acquire()
-
-			if len(self.chromosomes) >= len(previousPopulation.chromosomes):
-				self.getFitnessData()
-				self.locker.release()	
-				break
-
-			self.locker.release()
-			
-			randValue1 = randint(1,99)
-			randValue2 = randint(1,99)
-
-			#print(randValue1, randValue2, " memory : ", Population.ga_memory, " and ", self.chromosomes)
-
-			Population.slaveThreadsManager.locker.acquire()
-			Population.slaveThreadsManager.crossover(self, randValue1, randValue2)
-			Population.slaveThreadsManager.locker.release()
-
-			#time.sleep(0.005)
+		self.slaveThreadsManager.crossoverPop(self)
 
 		indiceMigration += 1
 
@@ -152,6 +133,8 @@ class Population:
 		return result
 
 	def replace(self, chromosome):
+
+		self.locker.acquire()
 
 		if chromosome not in self.chromosomes:
 
@@ -187,12 +170,11 @@ class Population:
 			# After inserting a new good chromosome into the population, i remove a bad one
 			del self.chromosomes[popSize-1]
 
+		self.locker.release()
+
 	def getImproved(self):
 
-		for chromosome in self.chromosomes:
-			Population.slaveThreadsManager.locker.acquire()
-			Population.slaveThreadsManager.handle(self, chromosome)
-			Population.slaveThreadsManager.locker.release()
+		self.slaveThreadsManager.improvePop(self.chromosomes)
 
 	def getFitnessData(self):
 
@@ -348,6 +330,31 @@ class Population:
 		self.insert(chromosome4)
 
 		#print ("pop : ", nextPopulation.chromosomes)
+
+	def crossPopulation(self):
+
+		prevPopData = copy.deepcopy(self.prevPopData)
+		previousPopulation = Population()
+		previousPopulation.chromosomes = copy.deepcopy(prevPopData[0])
+		previousPopulation.listFitnessData = copy.deepcopy(copy.deepcopy(prevPopData[1]))
+
+		while True:
+			
+			self.locker.acquire()
+
+			if len(self.chromosomes) >= len(previousPopulation.chromosomes):
+				self.getFitnessData()
+				self.locker.release()	
+				break
+
+			self.locker.release()
+			
+			randValue1 = randint(1,99)
+			randValue2 = randint(1,99)
+
+			#print(randValue1, randValue2, " memory : ", Population.ga_memory, " and ", self.chromosomes)
+
+			self.crossover(randValue1, randValue2)
 
 	def insert(self, chromosome):
 

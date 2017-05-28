@@ -2,7 +2,6 @@
 # -*-coding: utf-8 -*
 
 from clsp_main_thread import *
-from clsp_slave_thread import *
 
 #--------------------
 # Class : GeneticAlgorithm
@@ -21,7 +20,7 @@ class GeneticAlgorithm:
 	MigrationRate = 0 # this variable holds the number of generations needed before a migration occurs during the search
 	nbMainThreads = 3
 	nbSlavesThread = 3
-	NbGenToStop = 7
+	NbGenToStop = 5
 
 	# Builder
 	def __init__(self, inst):
@@ -29,15 +28,11 @@ class GeneticAlgorithm:
 		self.instance = inst
 		self.hashTable = {} #hashTable is a dictionnary
 		self.ga_memory = []
-		self.ItemsCounters = getListCounters(self.instance.nbItems)
 		self.listMainThreads = [] # i initialize a list that's intended to contain all the main threads of this genetic algorithm program
-		self.slaveThreadsManager = SlaveThreadsManager(GeneticAlgorithm.nbSlavesThread) # i initialize a list that's intended to contain all the population's initialization threads 
-
-
+		
 		# i impart some parameters to the chromosome class and population class
 		Chromosome.mutationRate = GeneticAlgorithm.mutationRate
 		Chromosome.problem = self.instance
-		Chromosome.ItemsCounters = self.ItemsCounters
 		Chromosome.hashTable = self.hashTable
 
 		# i set some class' properties of Population class
@@ -46,12 +41,14 @@ class GeneticAlgorithm:
 		Population.ga_memory = self.ga_memory
 		Population.gaMemoryLocker = threading.Lock()
 		Population.MigrationRate = GeneticAlgorithm.MigrationRate
-		Population.slaveThreadsManager = self.slaveThreadsManager
 		Population.crossOverRate = GeneticAlgorithm.crossOverRate
 
 		ClspThread.listMainThreads = self.listMainThreads
 		ClspThread.NbGenToStop = GeneticAlgorithm.NbGenToStop
+		ClspThread.nbSlavesThread = GeneticAlgorithm.nbSlavesThread
 		ClspThread.NumberOfMigrants = GeneticAlgorithm.NumberOfMigrants
+
+		
 
 	#--------------------
 	# function : initPopulation
@@ -120,9 +117,9 @@ class GeneticAlgorithm:
 			if  len(threadQueue) >= rootPerThread or i == 0:
 
 				# i initialize the thread and put it into a list of threads created for this purpose
-				clspThread = ClspThread(threadCounter, list(threadQueue))
+				clspThread = ClspThread(threadCounter, list(reversed(threadQueue)))
 				self.listMainThreads.append(clspThread)
-				(self.listMainThreads[threadCounter]).start()
+				#(self.listMainThreads[threadCounter]).start()
 
 				threadQueue = []
 				threadCounter += 1
@@ -134,6 +131,7 @@ class GeneticAlgorithm:
 
 		# want to make sure that the parent process will wait for the child threading before exiting
 		for thread in self.listMainThreads:
+			thread.start()
 			thread.join()
 
 		self.printResults()	

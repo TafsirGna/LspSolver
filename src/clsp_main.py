@@ -24,13 +24,13 @@ print("-------	Instance of Pigment Sequencing Problem to be used	-------")
 
 print(instance)
 
-# i store the time when the solving began
-startTime = time.clock()
-
 # I create an instance of the genetic algorithm to be used
 genAlgo = GeneticAlgorithm(instance)
 
 print("-------	Performing the genetic algorithm	--------")
+
+# i store the time when the solving began
+startTime = time.clock()
 
 genAlgo.start()
 

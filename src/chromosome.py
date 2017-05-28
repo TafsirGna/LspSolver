@@ -7,7 +7,6 @@ class Chromosome(object):
 
 	mutationRate = 0
 	problem = 0
-	ItemsCounters = []
 	hashTable = {}
 
 	# Builder 
@@ -120,7 +119,7 @@ class Chromosome(object):
 			if self.itemsRankFlag is False:
 
 				self._itemsRank = []
-				gridCounters = list(Chromosome.ItemsCounters)
+				gridCounters = [1]* Chromosome.problem.nbItems
 				#print("grid : ", gridCounters)
 
 				i = 0 
@@ -541,10 +540,12 @@ class Chromosome(object):
 
 		return cost
 
-	'''
+	
 	def listAllAdvMutations(self):
 
 		results = []
+		results.append(copy.deepcopy(self))
+
 		solution1 = list(self._solution)
 		itemsRank1 = self.itemsRank
 
@@ -584,11 +585,13 @@ class Chromosome(object):
 								self._itemsRank = c.itemsRank
 								self._fitnessValue = c.fitnessValue
 								self._hashSolution = c.hashSolution
+								results.append(copy.deepcopy(c))
 
 					item2 += 1
 
 			i+=1
-	'''
+
+		return results
 
 	# Class' methods
 	getCostof = classmethod(getCostof)

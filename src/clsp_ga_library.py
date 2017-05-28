@@ -99,12 +99,6 @@ def getManufactPeriodsGrid(nbItems, deadlineDemandPeriods):
 		
 	return resultGrid
 
-def getListCounters(nbItems):
-
-	ItemsCounters = [1] * nbItems
-
-	return ItemsCounters
-
 def switchGenes(chromosome,indice_gene1,indice_gene2):
 	c = list(chromosome)
 	c[indice_gene1] = chromosome[indice_gene2]
