@@ -33,11 +33,10 @@ class ClspThread(Thread):
 
 	def run(self):
 		
-		self.slaveThreadsManager.initPop()
+		self.slaveThreadsManager.start()
+		print (self.name, " ", "Initial Population : ", self.population)
 
-		#print (self.name, " ", "Initial Population : ", self.population)
-
-		
+		'''
 		self.population.getImproved()
 		self.population.getFitnessData()
 
@@ -87,7 +86,55 @@ class ClspThread(Thread):
 			#print ("Current population : ", self.population.chromosomes, " and ", self.population.listFitnessData)
 
 			i += 1
+		'''
 
+	def initSearch(self, queue):
+		
+		queueSize = len(queue)
+		currentNode = copy.deepcopy(queue[queueSize-1])
+		del queue[queueSize-1]
+		#print("Queue : ", self.queue)
+
+		while True:
+
+			if currentNode.isLeaf():
+
+				c = Chromosome(list(currentNode.solution))
+				c.advmutate()
+
+				self.locker.acquire()
+				self.locker.release()
+				'''
+				self.mainThread.meshThreadsManager.locker.acquire()
+				if not self.mainThread.meshThreadsManager.contains(self._chromosome.solution):
+					self.mainThread.meshThreadsManager.putInRank(self)
+					self.mainThread.meshThreadsManager.locker.release()
+					self.doneEvent.set()
+					break
+				self.mainThread.meshThreadsManager.locker.release()	
+				'''
+				break			
+
+			else:
+
+				#print ("current Node : ", currentNode)
+
+				l = currentNode.getChildren()
+				#print("Children : ", l)
+				queue += l
+
+			#print("inter : ", self.queue)
+			queueSize = len(queue)
+			if queueSize == 0:
+				#if self.population.listFitnessData == []:
+				#	self.population.getFitnessData()
+				break
+	
+			currentNode = copy.copy(queue[queueSize-1])
+			del queue[queueSize-1]
+
+
+		#print (self.name, " ", "Initial Population : ", self.population)
 
 	def sendMigrants(self):
 
@@ -104,80 +151,6 @@ class ClspThread(Thread):
 
 	def receiveMigrants(self, chromosomes):
 		self.migrants += chromosomes
-
-
-	def initSearch(self, queue):
-		
-		queueSize = len(queue)
-		currentNode = copy.copy(queue[queueSize-1])
-		del queue[queueSize-1]
-		#print("Queue : ", self.queue)
-
-		while True:
-
-			if currentNode.isLeaf():
-
-				#print ("Leaf : ", currentNode.solution)
-				chromosome = Chromosome(list(currentNode.solution))
-				#advMutations = chromosome.listAllAdvMutations()
-
-				# Get lock to synchronize threads
-				self.population.locker.acquire()
-
-				# i check that the size of the population don't exceed the maximum number of population considered
-				if len(self.population.chromosomes) >= Population.NbMaxPopulation:
-					if self.population.listFitnessData == []:
-						self.population.getFitnessData()	
-					self.population.locker.release()
-					break	
-
-				#for mutation in advMutations:
-
-				if chromosome not in self.population.chromosomes:
-					self.population.chromosomes.append(chromosome)
-
-				# Free lock to release 
-				self.population.locker.release()
-
-			else:
-
-				#print ("current Node : ", currentNode)
-
-				nextItem = 0
-				nextPeriod = 0
-				nextItemCounter = 0
-
-				# i produce the successors of this current node
-				if currentNode.currentPeriod < len(Chromosome.problem.deadlineDemandPeriods[currentNode.currentItem-1]):
-
-					nextItem = currentNode.currentItem
-					nextPeriod = currentNode.currentPeriod + 1
-					nextItemCounter = currentNode.itemCounter
-
-				elif currentNode.itemCounter < Chromosome.problem.nbItems:
-
-					nextItem = currentNode.currentItem + 1
-					if nextItem == Chromosome.problem.nbItems + 1:
-						nextItem = 1
-					nextPeriod = 1
-					nextItemCounter = currentNode.itemCounter + 1
-
-				if nextItem != 0:
-
-					self.putNextItem(nextItem, nextPeriod, nextItemCounter, currentNode, queue)
-					#print(self.queue)
-
-			#print("inter : ", self.queue)
-			queueSize = len(queue)
-			if queueSize == 0:
-				if self.population.listFitnessData == []:
-					self.population.getFitnessData()
-				break
-	
-			currentNode = copy.deepcopy(queue[queueSize-1])
-			del queue[queueSize-1]
-
-		#print (self.name, " ", "Initial Population : ", self.population)
 
 
 	def putNextItem(self, nextItem, nextPeriod, nextItemCounter, currentNode, queue):
@@ -199,7 +172,7 @@ class ClspThread(Thread):
 				nextNode.currentPeriod = nextPeriod
 				nextNode.solution = solution
 				nextNode.itemCounter = nextItemCounter
-				nextNode.fitnessValue = ClspThread.evaluate(nextNode.solution)
+				nextNode.fitnessValue = Node.evaluate(nextNode.solution)
 
 				nbChildren = len(childrenQueue)
 
@@ -239,60 +212,3 @@ class ClspThread(Thread):
 		#print("childrenQueue : ", list(reversed(childrenQueue)), "---")
 		queue += list(reversed(childrenQueue))
 		#print(self.queue, "---")
-
-	
-	def evaluate(cls, sol):
-			
-		solution = list(sol)
-
-		fitnessValue = 0
-		grid = Chromosome.problem.chanOverGrid
-
-		# Calculation of all the change-over costs
-		
-		i = 1
-		tmp = solution[0]
-		while i < Chromosome.problem.nbTimes :
-
-			n = solution[i]
-
-			if (tmp == 0):
-				i+=1
-				tmp = n
-			else:
-				
-				if (n != 0):
-					if (n != tmp):
-						fitnessValue += int((grid[tmp-1])[n-1])
-						tmp = n
-				else:
-					tmp = solution[i-1]
-
-					j=i
-					while j < Chromosome.problem.nbTimes and solution[j] == 0:
-						j+=1
-					i=j-1
-				
-				i+=1
-
-		#print(" intermediary cost : ", self._fitnessValue)
-		# Calculation of the sum of holding costs
-
-		itemCounter = [0] * Chromosome.problem.nbItems
-
-		i = 0
-		while i < Chromosome.problem.nbTimes:
-
-			item = solution[i]
-
-			if item != 0:
-
-				counter = itemCounter[item - 1] + 1
-				itemCounter[item - 1] = counter
-				fitnessValue += int(Chromosome.problem.holdingGrid[item-1]) * (Chromosome.problem.deadlineDemandPeriods[item-1][counter-1] - i)
-
-			i += 1
-
-		return fitnessValue
-
-	evaluate = classmethod(evaluate)

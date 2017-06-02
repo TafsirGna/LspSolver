@@ -76,13 +76,11 @@ class GeneticAlgorithm:
 			root = Node()
 			root.currentItem = item
 			root.currentPeriod = 1
-			root.itemCounter = 1
 
-			root.solution = [0] * Chromosome.problem.nbTimes
-			root.solution[i] = item
+			solution = [0] * Chromosome.problem.nbTimes
+			solution[i] = item
+			root.solution = solution
 			#print(root.solution)
-
-			root.fitnessValue = ClspThread.evaluate(root.solution)
 			
 			if (threadQueue == []):
 

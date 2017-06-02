@@ -123,7 +123,7 @@ ces dernières décennies depuis les travaux de Wagner et Within en 1958. \\
 	\hspace*{.5cm} Dans la plupart des cas, un problème d’optimisation tel que le problème de dimensionnement de lots se divise naturellement en deux phases : recherche des solutions admissibles puis recherche de la solution à coût optimal parmi ces dernières. Suivant la méthode employée, ce découpage est plus ou moins apparent dans la résolution. L’usage d’un algorithme génétique est adapté à une exploration rapide et globale d’un espace de recherche de taille importante et est capable de fournir plusieurs solutions. Des calculs effectués ont révélé que l'utilisation des algorithmes génétiques pour des problèmes de dimensionnement de lots semble raisonnable dans le cas de grands problèmes où trouver la solution avec d'autres algorithmes reste encore problématique en temps. Ainsi, Il est possible qu'un algorithme génétique convenablement construit et paramétré puisse trouver de bien meilleurs résultats comparativement à ceux trouvés par d'autres algorithmes tels que le programmation en nombre entier et cela pour un même laps de temps considéré.
 	
 	\section*{Notre contribution}
-	
+	Le "Pigment Sequencing Problem" est un problème NP-Difficile d'optimisation combinatoire pour lequel les instances de taille moyenne peuvent être efficacement résolues en utilisant une formulation appropriée de programmation en nombre mixte. Cependant, dans notre revue de littérature, aucun modèle basé sur les algorithmes génétiques n'a encore été proposé pour ce problème. Nous proposons donc deux méthodes basées sur les algorithmes génétiques pour le problème. La première est une méthode appelée "coarse-grained parallel genetic algorithm" qui divise la population globale en sous-populations. La seconde, appelée "fine-grained parallel genetic algorithm" qui réduit le champ de crossover à l'environnement immédiat. Les tests que nous avons menés afin de valider nos deux méthodes ont produit des résultats satisfaisants et confirmé le fait que les algorithmes génétiques sont efficaces quant il s'agit de problèmes d'optimisation.  
 	\section*{Organisation du travail}
 
 	Le travail effectué est organisé dans ce document en 3 parties. Le première partie présente une revue de littérature des problèmes de planification de production, en particulier celui nous concernant, le "Pigment Sequencing Problem" (PSP). Nous présentons également dans cette partie les algorithmes génétiques, leur origine, leurs étapes ainsi que leurs fondements. Dans le deuxième partie, nous présentons dans un premier temps, le modèle ainsi que la formulation utilisée afin de résoudre le problème. Puis dans un second temps, nous explicitons l'approche heuristique utilisée. Dans le chapitre 4, nous expérimentons  notre solution, présentons les résultats obtenus et comparons ces résultats à l'état de l'art en la matière. Pour finir, nous tirons une conclusion du travail effectué et dressons les perspectives possibles en vue d'améliorer ce qui a été fait.
@@ -135,6 +135,61 @@ ces dernières décennies depuis les travaux de Wagner et Within en 1958. \\
 		\section*{Introduction}
 		\addcontentsline{toc}{section}{Introduction}
 		L'état de l'art revêt une grande importance dans la conduite d'un travail de recherche. Elle permet de fixer les idées quant au travail qui a été déjà fait dans le domaine. Il s'agira donc principalement dans cette première partie de présenter la revue de littérature des problèmes de planification de production, d'exposer les travaux sur les algorithmes génétiques et de montrer en quoi les algorithmes génétiques sont particulièrement adaptés à ces genres de problèmes.
+		
+		\section{Les problèmes de planification de production}
+	La planification de production est un processus qui consiste à déterminer un plan qui indique quelle quantité d'articles produire durant une intervalle de temps appelé "horizon de planification". Il est un important défi pour les entreprises industrielles car il a un fort impact sur leur performance en terme de qualité service-client et des coût d'exploitation.	\subsection{Problématique}
+		
+ La planification de production s'avère être une tâche très complexe principalement pour les raisons suivantes:
+ \begin{itemize}
+ 	\item[-] Le plus souvent, une ressource de production n'est pas seulement dédié à une unique article, mais plutôt utilisée pour produire différents types d'articles. Dans un contexte de processus d'industrie, les ressources de production disponibles ne pas vraiment flexibles. En conséquence, la planification de production se heurte à la compétition entre les articles partageant les mêmes ressources et il faut décider quels articles produire, quand et en quelle quantité, tout en prenant en compte les contraintes liées au système de production. Dans certains cas, ces contraintes peuvent être si rigides que trouver une plan de production valide et faisable peut être difficile.
+ 	
+ 	\item[-] Un plan de production doit remplir plusieurs objectifs contradictoires, notamment, garantir un excellent niveau du service-client et minimiser la production et les coûts de stockage. Ainsi, les mesures basiques telles que, ne pas satisfaire la demande excédant les capacités de production et garder une haut niveau de stockage afin d'être capable de répondre à toute demande ne sont pas commercialement acceptables ou encore trop chères. Un bon plan de planification est donc le résultat d'un compromis entre différents objectifs contradictoires.
+ 	\item[-] Un plan de production n'est jamais fixé pour toujours. Sa validité est restreinte à un horizon de planification prédéfini. De plus, le réalité dévie le plus souvent des prévisions et si la divergence entre les plans et les prévisions sont trop grandes, le plan doit être revu avant la fin de l'horizon de planification.
+ \end{itemize}
+ 
+ La planification de production est donc un problème difficile et récurrent pour les compagnies industrielles. Il y a un fort besoin de systèmes d'aide à la décision. Le développement de tels systèmes a été l'objectif d'une grande partie de la littérature en recherche opérationnelle pour les cinquante dernières années. 
+	
+\subsection{Critères de classification}
+
+Différents critères interviennent dans la classification des problèmes de dimensionnement de lot, notamment : 
+\begin{description}
+	\item[\textsl{L'échelle de temps}:] La planification peut être effectuée soit sur des périodes discrètes soit sur un
+horizon de temps continu. Dans le premier cas, la longueur des périodes peut
+être soit de petite taille (Small time buckets) correspondant à des heures ou
+jours, soit de grande taille (Big time buckets) correspondant à des jours ou
+semaines, soit de très grande taille (Very big time buckets) correspondant à
+des mois ou trimestres.
+
+	\item[\textsl{Le nombre de niveaux}:] Dans le cas où seules les demandes venant de l'extérieur du système sont considérées, on parle de problèmes à un niveau. Un état de l'art sur ce type de problème est proposé par Karimi et al. [71]. Lorsqu'il existe une relation entre
+les produits, on considère des problèmes à plusieurs niveaux. Ce dernier type
+de problèmes se retrouve fréquemment dans l'industrie.
+
+	\item[\textsl{Le nombre de produits}:] Dans le cas où il n'y a pas de dépendance entre les produits, en particulier, s'il n'y a pas d'utilisation commune de la capacité, nous considérons des problèmes
+à un seul produit. Dans le cas inverse, on parle de problèmes à plusieurs pro-
+duits. Un état de l'art sur les problèmes à un produit est proposé par Brahimi
+et al. [16].
+
+	\item[\textsl{Les contraintes de capacité}:] Les contraintes de capacité incluent le nombre d'employés, la capacité des machines, la capacité de stockage . . . . Lorsque les contraintes de capacité sont
+introduites dans le modèle, elles rendent le problème plus difficile à résoudre,
+puisqu'elles lient les produits entre eux.
+
+	\item[\textsl{Les demandes}:] Il existe plusieurs types de demandes qui peuvent être réparties selon trois
+groupes :
+	\begin{itemize}
+		\item[•] Demandes constantes , les valeurs des demandes ne changent pas sur l'horizon de temps, ou demandes dynamiques , les valeurs varient au cours du temps.
+		\item[•] Demandes certaines , les valeurs sont connues à l'avance, ou demandes stochastiques , les valeurs sont basées sur des probabilités.
+		\item[•] Demandes indépendantes , lorsqu'un produit n'a pas besoin d'autres produits comme composants, ou demandes dépendantes , lorsqu'il existe une relation
+entre les produits.
+	\end{itemize}
+
+	\item[\textsl{Les coûts et temps de lancement ou préparation (setup)}:] Une ressource peut exécuter des produits de type différents. Ainsi il est parfois nécessaire de reconfigurer celle-ci à chaque changement de produits. Les coûts et temps induits par le lancement de la ressource sont souvent importants car
+élevés et longs.
+	
+\end{description}
+
+\subsection{Classes}
+
+\section{Les algorithmes génétiques}
 		\section*{Conclusion}
 		\addcontentsline{toc}{section}{Conclusion}
 		
@@ -164,7 +219,7 @@ période et d(i, t) $ \in $ {0, 1} avec i l’article et t la période.\\
 	\textbf{\textsl{Illustration}} : Soit un problème avec les données ci-dessous : \\
 	\begin{itemize}
 		\item[•] Nombre d’articles : $NI = 2$;
-		\item[•] Nombre d’articles : $NI = 2$;
+		\item[•] Nombre de périodes : $NI = 5$;
 		\item[•] Demande par période. Soit d(i, t) la demande de l’article i à la période t : $d(1, t) = (0, 1, 0, 0, 1)$ et $d(2, t) = (1, 0, 0, 0, 1)$;
 		\item[•] Coût de stockage. Soit h(i) le coût de stockage de l’article i : $h(1) = h(2) = 2$;
 	\end{itemize}

@@ -18,14 +18,13 @@ class SlaveThreadsManager:
 
 		super(SlaveThreadsManager, self).__init__()
 		self.listSlaveThreads = []
-		self.mainThread = mainThread
 		self.nbSlaveThreads = nbSlaveThreads
 
 		i = 0
 		while i < nbSlaveThreads:
 			
-			slaveThread = SlaveThread(i)
-			slaveThread.mainThread = self.mainThread
+			slaveThread = SlaveThread(i, mainThread)
+			slaveThread.queue = copy.deepcopy(mainThread.queue)
 
 			if i != 0:
 				slaveThread.mateDoneEvent = (self.listSlaveThreads[i-1]).doneEvent
@@ -34,8 +33,24 @@ class SlaveThreadsManager:
 
 			i += 1
 
+	def start(self):
+
+		# i create the initial population
+		self.initPop()
+
+		pass
+
 	def initPop(self):
 		
+		for thread in self.listSlaveThreads:
+
+			thread.action = 0
+			thread.start()
+			thread.join()
+
+		(self.listSlaveThreads[self.nbSlaveThreads-1]).doneEvent.wait()
+
+		'''
 		# i share out between all the threads including the main one the nodes in the queue
 		queue = copy.deepcopy(self.mainThread.queue)
 		self.mainThread.queue = []
@@ -68,6 +83,7 @@ class SlaveThreadsManager:
 			thread.run()
 		
 		(self.listSlaveThreads[self.nbSlaveThreads-1]).doneEvent.wait()
+		'''
 
 	def improvePop(self, chromosomes):
 
@@ -112,12 +128,12 @@ class SlaveThreadsManager:
 
 class SlaveThread(Thread):
 
-	def __init__(self, threadId):
+	def __init__(self, threadId, mainThread):
 
 		Thread.__init__(self)
 		self.queue = []
 		self.threadId = threadId
-		self.mainThread = 0
+		self.mainThread = mainThread
 		self.action = -1
 		self.doneEvent = Event()
 		self.mateDoneEvent = 0
@@ -128,6 +144,7 @@ class SlaveThread(Thread):
 		if self.action == 0 and self.queue != []: # if i want to initialize the first population
 
 			self.mainThread.initSearch(self.queue)
+
 		elif self.action == 1 and self.queue != []: # i want to improve the quality of the initial population
 
 			for chromosome in self.queue:
