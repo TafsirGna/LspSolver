@@ -21,85 +21,17 @@ class Population:
 		self.chromosomes = []
 		self.listFitnessData = []
 		self.lacksDiversity = False
-		self.thread_memory = []
 		self.locker = threading.Lock()
 		self.previousPopulation = 0
-		self.fitnessMean = 0
+		#self.fitnessMean = 0
 		self.slaveThreadsManager = 0
 
-	def initialize(self, indiceMigration, previousPopulation):
+	def initialize(self, previousPopulation):
 		
-		retVal = 0 # variable to be returned at the end
-
-		self.startPopData = copy.deepcopy(previousPopulation.startPopData)
-		self.thread_memory = previousPopulation.thread_memory
 		self.slaveThreadsManager = previousPopulation.slaveThreadsManager
 
 		self.previousPopulation = previousPopulation
-		# In the case where there's a lack of diversity, i introduce a bit of diversity by flipping a gene of one chromosome in the population
-		if previousPopulation.lacksDiversity:
 
-			#print(" CONVERGENCE : ", self.startingPopulation.chromosomes)
-			chromosome = copy.deepcopy(previousPopulation.chromosomes[0])
-			
-			# i store this local optima in the genetic algorithm's memory to remind me that it's already been visited before
-			Population.gaMemoryLocker.acquire()
-
-			if chromosome not in Population.ga_memory:
-				Population.ga_memory.append(copy.deepcopy(chromosome))
-				self.thread_memory.append(copy.deepcopy(chromosome))
-				
-			Population.gaMemoryLocker.release()
-
-			chromosome.advmutate()
-			
-			if chromosome != previousPopulation.chromosomes[0]:
-				
-				if chromosome not in self.thread_memory:
-					previousPopulation.chromosomes[0] = chromosome
-
-					retVal = 1 # this signals it's time for migration
-
-				else:
-
-					self.chromosomes = []
-					self.listFitnessData = []
-					self.lacksDiversity = False
-					return retVal
-
-			else:  
-
-				#if chromosome in self.startingPopulation.chromosomes:
-				#	self.startingPopulation.chromosomes.remove(chromosome)
-
-				i = 0
-				startPopSize = len(self.startPopData[0])
-				while i < startPopSize:
-					if chromosome == (self.startPopData[0])[i]:
-						del (self.startPopData[0])[i]
-						del (self.startPopData[1])[i]
-						break
-					i += 1
-
-				previousPopulation = Population()
-				previousPopulation.chromosomes = list(self.startPopData[0])
-				previousPopulation.listFitnessData = list(self.startPopData[1])
-				#print("Starting population : ", self.startingPopulation," and ", previousPopulation)
-				
-			previousPopulation.getFitnessData() # i make calculations over the resulting population
-
-		#print(" Memory : ", Population.ga_memory)
-		
-		if len(previousPopulation.chromosomes) == 1:
-
-			self.chromosomes = []
-			self.listFitnessData = []
-			self.lacksDiversity = False
-			return retVal
-		
-		#print("Starting population : ", self.startPopData[0])
-		#print ("population inter : ", previousPopulation)
-		#print " Percentage : ", previousPopulation.listFitnessData
 		# i perform the roulette-wheel method to select the parents
 		self.chromosomes = []
 		self.chromosomes.append(copy.deepcopy(previousPopulation.chromosomes[0])) # i add the best chromosome of the previous population to the current population
@@ -109,14 +41,6 @@ class Population:
 		self.prevPopData.append(copy.deepcopy(previousPopulation.listFitnessData))
 
 		self.slaveThreadsManager.crossoverPop(self)
-
-		indiceMigration += 1
-
-		if Population.MigrationRate != 0 and indiceMigration == Population.MigrationRate:
-			retVal = 1 # this signals it's time for migration
-			indiceMigration = 0
-
-		return retVal
 
 	def __repr__(self):
 		

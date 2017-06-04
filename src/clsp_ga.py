@@ -20,7 +20,7 @@ class GeneticAlgorithm:
 	MigrationRate = 0 # this variable holds the number of generations needed before a migration occurs during the search
 	nbMainThreads = 3
 	nbSlavesThread = 3
-	NbGenToStop = 5
+	NbGenToStop = 7
 
 	# Builder
 	def __init__(self, inst):

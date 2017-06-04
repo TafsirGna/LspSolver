@@ -7,6 +7,7 @@
 \usepackage{graphicx}
 \usepackage{palatino}
 \usepackage{sectsty}
+\usepackage[]{algorithm2e}
 %\usepackage{fancyhdr}
 \usepackage[colorlinks=true,linkcolor=black]{hyperref}
 \usepackage{color}
@@ -81,6 +82,9 @@
 	%Liste des Tableaux
 	\listoftables
 	\addcontentsline{toc}{section}{Liste des tableaux}
+	
+	%Liste des algorithms
+	\listofalgorithms
 	
 	\newpage % Page du résumé en français
 	
@@ -280,7 +284,6 @@ En effet, si $y_{t-1}^{i}$ et $y_{t}^{i}$ valent 1 alors $ch_{t}^{i,j}$ est obli
 		L'expérimentation lors d'une étude est une étape importante du travail de recherche. Il s'agit le plus souvent donc de tester les théories émises et d'analyser les résultats obtenus de tests afin de valider notre approche de solution du problème énoncée. Dans cette partie, nous présentons d'abord l'environnement de test, les instances utilisées. Ensuite, nous expérimentons notre solution et à partir des résultats obtenus, nous comparons notre approche heuristique basée sur les algorithmes génétiques à celles déjà appliquées à ce problème.
 		
 		\section{Environnement de test} 
-		\addcontentsline{toc}{section}{Environnement de test}
 		
 		\subsection{Matériel}
 		Pour l'implémentation de nos tests, nous avons travaillé sur un ordinateur présentant les caractéristiques suivantes :\\
@@ -303,6 +306,9 @@ En effet, si $y_{t-1}^{i}$ et $y_{t}^{i}$ valent 1 alors $ch_{t}^{i,j}$ est obli
 	
 	\part*{Bibliographie}
 	\addcontentsline{toc}{part}{Bibliographie}
+	
+	\appendix
 	\part*{Annexes}
 	\addcontentsline{toc}{part}{Annexes}
+	\section{Extension au problème de planification de production avec plusieurs machines}
 \end{document}
