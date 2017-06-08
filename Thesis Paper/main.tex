@@ -7,11 +7,11 @@
 \usepackage{graphicx}
 \usepackage{palatino}
 \usepackage{sectsty}
-\usepackage[]{algorithm2e}
+\usepackage[french]{algorithm2e}
 %\usepackage{fancyhdr}
 \usepackage[colorlinks=true,linkcolor=black]{hyperref}
 \usepackage{color}
-\usepackage[top=3cm, bottom=3cm, left=3cm, right=3cm]{geometry}
+\usepackage[top=3cm, bottom=3cm, left=2.5cm, right=2.5cm]{geometry}
 \pagestyle{plain}
 \author{Tafsir GNA}
 
@@ -47,7 +47,7 @@
 		\vspace{1.5cm}{\huge\bfseries Résolution de "Pigment Sequencing Problem" avec les algorithmes génétiques\par}
 		\vspace{2cm}{\scshape \Large\textbf{Présenté par} \\ Tafsir GNA \par}
 		\vfill
-		\Large\textbf{Supervisé par}\par Pr. Norbert \textsc{Hounkonnou} \\ \& \\ Ir. Ratheil Vinasétan \textsc{Houndji}, PhD Student
+		\Large\textbf{Supervisé par}\par Pr. Norbert \textsc{Hounkonnou} \\ \& \\ Dr. Ratheil Vinasétan \textsc{Houndji}
 		\vfill
 		{\large \scshape Année Académique 2016-2017 \par}
 	\end{titlepage}
@@ -83,8 +83,11 @@
 	\listoftables
 	\addcontentsline{toc}{section}{Liste des tableaux}
 	
-	%Liste des algorithms
+	\newpage
+	
+	%Liste des algorithmes
 	\listofalgorithms
+	\addcontentsline{toc}{section}{Liste des algorithmes}
 	
 	\newpage % Page du résumé en français
 	
@@ -140,15 +143,17 @@ ces dernières décennies depuis les travaux de Wagner et Within en 1958. \\
 		\addcontentsline{toc}{section}{Introduction}
 		L'état de l'art revêt une grande importance dans la conduite d'un travail de recherche. Elle permet de fixer les idées quant au travail qui a été déjà fait dans le domaine. Il s'agira donc principalement dans cette première partie de présenter la revue de littérature des problèmes de planification de production, d'exposer les travaux sur les algorithmes génétiques et de montrer en quoi les algorithmes génétiques sont particulièrement adaptés à ces genres de problèmes.
 		
-		\section{Les problèmes de planification de production}
-	La planification de production est un processus qui consiste à déterminer un plan qui indique quelle quantité d'articles produire durant une intervalle de temps appelé "horizon de planification". Il est un important défi pour les entreprises industrielles car il a un fort impact sur leur performance en terme de qualité service-client et des coût d'exploitation.	\subsection{Problématique}
+	\section{Les problèmes de planification de production}
+	La planification de production est un processus qui consiste à déterminer un plan qui indique quelle quantité d'articles produire durant un intervalle de temps appelé "horizon de planification". Il est un important défi pour les entreprises industrielles car il a un fort impact sur leur performance en terme de qualité du service-client et des coûts d'exploitation.	
+	
+	\subsection{Problématique}
 		
  La planification de production s'avère être une tâche très complexe principalement pour les raisons suivantes:
  \begin{itemize}
- 	\item[-] Le plus souvent, une ressource de production n'est pas seulement dédié à une unique article, mais plutôt utilisée pour produire différents types d'articles. Dans un contexte de processus d'industrie, les ressources de production disponibles ne pas vraiment flexibles. En conséquence, la planification de production se heurte à la compétition entre les articles partageant les mêmes ressources et il faut décider quels articles produire, quand et en quelle quantité, tout en prenant en compte les contraintes liées au système de production. Dans certains cas, ces contraintes peuvent être si rigides que trouver une plan de production valide et faisable peut être difficile.
+ 	\item[-] Le plus souvent, une ressource de production n'est pas seulement dédiée à un unique article, mais plutôt utilisée pour produire différents types d'articles. Dans un contexte de processus d'industrie, les ressources de production disponibles ne pas vraiment flexibles et ne peuvent produire qu'un type d'article à la fois. En conséquence, la planification de production se heurte à la compétition entre les articles partageant les mêmes ressources et il faut décider quels articles produire, quand et en quelle quantité, tout en prenant en compte les contraintes liées au système de production. Dans certains cas, ces contraintes peuvent être si rigides que trouver une plan de production valide et faisable peut être difficile.
  	
- 	\item[-] Un plan de production doit remplir plusieurs objectifs contradictoires, notamment, garantir un excellent niveau du service-client et minimiser la production et les coûts de stockage. Ainsi, les mesures basiques telles que, ne pas satisfaire la demande excédant les capacités de production et garder une haut niveau de stockage afin d'être capable de répondre à toute demande ne sont pas commercialement acceptables ou encore trop chères. Un bon plan de planification est donc le résultat d'un compromis entre différents objectifs contradictoires.
- 	\item[-] Un plan de production n'est jamais fixé pour toujours. Sa validité est restreinte à un horizon de planification prédéfini. De plus, le réalité dévie le plus souvent des prévisions et si la divergence entre les plans et les prévisions sont trop grandes, le plan doit être revu avant la fin de l'horizon de planification.
+ 	\item[-] Un plan de production doit remplir plusieurs objectifs souvent contradictoires, notamment, garantir un excellent niveau du service-client et minimiser la production et les coûts de stockage. Ainsi, les mesures basiques telles que, ne pas satisfaire la demande excédant les capacités de production et garder une haut niveau de stockage afin d'être capable de répondre à toute demande ne sont pas commercialement acceptables ou encore trop chères. Un bon plan de planification est donc le résultat d'un compromis entre différents objectifs contradictoires.
+ 	\item[-] Un plan de production n'est jamais fixé pour toujours. Sa validité est restreinte à un horizon de planification prédéfini. De plus, la réalité dévie le plus souvent des prévisions et si la divergence entre les plans et les prévisions est trop grande, le plan doit être revu avant la fin de l'horizon de planification.
  \end{itemize}
  
  La planification de production est donc un problème difficile et récurrent pour les compagnies industrielles. Il y a un fort besoin de systèmes d'aide à la décision. Le développement de tels systèmes a été l'objectif d'une grande partie de la littérature en recherche opérationnelle pour les cinquante dernières années. 
@@ -169,11 +174,10 @@ les produits, on considère des problèmes à plusieurs niveaux. Ce dernier type
 de problèmes se retrouve fréquemment dans l'industrie.
 
 	\item[\textsl{Le nombre de produits}:] Dans le cas où il n'y a pas de dépendance entre les produits, en particulier, s'il n'y a pas d'utilisation commune de la capacité, nous considérons des problèmes
-à un seul produit. Dans le cas inverse, on parle de problèmes à plusieurs pro-
-duits. Un état de l'art sur les problèmes à un produit est proposé par Brahimi
+à un seul produit. Dans le cas inverse, on parle de problèmes à plusieurs produits. Un état de l'art sur les problèmes à un produit est proposé par Brahimi
 et al. [16].
 
-	\item[\textsl{Les contraintes de capacité}:] Les contraintes de capacité incluent le nombre d'employés, la capacité des machines, la capacité de stockage . . . . Lorsque les contraintes de capacité sont
+	\item[\textsl{Les contraintes de capacité}:] Les contraintes de capacité incluent le nombre d'employés, la capacité des machines, la capacité de stockage, etc. Lorsque les contraintes de capacité sont
 introduites dans le modèle, elles rendent le problème plus difficile à résoudre,
 puisqu'elles lient les produits entre eux.
 
@@ -186,14 +190,130 @@ groupes :
 entre les produits.
 	\end{itemize}
 
-	\item[\textsl{Les coûts et temps de lancement ou préparation (setup)}:] Une ressource peut exécuter des produits de type différents. Ainsi il est parfois nécessaire de reconfigurer celle-ci à chaque changement de produits. Les coûts et temps induits par le lancement de la ressource sont souvent importants car
+	\item[\textsl{Les coûts et temps de lancement ou préparation (setup)}:] Une ressource peut exécuter des produits de types différents. Ainsi, il est parfois nécessaire de reconfigurer celle-ci à chaque changement de produits. Les coûts et temps induits par le lancement de la ressource sont souvent importants car
 élevés et longs.
 	
 \end{description}
 
+	La complexité des problèmes de dimensionnement de lots varie fortement sous l'influence des différents facteurs comme le nombre de produits, le nombre de niveaux, les contraintes de capacité, etc. Nous avons choisi dans cette étude de décrire les problèmes de dimensionnement de lots selon la longueur de la période de l'horizon de temps. Nous allons donc nous intéresser aux problèmes à courtes et longues périodes.
 \subsection{Classes}
+	\subsubsection{Problèmes à courtes périodes}
+	Ces problèmes (\emph{Small time bucket problems}) sont caractérisés par des périodes de l'ordre de quelques heures, et la séquence des lots lors de la production est prise en compte. Quatre types de problèmes sont étudiés dans la littérature. Pour une étude détaillée de tous ces problèmes, nous pourrons nous référer à Drexl and Kimms [35]. Ces différents types de problèmes sont donc:
+	\begin{itemize}
+		\item[-] Discrete lot-sizing and scheduling problem (DLSP);
+		\item[-] Continuous setup lot-sizing problem (CSLP);
+		\item[-] Proportional lot-sizing and scheduling problem (PLSP);
+		\item[-] General lot-sizing and scheduling problem (GLSP).
+	\end{itemize}
+	
+	\subsubsection{Problèmes à longues périodes}
+	Les problèmes à longues périodes (\emph{Big time bucket problems}) sont basés sur des
+horizons de l'ordre de quelques jours à quelques semaines et sont caractérisés par le fait que plus d'un produit peut être fabriqué par période. Nous proposons dans cette section, une étude restreinte de ces problèmes.
+	
+	\begin{itemize}
+		\item[-] les problèmes à un niveau et un produit;
+		\item[-] les problèmes à un niveau et un produit;
+		\item[-] les problèmes à un niveau et plusieurs produits;
+		\item[-] les problèmes à plusieurs niveaux.
+	\end{itemize}
+	
+	\begin{center}
+		\begin{figure}[!h]
+			\includegraphics[scale=.5]{img/classification_dimensionnement.png}
+			\caption{Exemple de classification des modèles de dimensionnement de lots}
+		\end{figure}
+	\end{center}
 
-\section{Les algorithmes génétiques}
+	\newpage
+	
+	\section{Les algorithmes génétiques}
+	Les algorithmes génétiques (AGs) sont des algorithmes d’exploration fondés sur les mécanismes de la sélection naturelle et de la génétique. Ils utilisent à la fois les principes de la survie des structures les mieux adaptées, et les échanges d’informations aléatoires, parfois guidés, pour former un algorithme d’exploration qui possède certaines des caractéristiques de l’exploration humaine. Ils ont été développés par John Holland [7] à l’université du Michigan.
+	\subsection{Concepts de base}
+	Les AGs constituent une classe de stratégies de recherche réalisant un compromis entre l’exploration et l’exploitation. Ils représentent des méthodes qui utilisent
+un choix aléatoire comme outil pour guider une exploration intelligente dans l’espace des paramètres codés. Ce sont des algorithmes itératifs de recherche globale dont l’objectif est d’optimiser une fonction prédéfinie appelée fonction coût ou fonction « fitness » f.
+	Les algorithmes génétiques emploient un vocabulaire emprunté à la génétique naturelle. Ils travaillent sur un ensemble d’individus appelé population. Un individu a deux représentations appelées phénotype et génotype. Le phénotype représente une solution potentielle du problème à optimiser en utilisant la formulation originale du problème. Le génotype donne une représentation codée
+d’une solution potentielle sous la forme d’un chromosome. Un chromosome est formé de gènes disposés en une succession linéaire et chaque gène peut prendre plusieurs
+valeurs appelées allèles. Par exemple, un chromosome se compose d’une succession de 0 et de 1 (c.-à-d. une chaîne binaire), et la valeur pour une certaine position correspond à on (la valeur = 1) ou à off (la valeur = 0) d’un certain dispositif. Des formes plus compliquées, telles qu’un ordre des symboles et une permutation des alphabets, sont choisies pour décrire les chromosomes du problème à optimiser. Chaque individu a une fonction objectif f (fonction « fitness ») qui mesure l’adaptation de l’individu à son environnement local. La théorie darwinienne indique que, parmi des individus d’une population, celui qui est le mieux adapté à l’environnement local a le plus de chance de survivre et d’avoir un plus grand nombre de descendants : c’est la règle de la « survie du plus fort ». Ainsi, la
+fonction objectif f du problème d’optimisation joue le rôle d’un critère d’adaptation [18]. Un des points les plus importants des algorithmes génétiques est la flexibilité dans la fonction objectif.
+	\subsection{Les opérateurs}
+		Un algorithme génétique simple utilise les trois opéra-
+teurs suivants : la sélection, le croisement et la mutation.
+		\subsubsection{L’opérateur de sélection}
+		La sélection est un processus dans lequel des individus d’une population sont choisis selon les valeurs de leur fonction coût ou «  fitness  » pour former une nouvelle population. Les individus évoluent par des itérations successives de la sélection, appelées générations. Chaque individu est sélectionné proportionnellement à sa fonction « fitness », donc, un individu avec une fonction « fitness »
+plus élevée aura plus de chance d’être sélectionné qu’un autre avec une valeur de « fitness » inférieure. Cette fonction peut être envisagée comme une mesure de profit ou de qualité qu’on souhaite maximiser. Un opérateur simple de sélection est la technique de la roulette pondérée où chaque individu d’une population
+occupe une surface de la roulette proportionnelle à la valeur de sa fonction « fitness ». Pour la reproduction, les candidats sont sélectionnés avec une probabilité proportionnelle à leur «  fitness  ». Pour chaque sélection d’un
+individu, une simple rotation de la roue donne le candidat sélectionné. Cependant cette sélection n’est pas parfaite. En effet, le risque de favoriser un individu ou un petit ensemble d’individus constitue un inconvénient qui risque d’appauvrir la diversité de la population.
+	\subsubsection{L’opérateur de croisement}
+	Le croisement est un opérateur de recombinaison. Les individus d’une population sont couplés au hasard par paires représentant les parents. Chaque paire d’individus
+subit le croisement décrit comme suit : le croisement opère sur les génotypes (c.-à-d. les chromosomes) de deux individus appelés parents. Il produit de nouveaux individus (généralement deux) appelés enfants dont les gènes sont hérités de l’un ou/et de l’autre parent. Ceci peut être fait en dédoublant chacun des deux chromosomes dans des fragments et en les recombinant pour former de nouveaux chromosomes.
+	\begin{description}
+		\item[\textsl{Le croisement à un point :}] Si le génotype est une chaîne binaire de longueur n. Le croisement à un point place un point de croisement au
+hasard. Un enfant prend une section avant le point de croisement d’un parent et prend l’autre section après le point de croisement de l’autre parent puis recombine les deux sections pour former une nouvelle chaîne binaire. L’autre enfant se construit inversement. Exemple : considérons P1 et P2 deux chaînes binaires de
+longueur n = 7 comme parents :
+	\begin{center}
+		P1 = 0 0 0 0 | 0 0 1 \\
+		P2 = 1 1 1 1 | 1 1 0
+	\end{center}
+	\hspace*{.5cm} Le symbole | indique un point de croisement, dans cet exemple il est placé après le quatrième bit. \\
+	\hspace*{.5cm} Le croisement à un point crée les deux nouveaux individus E1 et E2 comme suit :
+	\begin{center}
+		E1 = 0 0 0 0 | 1 1 0 \\
+		E2 = 1 1 1 1 | 0 0 1
+	\end{center}
+		
+		\item[\textsl{Le croisement à deux points :}]Le croisement à deux points place deux points de croisement au hasard, et prend une section entre les points d’un parent et les autres sections en dehors des points de l’autre parent puis les recombine. Dans l’exemple suivant, les deux points de croisement sont placés respectivement après le premier et quatrième bit :
+	
+	\begin{center}
+		P1 = 0 | 0 0 0 | 0 0 1 \\
+		P2 = 1 | 1 1 1 | 1 1 0
+	\end{center}
+	
+	Le croisement à deux points résultant rapporte les deux individus suivants :
+	\begin{center}
+		E1 = 0 | 1 1 1 | 0 0 1 \\
+		E2 = 1 | 0 0 0 | 1 1 0
+	\end{center}
+	
+		\item[\textsl{Le croisement uniforme :}]Ce type de croisement a été proposé par Syswerda [14]. Il consiste à choisir avec la même probabilité un allèle de l’un ou de l’autre parent, pour transmettre sa valeur à la même position, aux enfants. Comme le montre l'exemple suivant:
+	\begin{center}
+		P1 = 0 0 0 0 0 0 1 \\
+		P2 = 1 1 1 1 1 1 0 \\
+		M = 1 1 0 1 0 0 1
+	\end{center}
+	
+	\begin{center}
+		E1 = 0 0 1 0 1 1 1 \\
+		E2 = 1 1 0 1 0 0 0
+	\end{center}
+	
+	M représente le masque de transmission dont le principe est le suivant : si la valeur dans le masque est égale à 1, alors la valeur de l’allèle du parent 1 passe à l’enfant 1 (respectivement du parent 2 passe à l’enfant 2) ; sinon la valeur de l’allèle du parent 1 passe à l’enfant 2 (respectivement du parent 2 passe à l’enfant 1), tout en respectant la même position de l’allèle.
+	\end{description}
+	
+	\subsubsection{L'opérateur de mutation}
+	
+	La mutation opère sur le génotype d’un seul individu. Elle correspond, dans la nature, à une « erreur » qui se produit quand le chromosome est copié et reproduit. Dans une approche numérique, pour une chaîne binaire, elle consiste par exemple à faire pour un allèle un échange entre le « 0 » et le « 1 ». Si des copies exactes sont toujours garanties, alors le taux de mutation est égal à zéro. Cependant, dans la vie réelle, l’erreur de copie peut se produire dans diverses circonstances comme sous l’influence d’un bruit. La mutation change les valeurs de certains gènes avec une faible probabilité. Elle n’améliore pas, en général, les solutions, mais elle évite une perte irréparable de la diversité.
+	\begin{center}
+		A = 1 0 0 0 0 (avant mutation) \\
+		A' = 1 0 1 0 0 (après mutation)
+	\end{center}
+	
+	Le principe de l'algorithme génétique simple est représenté comme suit: \\
+	 
+	\begin{algorithm}[H]
+ 	\caption{Algorithme génétique standard}
+ 	%\KwData{this text}
+ 	%\KwResult{how to write algorithm with \LaTeX2e }
+ 	%initialization\;
+ 	Générer la population initiale Pi \\
+ 	Évaluer la population Pi \\
+ 	\While{le critère de terminaison n'est pas satisfait}{
+ 	 Sélectionner les éléments de Pi à copier dans P i+1 \\
+ 	 Appliquer le crossover aux éléments de Pi et les mettre dans P i+1 \\
+ 	 Appliquer la mutation aux éléments de Pi et les mettre dans P i+1 \\
+ 	 Évaluer la nouvelle population P i+1
+ 	 Pi = P i+1
+ 	}
+	\end{algorithm}
 		\section*{Conclusion}
 		\addcontentsline{toc}{section}{Conclusion}
 		
