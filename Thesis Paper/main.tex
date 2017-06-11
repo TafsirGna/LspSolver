@@ -7,13 +7,18 @@
 \usepackage{graphicx}
 \usepackage{palatino}
 \usepackage{sectsty}
-\usepackage[french]{algorithm2e}
+\usepackage[french, ruled]{algorithm2e}
 %\usepackage{fancyhdr}
 \usepackage[colorlinks=true,linkcolor=black]{hyperref}
 \usepackage{color}
 \usepackage[top=3cm, bottom=3cm, left=2.5cm, right=2.5cm]{geometry}
 \pagestyle{plain}
 \author{Tafsir GNA}
+
+
+\makeatletter
+\renewcommand{\@algocf@capt@plain}{above}% formerly {bottom}
+\makeatother
 
 %\allsectionsfont{\sf}
 %\sectionfont{\sffamily\color{black}\sectionrule{3ex}{3pt} %
@@ -88,6 +93,15 @@
 	%Liste des algorithmes
 	\listofalgorithms
 	\addcontentsline{toc}{section}{Liste des algorithmes}
+	
+	\newpage
+	\section*{Glossaire:}
+	\addcontentsline{toc}{section}{Glossaire}	
+	
+	\vspace{1cm}
+	
+	\textbf{PSP} : Pigment Sequencing Problem \\
+	\hspace*{.5cm} \textbf{AG} : Algorithme génétique
 	
 	\newpage % Page du résumé en français
 	
@@ -199,23 +213,37 @@ entre les produits.
 \subsection{Classes}
 	\subsubsection{Problèmes à courtes périodes}
 	Ces problèmes (\emph{Small time bucket problems}) sont caractérisés par des périodes de l'ordre de quelques heures, et la séquence des lots lors de la production est prise en compte. Quatre types de problèmes sont étudiés dans la littérature. Pour une étude détaillée de tous ces problèmes, nous pourrons nous référer à Drexl and Kimms [35]. Ces différents types de problèmes sont donc:
-	\begin{itemize}
-		\item[-] Discrete lot-sizing and scheduling problem (DLSP);
-		\item[-] Continuous setup lot-sizing problem (CSLP);
-		\item[-] Proportional lot-sizing and scheduling problem (PLSP);
-		\item[-] General lot-sizing and scheduling problem (GLSP).
-	\end{itemize}
+	\begin{description}
+		\item[\textsl{Discrete lot-sizing and scheduling problem :}]
+		Ce problème noté DLSP, est initialement formulé par Fleischmann [43]. La principale hypothèse de ce problème est qu'au plus un article peut être produit par
+période. Si un article est fabriqué sur une période, alors toute la capacité disponible sur cette période sera utilisée. Généralement, les coûts de lancement sont pris en compte seulement lorsqu'un nouveau lot commence et non à chaque période.
+		\item[\textsl{Continuous setup lot-sizing problem :}]
+		Ce problème noté CSLP est similaire au précédent problème. La différence réside dans le fait que lorsqu'un article est produit sur une période, on utilise la capacité nécessaire pour produire cet article et non la capacité entière comme pour le problème précèdent.
+		\item[\textsl{Proportional lot-sizing and scheduling problem : }] 
+		Dans ce problème, que l'on notera PSLP, la capacité restante pour une période donnée est réutilisée pour produire un second article. Ce problème a été étudié par Drexl et Haase [34] et Kimms et Drexl [78]. Il existe des extensions pour ce problème, par exemple, le cas à plusieurs niveaux et plusieurs machines. Dans [76], Kimms propose de calculer des bornes inférieures, et il résout ce problème à l'aide d'un algorithme génétique dans [77].
+		\item[\textsl{General lot-sizing and scheduling problem : }] 
+		Ce problème noté GLSP, est plus général que les problèmes précédents, puisque le nombre d'articles à produire par période n'est pas restrictif. Il est étudié par Fleischmann et Meyr [44]. Il existe des extensions de ce problème, par exemple en intégrant des temps de lancement de production dépendant de la séquence des lots à produire ([93]).
+	\end{description}
 	
 	\subsubsection{Problèmes à longues périodes}
 	Les problèmes à longues périodes (\emph{Big time bucket problems}) sont basés sur des
 horizons de l'ordre de quelques jours à quelques semaines et sont caractérisés par le fait que plus d'un produit peut être fabriqué par période. Nous proposons dans cette section, une étude restreinte de ces problèmes.
 	
-	\begin{itemize}
-		\item[-] les problèmes à un niveau et un produit;
-		\item[-] les problèmes à un niveau et un produit;
-		\item[-] les problèmes à un niveau et plusieurs produits;
-		\item[-] les problèmes à plusieurs niveaux.
-	\end{itemize}
+	\begin{description}
+		\item[Les problèmes à un niveau et un produit]: \\
+		Ces problèmes ne correspondent pas vraiment à la réalité mais reçoivent beaucoup d'attention et d'intérêt puisque les méthodes mises en œuvre pour les résoudre sont généralisées dans le cas des problématiques à plusieurs niveaux.
+		Les premiers travaux sur cette problématique ont été conduits par Manne [90]
+et Wagner et Whitin [129]. Leur méthode de résolution est utilisée dans plusieurs
+concepts pour résoudre des problèmes plus complexes. Brahimi et al. [16] ont proposé
+un état de l'art sur ces problématiques.		
+		\item[Les problèmes à un niveau et plusieurs produits]: \\
+		Le problème de dimensionnement de lots avec contraintes de capacité est considéré comme un problème complexe puisque la contrainte de capacité engendre un
+lien entre les différents produits. Dans le cas où la capacité est considérée comme
+infinie, le problème de dimensionnement de lots à N produits est réductible à N
+problèmes à un produit et sans capacité, chacun solvable en temps polynomial.
+		\item[Les problèmes à plusieurs niveaux]: \\ 
+		Ces problèmes sont caractérisés par le fait que les produits finis sont fabriqués à partir de produits intermédiaires. Ainsi, les demandes dépendantes (i.e. les demandes entre les produits) et les demandes indépendantes (i.e. les demandes arrivant de l'extérieur) sont prises en compte dans ce type de problème.
+	\end{description}
 	
 	\begin{center}
 		\begin{figure}[!h]
@@ -235,9 +263,41 @@ un choix aléatoire comme outil pour guider une exploration intelligente dans l�
 d’une solution potentielle sous la forme d’un chromosome. Un chromosome est formé de gènes disposés en une succession linéaire et chaque gène peut prendre plusieurs
 valeurs appelées allèles. Par exemple, un chromosome se compose d’une succession de 0 et de 1 (c.-à-d. une chaîne binaire), et la valeur pour une certaine position correspond à on (la valeur = 1) ou à off (la valeur = 0) d’un certain dispositif. Des formes plus compliquées, telles qu’un ordre des symboles et une permutation des alphabets, sont choisies pour décrire les chromosomes du problème à optimiser. Chaque individu a une fonction objectif f (fonction « fitness ») qui mesure l’adaptation de l’individu à son environnement local. La théorie darwinienne indique que, parmi des individus d’une population, celui qui est le mieux adapté à l’environnement local a le plus de chance de survivre et d’avoir un plus grand nombre de descendants : c’est la règle de la « survie du plus fort ». Ainsi, la
 fonction objectif f du problème d’optimisation joue le rôle d’un critère d’adaptation [18]. Un des points les plus importants des algorithmes génétiques est la flexibilité dans la fonction objectif.
+
+	\subsection{Fonctionnement}
+	
+	Le principe de fonctionnement de l'algorithme génétique simple est représenté comme suit: \\
+	 
+	\begin{algorithm}[H]
+ 	\caption{Algorithme génétique standard}
+ 	%\KwData{this text}
+ 	%\KwResult{how to write algorithm with \LaTeX2e }
+ 	%initialization\;
+ 	Générer la population initiale Pi \\
+ 	Évaluer la population Pi \\
+ 	\While{le critère de terminaison n'est pas satisfait}{
+ 	 Sélectionner les éléments de Pi à copier dans P i+1 \\
+ 	 Appliquer le crossover aux éléments de Pi et les mettre dans P i+1 \\
+ 	 Appliquer la mutation aux éléments de Pi et les mettre dans P i+1 \\
+ 	 Évaluer la nouvelle population P i+1 \\
+ 	 Pi = P i+1
+ 	}
+	\end{algorithm}
+	
+	\vspace*{1cm}
+	La figure ci-dessous décrit le processus d'un algorithme génétique simple.
+	
+	\begin{center}
+		\begin{figure}[!h]
+			\includegraphics[scale=.6]{img/genetic_algo_flowchart.png}
+			\caption{Diagramme d'un algorithme génétique standard}
+		\end{figure}
+	\end{center}
+	
+	\newpage
+	
 	\subsection{Les opérateurs}
-		Un algorithme génétique simple utilise les trois opéra-
-teurs suivants : la sélection, le croisement et la mutation.
+		Un algorithme génétique simple utilise les trois opérateurs suivants : la sélection, le croisement et la mutation.
 		\subsubsection{L’opérateur de sélection}
 		La sélection est un processus dans lequel des individus d’une population sont choisis selon les valeurs de leur fonction coût ou «  fitness  » pour former une nouvelle population. Les individus évoluent par des itérations successives de la sélection, appelées générations. Chaque individu est sélectionné proportionnellement à sa fonction « fitness », donc, un individu avec une fonction « fitness »
 plus élevée aura plus de chance d’être sélectionné qu’un autre avec une valeur de « fitness » inférieure. Cette fonction peut être envisagée comme une mesure de profit ou de qualité qu’on souhaite maximiser. Un opérateur simple de sélection est la technique de la roulette pondérée où chaque individu d’une population
@@ -297,25 +357,13 @@ longueur n = 7 comme parents :
 		A' = 1 0 1 0 0 (après mutation)
 	\end{center}
 	
-	Le principe de l'algorithme génétique simple est représenté comme suit: \\
-	 
-	\begin{algorithm}[H]
- 	\caption{Algorithme génétique standard}
- 	%\KwData{this text}
- 	%\KwResult{how to write algorithm with \LaTeX2e }
- 	%initialization\;
- 	Générer la population initiale Pi \\
- 	Évaluer la population Pi \\
- 	\While{le critère de terminaison n'est pas satisfait}{
- 	 Sélectionner les éléments de Pi à copier dans P i+1 \\
- 	 Appliquer le crossover aux éléments de Pi et les mettre dans P i+1 \\
- 	 Appliquer la mutation aux éléments de Pi et les mettre dans P i+1 \\
- 	 Évaluer la nouvelle population P i+1
- 	 Pi = P i+1
- 	}
-	\end{algorithm}
-		\section*{Conclusion}
-		\addcontentsline{toc}{section}{Conclusion}
+	\subsection{Application des algorithmes génétiques aux problèmes d'optimisation}
+	
+	Cette approche a été largement utilisée ces dernières années [9, 12, etc.]. L’utilisation des AGs dans de nombreux domaines a fait ses preuves, notamment dans des problèmes combinatoires tels que les problèmes d’ordonnancement [4, 13, 18, 5] et les problèmes de collecte et de distribution. Les problèmes d’ordonnancement d’un atelier classique de type Job-Shop (JSP) ont notamment été largement étudiés et résolus par les AGs [1, 3, 6, 10, 11, 15, etc.]. D’autres algorithmes hybrides ont été aussi proposés [2, 8, 16]. La difficulté principale dans la résolution de ces types de problèmes résulte dans la façon avec laquelle ils sont représentés sous forme algorithmique. Cette phase, la définition du chromosome, représente le point le plus important dans la recherche génétique. Plusieurs approches de représentation
+et différents types d’opérateurs d’AGs ont été proposés, pour résoudre ces problèmes.
+	
+	\section*{Conclusion}
+	\addcontentsline{toc}{section}{Conclusion}
 		
 	\newpage
 	
@@ -392,7 +440,7 @@ En effet, si $y_{t-1}^{i}$ et $y_{t}^{i}$ valent 1 alors $ch_{t}^{i,j}$ est obli
 		
 		\section*{Conclusion}
 		\addcontentsline{toc}{section}{Conclusion}
-		Cette deuxième partie a été l'occasion dans un premier temps d'expliciter le problème du Pigment Sequencing Problème (PSP), de présenter le modèle mathématique utilisé ainsi que sa formulation. Dans un second temps, nous avons présenté et détaillé l'approche heuristique basée sur les algorithmes génétiques utilisée afin de résoudre le problème. La troisième partie sera l'occasion de tester notre solution et d'analyser les résultats afin de les comparer à l'état de l'art en la matière.
+		Cette deuxième partie a été l'occasion dans un premier temps d'expliciter le problème du PSP, de présenter le modèle mathématique utilisé ainsi que sa formulation. Dans un second temps, nous avons présenté et détaillé l'approche heuristique basée sur les algorithmes génétiques utilisée afin de résoudre le problème. La troisième partie sera l'occasion de tester notre solution et d'analyser les résultats afin de les comparer à l'état de l'art en la matière.
 		
 	\newpage
 	
@@ -414,7 +462,7 @@ En effet, si $y_{t-1}^{i}$ et $y_{t}^{i}$ valent 1 alors $ch_{t}^{i,j}$ est obli
 			\item[•] Type du système d'exploitation: 64 bits.\\
 		\end{itemize}
 		\subsection{Langage de programmation}
-		Le langage de programmation utilisée afin de d'implémenter notre solution est le langage \emph{Python} dans sa version Python 3.5. \emph{Python} est un puissant langage de programmation interprété qui apparait de plus en plus comme une alternative crédile et intéressante dans le domaine de l'intelligence artificielle, tant il présente des qualités quant à sa robustesse, sa rapidité, sa portabilité, sa facilité de prise en main, sa rigueur et sa caractéristique de langage Open source.  
+		Le langage de programmation utilisée afin de d'implémenter notre solution est le langage \emph{Python} dans sa version Python 3.5. \emph{Python} est un puissant langage de programmation interprété qui apparaît de plus en plus comme une alternative crédible et intéressante dans le domaine de l'intelligence artificielle, tant il présente des qualités quant à sa robustesse, sa rapidité, sa portabilité, sa facilité de prise en main, sa rigueur et sa caractéristique de langage Open source.  
 		\subsection{Données de test}
 		\section*{Conclusion}
 		\addcontentsline{toc}{section}{Conclusion}
@@ -424,11 +472,28 @@ En effet, si $y_{t-1}^{i}$ et $y_{t}^{i}$ valent 1 alors $ch_{t}^{i,j}$ est obli
 	\part*{Conclusion et Perspectives}
 	\addcontentsline{toc}{part}{Conclusion et Perspectives}
 	
+	\newpage
+	
 	\part*{Bibliographie}
 	\addcontentsline{toc}{part}{Bibliographie}
+	
+	\newpage
 	
 	\appendix
 	\part*{Annexes}
 	\addcontentsline{toc}{part}{Annexes}
 	\section{Extension au problème de planification de production avec plusieurs machines}
+		\subsection{Description du problème}
+		On s’intéresse ici à un problème de planification de production avec plu-
+sieurs machines de capacités finies et constantes. Il y a plusieurs articles à
+produire sur un horizon de planification discret et fini. La demande est statique et déterministe et il n’y a pas de shortage. La fonction objectif comprend
+les coûts de :
+		\begin{itemize}
+			\item[•] \emph{setup}: lorsqu’on prépare une machine pour la production d’un article à une période donnée. Ce coût est induit une seule fois
+à une période donnée même si on produit plusieurs fois le même article sur la machine ;
+			\item[•] \emph{inventory} : lorsqu'on conserve en stocks des articles afin de pouvoir satisfaire les demandes.
+		\end{itemize}
+		\subsection{Modèle et formulation}
+		\subsection{Notre solution}
+		\subsection{Expérimentations et Analyse des résultats}
 \end{document}
