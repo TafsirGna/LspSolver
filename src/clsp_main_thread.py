@@ -15,7 +15,6 @@ class ClspThread(Thread):
 	listMainThreads = 0
 	NumberOfMigrants = 0
 	NbGenToStop = 0
-	nbSlavesThread = 0
 
 	def __init__(self, threadId, queue):
 
@@ -26,7 +25,8 @@ class ClspThread(Thread):
 		self.locker = threading.Lock()
 
 		self.immigrants = []
-		self.slaveThreadsManager = SlaveThreadsManager(self, ClspThread.nbSlavesThread) # i initialize a list that's intended to contain all the population's initialization threads 
+
+		self.slaveThreadsManager = SlaveThreadsManager(self) # i initialize a list that's intended to contain all the population's initialization threads 
 
 		self.population = Population()
 		self.population.slaveThreadsManager = self.slaveThreadsManager

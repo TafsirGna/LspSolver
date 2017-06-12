@@ -47,7 +47,7 @@
 			\includegraphics[width=1\linewidth]{img/uac_logo.png}
 		\end{minipage}
 				
-		\vspace{1cm}{\scshape\Large Institut de Formation de Recherche en Informatique (IFRI)\par}
+		\vspace{1cm}{\scshape\Large Institut de Formation et de Recherche en Informatique (IFRI)\par}
 		\vspace{1cm}{\scshape\Large Mémoire pour l'obtention du diplôme de Master en Systèmes d'Information et Réseaux Informatiques\par}
 		\vspace{1.5cm}{\huge\bfseries Résolution de "Pigment Sequencing Problem" avec les algorithmes génétiques\par}
 		\vspace{2cm}{\scshape \Large\textbf{Présenté par} \\ Tafsir GNA \par}
@@ -68,7 +68,7 @@
 	\hspace*{.5cm}Je remercie particulièrement : \\
 	\begin{itemize}
 		\item[•] Pr. Eugène EZIN, Directeur de l'Institut de Formation et de Recherche en Informatique (IFRI) ainsi que tous les membres du corps enseignant et administratif de l'IFRI;
-		\item[•] Pr. Norbert HOUNKONNOU, pour avoir accepté de superviser mes travaux ainsi que Ir. Ratheil HOUNDJI, PhD student pour l'encadrement et les conseils apportés;
+		\item[•] Pr. Norbert HOUNKONNOU, pour avoir accepté de superviser mes travaux ainsi que Dr. Ratheil HOUNDJI pour l'encadrement et les conseils apportés;
 		\item[•] Mon père, ma mère et par extension toute ma famille pour leur soutien et leurs encouragements. 
 	\end{itemize}
 	
@@ -100,8 +100,11 @@
 	
 	\vspace{1cm}
 	
-	\textbf{PSP} : Pigment Sequencing Problem \\
-	\hspace*{.5cm} \textbf{AG} : Algorithme génétique
+	\label{PSP}\textbf{PSP} : Pigment Sequencing Problem \\
+	\hspace*{.5cm} \textbf{AG} : Algorithme Génétique \\
+	\hspace*{.5cm} \textbf{F-PGA} : Fine-grained Parallel Genetic Algorithm \\
+	\hspace*{.5cm} \textbf{C-PGA} : Coarse-grained Parallel Genetic Algorithm
+	
 	
 	\newpage % Page du résumé en français
 	
@@ -364,10 +367,14 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
 	
 	\section*{Conclusion}
 	\addcontentsline{toc}{section}{Conclusion}
+	Le dimensionnement de lots en planification de production est un important défi pour les entreprises industrielles. Il consiste à trouver un plan de production qui satisfait aux contraintes spécifiques relatives au système de production. Plusieurs méthodes peuvent servir à résoudre ce problème. Au nombre de ces problèmes, figurent les algorithmes génétiques. Les AGs, à travers l'exploration et l'exploitation de l'espace de recherche ont permis de résoudre bon nombre de problèmes d'optimisation par le passé. Nous proposerons dans la partie suivante deux approches heuristiques basées sur les algorithmes génétiques afin de résoudre le \ref{PSP} PSP, un problème de dimensionnement de lots.
 		
 	\newpage
 	
 	\part{Modèle, Formulation et Implémentation}
+	
+	\setcounter{section}{0}
+	
 	%\newpage
 		\section*{Introduction}
 		\addcontentsline{toc}{section}{Introduction}
@@ -375,7 +382,7 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
 		
 		\section{Description du problème}
 		
-		Le "Pigment Sequencing Problem" consiste à trouver un plan de production
+		Le PSP consiste à trouver un plan de production
 de plusieurs articles à partir d’une machine avec des côuts de changeover . Les
 coûts de changeover sont les coûts encourus lors du passage de la production
 de l’article i à celui de l’article j avec $i \neq j$. Le plan de production doit
@@ -391,7 +398,7 @@ période et d(i, t) $ \in $ {0, 1} avec i l’article et t la période.\\
 	\textbf{\textsl{Illustration}} : Soit un problème avec les données ci-dessous : \\
 	\begin{itemize}
 		\item[•] Nombre d’articles : $NI = 2$;
-		\item[•] Nombre de périodes : $NI = 5$;
+		\item[•] Nombre de périodes : $NT = 5$;
 		\item[•] Demande par période. Soit d(i, t) la demande de l’article i à la période t : $d(1, t) = (0, 1, 0, 0, 1)$ et $d(2, t) = (1, 0, 0, 0, 1)$;
 		\item[•] Coût de stockage. Soit h(i) le coût de stockage de l’article i : $h(1) = h(2) = 2$;
 	\end{itemize}
@@ -427,20 +434,21 @@ $y_{t}^{i} = y_{t-1}^{i}$ ou $y_{t}^{i} = y_{t+1}^{i}$
 mais parfois il peut être intéressant de préparer
 la machine pour un article intermédiaire sans le produire. La contrainte (6) assigne les valeurs aux variables de changeover.
 En effet, si $y_{t-1}^{i}$ et $y_{t}^{i}$ valent 1 alors $ch_{t}^{i,j}$ est obligé de prendre la valeur 1 et sinon $ch_{t}^{i,j}$ serait égale à 0 grâce à la fonction objectif qui minimise le coût de changeover.
-		\section{Description de l'approche heuristique}
+		\section{Description de l'approche heuristique proposée}
 			\subsection{Représentation génétique}
-
+			\subsection{Initialisation}
 			\subsection{Opérateurs génétiques}
-				\subsubsection*{Initialisation}
-				\subsubsection*{Séléction}
-				\subsubsection*{Mutation}
-				\subsection*{Terminaison}
-			\subsection*{Fonction objectif}
-
+				\subsubsection{Sélection}
+				\subsubsection{Croisement}
+				\subsubsection{Mutation}
+			\subsection{Evaluation}
+			\subsection{Terminaison}
 		
+		\section{Fine-grained Parallel Genetic Algorithm}
+		\section{Coarse-grained Parallel Genetic Algorithm}
 		\section*{Conclusion}
 		\addcontentsline{toc}{section}{Conclusion}
-		Cette deuxième partie a été l'occasion dans un premier temps d'expliciter le problème du PSP, de présenter le modèle mathématique utilisé ainsi que sa formulation. Dans un second temps, nous avons présenté et détaillé l'approche heuristique basée sur les algorithmes génétiques utilisée afin de résoudre le problème. La troisième partie sera l'occasion de tester notre solution et d'analyser les résultats afin de les comparer à l'état de l'art en la matière.
+		Cette deuxième partie a été l'occasion dans un premier temps d'expliciter le problème du PSP, de présenter le modèle mathématique utilisé ainsi que sa formulation. Dans un second temps, nous avons présenté et détaillé deux approches heuristiques basées sur les algorithmes génétiques utilisée afin de résoudre le problème. La troisième partie sera l'occasion de tester nos deux approches et d'analyser les résultats afin de les comparer à l'état de l'art en la matière.
 		
 	\newpage
 	
@@ -449,7 +457,7 @@ En effet, si $y_{t-1}^{i}$ et $y_{t}^{i}$ valent 1 alors $ch_{t}^{i,j}$ est obli
 	%\newpage
 		\section*{Introduction}
 		\addcontentsline{toc}{section}{Introduction}
-		L'expérimentation lors d'une étude est une étape importante du travail de recherche. Il s'agit le plus souvent donc de tester les théories émises et d'analyser les résultats obtenus de tests afin de valider notre approche de solution du problème énoncée. Dans cette partie, nous présentons d'abord l'environnement de test, les instances utilisées. Ensuite, nous expérimentons notre solution et à partir des résultats obtenus, nous comparons notre approche heuristique basée sur les algorithmes génétiques à celles déjà appliquées à ce problème.
+		L'expérimentation lors d'une étude est une étape importante du travail de recherche. Il s'agit le plus souvent donc de tester les théories émises et d'analyser les résultats obtenus de tests afin de valider nos approches de solution du problème énoncées. Dans cette partie, nous présentons d'abord l'environnement de test, les instances utilisées. Ensuite, nous expérimentons notre solution et à partir des résultats obtenus, nous comparons nos approches heuristiques basées sur les algorithmes génétiques à celles déjà appliquées à ce problème.
 		
 		\section{Environnement de test} 
 		
@@ -463,7 +471,16 @@ En effet, si $y_{t-1}^{i}$ et $y_{t}^{i}$ valent 1 alors $ch_{t}^{i,j}$ est obli
 		\end{itemize}
 		\subsection{Langage de programmation}
 		Le langage de programmation utilisée afin de d'implémenter notre solution est le langage \emph{Python} dans sa version Python 3.5. \emph{Python} est un puissant langage de programmation interprété qui apparaît de plus en plus comme une alternative crédible et intéressante dans le domaine de l'intelligence artificielle, tant il présente des qualités quant à sa robustesse, sa rapidité, sa portabilité, sa facilité de prise en main, sa rigueur et sa caractéristique de langage Open source.  
+		
 		\subsection{Données de test}
+		
+		Deux ensembles d'instances ont été utilisés dans notre étude afin de tester nos deux solutions. Il s'agit d'une part de celles disponibles dans la bibliothèque \emph{CSPlib} à https://bitbucket.org/ratheilesse/cp4ppet proposées par Houndji et al. (2014). D'autres part, Ceschia et al dans leur application du recuit simulé au PSP ont mis au point un générateur paramétré. Leur générateur reçoit entre autres comme entrées, le nombre d'articles, le nombre de périodes et produit en sortie une instance aléatoire à l'aide de ces paramètres. Ces instances sont disponibles à http://opthub.uniud.it.
+		
+		\begin{description}
+			\item[CSPlib] 
+			\item[Opthub]
+		\end{description}
+		
 		\section*{Conclusion}
 		\addcontentsline{toc}{section}{Conclusion}
 		

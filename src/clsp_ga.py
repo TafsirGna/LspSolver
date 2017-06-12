@@ -25,14 +25,13 @@ class GeneticAlgorithm:
 	# Builder
 	def __init__(self, inst):
 
-		self.instance = inst
 		self.hashTable = {} #hashTable is a dictionnary
 		self.ga_memory = []
 		self.listMainThreads = [] # i initialize a list that's intended to contain all the main threads of this genetic algorithm program
 		
 		# i impart some parameters to the chromosome class and population class
 		Chromosome.mutationRate = GeneticAlgorithm.mutationRate
-		Chromosome.problem = self.instance
+		Chromosome.problem = inst
 		Chromosome.hashTable = self.hashTable
 
 		# i set some class' properties of Population class
@@ -45,7 +44,7 @@ class GeneticAlgorithm:
 
 		ClspThread.listMainThreads = self.listMainThreads
 		ClspThread.NbGenToStop = GeneticAlgorithm.NbGenToStop
-		ClspThread.nbSlavesThread = GeneticAlgorithm.nbSlavesThread
+		SlaveThreadsManager.nbSlavesThread = GeneticAlgorithm.nbSlavesThread
 		ClspThread.NumberOfMigrants = GeneticAlgorithm.NumberOfMigrants
 
 		
@@ -63,7 +62,7 @@ class GeneticAlgorithm:
 		# i pick the item, i will start the scheduling with
 		item = randint(1, Chromosome.problem.nbItems)
 		period = Chromosome.problem.deadlineDemandPeriods[item-1][0]
-		rootPerThread = math.ceil(period / GeneticAlgorithm.nbMainThreads)
+		rootPerThread = math.ceil((period+1) / GeneticAlgorithm.nbMainThreads)
 
 		# i initialize each thread and put it into the corresponding list 
 		i = period
@@ -82,38 +81,12 @@ class GeneticAlgorithm:
 			root.solution = solution
 			#print(root.solution)
 			
-			if (threadQueue == []):
+			threadQueue.append(copy.deepcopy(root))
 
-				threadQueue.append(root)
+			if len(threadQueue) == rootPerThread or i == 0:
+
+				threadQueue.sort()
 				#print(threadQueue)
-			
-			elif len(threadQueue) == 1 and (threadQueue[0]).fitnessValue == 0:
-
-				threadQueue.append(root)
-				#print(threadQueue)
-
-			else:
-
-				# i sort the list of zeroperiods from the most convenient place to the least convenient one
-
-				size = len(threadQueue)
-				prevValue = 0
-				j = 0
-				found = False
-				while j < size:
-					
-					if root.fitnessValue >= prevValue and root.fitnessValue <= (threadQueue[j]).fitnessValue:
-						threadQueue = threadQueue[:j] + [root] + threadQueue[j:]
-						found = True
-						break
-					prevValue = (threadQueue[j]).fitnessValue
-					j += 1
-				if found is False:
-					threadQueue.append(root)
-
-
-			if  len(threadQueue) >= rootPerThread or i == 0:
-
 				# i initialize the thread and put it into a list of threads created for this purpose
 				clspThread = ClspThread(threadCounter, list(reversed(threadQueue)))
 				self.listMainThreads.append(clspThread)
@@ -127,12 +100,14 @@ class GeneticAlgorithm:
 
 			i -= 1
 
+
+		
 		# want to make sure that the parent process will wait for the child threading before exiting
 		for thread in self.listMainThreads:
 			thread.start()
 			thread.join()
-
-		self.printResults()	
+		
+		self.printResults()
 	
 	#--------------------
 	# function : printResults

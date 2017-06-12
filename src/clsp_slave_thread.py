@@ -13,15 +13,15 @@ from population import *
 class SlaveThreadsManager:
 
 	"""docstring for SlaveThreadsManager"""
+	nbSlavesThread = 0
 
-	def __init__(self, mainThread, nbSlaveThreads):
+	def __init__(self, mainThread,):
 
 		super(SlaveThreadsManager, self).__init__()
 		self.listSlaveThreads = []
-		self.nbSlaveThreads = nbSlaveThreads
 
 		i = 0
-		while i < nbSlaveThreads:
+		while i < SlaveThreadsManager.nbSlavesThread:
 			
 			slaveThread = SlaveThread(i, mainThread)
 			slaveThread.queue = copy.deepcopy(mainThread.queue)
@@ -40,12 +40,13 @@ class SlaveThreadsManager:
 			thread.action = 0
 			thread.start()
 
-		(self.listSlaveThreads[self.nbSlaveThreads-1]).doneEvent.wait()
+		#print("Nb Slaves : ", SlaveThreadsManager.nbSlavesThread)
+		(self.listSlaveThreads[SlaveThreadsManager.nbSlavesThread-1]).doneEvent.wait()
 
 	def improvePop(self, chromosomes):
 
 		popSize = len(chromosomes)
-		nodePerSlave = math.ceil(popSize / self.nbSlaveThreads)
+		nodePerSlave = math.ceil(popSize / SlaveThreadsManager.nbSlavesThread)
 
 		i = 0
 		slaveQueue = []
@@ -68,7 +69,7 @@ class SlaveThreadsManager:
 		for thread in self.listSlaveThreads:
 			thread.run()
 		
-		(self.listSlaveThreads[self.nbSlaveThreads-1]).doneEvent.wait()
+		(self.listSlaveThreads[SlaveThreadsManager.nbSlavesThread-1]).doneEvent.wait()
 
 	def crossoverPop(self, population):
 
@@ -80,7 +81,7 @@ class SlaveThreadsManager:
 		for thread in self.listSlaveThreads:
 			thread.run()
 		
-		(self.listSlaveThreads[self.nbSlaveThreads-1]).doneEvent.wait()		
+		(self.listSlaveThreads[SlaveThreadsManager.nbSlavesThread-1]).doneEvent.wait()		
 
 
 class SlaveThread(Thread):
@@ -108,6 +109,8 @@ class SlaveThread(Thread):
 			for chromosome in self.queue:
 				chromosome.advmutate()
 				self.mainThread.population.replace(chromosome)
+
+			#self.mainThread.population.chromosomes.sort()
 			self.queue = []
 
 		elif self.action == 2:
