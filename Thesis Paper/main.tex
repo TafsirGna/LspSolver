@@ -109,7 +109,11 @@
 	\hspace*{.5cm} \textbf{F-PGA} : Fine-grained Parallel Genetic Algorithm \\
 	\hspace*{.5cm} \textbf{C-PGA} : Coarse-grained Parallel Genetic Algorithm \\
 	\hspace*{.5cm} \textbf{CLSP} : Capacited Lot Sizing Problem \\
-	\hspace*{.5cm} \textbf{DFS} : Depth First Search
+	\hspace*{.5cm} \textbf{DFS} : Depth First Search\\
+	\hspace*{.5cm} \textbf{MIP} : Mixed Integer Programming \\
+	\hspace*{.5cm} \textbf{CP} : Constraint Programming \\
+	\hspace*{.5cm} \textbf{HFC-PGA} : Hierarchical Fine-grained and Coarse-grained Parallel Genetic Algorithms \\
+\hspace*{.5cm} \textbf{HCM-PGA} : Hierarchical Coarse-grained and master-slave Parallel Genetic Algorithms \\
 	
 	
 	\newpage % Page du résumé en français
@@ -157,7 +161,7 @@ ces dernières décennies depuis les travaux de Wagner et Within en 1958. \\
 	 
 	\section*{Organisation du travail}
 
-	Le travail effectué est organisé dans ce document en 4 parties. Le première partie présente une revue de littérature des problèmes de dimensionnement de lots en planification de production en nous concentrant sur les classes de problèmes qui nous concerne particulièrement. Nous présentons également dans cette partie les algorithmes génétiques, leurs étapes ainsi que leurs fonctionnement. Dans le deuxième partie, nous présentons dans un premier temps, les modèles mathématiques spécifiques au PSP ainsi que leur formulation, utilisés afin de résoudre le PSP. En troisième partie, nous détaillons les deux méthodes de recherche utilisés dans leurs différents aspects ainsi que les algorithmes utilisés. Ensuite, en dernière et quatrième partie, nous expérimentons  nos deux méthodes, présentons les résultats obtenus et comparons ces résultats à l'état de l'art en la matière. Pour finir, nous tirons une conclusion du travail effectué et dressons les perspectives possibles en vue d'améliorer ce qui a été fait.
+	Le travail effectué est organisé dans ce document en 3 parties. Le première partie présente une revue de littérature des problèmes de dimensionnement de lots en planification de production en nous concentrant sur les classes de problèmes qui nous concerne particulièrement. Ensuite, nous présentons le PSP, le décrivons et présentons les modèles utilisés dans sa résoution. Nous présentons également dans cette partie les algorithmes génétiques, leurs étapes ainsi que leurs fonctionnement. En deuxième partie, nous détaillons les deux méthodes de recherche utilisés ainsi que les algorithmes utilisés. Ensuite, en dernière et troisième partie, nous expérimentons  nos deux méthodes, présentons les résultats obtenus et comparons ces résultats à l'état de l'art en la matière. Pour finir, nous tirons une conclusion du travail effectué et dressons les perspectives possibles en vue d'améliorer ce qui a été fait.
 	
 	\newpage
 	
@@ -266,6 +270,92 @@ problèmes à un produit et sans capacité, chacun solvable en temps polynomial.
 
 	\newpage
 	
+	\section{Le "Pigment sequencing problem"}
+	
+	\subsection{Description du problème}
+		\label{sec:problem_description}
+		Le PSP consiste à trouver un plan de production
+de plusieurs articles à partir d’une machine avec des côuts de changeover . Les
+coûts de changeover sont les coûts encourus lors du passage de la production
+de l’article i à celui de l’article j avec $i \neq j$. Le plan de production doit
+satisfaire les demandes des clients tout en :
+	\begin{itemize}
+		\item[•] respectant la capacité de production de la machine;
+		\item[•] minimisant les coûts de stockage et de changeover.
+	\end{itemize}
+	\hspace*{.5cm} On suppose que la période de production est suffisamment courte pour ne produire qu’au plus un article par période et que les demandes sont normalisées : la capacité de production de la machine est limitée à un article par
+période et d(i, t) $ \in $ {0, 1} avec i l’article et t la période.\\
+	\hspace*{.5cm} Il s’agit d’un problème de planification de production ayant les caractéristiques suivantes : un horizon de planification discret et fini ; des contraintes de capacité ; une demande statique et déterministe ; multi-item et small bucket, des coûts de changeover; un seul niveau; sans shortage.\\
+
+	\textbf{\textsl{Illustration}} : Soit un problème avec les données ci-dessous : \\
+	\begin{itemize}
+		\item[•] Nombre d’articles : $NI = 2$;
+		\item[•] Nombre de périodes : $NT = 5$;
+		\item[•] Demande par période. Soit d(i, t) la demande de l’article i à la période t : $d(1, t) = (0, 1, 0, 0, 1)$ et $d(2, t) = (1, 0, 0, 0, 1)$;
+		\item[•] Coût de stockage. Soit h(i) le coût de stockage de l’article i : $h(1) = h(2) = 2$;
+	\end{itemize}
+	Soit \emph{xT} le plan de production qui représente une solution potentielle du problème. Il s’agit d’un tableau de dimension \emph{NT} , contenant à son indice t (avec $t  \in  {1...NT}$) l’article i à produire. Une solution admissible du problème est : $ xT = (2, 1, 2, 0, 1)$ avec un coût de $ q(2, 1) + q(1, 2) + q(2, 1) + 2 * h(2) = 15 $. La solution optimale est : $ xT = (2, 1, 0, 1, 2)$ avec un coût de $q(2, 1) + q(1, 2) + h(1) = 10$.
+		
+		\subsection{Modèles et formulations}
+		Différents modèles ont été proposés afin de représenter, modéliser et résoudre le PSP. Les modèles de programmation mixte en nombres entiers ou MIP proposés par Pochet et Wolsey (2006, §14.4) sont récurrents dans la littérature sur les problèmes de dimensionnement de lot en particulier celui du PSP. Nous présentons donc ici les trois modèles MIP dont les deux derniers sont une reformulation de la première.
+		\subsubsection{Modèle MIP 1}
+		
+		\begin{eqnarray}
+			min \sum_{i,j,t} q^{i,j}ch_{t}^{i,j} + \sum_{i,t} h^{i} s_{t}^{i} \\
+			s_{0}^{i} = 0, \forall i \\
+			x_{t}^{i} + s_{t-1}^{i} = d_{t}^{i} + s_{t}^{i}, \forall i,t \\
+			x_{t}^{i} \leq y_{t}^{i}, \forall i,t \\
+			\sum_{i} y_{t}^{i} = 1 , \forall t \\
+			ch_{t}^{i,j} = y_{t-1}^{i} + y_{t}^{j} - 1, \forall i,j,t \\
+			x,y,ch \in \{0,1\}, s \in N, i \in \{0..NI\}, t \in \{1..NT\}
+		\end{eqnarray}
+		
+		avec les variables de décisions suivantes: \\
+		\begin{itemize}
+			\item[-] $x_{t}^{i}$ : variable binaire de production qui vaut 1 si l’article i est produit à la période t et 0 sinon ;
+			\item[-] $y_{t}^{i}$ : variable binaire de setup qui vaut 1 si la machine est préparée pour la production de l’article i et 0 sinon ;
+			\item[-] $s_{t}^{i}$ : variable entière de stockage qui contient le nombre d’articles i stockés à la période t ; 
+			\item[-] $ch_{t}^{i,j}$ : variable binaire de changeover qui vaut 1 si à la période t, on est passé de la production de l’article i à l’article j et 0 sinon.
+		\end{itemize}
+		\vspace*{.3cm}
+	\hspace*{.5cm} L'objectif est de minimiser la somme des coûts de stockage et des coûts de changeover et est exprimé par la contrainte (1). La contrainte (2) rappelle qu'il n'y a pas de stock initial. La contrainte (3) exprime la règle de la conservation de flot. La contrainte (4) vise à forcer la variable de setup $y_{t}^{i}$ à prendre la valeur 1 s’il y a production de l’article i à la période t. La contrainte (5) s'assure qu'il y a toujours un article qui est préparé. En accord avec la fonction objectif, $y_{t}^{i}$ va prendre la valeur qui minimise le coût de changeover. En général s’il n’y a pas de production à la période t,
+$y_{t}^{i} = y_{t-1}^{i}$ ou $y_{t}^{i} = y_{t+1}^{i}$
+mais parfois il peut être intéressant de préparer
+la machine pour un article intermédiaire sans le produire. La contrainte (6) assigne les valeurs aux variables de changeover.
+En effet, si $y_{t-1}^{i}$ et $y_{t}^{i}$ valent 1 alors $ch_{t}^{i,j}$ est obligé de prendre la valeur 1 et sinon $ch_{t}^{i,j}$ serait égale à 0 grâce à la fonction objectif qui minimise le coût de changeover.
+		
+		\subsubsection{Modèle MIP 2}
+		En remplaçant l'équation 6 par les équations suivantes, on obtient une deuxième formulations du problème.
+		
+		\begin{eqnarray}
+			Equations \ 1,\ 2,\ 3,\ 4,\ 5 \\
+			\sum_{i} ch_{t}^{i,j} = y_{t}^{j}, \forall j,t \\	
+			\sum_{j} ch_{t}^{i,j} = y_{t-1}^{i}, \forall i,t \\
+			\sum_{i} y_{0}^{i} = 1
+			y_{t}^{j} - z_{t-1}^{j} = y_{t-1}^{j} - w_{t-1}^{j} = ch_{t}^{jj}, \forall j,t		
+		\end{eqnarray}
+		
+		avec les variables de décisions suivantes: \\
+		\begin{itemize}
+			\item[-] $z_{t}^{i}$ : variable binaire qui vaut 1 si la machine est prête pour l'article i dans la période t mais pas la période t-1 ;
+			\item[-] $w_{t}^{i}$ : variable binaire qui vaut 1 si la machine est prête pour l'article i dans la période t mais pas la période t+1 ;
+		\end{itemize}
+		\vspace*{.3cm}
+		\hspace*{.5cm} L'équation (9) indique qu'à la période t, si une machine a été préparée pour l'article j (c’est-à-dire si $y_{t}^{j} = 1$) alors forcément il y a eu passage d’un article (produit à $t-1$) à l’article j en d’autres termes $\sum_{i} ch_{t}^{i,j} = 1$. De la même manière si $y_{t}^{j} = 0$ alors $\sum_{i} ch_{t}^{i,j} = 0$. L'équation 10, sur le même principe que le raisonnement précédent, on voit que si $y_{t-1}^{i} = 1$ alors $ \sum_{j} ch_{t}^{i,j} = 1$ et $y_{t-1}^{i} = 0$ alors $ \sum_{j} ch_{t}^{i,j} = 0$. Au niveau de l'équation 11, ayant utilisé $y_{t-1}^{i}$ avec $t \in \{1..NT\}$, il faut traiter le cas des $y_{0}^{i}$. L'équation 12 précise qu'intuitivement, s’il n’y a pas de setup de l’article $j$ à la période $t$ ($y_{t}^{j}=0$ et $z_{t}^{j}$), alors il n'y a pas de changeover de $j$ à $j$ ($ch_{t}^{tt} = 0$). Si $y_{t}^{j} = 1$ et $z_{t}^{j} = 0$, alors on est passé de la production de $j$ à $j$ à la période $t$ et $ch_{t}^{jj} = 1$. Dans le cas où $z_{t}^{j} = 1$ alors on a pas produit j à la période $t-1$ et donc $ch_{t}^{jj} = 0$. 
+		
+		\subsubsection{Modèle MIP 3}
+		On obtient une troisième modèle en ajoutant l'inégalité valide suivante.
+		\begin{eqnarray}
+			Formulation \  2 \\
+			s_{t-1} + \sum_{u=t}^{t+p-1} y_{u} + \sum_{u=t+1}^{t+p-1} (d_{ul}-(t+p-u))z_{u} + \sum_{u=t+p}^{l} d_{ul}z_{u} \geq s_{tl}
+		\end{eqnarray}
+		
+		avec les variables de décisions suivantes: \\
+		\begin{itemize}
+			\item[-] $d_{ul}$ : est la somme des demandes dans l'intervalle [$u,l$];
+			\item[-] $p$ :  le nombre de périodes où il y a une demande dans l'intervalle [$t,l$];
+			\item[-] L'équation 14 indique l'inégalité valide sur l'intervalle [$t,l$] $\subseteq$ [$1,NT$] avec $d_{l}=1$ ($d_{l}$ est la demande à la période $l$)
+		\end{itemize}
 	\section{Les algorithmes génétiques}
 	Les algorithmes génétiques (AGs) sont des algorithmes d’exploration fondés sur les mécanismes de la sélection naturelle et de la génétique. Ils utilisent à la fois les principes de la survie des structures les mieux adaptées, et les échanges d’informations aléatoires, parfois guidés, pour former un algorithme d’exploration qui possède certaines des caractéristiques de l’exploration humaine. Ils ont été développés par John Holland [7] à l’université du Michigan.
 	\subsection{Concepts de base}
@@ -376,88 +466,16 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
 	
 	\section*{Conclusion}
 	\addcontentsline{toc}{section}{Conclusion}
-	Le dimensionnement de lots en planification de production est un important défi pour les entreprises industrielles. Il consiste à trouver un plan de production qui satisfait aux contraintes spécifiques relatives au système de production. Plusieurs méthodes peuvent servir à résoudre ce problème. Au nombre de ces problèmes, figurent les algorithmes génétiques. Les AGs, à travers l'exploration et l'exploitation de l'espace de recherche ont permis de résoudre bon nombre de problèmes d'optimisation par le passé. Nous présentons dans la partie suivante le PSP ainsi que les modèles et leur formulation qui ont été utilisés dans sa résolution.
+	Le dimensionnement de lots en planification de production est un important défi pour les entreprises industrielles. Il consiste à trouver un plan de production qui satisfait aux contraintes spécifiques relatives au système de production. Le PSP constitue en effet une instance normalisée de ces types de problèmes. Plusieurs méthodes peuvent servir à résoudre ce problème. Au nombre de ces méthodes, figurent les algorithmes génétiques. Les AGs, à travers l'exploration et l'exploitation de l'espace de recherche ont permis de résoudre bon nombre de problèmes d'optimisation par le passé. Nous présentons dans la partie suivante le PSP ainsi que les modèles et leur formulation qui ont été utilisés dans sa résolution.		
 		
 	\newpage
 	
-	\part{Description et Modèles du Pigment Sequencing Problem}
-	\label{part:psp}
-	
+	\part{Méthodes et solutions}
 	\setcounter{section}{0}
 	
-	%\newpage
-		\section*{Introduction}
-		\addcontentsline{toc}{section}{Introduction}
-		L'étude des problèmes de dimensionnement de lots au cours de décennies de recherche a permis de développer différents modèles et formulations correspondant à différents problèmes spécifiques. L'étude du "Pigment Sequencing Problem" (PSP) n'échappe pas à la règle. Dans ce chapitre, nous présentons dans un premier temps une description de PSP. Puis dans un second temps, nous détaillons les différents modèles mathématiques utilisées afin de représenter et résoudre le problème.
-		
-		\section{Description du problème}
-		\label{sec:problem_description}
-		Le PSP consiste à trouver un plan de production
-de plusieurs articles à partir d’une machine avec des côuts de changeover . Les
-coûts de changeover sont les coûts encourus lors du passage de la production
-de l’article i à celui de l’article j avec $i \neq j$. Le plan de production doit
-satisfaire les demandes des clients tout en :
-	\begin{itemize}
-		\item[•] respectant la capacité de production de la machine;
-		\item[•] minimisant les coûts de stockage et de changeover.
-	\end{itemize}
-	\hspace*{.5cm} On suppose que la période de production est suffisamment courte pour ne produire qu’au plus un article par période et que les demandes sont normalisées : la capacité de production de la machine est limitée à un article par
-période et d(i, t) $ \in $ {0, 1} avec i l’article et t la période.\\
-	\hspace*{.5cm} Il s’agit d’un problème de planification de production ayant les caractéristiques suivantes : un horizon de planification discret et fini ; des contraintes de capacité ; une demande statique et déterministe ; multi-item et small bucket, des coûts de changeover; un seul niveau; sans shortage.\\
-
-	\textbf{\textsl{Illustration}} : Soit un problème avec les données ci-dessous : \\
-	\begin{itemize}
-		\item[•] Nombre d’articles : $NI = 2$;
-		\item[•] Nombre de périodes : $NT = 5$;
-		\item[•] Demande par période. Soit d(i, t) la demande de l’article i à la période t : $d(1, t) = (0, 1, 0, 0, 1)$ et $d(2, t) = (1, 0, 0, 0, 1)$;
-		\item[•] Coût de stockage. Soit h(i) le coût de stockage de l’article i : $h(1) = h(2) = 2$;
-	\end{itemize}
-	Soit \emph{xT} le plan de production qui représente une solution potentielle du problème. Il s’agit d’un tableau de dimension \emph{NT} , contenant à son indice t (avec $t  \in  {1...NT}$) l’article i à produire. Une solution admissible du problème est : $ xT = (2, 1, 2, 0, 1)$ avec un coût de $ q(2, 1) + q(1, 2) + q(2, 1) + 2 * h(2) = 15 $. La solution optimale est : $ xT = (2, 1, 0, 1, 2)$ avec un coût de $q(2, 1) + q(1, 2) + h(1) = 10$.
-		
-		\section{Modèles et formulations}
-		Différents modèles ont été proposés afin de représenter les problèmes de planification de production. Suivant le niveau du problème (single-level ou multi-level), le nombre de ressources à considérer (single-resource ou multi-resource) ou que le problème soit encore \emph{small bucket} ou \emph{big bucket}, les modèles en planification de production se rangent dans différentes catégories.   Dans les modèles \emph{small bucket}, au plus un type d'article  peut être produit sur une ressource durant chaque période de temps. Ainsi, un unique article est affecté à chaque période de planification et la séquence d'affectation article-période qui en résulte, définit le plan de production. Aussi dans les modèles \emph{small bucket}, la production d'un lot peut s'étaler sur plusieurs périodes et les coûts de production ne sont pris en compte que s'il y a un nouveau lot à produire. Pour modéliser cela, de nouvelles variables encore appelées variables de \emph{setup} ou variables de \emph{change-over} dans le cas du PSP sont utilisées. \\
-		\hspace*{.5cm} Ainsi, le modèle suivant proposé par Pochet et Wolsey (2006, §14.4) s'avère à la fois intéressant et satisfaisant dans le cadre de notre étude.\\
-		\\
-		\subsection{Modèle MILP 1}
-		\subsection{Modèle MILP 2}
-		\subsection{Modèle MILP 3}
-		\textbf{\textsl{Modèle utilisé}} :
-		\begin{eqnarray}
-			min \sum_{i,j,t} q^{i,j}ch_{t}^{i,j} + \sum_{i,t} h^{i} s_{t}^{i} \\
-			s_{0}^{i} = 0, \forall i \\
-			x_{t}^{i} + s_{t-1}^{i} = d_{t}^{i} + s_{t}^{i}, \forall i,t \\
-			x_{t}^{i} \leq y_{t}^{i}, \forall i,t \\
-			\sum_{i} y_{t}^{i} = 1 , \forall t \\
-			ch_{t}^{i,j} = y_{t-1}^{i} + y_{t}^{j} - 1, \forall i,j,t \\
-			x,y,ch \in \{0,1\}, s \in N, i \in \{0..NI\}, t \in \{1..NT\}
-		\end{eqnarray}
-		
-		avec les variables de décisions suivantes: \\
-		\begin{itemize}
-			\item[-] $x_{t}^{i}$ : variable binaire de production qui vaut 1 si l’article i est produit à la période t et 0 sinon ;
-			\item[-] $y_{t}^{i}$ : variable binaire de setup qui vaut 1 si la machine est préparée pour la production de l’article i et 0 sinon ;
-			\item[-] $s_{t}^{i}$ : variable entière de stockage qui contient le nombre d’articles i stockés à la période t ; 
-			\item[-] $ch_{t}^{i,j}$ : variable binaire de changeover qui vaut 1 si à la période t, on est passé de la production de l’article i à l’article j et 0 sinon.
-		\end{itemize}
-		\vspace*{.3cm}
-		\textbf{\textsl{Formulation du modèle}} :\\
-		\\
-	\hspace*{.5cm} L'objectif est de minimiser la somme des coûts de stockage et des coûts de changeover et est exprimé par la contrainte (1). La contrainte (2) rappelle qu'il n'y a pas de stock initial. La contrainte (3) exprime la règle de la conservation de flot. La contrainte (4) vise à forcer la variable de setup $y_{t}^{i}$ à prendre la valeur 1 s’il y a production de l’article i à la période t. La contrainte (5) s'assure qu'il y a toujours un article qui est préparé. En accord avec la fonction objectif, $y_{t}^{i}$ va prendre la valeur qui minimise le coût de changeover. En général s’il n’y a pas de production à la période t,
-$y_{t}^{i} = y_{t-1}^{i}$ ou $y_{t}^{i} = y_{t+1}^{i}$
-mais parfois il peut être intéressant de préparer
-la machine pour un article intermédiaire sans le produire. La contrainte (6) assigne les valeurs aux variables de changeover.
-En effet, si $y_{t-1}^{i}$ et $y_{t}^{i}$ valent 1 alors $ch_{t}^{i,j}$ est obligé de prendre la valeur 1 et sinon $ch_{t}^{i,j}$ serait égale à 0 grâce à la fonction objectif qui minimise le coût de changeover.
-		
-		\section*{Conclusion}
-		\addcontentsline{toc}{section}{Conclusion}
-		Cette deuxième partie a été l'occasion dans un premier temps d'expliciter le problème du PSP, de présenter le modèle mathématique utilisé ainsi que sa formulation. Dans un second temps, nous avons présenté et détaillé deux approches heuristiques basées sur les algorithmes génétiques utilisée afin de résoudre le problème. La troisième partie sera l'occasion de tester nos deux approches et d'analyser les résultats afin de les comparer à l'état de l'art en la matière.
-		
-	\newpage
-	
-	\part{Méthodes de recherche}
-	\setcounter{section}{0}
 	\section*{Introduction}
 	\addcontentsline{toc}{section}{Introduction}
+	L'étude des problèmes de dimensionnement de lots au cours de décennies de recherche a permis de tester différents méthodes de recherche à ces types de problèmes. L'étude du "Pigment Sequencing Problem" (PSP) n'échappe pas à la règle. Dans ce chapitre, nous présentons dans un premier temps, les aspects généraux ou communs à nos deux approches heuristiques basées sur les algorithmes génétiques; puis dans un second temps, nous décrivons ces deux méthodes de recherche en nous appuyant sur les algorithmes implémentés.
 	\section{Aspects généraux aux deux méthodes de recherche proposées}
 	\subsection{Représentation génétique}
 	Différentes représentations peuvent être utilisées avec les techniques évolutionnaires telles que les algorithmes génétiques. La représentation la plus simple pour les algorithmes génétiques est celle utilisée par John Holland: une chaîne de bits. Une chaîne de bits est connue comme un chromosome, et chaque bit est un gène. En début d'étude, nous avons donc commencé par représenter un chromosome en chaîne de bits. \\
@@ -641,8 +659,8 @@ En effet, si $y_{t-1}^{i}$ et $y_{t}^{i}$ valent 1 alors $ch_{t}^{i,j}$ est obli
 	\end{figure}
 	
 	\subsubsection{Méthode d'intégration des migrants}
- 	Différentes alternatives existent pour incorporer les "\emph{migrants}". Deux d'entre elles sont récurrentes. Il s'agit: du remplacement aléatoire des individus de la population actuelle par les "\emph{migrants}" et du remplacement compétitif ou élitiste. Dans le remplacement aléatoire, les individus devant être remplacés sont désignés de manière aléatoire. Dans le remplacement compétitif, seules les individus avec les plus mauvais scores de "fitness" sont remplacés par les nouveaux arrivants.\\
- 	\\
+ 	Différentes alternatives existent pour incorporer les "\emph{migrants}". Deux d'entre elles sont récurrentes. Il s'agit: du remplacement aléatoire des individus de la population actuelle par les "\emph{migrants}" et du remplacement compétitif ou élitiste. Dans le remplacement aléatoire, les individus devant être remplacés sont désignés de manière aléatoire. Dans le remplacement compétitif, seules les individus avec les plus mauvais scores de "fitness" sont remplacés par les nouveaux arrivants. \\
+ 	\subsubsection{Algorithme hiérarchique entre \emph{coarse-grained} et \emph{master-slave}}
  	\hspace*{.5cm} Une fois, ces problématiques abordées, la question de l'implémentation rapide des algorithmes génétiques de type "\emph{coarse-grained}" revient. Une des réponses serait en effet de combiner ce type d'algorithmes génétiques avec un autre type, le "\emph{master-slave}" par exemple. On obtient alors un nouvelle classe d'algorithmes génétiques que sont les algorithmes génétiques hiérarchiques avec au niveau supérieur un algorithme génétique de type \emph{coarse-grained} et au niveau inférieur un algorithme génétique de type \emph{master-slave} comme le présente la figure \ref{fig:hierarchical_gene1_fig}. Il s'agit ainsi de cette combinaison que nous avons utilisée pour nos tests
  	
 	\begin{figure}[!h]
@@ -703,13 +721,44 @@ En effet, si $y_{t-1}^{i}$ et $y_{t}^{i}$ valent 1 alors $ch_{t}^{i,j}$ est obli
 	\section{Autres implémentations}
 	\subsection{Hybridation}
 	L'hybridation consiste à combiner deux méthodes de recherche afin d'engendrer une nouvelle méthode de recherche dit \emph{hybride}. Les algorihmes génétiques facilite l'hybridation avec les autres techniques de recherche local afin d'obtenir la solution optimale. De façon basique, la recherche locale et les algorithmes génétiques sont complémentaires. Les algorithmes génétiques sont efficaces lorsqu'il s'agit de parcourir un espace de recherche global, dans le mesure où elles sont capables de rapidement des régions prometteuses. Cependant, elles prennent relativement beaucoup de temps à trouver des optimums dans ces régions. La recherche local est capable de trouver des optimums locaux avec une grande précision. \\
-	\hspace*{.5cm} Dans notre étude, il s'est agi de mettre au point un algorithme de recherche qui est utilisé à chaque fois que l'algorithme génétique converge sur une solution optimale afin de parcourir l'espace de recherche immédiat à cette solution et ainsi améliorer cette solution optimale. 
+	\hspace*{.5cm} Dans notre étude, il s'est agi de mettre au point un algorithme de recherche qui est utilisé à chaque fois que l'algorithme génétique converge sur une solution optimale afin de parcourir l'espace de recherche immédiat à cette solution et ainsi améliorer cette solution optimale.  \\
+	\\
+	\begin{algorithm}[H]
+		%\label{alg:principe_fine_grained}
+ 		\caption{Algorithme de recherche d'une meilleure solution}
+ 		\KwData{individu à améliorer}
+ 		\BlankLine
+ 		\For{chaque gène du chromosome}{
+ 			\BlankLine
+ 			récupérer les coûts relatifs à la valeur de ce gène\\
+ 			\BlankLine
+ 			déterminer toutes les gènes à zéro respectant les contraintes liées à la valeur de ce gène.\\
+ 			\BlankLine
+ 			calculer le fitness du chromosome pour chaque gène à zéro\\
+ 			\BlankLine
+ 			choisir le gène à zéro qui maximise le fitness du chromosome \\
+ 			\BlankLine
+ 			insérer la valeur de l'item dans ce dernier gène\\ 
+ 			\BlankLine
+ 		}
+	\end{algorithm}
+	\vspace*{.5cm}
+	Si on prend l'exemple du PSP en page \pageref{sec:problem_description} et qu'on applique cet algorithme au problème, on obtient la figure \ref{alg:principe_fine_grained}.
+	
+	\begin{figure}[!h]
+		\begin{center}
+			\includegraphics[scale=.6]{img/local_search_fig.png}
+			\caption{Application de l'algorithme de recherche de meilleure solution à une chromosome}
+			\label{fig:local_search_fig}
+		\end{center}
+	\end{figure} 
 	
 	\subsection{Table de Hash}
-	Dans le processus de réolution des problèmes à l'aides algorithmes génétiques, au fur et à mesure que les générations passent, la population évolue et la diversité au sein de cette dernière diminue amenant les mêmes chromosomes à être régulièrement réévalués. Dans les faits, l'effort de calculs dépensé à évaluer le "\emph{fitness}" dépasse celui dépensé sur les opérateurs génétiques. En utilisant une table de hash afin de stocker les chromosomes récemment évalués, une amélioration significative des performances peut être constatée. Nous avons donc utilisé un dictionnaire ou tableau associatif afin de stocker ces derniers.
+	Dans le processus de résolution des problèmes à l'aides algorithmes génétiques, au fur et à mesure que les générations passent, la population évolue et la diversité au sein de cette dernière diminue amenant les mêmes chromosomes à être régulièrement réévalués. Dans les faits, l'effort de calculs dépensé à évaluer le "\emph{fitness}" dépasse celui dépensé sur les opérateurs génétiques. En utilisant une table de hash afin de stocker les chromosomes récemment évalués, une amélioration significative des performances peut être constatée. Nous avons donc utilisé un dictionnaire ou tableau associatif afin de stocker ces derniers.
 	
 	\section*{Conclusion}
 	\addcontentsline{toc}{section}{Conclusion}
+	Cette deuxième partie a été l'occasion dans un premier temps d'expliciter les aspects communs aux deux solutions proposées. Dans un second temps, nous avons présenté et détaillé deux approches heuristiques basées sur les algorithmes génétiques utilisée afin de résoudre le problème. La troisième partie sera l'occasion de tester nos deux approches et d'analyser les résultats afin de les comparer à l'état de l'art en la matière.
 	
 	\newpage
 	
@@ -735,16 +784,76 @@ En effet, si $y_{t-1}^{i}$ et $y_{t}^{i}$ valent 1 alors $ch_{t}^{i,j}$ est obli
 		
 		\subsection{Données de test}
 		
-		Deux ensembles d'instances ont été utilisés dans notre étude afin de tester nos deux solutions. Il s'agit d'une part de celles disponibles dans la bibliothèque \emph{CSPlib} à https://bitbucket.org/ratheilesse/cp4ppet proposées par Houndji et al. (2014). D'autres part, Ceschia et al dans leur application du recuit simulé au PSP ont mis au point un générateur paramétré. Leur générateur reçoit entre autres comme entrées, le nombre d'articles, le nombre de périodes et produit en sortie une instance aléatoire à l'aide de ces paramètres. Ces instances sont disponibles à http://opthub.uniud.it.
+		Un ensemble de 10 instances a été utilisé dans notre étude afin de tester nos deux solutions. Il s'agit de celles disponibles dans la bibliothèque \href{https://bitbucket.org/ratheilesse/cp4pp}{CSPlib} et proposées par Houndji et al. (2014). Ces instances sont caractérisées par un nombre de périodes \emph{NT} = 20 et un nombre d'articles \emph{NI} = 20. Les résultats seront comparés à ceux obtenus par Houndji et al. dans leur application de l'approche CP à ces instances. %Ces instances sont considérées comme des instances moyennes. D'autres part, nous avons également testé nos algorithmes sur des instances de plus grande taille considérées comme un peu plus difficiles. Nos critères d'analyse sont de deux ordres. Premièrement, nous les avons analysé sous l'angle de la performance en temps. Il s'agit de voir comme ces algorithmes arrivent à répondre aussi rapidement que possible nos instances de PSP.  Le second angle d'analyse d'est porté sur la performance en terme de la qualité de la solution trouvée. Nous avons calculé l'écart entre la solution trouvée et la solution optimale connue dans la littérature. Nous commençons par décrire nos instances de tests.
 		
-		\begin{description}
-			\item[CSPlib] 
-			\item[Opthub]
-		\end{description}
+		\section{Résultats expérimentaux des algorithmes génétiques parallèles hiérarchiques "fine-grained" et "coarse-grained"}
+		Nous avons pu tester les algorithmes génétiques parallèles hiérarchiques "fine-grained" et "coarse-grained" sur 10 instances de PSP. Les résultats de ces tests sont consignés dans le tableau \ref{alg:principe_fine_grained} à coté de ceux obtenus de l'approche CP. Ce tableau présente les performances en temps des algorithmes génétiques parallèles hiérarchiques "fine-grained" et "coarse-grained".
 		
-		\section{Résultats expérimentaux du Fine-grained Parallel Genetic Algorithm}
-		\section{Résultats expérimentaux du Coarse-grained Parallel Genetic Algorithm}
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{|c|c|c|c|c|}
+			\hline
+			\textbf{Instance} & \textbf{Optimal cost} & \textbf{CP time} & \textbf{HFC-PGA time} & \textbf{GAs result gap} \\
+			\hline
+			\textbf{1} & 1377 & 9.14 & . & . \\
+			\textbf{2} & 1447 & 7.292 & . & .\\
+			\textbf{3} & 1107 & 2.946 & . & .\\
+			\textbf{4} & 1182 & 1.784 & . & .\\
+			\textbf{5} & 1471 & 0.235 & . & .\\
+			\textbf{6} & 2774 & 11.177 & . & .\\
+			\textbf{7} & 2655 & 12.846 & . & .\\
+			\textbf{8} & 1473 & 15.039 & . & .\\
+			\textbf{9} & 3117 & 25.352 & . & .\\
+			\textbf{10} & 1493 & 121.909 & . & . \\
+			\hline
+		\end{tabular}	
+		\caption{Résultats de test sur 10 instances du PSP du HFC-PGA en seconds}	
+	\end{table}			
+		
+		\section{Résultats expérimentaux des algorithmes génétiques parallèles hiérarchiques "coarse-grained" et "master-slave"}
+		
+		\begin{table}[h]
+		\centering
+		\begin{tabular}{|c|c|c|c|c|}
+			\hline
+			\textbf{Instance} & \textbf{Optimal cost} & \textbf{CP time} & \textbf{HCM-PGA time} & \textbf{GAs result gap} \\
+			\hline
+			\textbf{1} & 1377 & 9.14 & . & . \\
+			\textbf{2} & 1447 & 7.292 & . & .\\
+			\textbf{3} & 1107 & 2.946 & . & .\\
+			\textbf{4} & 1182 & 1.784 & . & .\\
+			\textbf{5} & 1471 & 0.235 & . & .\\
+			\textbf{6} & 2774 & 11.177 & . & .\\
+			\textbf{7} & 2655 & 12.846 & . & .\\
+			\textbf{8} & 1473 & 15.039 & . & .\\
+			\textbf{9} & 3117 & 25.352 & . & .\\
+			\textbf{10} & 1493 & 121.909 & . & . \\
+			\hline
+		\end{tabular}	
+		\caption{Résultats de test sur 10 instances du PSP du HCM-PGA en seconds}	
+	\end{table}			
+	
 		\section{Analyse comparative des résultats}
+	\begin{center}
+		 \begin{tikzpicture}[scale=0.7]
+       	 	\begin{axis}[xlabel=axe $x$, ylabel=axe $y$]
+        	\addplot {x^2+2*x-1};
+        	\addlegendentry{une fonction}
+        	\addplot coordinates {
+        	(0 ,15)
+        	(1 ,10)
+        	(2 ,6)
+        	(3 ,3)
+        	(4 ,1)
+       		(5 ,0)
+        	};
+        	\addlegendentry{des données}
+        \end{axis}
+        %\caption{g}
+    	\end{tikzpicture}
+    \end{center}
+   
+    
 		\section*{Conclusion}
 		\addcontentsline{toc}{section}{Conclusion}
 		
