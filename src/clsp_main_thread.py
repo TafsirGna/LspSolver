@@ -125,7 +125,8 @@ class ClspThread(Thread):
 
 			if currentNode.isLeaf():
 
-				c = Chromosome(list(currentNode.solution))
+				c = Chromosome()
+				c.init1(list(currentNode.solution), currentNode.fitnessValue)
 				#c.advmutate()
 
 				self.population.locker.acquire()

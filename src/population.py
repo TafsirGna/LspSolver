@@ -171,20 +171,20 @@ class Population:
 			#print(" randomIndice : ", randomIndice)
 			#print(" 2 - solution3 : ", solution3, " ranks3 : ", ranks3, " solution4 : ", solution4, " ranks4 : ", ranks4)
 
-			chromosome3 = Chromosome(solution3, ranks3)
-			chromosome3.getFeasible()
+			chromosome3 = Chromosome()
+			chromosome3.init2(solution3, ranks3)
 			#chromosome3.advmutate()
 
-			chromosome4 = Chromosome(solution4, ranks4)
-			chromosome4.getFeasible()
+			chromosome4 = Chromosome()
+			chromosome4.init2(solution4, ranks4)
 			#chromosome4.advmutate()
 
 			#print(" 2 - solution3 : ", chromosome3.solution, " ranks3 : ", ranks3, " solution4 : ", chromosome4.solution, " ranks4 : ", ranks4)
 			
 
 		else:
-			chromosome3 = Chromosome(chromosome1.solution)
-			chromosome4 = Chromosome(chromosome2.solution)
+			chromosome3 = copy.deepcopy(chromosome1)
+			chromosome4 = copy.deepcopy(chromosome2)
 
 		return chromosome3, chromosome4
 
