@@ -13,6 +13,7 @@
 %\usepackage{fancyhdr}
 \usepackage[colorlinks=true,linkcolor=black]{hyperref}
 \usepackage{color}
+%\usepackage{makeidx}
 \usepackage[top=3cm, bottom=3cm, left=2.5cm, right=2.5cm]{geometry}
 \pagestyle{plain}
 \author{Tafsir GNA}
@@ -165,10 +166,11 @@ ces dernières décennies depuis les travaux de Wagner et Within en 1958. \\
 	
 	\newpage
 	
-	\part{Etat de l'art}
+	\part{État de l'art}
 	%\newpage
-		\section*{Introduction}
-		\addcontentsline{toc}{section}{Introduction}
+	\section*{Introduction}
+	\addcontentsline{toc}{section}{Introduction}
+		
 		L'état de l'art revêt une grande importance dans la conduite d'un travail de recherche. Elle permet de fixer les idées quant au travail qui a été déjà fait dans le domaine. Il s'agira donc principalement dans cette première partie de présenter la revue de littérature des problèmes de dimensionnement de lot en planification de production, d'exposer les travaux sur les algorithmes génétiques et de montrer en quoi les algorithmes génétiques sont particulièrement adaptés à ces genres de problèmes.
 		
 	\section{Le dimensionnement de lot en planification de production}
@@ -272,13 +274,17 @@ problèmes à un produit et sans capacité, chacun solvable en temps polynomial.
 	
 	\section{Le "Pigment sequencing problem"}
 	
+	\subsection{Revue de littérature}
+	Le PSP appartient à la catégorie des DLSP. En effet, il s'agit d'un problème où toute la capacité disponible sur cette période sera utilisée si un article est fabriqué. Nous nous présentons dans cette sous-section une brève revue de littérature des différentes travaux effectués autour du PSP. \\
+	\hspace*{.5cm} Miller et Wolsey (2003) ont formulé le DSLP avec des coûts de préparation indépendants de séquence comme un problème de réseau à flot. Ils ont présentés des formulations MIP pour les différentes extensions (avec \emph{backlogging}, avec stock de sûreté, avec stock initial). Plusieurs variantes et formulations MIP du DLSP ont été proposées et discutées par Pochet et Wolsey (2006). \\
+	\hspace*{.5cm} Gicquel et al. (2009b) presentent une formulation et dérive des inégalités valides pour le DLSP avec plusieurs articles et des coûts et temps de préparation séquentiels; laquelle est une extension du problème proposé par Wolsey(2002). Dans Gicquel et al 2009a, les auteurs ont proposé une nouvelle manière de modeler le DLSP avec plusieurs articles et des coûts et temps de préparation séquentiels; qui exploite le fait que les attributs physiques pertinents des articles, tels que la couleur, la dimension, le niveau de qualité. Cela les a permis de réduire significativement le nombre des variables et des contraintes dans les modèles MIP.\\
+	\hspace*{.5cm}Houndji et al. (2014) ont introduit une nouvelle contrainte globale, qu'ils ont appelée \emph{Stocking Cost} afin d'efficacement résoudre le PSP en programmation par contrainte. Les auteurs l'ont alors testée sur de nouvelles instances et les ont publiées sur CSPlib (Gent et Walsh 1999, prob 58). Les résultats expérimentaux ont montré que le \emph{Stocking cost} est plus efficace en filtrage tout en prenant en compte les autres techniques de décompositions généralement utilisées dans la communauté de la programmation par contrainte. \\
+	\hspace*{.5cm} Plus récemment, Ceschia et al. (2016) ont applique le recuit simulé sur le PSP. Ils ont implémenté une approche qui prend en charge à la fois la faisabilité de la solution et l'optimisation du coût. Dans le but d'illustrer leur méthode, ils ont introduit une procédure de recuit simulé afin de guider la recherche locale.
+	 
 	\subsection{Description du problème}
+
 		\label{sec:problem_description}
-		Le PSP consiste à trouver un plan de production
-de plusieurs articles à partir d’une machine avec des côuts de changeover . Les
-coûts de changeover sont les coûts encourus lors du passage de la production
-de l’article i à celui de l’article j avec $i \neq j$. Le plan de production doit
-satisfaire les demandes des clients tout en :
+		Le PSP consiste à trouver un plan de production de plusieurs articles à partir d’une machine avec des coûts de changeover. Les coûts de changeover sont les coûts encourus lors du passage de la production de l’article i à celui de l’article j avec $i \neq j$. Le plan de production doit satisfaire les demandes des clients tout en :
 	\begin{itemize}
 		\item[•] respectant la capacité de production de la machine;
 		\item[•] minimisant les coûts de stockage et de changeover.
@@ -357,7 +363,9 @@ En effet, si $y_{t-1}^{i}$ et $y_{t}^{i}$ valent 1 alors $ch_{t}^{i,j}$ est obli
 			\item[-] L'équation 14 indique l'inégalité valide sur l'intervalle [$t,l$] $\subseteq$ [$1,NT$] avec $d_{l}=1$ ($d_{l}$ est la demande à la période $l$)
 		\end{itemize}
 	\section{Les algorithmes génétiques}
-	Les algorithmes génétiques (AGs) sont des algorithmes d’exploration fondés sur les mécanismes de la sélection naturelle et de la génétique. Ils utilisent à la fois les principes de la survie des structures les mieux adaptées, et les échanges d’informations aléatoires, parfois guidés, pour former un algorithme d’exploration qui possède certaines des caractéristiques de l’exploration humaine. Ils ont été développés par John Holland [7] à l’université du Michigan.
+		
+	Les algorithmes génétiques (AGs) sont des algorithmes d’exploration fondés sur les mécanismes de la sélection naturelle et de la génétique. Ils utilisent à la fois les principes de la survie des structures les mieux adaptées, et les échanges d’informations aléatoires, parfois guidés, pour former un algorithme d’exploration qui possède certaines des caractéristiques de l’exploration humaine. Ils ont été développés  et sont devenues populaires à travers les travaux de John Holland au début des années 1970, et particulièrement son livre \emph{Adapation in Natural an Artificial Systems} (1975). Holland présenta les GAs comme une abstraction de l'évolution biologique et des concepts théoriques à l'adaptation pour les GAs dans son livre. Il introduisit un formalisme afin de prédire la qualité de la prochaine génération, plus connue comme le théorème des schémas de Holland.
+	
 	\subsection{Concepts de base}
 	Les AGs constituent une classe de stratégies de recherche réalisant un compromis entre l’exploration et l’exploitation. Ils représentent des méthodes qui utilisent
 un choix aléatoire comme outil pour guider une exploration intelligente dans l’espace des paramètres codés. Ce sont des algorithmes itératifs de recherche globale dont l’objectif est d’optimiser une fonction prédéfinie appelée fonction coût ou fonction « fitness » f.
@@ -410,54 +418,17 @@ individu, une simple rotation de la roue donne le candidat sélectionné. Cepend
 subit le croisement décrit comme suit : le croisement opère sur les génotypes (c.-à-d. les chromosomes) de deux individus appelés parents. Il produit de nouveaux individus (généralement deux) appelés enfants dont les gènes sont hérités de l’un ou/et de l’autre parent. Ceci peut être fait en dédoublant chacun des deux chromosomes dans des fragments et en les recombinant pour former de nouveaux chromosomes.
 	\begin{description}
 		\item[\textsl{Le croisement à un point :}] Si le génotype est une chaîne binaire de longueur n. Le croisement à un point place un point de croisement au
-hasard. Un enfant prend une section avant le point de croisement d’un parent et prend l’autre section après le point de croisement de l’autre parent puis recombine les deux sections pour former une nouvelle chaîne binaire. L’autre enfant se construit inversement. Exemple : considérons P1 et P2 deux chaînes binaires de
-longueur n = 7 comme parents :
-	\begin{center}
-		P1 = 0 0 0 0 | 0 0 1 \\
-		P2 = 1 1 1 1 | 1 1 0
-	\end{center}
-	\hspace*{.5cm} Le symbole | indique un point de croisement, dans cet exemple il est placé après le quatrième bit. \\
-	\hspace*{.5cm} Le croisement à un point crée les deux nouveaux individus E1 et E2 comme suit :
-	\begin{center}
-		E1 = 0 0 0 0 | 1 1 0 \\
-		E2 = 1 1 1 1 | 0 0 1
-	\end{center}
+hasard. Un enfant prend une section avant le point de croisement d’un parent et prend l’autre section après le point de croisement de l’autre parent puis recombine les deux sections pour former une nouvelle chaîne binaire. L’autre enfant se construit inversement. 
 		
-		\item[\textsl{Le croisement à deux points :}]Le croisement à deux points place deux points de croisement au hasard, et prend une section entre les points d’un parent et les autres sections en dehors des points de l’autre parent puis les recombine. Dans l’exemple suivant, les deux points de croisement sont placés respectivement après le premier et quatrième bit :
+		\item[\textsl{Le croisement à deux points :}]Le croisement à deux points place deux points de croisement au hasard, et prend une section entre les points d’un parent et les autres sections en dehors des points de l’autre parent puis les recombine. 
 	
-	\begin{center}
-		P1 = 0 | 0 0 0 | 0 0 1 \\
-		P2 = 1 | 1 1 1 | 1 1 0
-	\end{center}
+		\item[\textsl{Le croisement uniforme :}]Ce type de croisement a été proposé par Syswerda [14]. Il consiste à choisir avec la même probabilité un allèle de l’un ou de l’autre parent, pour transmettre sa valeur à la même position, aux enfants. 
 	
-	Le croisement à deux points résultant rapporte les deux individus suivants :
-	\begin{center}
-		E1 = 0 | 1 1 1 | 0 0 1 \\
-		E2 = 1 | 0 0 0 | 1 1 0
-	\end{center}
-	
-		\item[\textsl{Le croisement uniforme :}]Ce type de croisement a été proposé par Syswerda [14]. Il consiste à choisir avec la même probabilité un allèle de l’un ou de l’autre parent, pour transmettre sa valeur à la même position, aux enfants. Comme le montre l'exemple suivant:
-	\begin{center}
-		P1 = 0 0 0 0 0 0 1 \\
-		P2 = 1 1 1 1 1 1 0 \\
-		M = 1 1 0 1 0 0 1
-	\end{center}
-	
-	\begin{center}
-		E1 = 0 0 1 0 1 1 1 \\
-		E2 = 1 1 0 1 0 0 0
-	\end{center}
-	
-	M représente le masque de transmission dont le principe est le suivant : si la valeur dans le masque est égale à 1, alors la valeur de l’allèle du parent 1 passe à l’enfant 1 (respectivement du parent 2 passe à l’enfant 2) ; sinon la valeur de l’allèle du parent 1 passe à l’enfant 2 (respectivement du parent 2 passe à l’enfant 1), tout en respectant la même position de l’allèle.
 	\end{description}
 	
 	\subsubsection{L'opérateur de mutation}
 	
 	La mutation opère sur le génotype d’un seul individu. Elle correspond, dans la nature, à une « erreur » qui se produit quand le chromosome est copié et reproduit. Dans une approche numérique, pour une chaîne binaire, elle consiste par exemple à faire pour un allèle un échange entre le « 0 » et le « 1 ». Si des copies exactes sont toujours garanties, alors le taux de mutation est égal à zéro. Cependant, dans la vie réelle, l’erreur de copie peut se produire dans diverses circonstances comme sous l’influence d’un bruit. La mutation change les valeurs de certains gènes avec une faible probabilité. Elle n’améliore pas, en général, les solutions, mais elle évite une perte irréparable de la diversité.
-	\begin{center}
-		A = 1 0 0 0 0 (avant mutation) \\
-		A' = 1 0 1 0 0 (après mutation)
-	\end{center}
 	
 	\subsection{Application des algorithmes génétiques aux problèmes d'optimisation}
 	
@@ -784,10 +755,10 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
 		
 		\subsection{Données de test}
 		
-		Un ensemble de 10 instances a été utilisé dans notre étude afin de tester nos deux solutions. Il s'agit de celles disponibles dans la bibliothèque \href{https://bitbucket.org/ratheilesse/cp4pp}{CSPlib} et proposées par Houndji et al. (2014). Ces instances sont caractérisées par un nombre de périodes \emph{NT} = 20 et un nombre d'articles \emph{NI} = 20. Les résultats seront comparés à ceux obtenus par Houndji et al. dans leur application de l'approche CP à ces instances. %Ces instances sont considérées comme des instances moyennes. D'autres part, nous avons également testé nos algorithmes sur des instances de plus grande taille considérées comme un peu plus difficiles. Nos critères d'analyse sont de deux ordres. Premièrement, nous les avons analysé sous l'angle de la performance en temps. Il s'agit de voir comme ces algorithmes arrivent à répondre aussi rapidement que possible nos instances de PSP.  Le second angle d'analyse d'est porté sur la performance en terme de la qualité de la solution trouvée. Nous avons calculé l'écart entre la solution trouvée et la solution optimale connue dans la littérature. Nous commençons par décrire nos instances de tests.
+		Afin de tester nos deux solutions, nous commençons par utiliser un ensemble de 10 instances proposées par Houndji et al. auxquelles ils ont appliquées le CP. Ces instances sont caractérisées par un nombre de périodes \emph{NT} = 20 et un nombre d'articles \emph{NI} = 20. Les résultats seront comparés à ceux obtenus par Houndji et al. dans leur application de l'approche CP à ces instances. %Ces instances sont considérées comme des instances moyennes. D'autres part, nous avons également testé nos algorithmes sur des instances de plus grande taille considérées comme un peu plus difficiles. Nos critères d'analyse sont de deux ordres. Premièrement, nous les avons analysé sous l'angle de la performance en temps. Il s'agit de voir comme ces algorithmes arrivent à répondre aussi rapidement que possible nos instances de PSP.  Le second angle d'analyse d'est porté sur la performance en terme de la qualité de la solution trouvée. Nous avons calculé l'écart entre la solution trouvée et la solution optimale connue dans la littérature. Nous commençons par décrire nos instances de tests.
 		
 		\section{Résultats expérimentaux des algorithmes génétiques parallèles hiérarchiques "fine-grained" et "coarse-grained"}
-		Nous avons pu tester les algorithmes génétiques parallèles hiérarchiques "fine-grained" et "coarse-grained" sur 10 instances de PSP. Les résultats de ces tests sont consignés dans le tableau \ref{alg:principe_fine_grained} à coté de ceux obtenus de l'approche CP. Ce tableau présente les performances en temps des algorithmes génétiques parallèles hiérarchiques "fine-grained" et "coarse-grained".
+		Nous avons pu tester les algorithmes génétiques parallèles hiérarchiques "fine-grained" et "coarse-grained" sur 10 instances de PSP. Les résultats de ces tests sont consignés dans le tableau \ref{alg:principe_fine_grained} à coté de ceux obtenus de l'approche CP. Ce tableau présente les performances en temps et qualité des solutions des algorithmes génétiques parallèles hiérarchiques "fine-grained" et "coarse-grained". Nous avons effectué nos tests à travers 10 essais sur chacune des instances.
 		
 	\begin{table}[h]
 		\centering
@@ -807,33 +778,37 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
 			\textbf{10} & 1493 & 121.909 & . & . \\
 			\hline
 		\end{tabular}	
-		\caption{Résultats de test sur 10 instances du PSP du HFC-PGA en seconds}	
+		\caption{Performances du HFC-PGA sur 10 instances du PSP}	
 	\end{table}			
 		
 		\section{Résultats expérimentaux des algorithmes génétiques parallèles hiérarchiques "coarse-grained" et "master-slave"}
 		
 		\begin{table}[h]
 		\centering
-		\begin{tabular}{|c|c|c|c|c|}
+		\begin{tabular}{|c|c|c|c|c|c|c|}
 			\hline
-			\textbf{Instance} & \textbf{Optimal cost} & \textbf{CP time} & \textbf{HCM-PGA time} & \textbf{GAs result gap} \\
+			\textbf{Instance} & \textbf{Opt cost} & \textbf{CP time} & \textbf{GAs time} & \textbf{GAs result gap} & \textbf{GAs Best Sol} & \textbf{Nb Gen}\\
 			\hline
-			\textbf{1} & 1377 & 9.14 & . & . \\
-			\textbf{2} & 1447 & 7.292 & . & .\\
-			\textbf{3} & 1107 & 2.946 & . & .\\
-			\textbf{4} & 1182 & 1.784 & . & .\\
-			\textbf{5} & 1471 & 0.235 & . & .\\
-			\textbf{6} & 2774 & 11.177 & . & .\\
-			\textbf{7} & 2655 & 12.846 & . & .\\
-			\textbf{8} & 1473 & 15.039 & . & .\\
-			\textbf{9} & 3117 & 25.352 & . & .\\
-			\textbf{10} & 1493 & 121.909 & . & . \\
+			\textbf{1} & 1377 & 9.14 & 4.778 & 3.11\% & 1377 & 10.1 \\
+			\textbf{2} & 1447 & 7.292 & 3.02 & 3.16\% & 1471 & 8.1\\
+			\textbf{3} & 1107 & 2.946 & 2.6 & 5.22\% & 1107 & 7.8\\
+			\textbf{4} & 1182 & 1.784 & 2.48 & 1.90\% & 1189 & 8.2\\
+			\textbf{5} & 1471 & 0.235 & 3.09 & 0.9\% & 1471 & 8.9\\
+			\textbf{6} & 2774 & 11.177 & 4.12 & 1,19\% & 2782 & 8.6\\
+			\textbf{7} & 2655 & 12.846 & 4.33 & 1,9\% & 2670 & 9.6\\
+			\textbf{8} & 1473 & 15.039 & 5.01 & 2.3\% & 1473 & 10.2\\
+			\textbf{9} & 3117 & 25.352 & 5.86 & 2.02\% & 3143 & 9.2\\
+			\textbf{10} & 1493 & 121.909 & 4.37 & 5\% & 1530 & 9.8\\
 			\hline
 		\end{tabular}	
-		\caption{Résultats de test sur 10 instances du PSP du HCM-PGA en seconds}	
+		\caption{Performances du HCM-PGA sur 10 instances du PSP}	
 	\end{table}			
 	
 		\section{Analyse comparative des résultats}
+		\subsection{HFC-PGA et Approche CP}
+		\subsection{HCM-PGA et Approche CP}
+		\subsection{HCM-PGA et HFC-PGA}
+		\subsection{Discussion}
 	\begin{center}
 		 \begin{tikzpicture}[scale=0.7]
        	 	\begin{axis}[xlabel=axe $x$, ylabel=axe $y$]
@@ -861,31 +836,20 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
 		
 	\part*{Conclusion et Perspectives}
 	\addcontentsline{toc}{part}{Conclusion et Perspectives}
-	
+	\cite{ref}
 	\newpage
 	
 	\part*{Bibliographie}
 	\addcontentsline{toc}{part}{Bibliographie}
+	
+	\bibliographystyle{plain} 
+	\bibliography{thesis}
 	
 	\newpage
 	
 	\appendix
 	\part*{Annexes}
 	\addcontentsline{toc}{part}{Annexes}
-	\section{Extension au problème de planification de production avec plusieurs machines}
-		\subsection{Description du problème}
-		On s’intéresse ici à un problème de planification de production avec plu-
-sieurs machines de capacités finies et constantes. Il y a plusieurs articles à
-produire sur un horizon de planification discret et fini. La demande est statique et déterministe et il n’y a pas de shortage. La fonction objectif comprend
-les coûts de :
-		\begin{itemize}
-			\item[•] \emph{setup}: lorsqu’on prépare une machine pour la production d’un article à une période donnée. Ce coût est induit une seule fois
-à une période donnée même si on produit plusieurs fois le même article sur la machine ;
-			\item[•] \emph{inventory} : lorsqu'on conserve en stocks des articles afin de pouvoir satisfaire les demandes.
-		\end{itemize}
-		\subsection{Modèle et formulation}
-		\subsection{Notre solution}
-		\subsection{Expérimentations et Analyse des résultats}
 		
 	\section{Conception et Structure du programme}
 
