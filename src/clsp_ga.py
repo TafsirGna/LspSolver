@@ -28,7 +28,8 @@ class GeneticAlgorithm:
 		self.hashTable = {} #hashTable is a dictionnary
 		self.ga_memory = []
 		self.listMainThreads = [] # i initialize a list that's intended to contain all the main threads of this genetic algorithm program
-		
+		self.moyNbGenerations = 0
+
 		# i impart some parameters to the chromosome class and population class
 		Chromosome.mutationRate = GeneticAlgorithm.mutationRate
 		Chromosome.problem = inst
@@ -106,7 +107,7 @@ class GeneticAlgorithm:
 		for thread in self.listMainThreads:
 			thread.start()
 			thread.join()
-		
+
 		self.printResults()
 	
 	#--------------------
@@ -132,4 +133,10 @@ class GeneticAlgorithm:
 		else:
 			
 			print("No solutions have been found so far. Please Try again.")
-	
+
+		# i print on the screen the number of generations, the program got through before quiting
+		sumNbGenerations = 0
+		for thread in self.listMainThreads:
+			sumNbGenerations += thread.NbGenerations
+
+		print("The average number of generations produced is : ", math.ceil(sumNbGenerations / (GeneticAlgorithm.nbMainThreads)))

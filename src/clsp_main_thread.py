@@ -23,6 +23,7 @@ class ClspThread(Thread):
 		self.name = "Thread - " + str(threadId)
 		self.queue = queue
 		self.locker = threading.Lock()
+		self.NbGenerations = 0
 
 		self.immigrants = []
 
@@ -111,8 +112,7 @@ class ClspThread(Thread):
 
 			i += 1
 
-	def localSearch(self):
-		pass
+		self.NbGenerations = i
 
 	def initSearch(self, queue):
 		
