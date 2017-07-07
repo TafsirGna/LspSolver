@@ -20,7 +20,6 @@
 
 \lstset{frame=lines, numbers=left,numberstyle=\tiny\bfseries\underline, stepnumber=1, firstnumber =1, numberfirstline=true, backgroundcolor={\color[gray]{0.9}}, showstringspaces=false, basicstyle=\rm\footnotesize}
 
-
 \makeatletter
 \renewcommand{\@algocf@capt@plain}{above}% formerly {bottom}
 \makeatother
@@ -57,11 +56,14 @@
 		\vspace{1.5cm}{\huge\bfseries Résolution de "Pigment Sequencing Problem" avec les algorithmes génétiques\par}
 		\vspace{2cm}{\scshape \Large\textbf{Présenté par} \\ Tafsir GNA \par}
 		\vfill
-		\Large\textbf{Supervisé par}\par Pr. Norbert \textsc{Hounkonnou} \\ \& \\ Dr. Ratheil Vinasétan \textsc{Houndji}
+		\Large\textbf{Supervisé par}\par Dr-Ing. Vinasétan Ratheil \textsc{Houndji} \\ \& \\ Pr. Norbert \textsc{Hounkonnou} 
 		\vfill
 		{\large \scshape Année Académique 2016-2017 \par}
 	\end{titlepage}
 
+	\newpage
+	\thispagestyle{empty}
+	\null
 	\newpage % Page de remerciement
 	
 	\section*{Remerciements}
@@ -75,7 +77,7 @@
 	\begin{itemize}
 		\item[•] Pr. Eugène EZIN, Directeur de l'Institut de Formation et de Recherche en Informatique (IFRI) ainsi que tous les membres du corps enseignant et administratif de l'IFRI;
 		\item[•] Pr. Norbert HOUNKONNOU, pour avoir accepté de superviser mes travaux ainsi que Dr. Ratheil HOUNDJI pour l'encadrement et les conseils apportés;
-		\item[•] Mon père, ma mère et par extension toute ma famille pour leur soutien et leurs encouragements. 
+		\item[•] Mon père, ma mère et par extension toute ma famille et mes proches pour leur soutien et leurs encouragements. 
 	\end{itemize}
 	
 	\newpage
@@ -116,7 +118,9 @@
 	\hspace*{.5cm} \textbf{CP} : Constraint Programming \\
 	\hspace*{.5cm} \textbf{HFC-PGA} : Hierarchical Fine-grained and Coarse-grained Parallel Genetic Algorithms \\
 \hspace*{.5cm} \textbf{HCM-PGA} : Hierarchical Coarse-grained and master-slave Parallel Genetic Algorithms \\
-	
+	\hspace*{.5cm} \textbf{WW} : Wagner-Whitin \\
+	\hspace*{.5cm} \textbf{EOQ} : Economic Order Quantity \\
+	\hspace*{.5cm} \textbf{ELSP} : Economic Lot Scheduling Problem
 	
 	\newpage % Page du résumé en français
 	
@@ -185,6 +189,7 @@ ces dernières décennies depuis les travaux de Wagner et Within en 1958. \\
  	\item[-] Le plus souvent, une ressource de production n'est pas seulement dédiée à un unique article, mais plutôt utilisée pour produire différents types d'articles. Dans un contexte de processus d'industrie, les ressources de production disponibles ne pas vraiment flexibles et ne peuvent produire qu'un type d'article à la fois. En conséquence, la planification de production se heurte à la compétition entre les articles partageant les mêmes ressources et il faut décider quels articles produire, quand et en quelle quantité, tout en prenant en compte les contraintes liées au système de production. Dans certains cas, ces contraintes peuvent être si rigides que trouver une plan de production valide et faisable peut être difficile.
  	
  	\item[-] Un plan de production doit remplir plusieurs objectifs souvent contradictoires, notamment, garantir un excellent niveau du service-client et minimiser la production et les coûts de stockage. Ainsi, les mesures basiques telles que, ne pas satisfaire la demande excédant les capacités de production et garder une haut niveau de stockage afin d'être capable de répondre à toute demande ne sont pas commercialement acceptables ou encore trop chères. Un bon plan de planification est donc le résultat d'un compromis entre différents objectifs contradictoires.
+ 	
  	\item[-] Un plan de production n'est jamais fixé pour toujours. Sa validité est restreinte à un horizon de planification prédéfini. De plus, la réalité dévie le plus souvent des prévisions et si la divergence entre les plans et les prévisions est trop grande, le plan doit être revu avant la fin de l'horizon de planification.
  \end{itemize}
  
@@ -194,20 +199,12 @@ ces dernières décennies depuis les travaux de Wagner et Within en 1958. \\
 
 Différents critères interviennent dans la classification des problèmes de dimensionnement de lot, notamment : 
 \begin{description}
-	\item[\textsl{L'échelle de temps}:] La planification peut être effectuée soit sur des périodes discrètes soit sur un
-horizon de temps continu. Dans le premier cas, la longueur des périodes peut
-être soit de petite taille (Small time buckets) correspondant à des heures ou
-jours, soit de grande taille (Big time buckets) correspondant à des jours ou
-semaines, soit de très grande taille (Very big time buckets) correspondant à
-des mois ou trimestres.
+	\item[\textsl{L'échelle de temps}:] La planification peut être effectuée soit sur des périodes discrètes soit sur un horizon de temps continu. Dans le premier cas, la longueur des périodes peut
+être soit de petite taille (Small time buckets) correspondant à des heures ou jours, soit de grande taille (Big time buckets) correspondant à des jours ou semaines, soit de très grande taille (Very big time buckets) correspondant à des mois ou trimestres.
 
-	\item[\textsl{Le nombre de niveaux}:] Dans le cas où seules les demandes venant de l'extérieur du système sont considérées, on parle de problèmes à un niveau. Un état de l'art sur ce type de problème est proposé par Karimi et al. [71]. Lorsqu'il existe une relation entre
-les produits, on considère des problèmes à plusieurs niveaux. Ce dernier type
-de problèmes se retrouve fréquemment dans l'industrie.
+	\item[\textsl{Le nombre de niveaux}:] Dans le cas où seules les demandes venant de l'extérieur du système sont considérées, on parle de problèmes à un niveau. Un état de l'art sur ce type de problème est proposé par Karimi et al. \cite{karimi} . Lorsqu'il existe une relation entre les produits, on considère des problèmes à plusieurs niveaux. Ce dernier type de problèmes se retrouve fréquemment dans l'industrie.
 
-	\item[\textsl{Le nombre de produits}:] Dans le cas où il n'y a pas de dépendance entre les produits, en particulier, s'il n'y a pas d'utilisation commune de la capacité, nous considérons des problèmes
-à un seul produit. Dans le cas inverse, on parle de problèmes à plusieurs produits. Un état de l'art sur les problèmes à un produit est proposé par Brahimi
-et al. [16].
+	\item[\textsl{Le nombre de produits}:] Dans le cas où il n'y a pas de dépendance entre les produits, en particulier, s'il n'y a pas d'utilisation commune de la capacité, nous considérons des problèmes à un seul produit. Dans le cas inverse, on parle de problèmes à plusieurs produits. Un état de l'art sur les problèmes à un produit est proposé par Brahimi et al. [16].
 
 	\item[\textsl{Les contraintes de capacité}:] Les contraintes de capacité incluent le nombre d'employés, la capacité des machines, la capacité de stockage, etc. Lorsque les contraintes de capacité sont
 introduites dans le modèle, elles rendent le problème plus difficile à résoudre,
@@ -305,7 +302,7 @@ période et d(i, t) $ \in $ {0, 1} avec i l’article et t la période.\\
 	Soit \emph{xT} le plan de production qui représente une solution potentielle du problème. Il s’agit d’un tableau de dimension \emph{NT} , contenant à son indice t (avec $t  \in  {1...NT}$) l’article i à produire. Une solution admissible du problème est : $ xT = (2, 1, 2, 0, 1)$ avec un coût de $ q(2, 1) + q(1, 2) + q(2, 1) + 2 * h(2) = 15 $. La solution optimale est : $ xT = (2, 1, 0, 1, 2)$ avec un coût de $q(2, 1) + q(1, 2) + h(1) = 10$.
 		
 		\subsection{Modèles et formulations}
-		Différents modèles ont été proposés afin de représenter, modéliser et résoudre le PSP. Les modèles de programmation mixte en nombres entiers ou MIP proposés par Pochet et Wolsey (2006, §14.4) sont récurrents dans la littérature sur les problèmes de dimensionnement de lot en particulier celui du PSP. Nous présentons donc ici les trois modèles MIP dont les deux derniers sont une reformulation de la première.
+		Différents modèles ont été proposés afin de représenter, modéliser et résoudre le PSP. Les modèles de programmation mixte en nombres entiers ou MIP proposés par Pochet et Wolsey (2006, §14.4) sont dans la littérature, considérés comme l'état de l'art des méthodes de résolution exactes sur les problèmes de dimensionnement de lot en particulier celui du PSP. Nous présentons donc ici les trois modèles MIP dont les deux derniers sont une reformulation de la première.
 		\subsubsection{Modèle MIP 1}
 		
 		\begin{eqnarray}
@@ -364,16 +361,17 @@ En effet, si $y_{t-1}^{i}$ et $y_{t}^{i}$ valent 1 alors $ch_{t}^{i,j}$ est obli
 			\item[-] $p$ :  le nombre de périodes où il y a une demande dans l'intervalle [$t,l$];
 			\item[-] L'équation 14 indique l'inégalité valide sur l'intervalle [$t,l$] $\subseteq$ [$1,NT$] avec $d_{l}=1$ ($d_{l}$ est la demande à la période $l$)
 		\end{itemize}
+		
 	\section{Les algorithmes génétiques}
 		
-	Les algorithmes génétiques (AGs) sont des algorithmes d’exploration fondés sur les mécanismes de la sélection naturelle et de la génétique. Ils utilisent à la fois les principes de la survie des structures les mieux adaptées, et les échanges d’informations aléatoires, parfois guidés, pour former un algorithme d’exploration qui possède certaines des caractéristiques de l’exploration humaine. Ils ont été développés  et sont devenues populaires à travers les travaux de John Holland au début des années 1970, et particulièrement son livre \emph{Adapation in Natural an Artificial Systems} (1975). Holland présenta les GAs comme une abstraction de l'évolution biologique et des concepts théoriques à l'adaptation pour les GAs dans son livre. Il introduisit un formalisme afin de prédire la qualité de la prochaine génération, plus connue comme le théorème des schémas de Holland.
+	Les algorithmes génétiques (AGs) sont des algorithmes d’exploration fondés sur les mécanismes de la sélection naturelle et de la génétique. Ils utilisent à la fois les principes de la survie des structures les mieux adaptées, et les échanges d’informations aléatoires, parfois guidés, pour former un algorithme d’exploration qui possède certaines des caractéristiques de l’exploration humaine. Ils ont été proposés pour la première fois et sont devenues populaires à travers les travaux de John Holland au début des années 1970, et particulièrement son livre \emph{Adapation in Natural an Artificial Systems} (1975). Holland présenta les GAs comme une abstraction de l'évolution biologique et des concepts théoriques à l'adaptation pour les GAs dans son livre. Il introduisit un formalisme afin de prédire la qualité de la prochaine génération, plus connue comme le théorème des schémas de Holland.
 	
 	\subsection{Concepts de base}
 	Les AGs constituent une classe de stratégies de recherche réalisant un compromis entre l’exploration et l’exploitation. Ils représentent des méthodes qui utilisent
-un choix aléatoire comme outil pour guider une exploration intelligente dans l’espace des paramètres codés. Ce sont des algorithmes itératifs de recherche globale dont l’objectif est d’optimiser une fonction prédéfinie appelée fonction coût ou fonction « fitness » f.
+un choix aléatoire comme outil pour guider une exploration intelligente dans l’espace des paramètres codés. Ce sont des algorithmes itératifs de recherche globale dont l’objectif est d’optimiser une fonction prédéfinie appelée fonction coût ou fonction « fitness ».
 	Les algorithmes génétiques emploient un vocabulaire emprunté à la génétique naturelle. Ils travaillent sur un ensemble d’individus appelé population. Un individu a deux représentations appelées phénotype et génotype. Le phénotype représente une solution potentielle du problème à optimiser en utilisant la formulation originale du problème. Le génotype donne une représentation codée
 d’une solution potentielle sous la forme d’un chromosome. Un chromosome est formé de gènes disposés en une succession linéaire et chaque gène peut prendre plusieurs
-valeurs appelées allèles. Par exemple, un chromosome se compose d’une succession de 0 et de 1 (c.-à-d. une chaîne binaire), et la valeur pour une certaine position correspond à on (la valeur = 1) ou à off (la valeur = 0) d’un certain dispositif. Des formes plus compliquées, telles qu’un ordre des symboles et une permutation des alphabets, sont choisies pour décrire les chromosomes du problème à optimiser. Chaque individu a une fonction objectif f (fonction « fitness ») qui mesure l’adaptation de l’individu à son environnement local. La théorie darwinienne indique que, parmi des individus d’une population, celui qui est le mieux adapté à l’environnement local a le plus de chance de survivre et d’avoir un plus grand nombre de descendants : c’est la règle de la « survie du plus fort ». Ainsi, la
+valeurs appelées allèles. Par exemple, un chromosome se compose d’une succession de 0 et de 1 (c.-à-d. une chaîne binaire), et la valeur pour une certaine position correspond à "on" (la valeur = 1) ou à "off" (la valeur = 0) d’un certain dispositif. Des formes plus compliquées, telles qu’un ordre des symboles et une permutation des alphabets, sont choisies pour décrire les chromosomes du problème à optimiser. Chaque individu a une fonction objectif f (fonction « fitness ») qui mesure l’adaptation de l’individu à son environnement local. La théorie darwinienne indique que, parmi des individus d’une population, celui qui est le mieux adapté à l’environnement local a le plus de chance de survivre et d’avoir un plus grand nombre de descendants : c’est la règle de la « survie du plus fort ». Ainsi, la
 fonction objectif f du problème d’optimisation joue le rôle d’un critère d’adaptation [18]. Un des points les plus importants des algorithmes génétiques est la flexibilité dans la fonction objectif.
 
 	\subsection{Fonctionnement}
@@ -385,14 +383,14 @@ fonction objectif f du problème d’optimisation joue le rôle d’un critère 
  	%\KwData{this text}
  	%\KwResult{how to write algorithm with \LaTeX2e }
  	%initialization\;
- 	Générer la population initiale Pi \\
- 	Évaluer la population Pi \\
+ 	Générer la population initiale $P_{i}$ \\
+ 	Évaluer la population $P_{i}$ \\
  	\While{le critère de terminaison n'est pas satisfait}{
- 	 Sélectionner les éléments de Pi à copier dans P i+1 \\
- 	 Appliquer le crossover aux éléments de Pi et les mettre dans P i+1 \\
- 	 Appliquer la mutation aux éléments de Pi et les mettre dans P i+1 \\
- 	 Évaluer la nouvelle population P i+1 \\
- 	 Pi = P i+1
+ 	 Sélectionner les éléments de $P_{i}$ à copier dans $P_{i+1}$ \\
+ 	 Appliquer le croisement aux éléments de $P_{i}$ et les mettre dans $P_{i+1}$ \\
+ 	 Appliquer la mutation aux éléments de $P_{i}$ et les mettre dans $P_{i+1}$ \\
+ 	 Évaluer la nouvelle population $P_{i+1}$ \\
+ 	 $P_{i}$ = $P_{i+1}$
  	}
 	\end{algorithm}
 	
@@ -434,12 +432,12 @@ hasard. Un enfant prend une section avant le point de croisement d’un parent e
 	
 	\subsection{Application des algorithmes génétiques aux problèmes d'optimisation}
 	
-	Cette approche a été largement utilisée ces dernières années [9, 12, etc.]. L’utilisation des AGs dans de nombreux domaines a fait ses preuves, notamment dans des problèmes combinatoires tels que les problèmes d’ordonnancement [4, 13, 18, 5] et les problèmes de collecte et de distribution. Les problèmes d’ordonnancement d’un atelier classique de type Job-Shop (JSP) ont notamment été largement étudiés et résolus par les AGs [1, 3, 6, 10, 11, 15, etc.]. D’autres algorithmes hybrides ont été aussi proposés [2, 8, 16]. La difficulté principale dans la résolution de ces types de problèmes résulte dans la façon avec laquelle ils sont représentés sous forme algorithmique. Cette phase, la définition du chromosome, représente le point le plus important dans la recherche génétique. Plusieurs approches de représentation
+	Les algorithmes génétiques ont été largement utilisées ces dernières années [9, 12, etc.]. L’utilisation des AGs dans de nombreux domaines a fait ses preuves, notamment dans des problèmes combinatoires tels que les problèmes d’ordonnancement [4, 13, 18, 5] et les problèmes de collecte et de distribution. Les problèmes d’ordonnancement d’un atelier classique de type Job-Shop (JSP) ont notamment été largement étudiés et résolus par les AGs [1, 3, 6, 10, 11, 15, etc.]. D’autres algorithmes hybrides ont été aussi proposés [2, 8, 16]. La difficulté principale dans la résolution de ces types de problèmes résulte dans la façon avec laquelle ils sont représentés sous forme algorithmique. Cette phase, la définition du chromosome, représente le point le plus important dans la recherche génétique. Plusieurs approches de représentation
 et différents types d’opérateurs d’AGs ont été proposés, pour résoudre ces problèmes.
 	
 	\section*{Conclusion}
 	\addcontentsline{toc}{section}{Conclusion}
-	Le dimensionnement de lots en planification de production est un important défi pour les entreprises industrielles. Il consiste à trouver un plan de production qui satisfait aux contraintes spécifiques relatives au système de production. Le PSP constitue en effet une instance normalisée de ces types de problèmes. Plusieurs méthodes peuvent servir à résoudre ce problème. Au nombre de ces méthodes, figurent les algorithmes génétiques. Les AGs, à travers l'exploration et l'exploitation de l'espace de recherche ont permis de résoudre bon nombre de problèmes d'optimisation par le passé. Nous présentons dans la partie suivante le PSP ainsi que les modèles et leur formulation qui ont été utilisés dans sa résolution.		
+	Le dimensionnement de lots en planification de production est un important défi pour les entreprises industrielles. Il consiste à trouver un plan de production qui satisfait aux contraintes spécifiques relatives au système de production. Le PSP constitue en effet une variante NP-Difficile de ces types de problèmes. Plusieurs méthodes peuvent servir à résoudre ce problème. Au nombre de ces méthodes, figurent les algorithmes génétiques. Les AGs, à travers l'exploration et l'exploitation de l'espace de recherche ont permis de résoudre bon nombre de problèmes d'optimisation par le passé. Nous présentons dans la partie suivante le PSP ainsi que les modèles et leur formulation qui ont été utilisés dans sa résolution.		
 		
 	\newpage
 	
@@ -451,6 +449,25 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
 	L'étude des problèmes de dimensionnement de lots au cours de décennies de recherche a permis de tester différents méthodes de recherche à ces types de problèmes. L'étude du "Pigment Sequencing Problem" (PSP) n'échappe pas à la règle. Dans ce chapitre, nous présentons dans un premier temps, les aspects généraux ou communs à nos deux approches heuristiques basées sur les algorithmes génétiques; puis dans un second temps, nous décrivons ces deux méthodes de recherche en nous appuyant sur les algorithmes implémentés.
 	
 	\section{Modèle et formulation utilisés}
+	Dans le but de modeliser et de formuler notre problème de PSP, nous nous sommes servi de la première formulation en programmation en nombres entiers (MIP1). Nous rappelons ici ce modèle. 
+	
+	\begin{eqnarray}
+		min \sum_{i,j,t} q^{i,j}ch_{t}^{i,j} + \sum_{i,t} h^{i} s_{t}^{i} \\
+		s_{0}^{i} = 0, \forall i \\
+		x_{t}^{i} + s_{t-1}^{i} = d_{t}^{i} + s_{t}^{i}, \forall i,t \\
+		x_{t}^{i} \leq y_{t}^{i}, \forall i,t \\
+		\sum_{i} y_{t}^{i} = 1 , \forall t \\
+		ch_{t}^{i,j} = y_{t-1}^{i} + y_{t}^{j} - 1, \forall i,j,t \\
+		x,y,ch \in \{0,1\}, s \in N, i \in \{0..NI\}, t \in \{1..NT\}
+	\end{eqnarray}
+		
+		avec les variables de décisions suivantes: \\
+		\begin{itemize}
+			\item[-] $x_{t}^{i}$ : variable binaire de production qui vaut 1 si l’article i est produit à la période t et 0 sinon ;
+			\item[-] $y_{t}^{i}$ : variable binaire de setup qui vaut 1 si la machine est préparée pour la production de l’article i et 0 sinon ;
+			\item[-] $s_{t}^{i}$ : variable entière de stockage qui contient le nombre d’articles i stockés à la période t ; 
+			\item[-] $ch_{t}^{i,j}$ : variable binaire de changeover qui vaut 1 si à la période t, on est passé de la production de l’article i à l’article j et 0 sinon.
+		\end{itemize}
 	
 	\section{Aspects généraux aux deux méthodes de recherche proposées}
 	\subsection{Représentation génétique}
@@ -566,8 +583,10 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
 	
 	\subsection{Opérateurs génétiques}
 		\subsubsection{Sélection}
+		
 		La sélection est le processus qui consiste à choisir dans la génération actuelle, les chromosomes ou individus qui seront reproduits afin de former la prochaine génération. Différentes méthodes de sélection existent. On distingue entre autres, la selection par tournoi et la sélection par "\emph{roulette wheel}". \\
-		\hspace*{.5cm} Dans notre étude, nous choisissons de nous interesser à la plus connue et commune d'entre les méthodes de sélection: le \emph{"Roulette Wheel"}. Dans la sélection par "\emph{roulette wheel}", les individus se voient attribués une probabilité d'être sélectionnés. Cette probabilité est directement proportionnelle à leur fonction d'évaluation. Les individus sont donc choisis aléatoirement en se basant sur leur probabilité et se reproduisent en générant des individus "\emph{fils}". Ces "\emph{fils}" sont ainsi de nouvelles solutions au problème et forme une nouvelle population.
+		\hspace*{.5cm} Dans notre étude, nous choisissons de nous interesser à la plus connue et commune d'entre les méthodes de sélection: le \emph{"Roulette Wheel"}. Dans la sélection par "\emph{roulette wheel}", les individus se voient attribués une probabilité d'être sélectionnés. Cette probabilité est directement proportionnelle à leur fonction d'évaluation. Les individus sont donc choisis aléatoirement en se basant sur leur probabilité et se reproduisent en générant des individus "\emph{fils}". Ces "\emph{fils}" sont ainsi de nouvelles solutions au problème et forme une nouvelle population.		
+		
 		\subsubsection{Croisement}
 		
 		Une fois les individus sélectionnés, intervient le croisement. Le croisement en un point a été choisi afin de reproduire ces individus. Cette forme de croisement reste une des plus simples et répandues. La figure \ref{fig:used_cross_over} présente une illustration du croisement appliqué à l'instance de PSP introduite à la page \pageref{ex:psp}. \\
@@ -579,10 +598,43 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
 			\end{center}
 		\end{figure}
 		
-		\hspace*{.5cm} Le croisement se fait ainsi après la troisième période. Le croisement peut engendrer des individus qui, contrairement à la figure \ref{fig:used_cross_over}, ne respectent pas les contraintes de sytème en terme de \emph{shortage} ou de \emph{backlogging}. Il faut alors rendre ces individus à nouveau faisables avant de procéder à une quelconque mutation.
+		\hspace*{.5cm} Le croisement se fait ainsi après la troisième période. Le croisement peut engendrer des individus qui, contrairement à la figure \ref{fig:used_cross_over}, ne respectent pas les contraintes de sytème en terme de \emph{shortage} ou de \emph{backlogging}. Il faut alors rendre ces individus à nouveau faisables avant de procéder à une quelconque mutation. L'algorithme \ref{alg:cross_over} présente le croisement implémenté dans le cadre de cette étude.\\
+		
+		\begin{algorithm}[H]
+ 		\caption{Algorithme de croisement utilisé}
+ 		\label{alg:cross_over}
+ 		\KwData{parent1, parent2, seuil\_probabilite}
+ 		\KwResult{child1 et child2}
+ 		\BlankLine
+ 		child1 $\gets$ $nouveau\ chromosome()$ \\
+ 		child2 $\gets$ $nouveau\ chromosome()$ \\
+ 		$probabilite \gets random(1,99)$ \\
+ 		\BlankLine
+ 		\If{probabilite $\geq$ seuil\_probabilite}
+ 		{
+ 			$nbGenes \gets NombreDeGenes(parent1)$\\
+ 			$indice\_gene \gets random(1, nbGenes)$\\
+ 			//$ Le \ nombre \ de \ genes \ du \ parent1 \ est \ le \ meme \ que \ celui \ du \ parent2 $\\
+ 			\For{ i $\gets$ 0 \KwTo nbGenes}
+ 			{
+ 				$gene1 \gets getGene(parent1, i)$ \\
+ 				$gene2 \gets getGene(parent2, i)$ \\
+ 				\eIf{i $\leq$ indice\_gene}
+ 				{
+ 					$child1.ajouterGene(gene)$ \\
+ 					$child2.ajouterGene(gene)$ \\
+ 				}
+ 				{
+ 					$child2.ajouterGene(gene)$ \\
+ 					$child1.ajouterGene(gene)$ \\
+ 				}
+ 			}
+ 		}
+ 		\Return{child1, child2}
+		\end{algorithm}
 		  
 	\subsubsection{Mutation}
-	Après la sélection et le croisement, une nouvelle population d'individus est prête. Certains ont été copiés directement et d'autres se sont reproduits par croisement. Dans le but de s'assurer que les individus ne sont pas exactement les mêmes, une mutation est appliquée à chacun des individus "\emph{fils}". A chaque gène, on attribue une chance de muter. Dans le cas, où la mutation se produit, la valeur du gène muté change de période. Un visuel de la mutation est présenté à la figure \ref{fig:used_mutation}. La mutation est une élément vital de la garantie d'une diversité au sein de la population. 
+	Après la sélection et le croisement, une nouvelle population d'individus est prête. Certains ont été copiés directement et d'autres se sont reproduits par croisement. Dans le but de s'assurer que les individus ne sont pas exactement les mêmes, une mutation est appliquée à chacun des individus "\emph{fils}". A chaque gène, on attribue une chance de muter. Dans le cas, où la mutation se produit, la valeur du gène muté change de période. Un visuel de la mutation est présenté à la figure \ref{fig:used_mutation}. La mutation est une élément vital de la garantie d'une diversité au sein de la population. L'algorithme \ref{alg:mutation} détaille le processus utilisé afin de faire muter un chromosome. 
 	
 	\begin{figure}[!h]
 		\begin{center}
@@ -592,6 +644,33 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
 		\end{center}
 	\end{figure}
 	
+	\begin{algorithm}[H]
+ 		\caption{Algorithme de mutation utilisée}
+ 		\label{alg:mutation}
+ 		\KwData{chromosome, seuil\_probabilite}
+ 		\KwResult{chromosome}
+ 		\BlankLine
+ 		$probabilite \gets random(1,99)$ \\
+ 		\BlankLine
+ 		\If{probabilite $\geq$ seuil\_probabilite}
+ 		{
+ 			$nbGenes \gets NombreDeGenes(chromosome)$\\
+ 			$indice\_gene \gets random(1, nbGenes)$\\
+ 			//$ Le \ nombre \ de \ genes \ du \ parent1 \ est \ le \ meme \ que \ celui \ du \ parent2 $\\
+ 			\For{ i $\gets$ 0 \KwTo indice\_gene}
+ 			{
+ 				$gene1 \gets getGene(chromosome, i)$ \\
+ 				\If{gene est disponible}
+ 				{
+ 					$gene2 \gets getGene(indice\_gene)$\\
+ 					$deplacer(gene1, gene2, chromosome)$ \\
+ 					$arret$
+ 				}
+ 			}
+ 		}
+ 		\Return{chromosome}
+		\end{algorithm}
+	
 	\subsection{Évaluation}
 	L'évaluation dans notre étude, se réfère à la fonction objectif. Il s'agit de minimiser les coûts d'exploitation et de production. Deux types de coût sont à prendre en compte:
 	\begin{itemize}
@@ -599,11 +678,68 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
 		\item[•] Les coûts de stockage qui sont induis lors du conditionnement et d’entreposage.
 	\end{itemize}
 	
+	\begin{algorithm}[H]
+ 		\caption{Algorithme dans le processus d'évaluation d'un chromosome}
+ 		\label{alg:evaluation}
+ 		\KwData{chromosome, cout\_stockage, cout\_transition}
+ 		\KwResult{eval}
+ 		\BlankLine
+ 		$eval \gets 0$\\
+ 		$// On\ calcule\ le\ cout\ de\ stockage\ de\ chaque\ production$ \\
+ 		\For{gene in chromosome}{
+ 			\If{gene.value != 0}{		
+ 				$date\_limite \gets getDateLimite(gene)$ \\
+ 				$temp \gets (date\_limite\ -\ gene.periode) * cout\_stockage(gene.value)$ \\
+ 				$evaluation \gets evaluation\ +\ temp$ \\
+ 			}
+ 		}
+ 		$// On\ calcule\ le\ cout\ de\ transition\ de\ entre\ deux\ productions$ \\
+ 		\For{gene in chromosome}{
+ 			\If{gene.value != 0}{		
+ 				$next\_gene \gets getNextGene(chromosome)$ \\
+ 				\If{transition(gene, next\_gene) est vrai}{
+ 					$temp \gets cout\_transition(gene, next\_gene)$\\
+ 					$evaluation \gets evaluation\ +\ temp$
+ 				}
+ 			}
+ 		}
+ 		\Return{evaluation}
+	\end{algorithm}
+	
 	\subsection{Terminaison}
 	Deux moyens sont utilisés par lesquels les algorithmes génétiques se terminent. Habituellement, une limite est mise sur le nombre de générations après lesquelles le processus se termine. Avec certains problèmes, le processus de recherche se termine quand une solution particulière a été trouvée ou encore lorsque la plus haute valeur de "fitness" dans la population a atteint une valeur particulière. \\
 	\hspace*{.5cm} Deux critères de terminaison sont utilisés dans notre étude afin de terminer une recherche. D'une part, la recherche se termine lorsque l'algorithme converge sur un individu considéré comme une solution optimale. D'autre part, une limite a été fixée sur le nombre de générations parcourues sans aucune amélioration de la valeur de "fitness" du meilleur individu de la population.
 	
 	\subsection{Fonction de faisabilité}
+	Le croisement et la mutation sont tous des opérateurs génétiques qui produisent en sortie des chromosomes. En fonction du gène muté dans le cas de la mutation ou du point de croisement dans le cas du croisement, ces chromosomes peuvent ne pas être faisables; c'est-à-dire qu'ils ne représentent pas des solutions au problème à résoudre. Il importe donc de rendre à nouveau faisable. La fonction de faisabilité permet de rendre un chromosome ou individu à nouveau faisable. Afin d'y parvenir, nous avons réduit le surplus de production dans le cas d'un surplus et augmenter la quantité d'articles produits dans le cas d'un manque de production. L'algorithme utilisé dans cet objectif est présenté comme suit: 
+	\\
+	\begin{algorithm}[H]
+ 		\caption{Algorithme utilisé comme fonction de faisabilité}
+ 		\label{alg:faisabilite}
+ 		\KwData{chromosome, cout\_stockage, cout\_transition}
+ 		\KwResult{eval}
+ 		\BlankLine
+ 		$eval \gets 0$\\
+ 		$// On\ calcule\ le\ cout\ de\ stockage\ de\ chaque\ production$ \\
+ 		\For{gene in chromosome}{
+ 			\If{gene.value != 0}{		
+ 				$date\_limite \gets getDateLimite(gene)$ \\
+ 				$temp \gets (date\_limite\ -\ gene.periode) * cout\_stockage(gene.value)$ \\
+ 				$evaluation \gets evaluation\ +\ temp$ \\
+ 			}
+ 		}
+ 		$// On\ calcule\ le\ cout\ de\ transition\ de\ entre\ deux\ productions$ \\
+ 		\For{gene in chromosome}{
+ 			\If{gene.value != 0}{		
+ 				$next\_gene \gets getNextGene(chromosome)$ \\
+ 				\If{transition(gene, next\_gene) est vrai}{
+ 					$temp \gets cout\_transition(gene, next\_gene)$\\
+ 					$evaluation \gets evaluation\ +\ temp$
+ 				}
+ 			}
+ 		}
+ 		\Return{evaluation}
+	\end{algorithm}
 	
 	\section{Algorithmes génétiques parallèles}	
 	Les algorithmes génétiques sont des techniques de recherche qui ont été utilisées avec succès dans la résolution de problèmes dans différents disciplines. Cependant, la recherche permanente de performance dans l'exécution des algorithmes et le développement constant d'ordinateurs toujours plus performants et parallèles ont conduit à émergence d'un type d'algorithmes génétiques plus performants que les algorithmes génétiques standards. A propos des algorithmes génétiques parallèles, on distingue généralement trois classes : les "\emph{master-slave} parallel genetic algorithms", les "\emph{ coarsed-grained} parallel genetic algorithms" et les "\emph{fine-grained} parallel genetic algorithms". Les "master-slave parallel genetic algorithms" sont le type le plus simples d'algorithmes génétiques parallèles. Elles consistent essentiellement à distribuer l'évaluation de la population globale entre plusieurs processeurs. Le processeur qui conserve la population et exécute l'algorithme génétique est le maître et les processus qui évaluent la population sont les esclaves. La figure \ref{fig:master_slave_ga} montre un schéma de l'algorithme génétique parallèle "coarse-grained". Nous nous intéressons dans notre étude aux deux autres types, plus compliqués mais également plus intéressants dans leur fonctionnement et performances.
@@ -747,7 +883,7 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
 		\addcontentsline{toc}{section}{Introduction}
 		L'expérimentation lors d'une étude est une étape importante du travail de recherche. Il s'agit le plus souvent donc de tester les théories émises et d'analyser les résultats obtenus de tests afin de valider nos approches de solution du problème énoncées. Dans cette partie, nous présentons d'abord l'environnement de test, les instances utilisées. Ensuite, nous expérimentons nos solutions et à partir des résultats obtenus, nous comparons nos approches heuristiques basées sur les algorithmes génétiques à celles déjà appliquées à ce problème.
 		
-		\section{Environnement de tests} 
+		\section{Environnement de test} 
 		
 		\subsection{Matériel}
 		Pour l'implémentation de nos tests, nous avons travaillé sur un ordinateur présentant les caractéristiques suivantes :\\
@@ -760,14 +896,25 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
 		\subsection{Langage de programmation}
 		Le langage de programmation utilisée afin de d'implémenter notre solution est le langage \emph{Python} dans sa version Python 3.5. \emph{Python} est un puissant langage de programmation interprété qui apparaît de plus en plus comme une alternative crédible et intéressante dans le domaine de l'intelligence artificielle, tant il présente des qualités quant à sa robustesse, sa rapidité, sa portabilité, sa facilité de prise en main, sa rigueur et sa caractéristique de langage Open source.  
 		
-		\subsection{Données de tests}
+		\subsection{Données de test}
 		
 		Afin de tester nos deux solutions, nous commençons par utiliser un ensemble de 10 instances proposées par Houndji et al. auxquelles ils ont appliquées le CP. Ces instances sont caractérisées par un nombre de périodes \emph{NT} = 20 et un nombre d'articles \emph{NI} = 20. Les résultats seront comparés à ceux obtenus par Houndji et al. dans leur application de l'approche CP à ces instances. %Ces instances sont considérées comme des instances moyennes. D'autres part, nous avons également testé nos algorithmes sur des instances de plus grande taille considérées comme un peu plus difficiles. Nos critères d'analyse sont de deux ordres. Premièrement, nous les avons analysé sous l'angle de la performance en temps. Il s'agit de voir comme ces algorithmes arrivent à répondre aussi rapidement que possible nos instances de PSP.  Le second angle d'analyse d'est porté sur la performance en terme de la qualité de la solution trouvée. Nous avons calculé l'écart entre la solution trouvée et la solution optimale connue dans la littérature. Nous commençons par décrire nos instances de tests.
 		
-		\subsection{Paramètres de tests}
+		\subsection{Paramètres de test}
+		Les paramètres de test utilisés afin d'effectuer les test sont les suivants:
+		\begin{itemize}
+			\item[•] Taille de la population : 100 individus;
+			\item[•] Probabilité de mutation : 5\%;
+			\item[•] Probabilité de croisement : 80\%;
+			\item[•] Nombre de migrants : 1 individu;
+			\item[•] Nombre de générations sans amélioration avant arrêt : 7 générations;
+			\item[•] Nombre de processus esclaves (cas du HCM-PGA) : 3 processus;
+			\item[•] Nombre de processus principaux : 3 processus;
+			\item[•] Nombre de générations avant migration : 0 génération.
+		\end{itemize}
 		
 	\section{Brève présentation de la programmation par contrainte}	
-	Un problème de satisfaction de contrainte ou \emph{Constraint Sattisfaction Problem} (CSP) est une type spécial de problème qui satisfait certaines propriétés structurelles additionnelles desquelles les conditions basiques requises en général. En CSP, les états sont définis par les valeurs d'un ensemble de variables et le test final constitue en une ensemble de contraintes auxquelles doivent obéir les variables. \\
+	Un problème de satisfaction de contrainte ou \emph{Constraint Satisfaction Problem} (CSP) est une type spécial de problème qui satisfait certaines propriétés structurelles additionnelles desquelles les conditions basiques requises en général. En CSP, les états sont définis par les valeurs d'un ensemble de variables et le test final constitue en une ensemble de contraintes auxquelles doivent obéir les variables. \\
 	\hspace*{.5cm} Ainsi, un CSP est un ensemble fini de variables $X := x1,...,xn$ définis sur les domaines respectifs $D1,...,Dn$ et un ensemble de fini de contraintes $C$, chacune établissant une relation entre un sous-ensemble de variables. Soit $DE = x1 \in D1,..., xn \in Dn$ l'expression des domaines. On peut noter : $CSP = <C,D,E>$. On dira que $(d1,...,dn) \in D1*...*Dn$ est une relation si elle satisfait toutes les contraintes $c \in C$. Le CSP sera dit \emph{consistant} s'il possède une solution et \emph{inconsistant} sinon.Un exemple est un problème des 8 reines qui peut être vu comme un CSP dans lequel les variables sont les locations de chacune des huit reines. Les valeurs possibles sont les carrés sur le tableaux et les contraintes établissent que deux reines ne peuvent rester sur la même ligne, même colonne et même diagonale. \\
 	\hspace*{.5cm} La programmation par contrainte constitue un moyen de formuler et de résoudre ce type de problèmes à travers des algorithmes spécifiques. La CP vise donc à trouver des solutions faisables qui satisfont aux contraintes et présentant un ensemble de valeurs possibles pour chaque variables de décisions.
 		
@@ -792,7 +939,7 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
 			\textbf{10} & 1493 & 121.909 & 6.77 & 2.49\% & 1497 & 9.8\\
 			\hline
 		\end{tabular}	
-		\caption{Performances du HCM-PGA sur 10 instances du PSP}	
+		\caption{Performances du HFC-PGA sur 10 instances du PSP}	
 	\end{table}			
 		
 		\section{Résultats expérimentaux des algorithmes génétiques parallèles hiérarchiques "coarse-grained" et "master-slave"}
@@ -824,10 +971,12 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
 		Il s'agit dans cette section d'effectuer une analyse comparative des résultats afin de dégager des conclusions. Il serait par exemple intéressant de d'analyser les performances entre algorithmes génétiques parallèles hiérarchiques \emph{fine-grained} et \emph{coarse-grained} et programmation par contrainte d'une part et d'autre part de pouvoir faire de même entre programmation par contrainte et algorithmes génétiques hiérarchiques \emph{coarse-grained} et \emph{master-slave}. Enfin, répondre à la question de savoir qui des algorithmes génétiques parallèles hiérarchiques \emph{coarse-grained} et \emph{fine-grained} et algorithmes génétiques parallèles \emph{master-slave} et \emph{coarse-grained} est le plus performant serait une bonne façon d'achever cette analyse.
 		\subsection{HCM-PGA et Approche CP}
 		
+	L'approche CP dans son application au PSP s'est avérée efficace. Nous analysons à présent les résultats obtenus en appliquant le HCM-PGA au PSP. Comme le montre la figure \ref{fig:CP_HCM-PGA_time}, avec pour critère de comparaison le temps de recherche. Nous avons pu constater que le HCM-PGA parcourt bien plus vite l'espace de recherche. Il nous est possible de constater que sur certaines instances le gain de temps est dans le meilleur de cas (instance 10) de 96,41\% . En poursuivant notre analyse, nous pouvons  également faire noter que le temps de recherche est relativement constant. Sur des instances où l'approche CP prend beaucoup plus de temps (instances 6,7,8,9 et 10), notre solution HCM-PGA conserve un temps de recherche stable. En conséquence, l'usage de notre solution HCM-PGA s'avère pertinente en matière de temps en comparaison de la solution CP. Analysons à présent la performance de HCM-PGA en matière de qualité de la meilleure solution trouvée sur nos 10 essais.
+	
+	\begin{figure}[!h]
 	\begin{center}
 	\begin{tikzpicture}[scale=0.7]
-       	\begin{axis}[xlabel=axe $x$, ylabel=axe $y$]
-        %\addplot {x^2+2*x-1};
+       	\begin{axis}[xlabel=instances des PSP testées, ylabel=temps en secondes]
         \addplot coordinates {
         	(1 ,9.14)
         	(2 ,7.29)
@@ -857,11 +1006,19 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
         \end{axis}
         %\caption{g}
     \end{tikzpicture}
+    \label{fig:CP_HCM-PGA_time}
+    \caption{Performances comparées de CP et HCM-PGA en temps}
     \end{center}
+    \end{figure}
     
+    La figure \ref{fig:CP_HCM-PGA_best_fitness} nous présente sous forme de graphique les résultats des tests de performances en matière de qualité de la meilleure solution trouvée. L'analyse de ce graphique nous permet de remarquer de la courbe de performance de HCM-PGA est semble la même que celle de CP. Ces deux courbes présentent la même allure et sensiblement les même valeurs de performances. Notre solution HCM-PGA présente donc les même performances à quelques petites différences près que l'approche de référence (approche CP). \\
+    \hspace*{.5cm} En combinant cette analyse ainsi que la présente, nous pouvons déduire que notre solution HCM-PGA réussit à parcourir l'espace de recherche plus vite que notre approche de référence tout en trouvant sur nos 10 essais tests à trouver la solution optimale ou une solution approchant cette dernière de très près. Nous allons pour la suite, analyser la moyenne des solutions trouvées en matière de performance de fitness.
+    
+    \begin{figure}[!h]
+    \label{fig:CP_HCM-PGA_best_fitness}
     \begin{center}
 	\begin{tikzpicture}[scale=0.7]
-       	\begin{axis}[xlabel=axe $x$, ylabel=axe $y$]
+       	\begin{axis}[xlabel=instances des PSP testées, ylabel=fitness]
         %\addplot {x^2+2*x-1};
         \addplot coordinates {
         	(1 ,1377)
@@ -893,10 +1050,13 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
         %\caption{g}
     \end{tikzpicture}
     \end{center}
+    \caption{Performances comparées de CP et HCM-PGA en fitness de la meilleure solution trouvée}
+    \end{figure}
     
+    \begin{figure}[!h]
     \begin{center}
 	\begin{tikzpicture}[scale=0.7]
-       	\begin{axis}[xlabel=axe $x$, ylabel=axe $y$]
+       	\begin{axis}[xlabel=instances des PSP testées, ylabel=fitness moyen]
         %\addplot {x^2+2*x-1};
         \addplot coordinates {
         	(1 ,1377)
@@ -928,11 +1088,15 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
         %\caption{g}
     \end{tikzpicture}
     \end{center}
-		\subsection{HFC-PGA et Approche CP}
+    \caption{Performances comparées de CP et HCM-PGA en fitness moyen des solutions trouvées}
+	\end{figure}    
+    
+	\subsection{HFC-PGA et Approche CP}
 		
-		\begin{center}
+	\begin{figure}[!h]
+	\begin{center}
 	\begin{tikzpicture}[scale=0.7]
-       	\begin{axis}[xlabel=axe $x$, ylabel=axe $y$]
+       	\begin{axis}[xlabel=instances des PSP testées, ylabel=temps en secondes]
         %\addplot {x^2+2*x-1};
         \addplot coordinates {
         	(1 ,9.14)
@@ -964,10 +1128,13 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
         %\caption{g}
     \end{tikzpicture}
     \end{center}
+	\caption{Performances comparées de CP et HFC-PGA en temps}
+    \end{figure}
     
+    \begin{figure}[!h]
     \begin{center}
 	\begin{tikzpicture}[scale=0.7]
-       	\begin{axis}[xlabel=axe $x$, ylabel=axe $y$]
+       	\begin{axis}[xlabel=instances des PSP testées, ylabel=fitness]
         %\addplot {x^2+2*x-1};
         \addplot coordinates {
         	(1 ,1377)
@@ -996,13 +1163,15 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
         	};
         \addlegendentry{HFC-PGA}
         \end{axis}
-        %\caption{g}
     \end{tikzpicture}
     \end{center}
+	\caption{Performances comparées de CP et HFC-PGA en fitness de la meilleure solution trouvée}
+    \end{figure}
     
+    \begin{figure}[!h]
     \begin{center}
 	\begin{tikzpicture}[scale=0.7]
-       	\begin{axis}[xlabel=axe $x$, ylabel=axe $y$]
+       	\begin{axis}[xlabel=instances des PSP testées, ylabel=fitness]
         %\addplot {x^2+2*x-1};
         \addplot coordinates {
         	(1 ,1377)
@@ -1034,9 +1203,12 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
         %\caption{g}
     \end{tikzpicture}
     \end{center}
+    \caption{Performances comparées de CP et HFC-PGA en fitness moyen des solution trouvées}
+    \end{figure}
     
 		\subsection{HCM-PGA et HFC-PGA}
 		
+	\begin{figure}[!h]
 	\begin{center}
 	\begin{tikzpicture}[scale=0.7]
        	\begin{axis}[xlabel=axe $x$, ylabel=axe $y$]
@@ -1071,6 +1243,9 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
         %\caption{g}
     \end{tikzpicture}
     \end{center}
+    \caption{•}
+    \end{figure}
+    
 		\subsection{Discussion}
    
     
@@ -1081,13 +1256,14 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
 		
 	\part*{Conclusion et Perspectives}
 	\addcontentsline{toc}{part}{Conclusion et Perspectives}
-	\cite{ref}
+	%\cite{ref}
 	\newpage
 	
 	\part*{Bibliographie}
 	\addcontentsline{toc}{part}{Bibliographie}
 	
 	\bibliographystyle{plain} 
+	%\nocite{*}
 	\bibliography{thesis}
 	
 	\newpage
@@ -1100,7 +1276,188 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
 	\subsection{Modélisation du programme}
 	\subsection{Code et implémentation}
 	
+	\begin{lstlisting}[language=python]
+class Chromosome(object):
+
+	mutationRate = 0
+	problem = 0
+	hashTable = {}
+
+	# Builder 
+	def __init__(self):
+		#Code de la fonction ici
+	
+	def init2(self, solution, itemsRank):
+		#Code de la fonction ici
+	
+	def __lt__(self, chromosome):
+		#Code de la fonction ici
+	
+	def _get_fitnessValue(self):
+		#Code de la fonction ici
+	
+	def _get_solution(self):
+		#Code de la fonction ici
+	
+	def _get_itemsRanks(self):
+		#Code de la fonction ici
+	
+	def _get_hashSolution(self):
+		#Code de la fonction ici
+	
+	def _set_hashSolution(self, new_value):
+		#Code de la fonction ici
+	
+	def _set_itemsRanks(self, new_value):
+		#Code de la fonction ici
+	
+	def _set_solution(self, new_solution):
+		#Code de la fonction ici
+	
+	def _set_fitnessValue(self, new_value):
+		#Code de la fonction ici
+	
+	def __repr__(self):
+		#Code de la fonction ici
+	
+	def __eq__(self, chromosome):
+		#Code de la fonction ici
+	
+	def __ne__(self, chromosome):
+		#Code de la fonction ici
+	
+	def isFeasible(self):
+		#Code de la fonction ici
+	
+	def mutate(self):
+		#Code de la fonction ici
+	
+	def advmutate(self):
+		#Code de la fonction ici
+	
+	def getFeasible(self):
+		#Code de la fonction ici
+	
+	def getCostof(cls, indice, item, rank,solution, secondIndice = -1):
+		#Code de la fonction ici
+	
+	# Class' methods
+	getCostof = classmethod(getCostof)
+
+	# Properties
+	solution = property(_get_solution,_set_solution)
+	fitnessValue = property(_get_fitnessValue,_set_fitnessValue)
+	itemsRank = property(_get_itemsRanks, _set_itemsRanks)
+	hashSolution = property(_get_hashSolution, _set_hashSolution) 
+
+    \end{lstlisting}
+    
+    \begin{lstlisting}[language=python]
+class Population:
+
+	NbMaxPopulation = 0
+	FITNESS_PADDING = 0
+	crossOverRate = 0
+	ga_memory = []
+	gaMemoryLocker = 0
+	MigrationRate = 0
+	crossOverRate = 0
+	
+	# builder 
+	def __init__(self):
+		#Code de la fonction ici
+	
+	def initialize(self, previousPopulation):
+		#Code de la fonction ici
+	
+	def __repr__(self):
+		#Code de la fonction ici
+	
+	def replace(self, chromosome):
+		#Code de la fonction ici
+	
+	def getImproved(self):
+		#Code de la fonction ici
+	
+	def getFitnessData(self):
+		#Code de la fonction ici
+	
+	def mate(self, chromosome1, chromosome2):
+		#Code de la fonction ici
+	
+	def crossover(self, randValue1, randValue2):
+		#Code de la fonction ici
+	
+	def crossPopulation(self):
+		#Code de la fonction ici
+	
+	def insert(self, chromosome):
+		#Code de la fonction ici
+		
+    \end{lstlisting}
+    
+    \begin{lstlisting}[language=python]
+class GeneticAlgorithm:
+
+	#	Class' variables
+	NbMaxPopulation = 25
+	mutationRate = 0.05
+	crossOverRate = 0.80
+	FITNESS_PADDING = 1
+	NumberOfMigrants = 1
+	MigrationRate = 0 
+	nbMainThreads = 3
+	nbSlavesThread = 3
+	NbGenToStop = 7
+
+	# Builder
+	def __init__(self, inst):
+		#Code de la fonction ici
+	
+	def start(self):
+		#Code de la fonction ici
+	
+	def printResults(self):
+		#Code de la fonction ici
+		
+    \end{lstlisting}
+	
+	\newpage
+	\section{Résultats des tests de l'application des algorithmes génétiques parallèles aux instances de PSP}
+	
 	\newpage
 	\section{Glossaire}
+	\begin{description}
+		\item[\emph{Shortage}:] On parle de shortage lorsque c'est possible de ne pas satisfaire toutes les demandes.
+		\vspace*{.3cm}
+		\item[\emph{Backlogging}:] On parle de backlogging lorsqu'on peut satisfaire une demande après sa date limite.
+		\vspace*{.3cm}
+		\item[\emph{Lost sales}:] On parle de \emph{lost sales} lorsqu'on ne peut pas satisfaire du tout une demande. 
+		\vspace*{.3cm}
+		\item[\emph{Chromosome}:] Un ensemble d'informations qui encode certains des aspects d'un individu. En algorithmes évolutionnaires, le chromosome fait souvent référence à un génome.
+		\vspace*{.3cm}
+		\item[\emph{Deme}:] Une population des individus. Les membres d'une "\emph{deme}" typiquement partagent des traits communs.
+		\vspace*{.3cm}
+		\item[\emph{Algorithmes évolutionnaires}:] Une classe d'algorithmes stochastiques basés sur des simplifications des processus évolutionnaires naturels tels que la sélection, la survie du plus fort, le croisement, la mutation, et l'extinction.
+		\vspace*{.3cm}
+		\item[\emph{Gène}:] La plus petite unité dans un génome. Dans un génome de suite de bits, les bits sont des gènes. Dans un tableau de caractères, chaque charactère est un gène. 
+		\vspace*{.3cm}
+		\item[\emph{Programmation génétique}:] Il s'agit de l'utilisation d'algorithmes génétiques dans des programmes informatiques.
+		\vspace*{.3cm}
+		\item[\emph{Allèle}:] Il s'agit d'une des différentes valeurs possibles pour un gène. Dans un génome de suite de bits, les allèles sont 0 et 1.
+		\vspace*{.3cm}
+		\item[\emph{Migration}:] Il s'agit du transfert d'individus d'une population à une autre.
+		\vspace*{.3cm}
+		\item[\emph{Exploration}:] Recherche globale.
+		\vspace*{.3cm}
+		\item[\emph{Exploitation}:] Recherche locale.
+		\vspace*{.3cm}
+		\item[\emph{Wagner-Whitin}:] Il s'agit d'un problème de \emph{lot sizing} avec une condition supplémentaire $h_{t} + p_{t} \geq p_{t+1}$ où $h$ est le coût de stockage et $p$ le coût de production. En d'autres termes, il sera toujours préférable de produire le plus tard possible.
+		\vspace*{.3cm}
+		\item[\emph{Lot sizing}:] Il s'agit du problème de planification de production de base sans restriction particulière.
+		vspace*{.3cm}
+		\item[\emph{Lot sizing}:]
+		
+	\end{description}
 
 \end{document}
