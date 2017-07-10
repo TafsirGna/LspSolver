@@ -60,17 +60,11 @@ class GeneticAlgorithm:
 
 		# In order to create this new population, i use the deep first search(DFS) to create some potential good chromosomes
 
-		# i pick the item, i will start the scheduling with
-		item = randint(1, Chromosome.problem.nbItems)
-		period = Chromosome.problem.deadlineDemandPeriods[item-1][0]
-		rootPerThread = math.ceil((period+1) / GeneticAlgorithm.nbMainThreads)
-
-		# i initialize each thread and put it into the corresponding list 
-		i = period
+		rootPerThread = math.ceil((Chromosome.problem.nbItems) / GeneticAlgorithm.nbMainThreads)
 		threadQueue = []
 		threadCounter = 0
 
-		while i >= 0:
+		for item in range(1, Chromosome.problem.nbItems+1):
 
 			# i initialize the node from which the search of each thread will start
 			root = Node()
@@ -78,18 +72,17 @@ class GeneticAlgorithm:
 			root.currentPeriod = 1
 
 			solution = [0] * Chromosome.problem.nbTimes
-			solution[i] = item
+			solution[0] = item
 			root.solution = solution
 			#print(root.solution)
 			
 			threadQueue.append(copy.deepcopy(root))
 
-			if len(threadQueue) == rootPerThread or i == 0:
+			if len(threadQueue) == rootPerThread or item == Chromosome.problem.nbItems:
 
-				threadQueue.sort()
-				#print(threadQueue)
+				print(threadQueue)
 				# i initialize the thread and put it into a list of threads created for this purpose
-				clspThread = ClspThread(threadCounter, list(reversed(threadQueue)))
+				clspThread = ClspThread(threadCounter, list(threadQueue))
 				self.listMainThreads.append(clspThread)
 				#(self.listMainThreads[threadCounter]).start()
 
@@ -98,9 +91,6 @@ class GeneticAlgorithm:
 
 				#if threadCounter == 1:
 				#	break
-
-			i -= 1
-
 
 		
 		# want to make sure that the parent process will wait for the child threading before exiting
