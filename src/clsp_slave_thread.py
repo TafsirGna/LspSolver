@@ -19,12 +19,13 @@ class SlaveThreadsManager:
 
 		super(SlaveThreadsManager, self).__init__()
 		self.listSlaveThreads = []
+		self.mainThread = mainThread
 
 		i = 0
 		while i < SlaveThreadsManager.nbSlavesThread:
 			
 			slaveThread = SlaveThread(i, mainThread)
-			slaveThread.queue = copy.deepcopy(mainThread.queue)
+			#slaveThread.queue = copy.deepcopy(mainThread.queue)
 
 			if i != 0:
 				slaveThread.mateDoneEvent = (self.listSlaveThreads[i-1]).doneEvent
@@ -35,11 +36,25 @@ class SlaveThreadsManager:
 
 	def initPop(self):
 		
+		threadQueue = []
+		nodePerSlave = math.ceil(len(self.mainThread.queue) / SlaveThreadsManager.nbSlavesThread)
+		counterSlave = 0
+		for node in self.mainThread.queue:
+			threadQueue.append(node)
+			if len(threadQueue) == nodePerSlave:
+				(self.listSlaveThreads[counterSlave]).queue = copy.deepcopy(threadQueue)
+				counterSlave += 1
+				threadQueue = []
+
+		if threadQueue != []:
+			(self.listSlaveThreads[counterSlave]).queue = copy.deepcopy(threadQueue)
+
+		
 		for thread in self.listSlaveThreads:
 
 			thread.action = 0
 			thread.start()
-
+		
 		#print("Nb Slaves : ", SlaveThreadsManager.nbSlavesThread)
 		(self.listSlaveThreads[SlaveThreadsManager.nbSlavesThread-1]).doneEvent.wait()
 

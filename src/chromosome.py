@@ -504,112 +504,90 @@ class Node(object):
 	def __init__(self):
 
 		self._solution = []
-		self._currentItem = 0
 		self._currentPeriod = 0
 		self.fitnessValue = 0
-		self.remPeriods = []
+		self.tab = []
 
-		self.remItems = []
-		for i in range(Chromosome.problem.nbItems):
-			self.remItems.append(i + 1)
+		# i make calculations over the number of zero that gonna be in a string of a chromosome.
+		nbZero = Chromosome.problem.nbTimes
+		for deadlines in Chromosome.problem.deadlineDemandPeriods:
+			nbZero -= len(deadlines)
+		tabZero = [0] * nbZero
+		self.tab += copy.deepcopy(Chromosome.problem.deadlineDemandPeriods)
+		self.tab.append(tabZero)
 
 	def __repr__(self):
-		return "Chromosome : " + str(self._solution) + ", " + str(self.fitnessValue)
+		return "Chromosome : " + str(self._solution) + ", " + str(self.fitnessValue) +  ", " + str(self._currentPeriod) + ", " + str(self.tab) + ";" 
 		#" Current Item : " + str(self.currentItem) + " Current Period : " + str(self.currentPeriod) + " Item Counter : " + str(self.itemCounter) + " Fitness value : " + 
 
 	def isLeaf(self):
 		
-		#if self.itemCounter == Chromosome.problem.nbItems and self.currentPeriod == len(Chromosome.problem.deadlineDemandPeriods[self.currentItem-1]):
-		#	return True
-		#return False
-
-		if self.remItems == [] and self.remPeriods == []:
+		if self._currentPeriod == Chromosome.problem.nbTimes:
 			return True
 		return False
 
-	def getChildren(self):
+	def isGood(self):
 		
-		children = []
-		#print(self.remItems, " : ",self.remPeriods)
+		for deadlines in self.tab:
+			if deadlines != []:
+				return False
+		return True
+		
 
-		nextItem = 0
-		nextPeriod = 0
+	def getChildren(self):
 
-		# i produce the successors of this current node
-		if self.remPeriods != []:
-
-			nextItem = self.currentItem
-			nextPeriod = self.remPeriods[randint(0, len(self.remPeriods)-1)]
-
-		elif self.remItems != []:
-
-			nextItem = self.remItems[randint(0, len(self.remItems)-1)]
-			nextPeriod = randint(1, len(Chromosome.problem.deadlineDemandPeriods[nextItem-1]))
-
-		if nextItem != 0:
-
-			#print(" log getChildren : ", nextItem, " : ", nextPeriod)
-			children = list(self.putNextItem(nextItem, nextPeriod))
-			#print(self.queue)
-
-		return children
-
-	def buildRemPeriod(self):
-
-		self.remPeriods = []
-		for i in range(len(Chromosome.problem.deadlineDemandPeriods[self._currentItem-1])):
-			self.remPeriods.append(i + 1)
-
-	def putNextItem(self, nextItem, nextPeriod):
-
-		period = Chromosome.problem.deadlineDemandPeriods[nextItem-1][nextPeriod-1]
-
-		i = period
+		nextPeriod = self._currentPeriod + 1
+		#print("nextPeriod : ", nextPeriod, len(self.tab))
 		childrenQueue = []
 
-		while i >= 0:
+		# i take into account the fact that the value of a gene can be zero
+		if self.tab[len(self.tab)-1] != []:
+			solution = list(self.solution)
+			solution[nextPeriod - 1] = 0
+			nextNode = copy.deepcopy(self)
+			nextNode.currentPeriod = nextPeriod
+			nextNode.solution = solution
+			tempTab = copy.deepcopy(self.tab)
+			del tempTab[Chromosome.problem.nbItems][0]
+			nextNode.tab = copy.deepcopy(tempTab)
+			childrenQueue.append(copy.deepcopy(nextNode))
 
-			if self.solution[i] == 0 : 
+		i = 0
+		while i < len(self.tab) - 1:
 
-				solution = list(self.solution)
-				solution[i] = nextItem
+			if self.tab[i] != []:
+				#print ("i : ", i , self.tab[i], self.tab[i][0])
 
-				nextNode = copy.deepcopy(self)
-				if nextItem != self.currentItem:
-					nextNode.currentItem = nextItem
-					nextNode.buildRemPeriod()
+				if self.tab[i][0] >= nextPeriod - 1: 
+
+					solution = list(self.solution)
+					solution[nextPeriod - 1] = i + 1
+
+					nextNode = copy.deepcopy(self)
 					nextNode.currentPeriod = nextPeriod
-				else:
-					nextNode.currentPeriod = nextPeriod
+					nextNode.solution = solution
+					tempTab = copy.deepcopy(self.tab)
+					del tempTab[i][0]
+					nextNode.tab = copy.deepcopy(tempTab)
 
-				nextNode.solution = solution
+					#print("nextNode : ", nextNode)
 
-				childrenQueue.append(copy.deepcopy(nextNode))
+					childrenQueue.append(copy.deepcopy(nextNode))
 
-			i -= 1
+			i += 1
 
 		#print("childrenQueue : ", list(reversed(childrenQueue)), "---")
 		childrenQueue.sort()
-		return reversed(childrenQueue)
+		return list(reversed(childrenQueue))
+		#return list(childrenQueue)
 		#print(self.queue, "---")
 	
-
-	def _get_currentItem(self):
-		return self._currentItem
-
-	def _set_currentItem(self, new_value):
-		self._currentItem = new_value
-		self.remItems.remove(new_value)
-
-		self.buildRemPeriod()
-		#self.nbCurrentItemDeadlines = len(Chromosome.problem.deadlineDemandPeriods[self.currentItem-1])
 
 	def _get_currentPeriod(self):
 		return self._currentPeriod
 
 	def _set_currentPeriod(self, new_value):
 		self._currentPeriod = new_value
-		self.remPeriods.remove(new_value)
 
 	def _get_solution(self):
 		return self._solution
@@ -678,6 +656,5 @@ class Node(object):
 	evaluate = classmethod(evaluate)
 
 	# Properties
-	currentItem = property(_get_currentItem, _set_currentItem)
 	currentPeriod = property(_get_currentPeriod, _set_currentPeriod)
 	solution = property(_get_solution, _set_solution)

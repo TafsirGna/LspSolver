@@ -35,7 +35,8 @@ class ClspThread(Thread):
 	def run(self):
 		
 		self.slaveThreadsManager.initPop()
-		#print (self.name, " ", "Initial Population : ", self.population)
+		print (self.name, " ", "Initial Population : ", self.population)
+
 		self.population.getImproved()
 		self.population.getFitnessData()
 
@@ -117,35 +118,50 @@ class ClspThread(Thread):
 	def initSearch(self, queue):
 		
 		queueSize = len(queue)
-		currentNode = copy.deepcopy(queue[queueSize-1])
-		del queue[queueSize-1]
+		indice = randint(0, queueSize - 1)
+		currentNode = copy.deepcopy(queue[indice])
+		del queue[indice]
 		#print("Queue : ", self.queue)
 
 		while True:
 
 			if currentNode.isLeaf():
+				#print("Yes : ", currentNode)
+				if currentNode.isGood():
+					c = Chromosome()
+					c.init1(list(currentNode.solution), currentNode.fitnessValue)
+					#c.advmutate()
 
-				c = Chromosome()
-				c.init1(list(currentNode.solution), currentNode.fitnessValue)
-				#c.advmutate()
-
-				self.population.locker.acquire()
-				if len(self.population.chromosomes) >= Population.NbMaxPopulation:
+					self.population.locker.acquire()
+					if len(self.population.chromosomes) >= Population.NbMaxPopulation:
+						self.population.locker.release()
+						break
+					if c not in self.population.chromosomes:
+						self.population.chromosomes.append(copy.deepcopy(c))
 					self.population.locker.release()
-					break
-				if c not in self.population.chromosomes:
-					self.population.chromosomes.append(copy.deepcopy(c))
-				self.population.locker.release()
 
+				#print("inter : ", self.queue)
+				'''
+				queueSize = len(queue)
+				if queueSize == 0:
+					#if self.population.listFitnessData == []:
+					#	self.population.getFitnessData()
+					break
+		
+				currentNode = copy.copy(queue[queueSize-1])
+				del queue[queueSize-1]
+				'''
 			else:
 
 				#print ("current Node : ", currentNode)
-
 				l = currentNode.getChildren()
 				#print("Children : ", l)
+				
+				#queueSize1 = len(queue)
 				queue += l
+				#print("indice : ", currentNode)
+				#print("inter : ", queue)
 
-			#print("inter : ", self.queue)
 			queueSize = len(queue)
 			if queueSize == 0:
 				#if self.population.listFitnessData == []:
@@ -155,6 +171,20 @@ class ClspThread(Thread):
 			currentNode = copy.copy(queue[queueSize-1])
 			del queue[queueSize-1]
 
+			'''
+			queueSize2 = len(queue)
+			if queueSize2 == 0:
+				break
+	
+			indice = 0
+			if l != []:
+				indice = randint(0,len(l)-1)
+				currentNode = copy.copy(queue[indice + queueSize1])
+				del queue[indice + queueSize1]
+			else:
+				currentNode = copy.copy(queue[queueSize2 - 1])
+				del queue[queueSize2 - 1]
+			'''
 
 		#print (self.name, " ", "Initial Population : ", self.population)
 
