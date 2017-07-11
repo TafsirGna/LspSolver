@@ -542,6 +542,7 @@ class Node(object):
 
 		# i take into account the fact that the value of a gene can be zero
 		if self.tab[len(self.tab)-1] != []:
+
 			solution = list(self.solution)
 			solution[nextPeriod - 1] = 0
 			nextNode = copy.deepcopy(self)
@@ -550,30 +551,57 @@ class Node(object):
 			tempTab = copy.deepcopy(self.tab)
 			del tempTab[Chromosome.problem.nbItems][0]
 			nextNode.tab = copy.deepcopy(tempTab)
-			childrenQueue.append(copy.deepcopy(nextNode))
 
+			# Before putting this nodes in the queue, i check that there's still places for the other products
+			#print ("log getChildren : ", nextNode)
+			ok = True
+			i = 0
+			while i < len(nextNode.tab) - 1:
+				deadlines = nextNode.tab[i]
+				if deadlines != [] and deadlines[0] <= (nextPeriod-1):
+					ok = False
+					break
+				i += 1
+
+			if ok: 
+				childrenQueue.append(copy.deepcopy(nextNode))
+			
+			#childrenQueue.append(copy.deepcopy(nextNode))
+			#print ("log getChildren : ", childrenQueue, nextNode.tab, " : ", nextNode.currentPeriod) 
+		#print("cool")
 		i = 0
 		while i < len(self.tab) - 1:
-
+			#print ("log getChildren 1 : ", self.tab[i], " : ", i)
 			if self.tab[i] != []:
 				#print ("i : ", i , self.tab[i], self.tab[i][0])
+				solution = list(self.solution)
+				solution[nextPeriod - 1] = i + 1
 
-				if self.tab[i][0] >= nextPeriod - 1: 
+				nextNode = copy.deepcopy(self)
+				nextNode.currentPeriod = nextPeriod
+				nextNode.solution = solution
+				tempTab = copy.deepcopy(self.tab)
+				del tempTab[i][0]
+				nextNode.tab = copy.deepcopy(tempTab)
 
-					solution = list(self.solution)
-					solution[nextPeriod - 1] = i + 1
-
-					nextNode = copy.deepcopy(self)
-					nextNode.currentPeriod = nextPeriod
-					nextNode.solution = solution
-					tempTab = copy.deepcopy(self.tab)
-					del tempTab[i][0]
-					nextNode.tab = copy.deepcopy(tempTab)
-
-					#print("nextNode : ", nextNode)
-
+				#print("nextNode : ", nextNode)
+				# Before putting this nodes in the queue, i check that there's still places for the other products
+				#print ("log getChildren : ", nextNode) 
+				
+				ok = True
+				j = 0
+				while j < len(nextNode.tab) - 1:
+					deadlines = nextNode.tab[j]
+					if deadlines != [] and deadlines[0] <= nextPeriod - 1:
+						ok = False
+						break
+					j += 1
+				#print ("log getChildren : ", nextNode, " : ", ok) 
+				if ok : 
 					childrenQueue.append(copy.deepcopy(nextNode))
-
+				
+				#childrenQueue.append(copy.deepcopy(nextNode))
+				
 			i += 1
 
 		#print("childrenQueue : ", list(reversed(childrenQueue)), "---")

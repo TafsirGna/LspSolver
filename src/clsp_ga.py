@@ -93,8 +93,8 @@ class GeneticAlgorithm:
 				#	break
 
 		# want to make sure that the parent process will wait for the child threading before exiting
-		#(self.listMainThreads[0]).start()
-		#(self.listMainThreads[0]).join()
+		#(self.listMainThreads[1]).start()
+		#(self.listMainThreads[1]).join()
 		
 		for thread in self.listMainThreads:
 			thread.start()
