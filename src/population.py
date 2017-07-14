@@ -39,6 +39,7 @@ class Population:
 		self.prevPopData.append(copy.deepcopy(previousPopulation.listFitnessData))
 
 		self.slaveThreadsManager.crossoverPop(self)
+		#self.chromosomes.sort()
 
 	def __repr__(self):
 		
@@ -62,8 +63,6 @@ class Population:
 
 			self.chromosomes.append(copy.deepcopy(chromosome))
 
-			self.chromosomes.sort()
-
 			# After inserting a new good chromosome into the population, i remove a bad one
 			del self.chromosomes[len(self.chromosomes)-1]
 
@@ -72,6 +71,8 @@ class Population:
 	def getImproved(self):
 
 		self.slaveThreadsManager.improvePop(self.chromosomes)
+		self.chromosomes.sort()
+		self.listFitnessData = []
 
 	def getFitnessData(self):
 
@@ -240,6 +241,7 @@ class Population:
 			self.locker.acquire()
 
 			if len(self.chromosomes) >= len(previousPopulation.chromosomes):
+				self.chromosomes.sort()
 				self.getFitnessData()
 				self.locker.release()	
 				break
@@ -265,6 +267,7 @@ class Population:
 			limit = len(self.previousPopulation.chromosomes)
 		
 		if popSize >= limit:
+			self.chromosomes.sort()
 			self.getFitnessData()
 			self.locker.release()
 			return 
@@ -278,7 +281,6 @@ class Population:
 				return
 
 		self.chromosomes.append(copy.deepcopy(chromosome))
-		self.chromosomes.sort()
 
 		#print("Yes ", population.chromosomes)
 		# Free lock to release next thread

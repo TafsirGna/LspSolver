@@ -37,6 +37,7 @@ class SlaveThreadsManager:
 	def initPop(self):
 		
 		threadQueue = []
+		#print("master : ", self.mainThread.queue)
 		nodePerSlave = math.ceil(len(self.mainThread.queue) / SlaveThreadsManager.nbSlavesThread)
 		counterSlave = 0
 		for node in self.mainThread.queue:
@@ -116,6 +117,7 @@ class SlaveThread(Thread):
 		
 		if self.action == 0 and self.queue != []: # if i want to initialize the first population
 
+			#print("slave : ", self.queue)
 			self.mainThread.initSearch(self.queue)
 			self.queue = []
 

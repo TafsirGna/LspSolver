@@ -47,6 +47,7 @@ class Chromosome(object):
 			hashTableData = Chromosome.hashTable[self.hashSolution]
 			self._fitnessValue = hashTableData[0]
 
+		# TODO
 		self._get_itemsRanks()
 
 	def __lt__(self, chromosome):
@@ -274,6 +275,7 @@ class Chromosome(object):
 
 		solution1 = list(self._solution)
 		itemsRank1 = self.itemsRank
+		resultingChromosomes = []
 
 		i = 0
 		while i < Chromosome.problem.nbTimes:
@@ -281,30 +283,23 @@ class Chromosome(object):
 			if solution1[i] != 0:
 
 				item1 = solution1[i]
+				item2 = 0
 
-				item2 = 1
+				item1DemandPeriod = Chromosome.problem.deadlineDemandPeriods[item1-1][itemsRank1[i]-1]
+				j = item1DemandPeriod
+				solution2 = []
+				while j >= 0:
 
-				while item2 <= Chromosome.problem.nbItems :
-					
-					if item2 != item1:
+					if solution1[j] != 0 and solution1[j] != item1:
 
+						item2 = solution1[j]
 						item2DemandPeriods = Chromosome.problem.deadlineDemandPeriods[item2-1]
-
-						#print(" i : ", i," item2 : ", item2, " item2DemandPeriods : ", item2DemandPeriods)
-						j = i
-						solution2 = []
-						while j >= 0:
-							if solution1[j] == item2:
-								#print(" item's rank value : ", itemsRank[j], " j : ", j)
-								if item2DemandPeriods[itemsRank1[j]-1] >= i:
-									solution2 = switchGenes(solution1, j, i)
-									itemsRank2 = switchGenes(itemsRank1, j, i)									
-									break
-							j-=1
-
-						# i check if the resulting chromosome would have a better fitness than the current's fitness
-						if solution2 != []:
-
+						#print(" item's rank value : ", itemsRank[j], " j : ", j)
+						if item2DemandPeriods[itemsRank1[j]-1] >= i and item1DemandPeriod >= j :
+							solution2 = switchGenes(solution1, j, i)
+							# TODO
+							itemsRank2 = switchGenes(itemsRank1, j, i)									
+							
 							c = Chromosome()
 							c.init1(solution2)
 							if c.fitnessValue < self.fitnessValue:
@@ -312,12 +307,26 @@ class Chromosome(object):
 								self._itemsRank = c.itemsRank
 								self._fitnessValue = c.fitnessValue
 								self._hashSolution = c.hashSolution
+					
+					'''
+					if solution1[j] == 0:
+						solution2 = switchGenes(solution1, j, i)
+						# TODO
+						itemsRank2 = switchGenes(itemsRank1, j, i)
 
-					item2 += 1
+						c = Chromosome()
+						c.init1(solution2)
+						if c.fitnessValue < self.fitnessValue:
+							self._solution = c.solution
+							self._itemsRank = c.itemsRank
+							self._fitnessValue = c.fitnessValue
+							self._hashSolution = c.hashSolution
+					'''
+
+					j-=1
 
 			i+=1
 
-	
 	def getFeasible(self):
 
 		#print(" In Chromosome 1 : ", self._solution)
@@ -536,6 +545,19 @@ class Node(object):
 
 	def getChildren(self):
 
+		# first, i check if the node that i have to get the children from, is available for.
+		ok = True
+		i = 0
+		while i < len(self.tab) - 1:
+			deadlines = self.tab[i]
+			if deadlines != [] and deadlines[0] <= self.currentPeriod - 1:
+				ok = False
+				break
+			i += 1
+		#print ("log getChildren : ", nextNode, " : ", ok) 
+		if not ok : 
+			return []
+
 		nextPeriod = self._currentPeriod + 1
 		#print("nextPeriod : ", nextPeriod, len(self.tab))
 		childrenQueue = []
@@ -543,6 +565,7 @@ class Node(object):
 		# i take into account the fact that the value of a gene can be zero
 		if self.tab[len(self.tab)-1] != []:
 
+			#print("yes")
 			solution = list(self.solution)
 			solution[nextPeriod - 1] = 0
 			nextNode = copy.deepcopy(self)
@@ -553,21 +576,9 @@ class Node(object):
 			nextNode.tab = copy.deepcopy(tempTab)
 
 			# Before putting this nodes in the queue, i check that there's still places for the other products
-			#print ("log getChildren : ", nextNode)
-			ok = True
-			i = 0
-			while i < len(nextNode.tab) - 1:
-				deadlines = nextNode.tab[i]
-				if deadlines != [] and deadlines[0] <= (nextPeriod-1):
-					ok = False
-					break
-				i += 1
-
-			if ok: 
-				childrenQueue.append(copy.deepcopy(nextNode))
-			
-			#childrenQueue.append(copy.deepcopy(nextNode))
-			#print ("log getChildren : ", childrenQueue, nextNode.tab, " : ", nextNode.currentPeriod) 
+			#print ("log getChildren 1 : ", nextNode)
+			childrenQueue.append(copy.deepcopy(nextNode))
+			#print ("log getChildren 2 : ", childrenQueue, nextNode.tab, " : ", nextNode.currentPeriod) 
 		#print("cool")
 		i = 0
 		while i < len(self.tab) - 1:
@@ -586,21 +597,8 @@ class Node(object):
 
 				#print("nextNode : ", nextNode)
 				# Before putting this nodes in the queue, i check that there's still places for the other products
-				#print ("log getChildren : ", nextNode) 
-				
-				ok = True
-				j = 0
-				while j < len(nextNode.tab) - 1:
-					deadlines = nextNode.tab[j]
-					if deadlines != [] and deadlines[0] <= nextPeriod - 1:
-						ok = False
-						break
-					j += 1
-				#print ("log getChildren : ", nextNode, " : ", ok) 
-				if ok : 
-					childrenQueue.append(copy.deepcopy(nextNode))
-				
-				#childrenQueue.append(copy.deepcopy(nextNode))
+				#print ("log getChildren 1 : ", nextNode) 
+				childrenQueue.append(copy.deepcopy(nextNode))
 				
 			i += 1
 

@@ -35,13 +35,14 @@ class ClspThread(Thread):
 	def run(self):
 		
 		self.slaveThreadsManager.initPop()
-		print (self.name, " ", "Initial Population : ", self.population)
-
+		#print (self.name, " ", "Initial Population : ", self.population)
+		
 		self.population.getImproved()
 		self.population.getFitnessData()
+		print (self.name, " ", "Initial Population : ", self.population)
+		print (self.name, " ", "Population Data: ", self.population.listFitnessData)
 
-		#print (self.name, " ", "Initial Population : ", self.population)
-
+		
 		# i send the best chromosomes of the population to its neighbors
 		self.sendMigrants()
 
@@ -58,18 +59,20 @@ class ClspThread(Thread):
 				for chromosome in self.immigrants:
 					self.population.replace(chromosome)
 				self.population.listFitnessData = []
+				self.population.chromosomes.sort()
 				self.population.getFitnessData()
 			self.immigrants = []
 			self.locker.release()
 
-			#print (self.name, " ", "Initial Population : " + str(i), self.population, " + ", self.population.listFitnessData)
-			#print (" ")
-
 			population = Population()
 			population.initialize(self.population)
 
+			print (self.name, " ", "Population : " + str(i), population, " + ", population.listFitnessData)
+			print (" ")
+
 			if population.lacksDiversity:
 
+				print("LACKING DIVERSITY")
 				chromosome = copy.deepcopy(population.chromosomes[0])
 			
 				# i store this local optima in the genetic algorithm's memory to remind me that it's already been visited before
@@ -93,6 +96,7 @@ class ClspThread(Thread):
 					population.listFitnessData = []
 					population.getFitnessData()
 					self.sendMigrants()
+			'''
 			else:
 
 				if (population.chromosomes[0]).fitnessValue >= (self.population.chromosomes[0]).fitnessValue:
@@ -103,10 +107,11 @@ class ClspThread(Thread):
 				if nbIdleGen >= ClspThread.NbGenToStop:
 					Population.gaMemoryLocker.acquire()
 					if len(Population.ga_memory) >= 1:
+						Population.ga_memory.append(copy.deepcopy(population.chromosomes[0]))
 						Population.gaMemoryLocker.release()
 						break
 					Population.gaMemoryLocker.release()
-
+			'''
 			self.population = population
 			#if i == 7:
 			#	break
@@ -114,14 +119,15 @@ class ClspThread(Thread):
 			i += 1
 
 		self.NbGenerations = i
+		
 
 	def initSearch(self, queue):
 		
+		#print("Queue : ", queue)
 		queueSize = len(queue)
 		indice = randint(0, queueSize - 1)
 		currentNode = copy.deepcopy(queue[indice])
 		del queue[indice]
-		#print("Queue : ", self.queue)
 
 		while True:
 
@@ -133,6 +139,7 @@ class ClspThread(Thread):
 					#c.advmutate()
 
 					self.population.locker.acquire()
+					#print(self.population.chromosomes)
 					if len(self.population.chromosomes) >= Population.NbMaxPopulation:
 						self.population.locker.release()
 						break
@@ -141,16 +148,7 @@ class ClspThread(Thread):
 					self.population.locker.release()
 
 				#print("inter : ", self.queue)
-				'''
-				queueSize = len(queue)
-				if queueSize == 0:
-					#if self.population.listFitnessData == []:
-					#	self.population.getFitnessData()
-					break
-		
-				currentNode = copy.copy(queue[queueSize-1])
-				del queue[queueSize-1]
-				'''
+				
 			else:
 
 				#print ("current Node : ", currentNode)
@@ -160,38 +158,24 @@ class ClspThread(Thread):
 				#queueSize1 = len(queue)
 				queue += l
 				#print("indice : ", currentNode)
-				#print("inter : ", queue)
+				#print("queue : ", queue)
 
 			queueSize = len(queue)
 			if queueSize == 0:
 				#if self.population.listFitnessData == []:
 				#	self.population.getFitnessData()
 				break
-	
+			
+			#queue.sort()
+			#queue = list(reversed(queue))
+
 			currentNode = copy.copy(queue[queueSize-1])
 			del queue[queueSize-1]
-
-			'''
-			queueSize2 = len(queue)
-			if queueSize2 == 0:
-				break
-	
-			indice = 0
-			if l != []:
-				indice = randint(0,len(l)-1)
-				currentNode = copy.copy(queue[indice + queueSize1])
-				del queue[indice + queueSize1]
-			else:
-				currentNode = copy.copy(queue[queueSize2 - 1])
-				del queue[queueSize2 - 1]
-			'''
 
 		#print (self.name, " ", "Initial Population : ", self.population)
 
 	def sendMigrants(self):
-
-		#self.locker
-
+		
 		if self.population.chromosomes != []:
 
 			chromosomes = []
@@ -204,7 +188,9 @@ class ClspThread(Thread):
 				if thread.getName() != self.name:
 					thread.receiveMigrants(chromosomes)
 
+			#print("Migrants : ", chromosomes)
+
 	def receiveMigrants(self, chromosomes):
 		self.locker.acquire()
-		self.immigrants += chromosomes
+		self.immigrants += copy.deepcopy(chromosomes)
 		self.locker.release()
