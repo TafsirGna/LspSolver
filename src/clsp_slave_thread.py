@@ -2,7 +2,7 @@
 # -*-coding: utf-8 -*
 
 from clsp_ga_library import *
-from population import *
+from chromosome import *
 
 #--------------------
 # Class : SlaveThreadsManager
@@ -15,7 +15,7 @@ class SlaveThreadsManager:
 	"""docstring for SlaveThreadsManager"""
 	nbSlavesThread = 0
 
-	def __init__(self, mainThread,):
+	def __init__(self, mainThread):
 
 		super(SlaveThreadsManager, self).__init__()
 		self.listSlaveThreads = []
@@ -50,9 +50,7 @@ class SlaveThreadsManager:
 		if threadQueue != []:
 			(self.listSlaveThreads[counterSlave]).queue = copy.deepcopy(threadQueue)
 
-		
 		for thread in self.listSlaveThreads:
-
 			thread.action = 0
 			thread.start()
 		
@@ -68,7 +66,7 @@ class SlaveThreadsManager:
 		slaveQueue = []
 		counter = 0
 		for chromosome in chromosomes:
-			slaveQueue.append(chromosome)
+			slaveQueue.append(chromosome) # TODO
 			i += 1
 			if i == nodePerSlave:
 				(self.listSlaveThreads[counter]).queue = copy.deepcopy(slaveQueue)
@@ -87,11 +85,10 @@ class SlaveThreadsManager:
 		
 		(self.listSlaveThreads[SlaveThreadsManager.nbSlavesThread-1]).doneEvent.wait()
 
-	def crossoverPop(self, population):
+	def crossoverPop(self):
 
 		for thread in self.listSlaveThreads:
 			thread.action = 2 # i want to perform cross over between chromosomes of the current population
-			thread.population = population
 			thread.doneEvent.clear()
 			
 		for thread in self.listSlaveThreads:
@@ -111,7 +108,6 @@ class SlaveThread(Thread):
 		self.action = -1
 		self.doneEvent = Event()
 		self.mateDoneEvent = 0
-		self.population = 0
 
 	def run(self):
 		
@@ -125,13 +121,13 @@ class SlaveThread(Thread):
 
 			for chromosome in self.queue:
 				chromosome.advmutate()
-				self.mainThread.population.replace(chromosome)
+				self.mainThread.replace(chromosome)
 
 			#self.mainThread.population.chromosomes.sort()
 			self.queue = []
 
 		elif self.action == 2:
-			self.population.crossPopulation()
+			self.mainThread.crossPopulation()
 
 		if self.threadId != 0:
 			self.mateDoneEvent.wait()

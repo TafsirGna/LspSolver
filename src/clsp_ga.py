@@ -36,13 +36,13 @@ class GeneticAlgorithm:
 		Chromosome.hashTable = self.hashTable
 
 		# i set some class' properties of Population class
-		Population.NbMaxPopulation = GeneticAlgorithm.NbMaxPopulation
-		Population.FITNESS_PADDING = GeneticAlgorithm.FITNESS_PADDING
-		Population.ga_memory = self.ga_memory
-		Population.gaMemoryLocker = threading.Lock()
-		Population.MigrationRate = GeneticAlgorithm.MigrationRate
-		Population.crossOverRate = GeneticAlgorithm.crossOverRate
+		ClspThread.FITNESS_PADDING = GeneticAlgorithm.FITNESS_PADDING
+		#Population.ga_memory = self.ga_memory
+		#Population.gaMemoryLocker = threading.Lock()
+		ClspThread.MigrationRate = GeneticAlgorithm.MigrationRate
+		ClspThread.crossOverRate = GeneticAlgorithm.crossOverRate
 
+		ClspThread.NbMaxPopulation = GeneticAlgorithm.NbMaxPopulation
 		ClspThread.listMainThreads = self.listMainThreads
 		ClspThread.NbGenToStop = GeneticAlgorithm.NbGenToStop
 		SlaveThreadsManager.nbSlavesThread = GeneticAlgorithm.nbSlavesThread
@@ -64,6 +64,7 @@ class GeneticAlgorithm:
 		threadQueue = []
 		threadCounter = 0
 
+		prevThread = 0
 		for item in range(0, Chromosome.problem.nbItems + 1):
 
 			# i initialize the node from which the search of each thread will start
@@ -95,16 +96,56 @@ class GeneticAlgorithm:
 				threadQueue = []
 				threadCounter += 1
 
-				#if threadCounter == 1:
-				#	break
+				if threadCounter == 1:
+					prevThread = clspThread
+				elif threadCounter > 1:
+					clspThread.readyFlag = prevThread.readyEvent
+					prevThread = clspThread
+
+				if threadCounter == 3:
+					break
 
 		# want to make sure that the parent process will wait for the child threading before exiting
 		#(self.listMainThreads[2]).start()
 		#(self.listMainThreads[2]).join()
 		
+		# first, i initialize the population upon which the search will be applied
 		for thread in self.listMainThreads:
 			thread.start()
 			thread.join()
+
+		(self.listMainThreads[len(self.listMainThreads)-1]).readyEvent.wait()
+
+		print("Initialized!!!")
+
+		# then, i launch the search in order to find out the global optima
+		ok = True
+		it = 0
+		while ok:
+			print(it)
+			for thread in self.listMainThreads:
+				thread.run()
+				#print("Pop : ", thread.population)
+
+			(self.listMainThreads[len(self.listMainThreads)-1]).readyEvent.wait()
+
+			for thread in self.listMainThreads:
+				thread.readyEvent.clear()
+
+			ok = False
+			for mainThread in self.listMainThreads:
+				if not mainThread.finished:
+					ok = True
+					break
+
+			if not ok:
+				break
+
+			if it == 12:
+				break
+
+			it += 1
+
 		
 		self.printResults()
 	

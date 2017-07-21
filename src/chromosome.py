@@ -475,19 +475,14 @@ class Chromosome(object):
 			solution[secondIndice] = 0
 
 		cost = 0
+		if item == 0:
+			return cost
+
 		# stocking cost 
 		deadline = cls.problem.deadlineDemandPeriods[item-1][rank-1]
 		cost += (deadline - indice)* int(Chromosome.problem.holdingGrid[item-1])
 
 		#print(" cost 1 : ", cost)
-
-		# change-over cost 
-		nItem, nIndice = nextPeriodItemOf(indice, solution)
-		#print(" nItem : ", nItem, " nIndice : ", nIndice)
-		if nItem != 0:
-			cost += int(Chromosome.problem.chanOverGrid[item-1][nItem-1])
-
-		#print(" cost 2 : ", cost)
 
 		pItem, pIndice = previousPeriodItemOf(indice, solution)
 		#print(" pItem : ", pItem, " pIndice : ", pIndice, " solution : ", solution)
@@ -630,51 +625,14 @@ class Node(object):
 		solution = list(sol)
 
 		fitnessValue = 0
-		grid = Chromosome.problem.chanOverGrid
-
 		# Calculation of all the change-over costs
-		
-		i = 1
-		tmp = solution[0]
-		while i < Chromosome.problem.nbTimes :
-
-			n = solution[i]
-
-			if (tmp == 0):
-				i+=1
-				tmp = n
-			else:
-				
-				if (n != 0):
-					if (n != tmp):
-						fitnessValue += int((grid[tmp-1])[n-1])
-						tmp = n
-				else:
-					tmp = solution[i-1]
-
-					j=i
-					while j < Chromosome.problem.nbTimes and solution[j] == 0:
-						j+=1
-					i=j-1
-				
-				i+=1
-
-		#print(" intermediary cost : ", self._fitnessValue)
-		# Calculation of the sum of holding costs
-
-		itemCounter = [0] * Chromosome.problem.nbItems
-
+		itemsRank = [1] * Chromosome.problem.nbItems
 		i = 0
-		while i < Chromosome.problem.nbTimes:
-
-			item = solution[i]
-
-			if item != 0:
-
-				counter = itemCounter[item - 1] + 1
-				itemCounter[item - 1] = counter
-				fitnessValue += int(Chromosome.problem.holdingGrid[item-1]) * (Chromosome.problem.deadlineDemandPeriods[item-1][counter-1] - i)
-
+		for gene in solution:
+			#print("gene : ", gene, " cost : ", Chromosome.getCostof(i, gene, itemsRank[gene-1], solution))
+			fitnessValue += Chromosome.getCostof(i, gene, itemsRank[gene-1], solution)
+			if gene != 0:
+				itemsRank[gene-1] += 1
 			i += 1
 
 		return fitnessValue
