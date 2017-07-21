@@ -32,6 +32,7 @@ print("-------	Performing the genetic algorithm	--------")
 # i store the time when the solving began
 startTime = time.clock()
 
+#print(Node.evaluate([2,1,0,2,1]))
 genAlgo.start()
 
 # i store the time when the solving ended

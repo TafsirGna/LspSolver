@@ -16,26 +16,6 @@ import time
 # purpose : Containing all the functions or objects needed in the algorithm implementation process
 #--------------------
 
-#---	First part:  The functions
-
-def nextPeriodItemOf(indice, solution):
-	
-	nbTimes = len(solution)
-	if indice < nbTimes-1:
-
-		if solution[indice+1] != 0:
-				return solution[indice+1], indice+1
-		else:
-			j = indice+1
-			while j < nbTimes:
-				if solution[j] != 0:
-					return solution[j], j
-				j+=1
-			return 0,0
-	else:
-		# The case where the variable indice corresponds to the last period and then, there's no next period's item
-		return 0,0
-
 def previousPeriodItemOf(indice, solution):
 
 	if indice > 0:
