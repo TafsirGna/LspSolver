@@ -86,7 +86,6 @@ class SlaveThreadsManager:
 		(self.listSlaveThreads[SlaveThreadsManager.nbSlavesThread-1]).doneEvent.wait()
 
 	def crossoverPop(self):
-
 		for thread in self.listSlaveThreads:
 			thread.action = 2 # i want to perform cross over between chromosomes of the current population
 			thread.doneEvent.clear()

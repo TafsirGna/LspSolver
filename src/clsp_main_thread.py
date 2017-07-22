@@ -28,12 +28,13 @@ class ClspThread(Thread):
 		self.locker = threading.Lock()
 		self.NbGenerations = 0
 		self.readyFlag = 0
+		self.readyFlagId = 0
 		self.readyEvent = Event()
 		self.action = 1
 		self.finished = False
 		self.result = 0
 		self.memory = []
-		self.popDiversity = True
+		self.popLackingDiversity = False
 
 		self.chromosomes = []
 		self.listFitnessData = []
@@ -68,6 +69,7 @@ class ClspThread(Thread):
 			else:
 				self.action = 2
 
+			self.readyFlag = 0
 			self.readyEvent.set()
 			return
 
@@ -86,16 +88,22 @@ class ClspThread(Thread):
 			self.locker.release()
 			#print("ok")
 			self.prevChromosomes = copy.deepcopy(self.chromosomes)
-			self.prevListFitnessData = copy.deepcopy(self.prevListFitnessData)
+			self.prevListFitnessData = copy.deepcopy(self.listFitnessData)
+
+			self.chromosomes = []
+			self.listFitnessData = []
+
+			#print (self.name, " ", "Prev Population : ", self.prevChromosomes, " + ", self.prevListFitnessData, )
+			#print (" ")
 
 			self.slaveThreadsManager.crossoverPop()
 
-			print (self.name, " ", "Population : ", self.chromosomes, " + ", self.listFitnessData)
-			print (" ")
+			#print (self.name, " ", "Population : ", self.chromosomes, " + ", self.listFitnessData)
+			#print (" ")
 
-			if self.popDiversity:
+			if self.popLackingDiversity:
 
-				print("LACKING DIVERSITY")
+				#print("LACKING DIVERSITY - ", self.name)
 				chromosome = copy.deepcopy(self.chromosomes[0])
 			
 				# i store this local optima in the genetic algorithm's memory to remind me that it's already been visited before
@@ -115,11 +123,17 @@ class ClspThread(Thread):
 					self.getFitnessData()
 					self.sendMigrants()
 
-				self.chromosomes = copy.deepcopy(self.prevChromosomes)
+					#self.chromosomes = copy.deepcopy(self.prevChromosomes)
 
-			if self.threadId != 0:
+			if self.readyFlag != 0:
+				#print(self.readyFlag.isSet(), self.readyFlagId)
 				self.readyFlag.wait()
+
+			self.NbGenerations += 1
+
+			self.readyFlag = 0
 			self.readyEvent.set()
+			#print("Set : ", self.threadId, self.readyEvent.isSet())
 
 			return
 
@@ -257,7 +271,7 @@ class ClspThread(Thread):
 			#print(" Fitness Data 1 : ", self.listFitnessData)
 
 			if tmpSumFitness == 0:
-				self.popDiversity = True
+				self.popLackingDiversity = True
 			
 			self.fitnessMean = math.floor(sumAllFitnessValues / popSize)
 
@@ -290,7 +304,7 @@ class ClspThread(Thread):
 		solution4 = []
 
 		#print(Population.crossOverRate)
-		if (randint(0,100) < (Population.crossOverRate*100)):
+		if (randint(0,100) < (ClspThread.crossOverRate*100)):
 
 			# i retrieve a table that stores the period each item has been manufactered for
 			ranks1 = chromosome1.itemsRank
@@ -410,10 +424,10 @@ class ClspThread(Thread):
 		self.locker.acquire()
 		popSize = len(self.chromosomes)
 
-		limit = Population.NbMaxPopulation
+		limit = ClspThread.NbMaxPopulation
 
-		if self.previousPopulation != 0:
-			limit = len(self.previousPopulation.chromosomes)
+		if self.prevChromosomes != []:
+			limit = len(self.prevChromosomes)
 		
 		if popSize >= limit:
 			self.chromosomes.sort()
@@ -422,7 +436,7 @@ class ClspThread(Thread):
 			return 
 
 		
-		if self.previousPopulation != 0:
+		if self.prevChromosomes != []:
 			chromosome.mutate()
 		else:
 			if chromosome in self.chromosomes:

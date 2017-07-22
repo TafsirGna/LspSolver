@@ -26,7 +26,6 @@ class GeneticAlgorithm:
 	def __init__(self, inst):
 
 		self.hashTable = {} #hashTable is a dictionnary
-		self.ga_memory = []
 		self.listMainThreads = [] # i initialize a list that's intended to contain all the main threads of this genetic algorithm program
 		self.moyNbGenerations = 0
 
@@ -83,8 +82,9 @@ class GeneticAlgorithm:
 				solution[0] = item
 				root.solution = solution
 				del root.tab[item-1][0]
-				#print("Root : ", root)
 				threadQueue.append(copy.deepcopy(root))
+
+			#print("Root : ", threadQueue)
 
 			if len(threadQueue) == rootPerThread or item == Chromosome.problem.nbItems:
 
@@ -102,8 +102,8 @@ class GeneticAlgorithm:
 					clspThread.readyFlag = prevThread.readyEvent
 					prevThread = clspThread
 
-				if threadCounter == 3:
-					break
+				#if threadCounter == 1:
+				#	break
 
 		# want to make sure that the parent process will wait for the child threading before exiting
 		#(self.listMainThreads[2]).start()
@@ -118,31 +118,44 @@ class GeneticAlgorithm:
 
 		print("Initialized!!!")
 
+		readyFlag = 0
+		flagId = -1
+		for mainThread in self.listMainThreads:
+			if not mainThread.finished:
+				thread.readyFlag = readyFlag
+				readyFlag = thread.readyEvent
+				thread.flagId = flagId
+				flagId = thread.threadId
+
 		# then, i launch the search in order to find out the global optima
 		ok = True
 		it = 0
 		while ok:
-			print(it)
+
+			#for thread in self.listMainThreads:
+			#	thread.readyEvent.clear()
+
+			#print(it)
 			for thread in self.listMainThreads:
 				thread.run()
 				#print("Pop : ", thread.population)
 
 			(self.listMainThreads[len(self.listMainThreads)-1]).readyEvent.wait()
 
-			for thread in self.listMainThreads:
-				thread.readyEvent.clear()
-
+			# once, the current generation has been produced, i check if i should stop the search and i set the event of each thread
+			readyFlag = 0
 			ok = False
 			for mainThread in self.listMainThreads:
 				if not mainThread.finished:
 					ok = True
-					break
+					thread.readyFlag = readyFlag
+					readyFlag = thread.readyEvent
 
 			if not ok:
 				break
 
-			if it == 12:
-				break
+			#if it == 5:
+			#	break
 
 			it += 1
 
@@ -157,21 +170,20 @@ class GeneticAlgorithm:
 	def printResults(self):
 
 		#print(self.ga_memory)
-		if len(self.ga_memory) != 0:
+		for thread in self.listMainThreads:
+			if not isinstance(thread.result, int):
+				chromosome = thread.result
 
-			self.bestSolution = self.ga_memory[0] # variable that holds the best solution found so far in the search
+		for thread in self.listMainThreads:
+			if not isinstance(thread.result, int) and thread.result.fitnessValue < chromosome.fitnessValue:
+			#if thread.result.fitnessValue < chromosome.fitnessValue:
+				chromosome = thread.result
+			#print(" PRINTING : ", thread.result)
 
-			for chromosome in self.ga_memory:
-				if chromosome.fitnessValue < self.bestSolution.fitnessValue:
-					self.bestSolution = chromosome
-
-			print("The best solution found so far is : ", self.bestSolution.solution)
-			#print(self.population)
-			print("The fitness of this solution is : ", self.bestSolution.fitnessValue)
-
-		else:
-			
-			print("No solutions have been found so far. Please Try again.")
+		
+		print("The best solution found so far is : ", chromosome.solution)
+		#print(self.population)
+		print("The fitness of this solution is : ", chromosome.fitnessValue)
 
 		# i print on the screen the number of generations, the program got through before quiting
 		sumNbGenerations = 0
