@@ -68,21 +68,9 @@ class GeneticAlgorithm:
 
 			# i initialize the node from which the search of each thread will start
 			root = Node()
-			root.currentPeriod = 1
-
-			if item == 0:
-				if root.tab[Chromosome.problem.nbItems] != []:
-					solution = [0] * Chromosome.problem.nbTimes
-					solution[0] = item
-					root.solution = solution
-					del root.tab[Chromosome.problem.nbItems][0]
-					threadQueue.append(copy.deepcopy(root))
-			else:
-				solution = [0] * Chromosome.problem.nbTimes
-				solution[0] = item
-				root.solution = solution
-				del root.tab[item-1][0]
-				threadQueue.append(copy.deepcopy(root))
+			root.currentItem = item
+			#print("root ", root)
+			threadQueue.append(copy.deepcopy(root))
 
 			#print("Root : ", threadQueue)
 
@@ -117,7 +105,7 @@ class GeneticAlgorithm:
 		(self.listMainThreads[len(self.listMainThreads)-1]).readyEvent.wait()
 
 		print("Initialized!!!")
-
+		
 		readyFlag = 0
 		flagId = -1
 		for mainThread in self.listMainThreads:
@@ -161,6 +149,7 @@ class GeneticAlgorithm:
 
 		
 		self.printResults()
+		
 	
 	#--------------------
 	# function : printResults

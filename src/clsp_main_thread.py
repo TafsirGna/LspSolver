@@ -152,7 +152,7 @@ class ClspThread(Thread):
 				#print("Yes : ", currentNode)
 				if currentNode.isGood():
 					c = Chromosome()
-					c.init1(list(currentNode.solution), currentNode.fitnessValue)
+					c.init1(list(currentNode.solution), currentNode.itemsRank, currentNode.fitnessValue)
 					#c.advmutate()
 
 					self.locker.acquire()
@@ -171,6 +171,7 @@ class ClspThread(Thread):
 				#print ("current Node : ", currentNode)
 				l = currentNode.getChildren()
 				#print("Children : ", l)
+				#print(" ")
 				
 				#queueSize1 = len(queue)
 				queue += l
