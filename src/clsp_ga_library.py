@@ -16,6 +16,9 @@ import time
 # purpose : Containing all the functions or objects needed in the algorithm implementation process
 #--------------------
 
+def getCostTabKey(item):
+	return item[3]
+
 def previousPeriodItemOf(indice, solution):
 
 	if indice > 0:

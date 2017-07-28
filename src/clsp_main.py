@@ -32,6 +32,13 @@ print("-------	Performing the genetic algorithm	--------")
 # i store the time when the solving began
 startTime = time.clock()
 
+'''
+c = Chromosome()
+c.init1([2,1,1,2,0], [1,1,2,2,0])
+c.advmutate()
+print(c)
+'''
+
 #print(Node.evaluate([2,1,0,2,1]))
 genAlgo.start()
 

@@ -20,7 +20,7 @@ class Chromosome(object):
 		self._hashSolution = ""
 		self.manufactItemsPeriods = getManufactPeriodsGrid(Chromosome.problem.nbItems, Chromosome.problem.deadlineDemandPeriods) #Chromosome.problem.manufactItemsPeriods 
 
-	def init1(self, solution, itemsRank, fitnessValue = 0):
+	def init1(self, solution, fitnessValue = 0):
 		self._solution = list(solution)
 		self._get_hashSolution()
 
@@ -33,8 +33,8 @@ class Chromosome(object):
 		else:
 			self._fitnessValue = fitnessValue
 
-		#self._get_itemsRanks()
-		self._itemsRank = itemsRank
+		self._get_itemsRanks()
+		#self._itemsRank = itemsRank
 
 	def init2(self, solution, itemsRank):
 		self._solution = list(solution)
@@ -223,10 +223,10 @@ class Chromosome(object):
 							if item2DemandPeriod >= randomIndice:
 								#print(i, randomIndice)
 								solution = switchGenes(self._solution, randomIndice, i)
-								ir = switchGenes(self._itemsRank, randomIndice, i)
+								#ir = switchGenes(self._itemsRank, randomIndice, i)
 
 								c = Chromosome()
-								c.init1(solution, ir)
+								c.init1(solution)
 								self._solution = c.solution
 								self._fitnessValue = c.fitnessValue
 								self._hashSolution = c.hashSolution
@@ -256,9 +256,9 @@ class Chromosome(object):
 								if item1DemandPeriod >= i:
 									#print(i, randomIndice)
 									solution = switchGenes(self._solution, randomIndice, i)
-									ir = switchGenes(self._itemsRank, randomIndice, i)
+									#ir = switchGenes(self._itemsRank, randomIndice, i)
 									c = Chromosome()
-									c.init1(solution, ir)
+									c.init1(solution)
 									self._solution = c.solution
 									self._fitnessValue = c.fitnessValue
 									self._hashSolution = c.hashSolution
@@ -274,6 +274,28 @@ class Chromosome(object):
 
 	# TODO Revamp advmutate function as function mutate is
 
+	def getCostTab(self):
+
+		i = 0
+		costTab = []
+
+		size1 = len(self._solution)
+		for i in range(0, size1):
+
+			if self._solution[i] != 0:
+
+				rec = []
+				rec.append(self._solution[i])
+				rec.append(i)
+				rec.append(self._itemsRank[i])
+				#print (i, " : ", self._solution, self.)
+				rec.append(Chromosome.getCostof(i, self._solution[i], self._itemsRank[i], self._solution))
+				costTab.append(rec)
+
+		costTab = sorted(costTab, key = getCostTabKey)
+		return costTab
+
+	'''
 	def advmutate(self):
 
 		solution1 = list(self._solution)
@@ -314,6 +336,54 @@ class Chromosome(object):
 					j-=1
 
 			i+=1
+	'''
+
+	def advmutate(self):
+		# In order to implement this local search, i try to find out the gene that i call the critical gene, that's to say, the gene
+		# with the highest cost depending on the changeover cost and the holding cost	
+		
+		# We're gonna search the nearby era to find out a better solution to this problem
+		nbResults = 7
+		resultQueue = []
+		queue = []
+		currentNode = AdvMutateNode(self)
+
+		while True:
+
+			children = currentNode.getChildren()
+
+			if children == []:
+
+				resultQueue.append(copy.deepcopy(currentNode))
+				if len(resultQueue) >= nbResults:
+					break
+
+			else:
+
+				queue += copy.deepcopy(children)
+
+				if queue == []:
+					break
+
+				currentNode = queue[len(queue)-1]
+				del queue[len(queue)-1]
+
+		#print("Result Queue : ", resultQueue)
+
+		if resultQueue != []:
+
+			result = resultQueue[len(resultQueue)-1]
+			#print ("Result : ", result)
+			for r in resultQueue:
+				if r.chromosome.fitnessValue < result.chromosome.fitnessValue:
+					result = r
+			#print ("Result : ", result)
+
+			self._solution = copy.deepcopy(result.chromosome.solution)
+			self._itemsRank = copy.deepcopy(result.chromosome.itemsRank)
+			self._fitnessValue = result.chromosome.fitnessValue
+			self._hashSolution = copy.deepcopy(result.chromosome.hashSolution)
+
 
 	def getFeasible(self):
 
@@ -644,3 +714,53 @@ class Node(object):
 	currentPeriod = property(_get_currentPeriod, _set_currentPeriod)
 	solution = property(_get_solution, _set_solution)
 	currentItem = property(_get_currentItem, _set_currentItem)
+
+class AdvMutateNode(object):
+	"""docstring for AdvMutateNode"""
+	def __init__(self, chromosome, gap = 0):
+		super(AdvMutateNode, self).__init__()
+		#self.arg = arg
+
+		self.chromosome = copy.deepcopy(chromosome)
+		self.gap = gap
+
+	def getChildren(self):
+
+		children = []
+		costTab = self.chromosome.getCostTab()
+		#print("iterator : ", it, costTab)
+		i = len(costTab) - 1
+		
+		while i >= 0:
+
+			item = costTab[i][0]
+			indice = costTab[i][1]
+			rank = costTab[i][2]
+
+			j = Chromosome.problem.deadlineDemandPeriods[item-1][rank-1]
+			while j >= indice + 1:
+
+				#if self.chromosome.solution[j] != item and Chromosome.problem.deadlineDemandPeriods[self.chromosome.solution[j]-1][self.chromosome.itemsRank[j]-1] >= indice:
+				if self.chromosome.solution[j] != item:
+					
+					c = Chromosome()
+					c.init1(switchGenes(self.chromosome.solution, indice, j))
+					#print("		j : ", j, c.solution, c.fitnessValue)
+					if c.fitnessValue < self.chromosome.fitnessValue:
+						gap = self.chromosome.fitnessValue - c.fitnessValue
+						child = AdvMutateNode(c, gap)
+						children.append(child)
+				
+				j -= 1
+
+			i -= 1
+
+		children.sort()
+		#print (str(children))
+		return children
+
+	def __lt__(self, node):
+		return self.gap < node.gap
+
+	def __repr__(self):
+		return str(self.chromosome) + " : " + str(self.gap)
