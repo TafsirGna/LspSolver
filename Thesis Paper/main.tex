@@ -116,6 +116,7 @@
 	\hspace*{.5cm} \textbf{DFS} : Depth First Search\\
 	\hspace*{.5cm} \textbf{MIP} : Mixed Integer Programming \\
 	\hspace*{.5cm} \textbf{CP} : Constraint Programming \\
+	\hspace*{.5cm} \textbf{SA} : Simulated Annealing\\
 	\hspace*{.5cm} \textbf{HFC-PGA} : Hierarchical Fine-grained and Coarse-grained Parallel Genetic Algorithms \\
 \hspace*{.5cm} \textbf{HCM-PGA} : Hierarchical Coarse-grained and master-slave Parallel Genetic Algorithms \\
 	\hspace*{.5cm} \textbf{WW} : Wagner-Whitin \\
@@ -160,15 +161,15 @@ et la plus difficile. En effet, de la qualité des décisions qui seront prises
 dépendent la performance et la compétitivité de l’entreprise. Connu dans la
 littérature sous le nom de problème de lot sizing, il a été beaucoup étudié
 ces dernières décennies depuis les travaux de Wagner et Within en 1958. \\
-	\hspace*{.5cm} Différentes versions de dimensionnement de lots ont été proposées dans le littérature, chacune étant spécifique à leur domaine d'application. Récemment, (Houndji et al., “The stockingCost constraint”, 2014) et (Ceschia et al., opthub.uniud.it, 2016) ont expérimenté une variante NP-Difficile du problème de dimensionnement de lots. Cette version est connue comme le “Pigment Sequencing Problem” (Pochet et Wolsey 2006, §14.4) et a été récemment inclue à la bibliothèque CSPlib (Gent and Walsh, 1999, prob058) . Il s'agit de produire plusieurs articles avec une seule machine dont la capacité de production est limitée à un article par période. L'horizon de planification est discret et fini, et il y a des coûts de stockage et des coûts de transition d'une production à une autre. Par ailleurs, les demandes sont normalisées et donc binaires. \\
+	\hspace*{.5cm} Différentes versions de dimensionnement de lots ont été proposées dans le littérature, chacune étant spécifique à leur domaine d'application. Récemment, Houndji et al. \cite{hvr_stockingCost} et Ceschia et al. \cite{opthub} ont expérimenté une variante NP-Difficile du problème de dimensionnement de lots. Cette version est connue comme le “Pigment Sequencing Problem” (Pochet et Wolsey \cite{pochet_wolsey}) et a été récemment inclue à la bibliothèque CSPlib (Gent and Walsh, \cite{gent_walsh}) . Il s'agit de produire plusieurs articles avec une seule machine dont la capacité de production est limitée à un article par période. L'horizon de planification est discret et fini, et il y a des coûts de stockage et des coûts de transition d'une production à une autre. Par ailleurs, les demandes sont normalisées et donc binaires. \\
 	\hspace*{.5cm} Dans la plupart des cas, un problème d’optimisation tel que le problème de dimensionnement de lots se divise naturellement en deux phases : recherche des solutions admissibles puis recherche de la solution à coût optimal parmi ces dernières. Suivant la méthode employée, ce découpage est plus ou moins apparent dans la résolution. L’usage d’un algorithme génétique est adapté à une exploration rapide et globale d’un espace de recherche de taille importante et est capable de fournir plusieurs solutions. Des calculs effectués ont révélé que l'utilisation des algorithmes génétiques pour des problèmes de dimensionnement de lots semble raisonnable dans le cas de grands problèmes où trouver la solution avec d'autres algorithmes reste encore problématique en temps. Ainsi, Il est possible qu'un algorithme génétique convenablement construit et paramétré puisse trouver de bien meilleurs résultats comparativement à ceux trouvés par d'autres algorithmes tels que le programmation en nombre entier et cela pour un même laps de temps considéré.
 	
 	\section*{Notre contribution}
-	Le "Pigment Sequencing Problem" est un problème NP-Difficile d'optimisation combinatoire pour lequel les instances de taille moyenne peuvent être efficacement résolues en utilisant une formulation appropriée de programmation en nombre mixte. Cependant, dans notre revue de littérature, aucun modèle basé sur les algorithmes génétiques n'a encore été proposé pour ce problème. Nous proposons donc deux méthodes basées sur les algorithmes génétiques pour le problème. La première est une méthode appelée "coarse-grained parallel genetic algorithm" qui divise la population globale en sous-populations. La seconde, appelée "fine-grained parallel genetic algorithm" qui réduit le champ de crossover à l'environnement immédiat. Les tests que nous avons menés afin de valider nos deux méthodes ont produit des résultats satisfaisants et confirmé le fait que les algorithmes génétiques sont efficaces quant il s'agit de résoudre des problèmes d'optimisation. 
+	Le "Pigment Sequencing Problem" est un problème NP-Difficile d'optimisation combinatoire pour lequel les instances de taille moyenne peuvent être efficacement résolues en utilisant une formulation appropriée de programmation en nombre mixte. Cependant, dans notre revue de littérature, aucun modèle basé sur les algorithmes génétiques n'a encore été proposé pour ce problème. Nous proposons donc deux méthodes basées sur les algorithmes génétiques pour le problème. La première est une méthode appelée "hierarchical coarsed-grained and master slave parallel genetic algorithm" qui divise la population globale en sous-populations. La seconde, appelée "hierarchical fine-grained and coarse-grained parallel genetic algorithm" qui réduit le champ de croisement à l'environnement immédiat. Les tests que nous avons menés afin de valider nos deux méthodes ont produit des résultats satisfaisants et confirmé le fait que les algorithmes génétiques sont efficaces quant il s'agit de résoudre des problèmes d'optimisation. 
 	 
 	\section*{Organisation du travail}
 
-	Le travail effectué est organisé dans ce document en 3 parties. Le première partie présente une revue de littérature des problèmes de dimensionnement de lots en planification de production en nous concentrant sur les classes de problèmes qui nous concerne particulièrement. Ensuite, nous présentons le PSP, le décrivons et présentons les modèles utilisés dans sa résoution. Nous présentons également dans cette partie les algorithmes génétiques, leurs étapes ainsi que leurs fonctionnement. En deuxième partie, nous détaillons les deux méthodes de recherche utilisés ainsi que les algorithmes utilisés. Ensuite, en dernière et troisième partie, nous expérimentons  nos deux méthodes, présentons les résultats obtenus et comparons ces résultats à l'état de l'art en la matière. Pour finir, nous tirons une conclusion du travail effectué et dressons les perspectives possibles en vue d'améliorer ce qui a été fait.
+	Le travail effectué est organisé dans ce document en 3 parties. Le première partie présente une revue de littérature des problèmes de dimensionnement de lots en planification de production en nous concentrant sur les classes de problèmes qui nous concernent dans notre étude. Ensuite, nous présentons le PSP, le décrivons et présentons les modèles utilisés dans sa résolution. Nous présentons également dans cette partie les algorithmes génétiques, leurs étapes ainsi que leurs fonctionnement. En deuxième partie, nous détaillons les deux méthodes de recherche utilisées ainsi que les algorithmes associés utilisés. Ensuite, en dernière et troisième partie, nous expérimentons  nos deux méthodes, présentons les résultats obtenus et comparons ces résultats à l'état de l'art en la matière. Pour finir, nous tirons une conclusion du travail effectué et dressons les perspectives possibles en vue d'améliorer ce qui a été fait.
 	
 	\newpage
 	
@@ -186,7 +187,7 @@ ces dernières décennies depuis les travaux de Wagner et Within en 1958. \\
 		
  La planification de production s'avère être une tâche très complexe principalement pour les raisons suivantes:
  \begin{itemize}
- 	\item[-] Le plus souvent, une ressource de production n'est pas seulement dédiée à un unique article, mais plutôt utilisée pour produire différents types d'articles. Dans un contexte de processus d'industrie, les ressources de production disponibles ne pas vraiment flexibles et ne peuvent produire qu'un type d'article à la fois. En conséquence, la planification de production se heurte à la compétition entre les articles partageant les mêmes ressources et il faut décider quels articles produire, quand et en quelle quantité, tout en prenant en compte les contraintes liées au système de production. Dans certains cas, ces contraintes peuvent être si rigides que trouver une plan de production valide et faisable peut être difficile.
+ 	\item[-] Le plus souvent, une ressource de production n'est pas seulement dédiée à un unique article, mais plutôt utilisée pour produire différents types d'articles. Dans un contexte de processus d'industrie, les ressources de production disponibles ne sont pas vraiment flexibles et ne peuvent produire qu'un type d'article à la fois. En conséquence, la planification de production se heurte à la compétition entre les articles partageant les mêmes ressources et il faut décider quels articles produire, quand et en quelle quantité, tout en prenant en compte les contraintes liées au système de production. Dans certains cas, ces contraintes peuvent être si rigides que trouver une plan de production valide et faisable peut être difficile.
  	
  	\item[-] Un plan de production doit remplir plusieurs objectifs souvent contradictoires, notamment, garantir un excellent niveau du service-client et minimiser la production et les coûts de stockage. Ainsi, les mesures basiques telles que, ne pas satisfaire la demande excédant les capacités de production et garder une haut niveau de stockage afin d'être capable de répondre à toute demande ne sont pas commercialement acceptables ou encore trop chères. Un bon plan de planification est donc le résultat d'un compromis entre différents objectifs contradictoires.
  	
@@ -204,7 +205,7 @@ Différents critères interviennent dans la classification des problèmes de dim
 
 	\item[\textsl{Le nombre de niveaux}:] Dans le cas où seules les demandes venant de l'extérieur du système sont considérées, on parle de problèmes à un niveau. Un état de l'art sur ce type de problème est proposé par Karimi et al. \cite{karimi} . Lorsqu'il existe une relation entre les produits, on considère des problèmes à plusieurs niveaux. Ce dernier type de problèmes se retrouve fréquemment dans l'industrie.
 
-	\item[\textsl{Le nombre de produits}:] Dans le cas où il n'y a pas de dépendance entre les produits, en particulier, s'il n'y a pas d'utilisation commune de la capacité, nous considérons des problèmes à un seul produit. Dans le cas inverse, on parle de problèmes à plusieurs produits. Un état de l'art sur les problèmes à un produit est proposé par Brahimi et al. [16].
+	\item[\textsl{Le nombre de produits}:] Dans le cas où il n'y a pas de dépendance entre les produits, en particulier, s'il n'y a pas d'utilisation commune de la capacité, nous considérons des problèmes à un seul produit. Dans le cas inverse, on parle de problèmes à plusieurs produits. Un état de l'art sur les problèmes à un produit est proposé par Brahimi et al. \cite{brahimi}.
 
 	\item[\textsl{Les contraintes de capacité}:] Les contraintes de capacité incluent le nombre d'employés, la capacité des machines, la capacité de stockage, etc. Lorsque les contraintes de capacité sont
 introduites dans le modèle, elles rendent le problème plus difficile à résoudre,
@@ -227,17 +228,17 @@ entre les produits.
 	La complexité des problèmes de dimensionnement de lots varie fortement sous l'influence des différents facteurs comme le nombre de produits, le nombre de niveaux, les contraintes de capacité, etc. Nous avons choisi dans cette étude de décrire les problèmes de dimensionnement de lots selon la longueur de la période de l'horizon de temps. Nous allons donc nous intéresser aux problèmes à courtes et longues périodes.
 \subsection{Classes}
 	\subsubsection{Problèmes à courtes périodes}
-	Ces problèmes (\emph{Small time bucket problems}) sont caractérisés par des périodes de l'ordre de quelques heures, et la séquence des lots lors de la production est prise en compte. Quatre types de problèmes sont étudiés dans la littérature. Pour une étude détaillée de tous ces problèmes, nous pourrons nous référer à Drexl and Kimms [35]. Ces différents types de problèmes sont donc:
+	Ces problèmes (\emph{Small time bucket problems}) sont caractérisés par des périodes de l'ordre de quelques heures, et la séquence des lots lors de la production est prise en compte. Quatre types de problèmes sont étudiés dans la littérature. Pour une étude détaillée de tous ces problèmes, nous pourrons nous référer à Drexl and Kimms \cite{drexl_kimms}. Ces différents types de problèmes sont donc:
 	\begin{description}
 		\item[\textsl{Discrete lot-sizing and scheduling problem :}]
-		Ce problème noté DLSP, est initialement formulé par Fleischmann [43]. La principale hypothèse de ce problème est qu'au plus un article peut être produit par
+		Ce problème noté DLSP, est initialement formulé par Fleischmann \cite{fleischmann}. La principale hypothèse de ce problème est qu'au plus un article peut être produit par
 période. Si un article est fabriqué sur une période, alors toute la capacité disponible sur cette période sera utilisée. Généralement, les coûts de lancement sont pris en compte seulement lorsqu'un nouveau lot commence et non à chaque période.
 		\item[\textsl{Continuous setup lot-sizing problem :}]
 		Ce problème noté CSLP est similaire au précédent problème. La différence réside dans le fait que lorsqu'un article est produit sur une période, on utilise la capacité nécessaire pour produire cet article et non la capacité entière comme pour le problème précèdent.
 		\item[\textsl{Proportional lot-sizing and scheduling problem : }] 
-		Dans ce problème, que l'on notera PSLP, la capacité restante pour une période donnée est réutilisée pour produire un second article. Ce problème a été étudié par Drexl et Haase [34] et Kimms et Drexl [78]. Il existe des extensions pour ce problème, par exemple, le cas à plusieurs niveaux et plusieurs machines. Dans [76], Kimms propose de calculer des bornes inférieures, et il résout ce problème à l'aide d'un algorithme génétique dans [77].
+		Dans ce problème, que l'on notera PSLP, la capacité restante pour une période donnée est réutilisée pour produire un second article. Ce problème a été étudié par Drexl et Haase \cite{drexl_haase} et Kimms et Drexl \cite{drexl_kimms}. Il existe des extensions pour ce problème, par exemple, le cas à plusieurs niveaux et plusieurs machines. Dans \cite{kimms}, Kimms propose de calculer des bornes inférieures, et il résout ce problème à l'aide d'un algorithme génétique dans \cite{kimms2}.
 		\item[\textsl{General lot-sizing and scheduling problem : }] 
-		Ce problème noté GLSP, est plus général que les problèmes précédents, puisque le nombre d'articles à produire par période n'est pas restrictif. Il est étudié par Fleischmann et Meyr [44]. Il existe des extensions de ce problème, par exemple en intégrant des temps de lancement de production dépendant de la séquence des lots à produire ([93]).
+		Ce problème noté GLSP, est plus général que les problèmes précédents, puisque le nombre d'articles à produire par période n'est pas restrictif. Il est étudié par Fleischmann et Meyr \cite{fleischmann_meyr}. Il existe des extensions de ce problème, par exemple en intégrant des temps de lancement de production dépendant de la séquence des lots à produire (\cite{meyr}).
 	\end{description}
 	
 	\subsubsection{Problèmes à longues périodes}
@@ -247,9 +248,9 @@ horizons de l'ordre de quelques jours à quelques semaines et sont caractérisé
 	\begin{description}
 		\item[Les problèmes à un niveau et un produit]: \\
 		Ces problèmes ne correspondent pas vraiment à la réalité mais reçoivent beaucoup d'attention et d'intérêt puisque les méthodes mises en œuvre pour les résoudre sont généralisées dans le cas des problématiques à plusieurs niveaux.
-		Les premiers travaux sur cette problématique ont été conduits par Manne [90]
-et Wagner et Whitin [129]. Leur méthode de résolution est utilisée dans plusieurs
-concepts pour résoudre des problèmes plus complexes. Brahimi et al. [16] ont proposé
+		Les premiers travaux sur cette problématique ont été conduits par Manne \cite{manne}
+et Wagner et Whitin \cite{wagner_whitin}. Leur méthode de résolution est utilisée dans plusieurs
+concepts pour résoudre des problèmes plus complexes. Brahimi et al. \cite{brahimi} ont proposé
 un état de l'art sur ces problématiques.		
 		\item[Les problèmes à un niveau et plusieurs produits]: \\
 		Le problème de dimensionnement de lots avec contraintes de capacité est considéré comme un problème complexe puisque la contrainte de capacité engendre un
@@ -275,10 +276,10 @@ problèmes à un produit et sans capacité, chacun solvable en temps polynomial.
 	
 	\subsection{Revue de littérature}
 	Le PSP appartient à la catégorie des DLSP. En effet, il s'agit d'un problème où toute la capacité disponible sur cette période sera utilisée si un article est fabriqué. Nous nous présentons dans cette sous-section une brève revue de littérature des différentes travaux effectués autour du PSP. \\
-	\hspace*{.5cm} Miller et Wolsey (2003) ont formulé le DSLP avec des coûts de préparation indépendants de séquence comme un problème de réseau à flot. Ils ont présentés des formulations MIP pour les différentes extensions (avec \emph{backlogging}, avec stock de sûreté, avec stock initial). Plusieurs variantes et formulations MIP du DLSP ont été proposées et discutées par Pochet et Wolsey (2006). \\
-	\hspace*{.5cm} Gicquel et al. (2009b) presentent une formulation et dérive des inégalités valides pour le DLSP avec plusieurs articles et des coûts et temps de préparation séquentiels; laquelle est une extension du problème proposé par Wolsey(2002). Dans Gicquel et al 2009a, les auteurs ont proposé une nouvelle manière de modeler le DLSP avec plusieurs articles et des coûts et temps de préparation séquentiels; qui exploite le fait que les attributs physiques pertinents des articles, tels que la couleur, la dimension, le niveau de qualité. Cela les a permis de réduire significativement le nombre des variables et des contraintes dans les modèles MIP.\\
-	\hspace*{.5cm}Houndji et al. (2014) ont introduit une nouvelle contrainte globale, qu'ils ont appelée \emph{Stocking Cost} afin d'efficacement résoudre le PSP en programmation par contrainte. Les auteurs l'ont alors testée sur de nouvelles instances et les ont publiées sur CSPlib (Gent et Walsh 1999, prob 58). Les résultats expérimentaux ont montré que le \emph{Stocking cost} est plus efficace en filtrage tout en prenant en compte les autres techniques de décompositions généralement utilisées dans la communauté de la programmation par contrainte. \\
-	\hspace*{.5cm} Plus récemment, Ceschia et al. (2016) ont applique le recuit simulé sur le PSP. Ils ont implémenté une approche qui prend en charge à la fois la faisabilité de la solution et l'optimisation du coût. Dans le but d'illustrer leur méthode, ils ont introduit une procédure de recuit simulé afin de guider la recherche locale.
+	\hspace*{.5cm} Miller et Wolsey \cite{miller_wolsey} ont formulé le DSLP avec des coûts de préparation indépendants de séquence comme un problème de réseau à flot. Ils ont présentés des formulations MIP pour les différentes extensions (avec \emph{backlogging}, avec stock de sûreté, avec stock initial). Plusieurs variantes et formulations MIP du DLSP ont été proposées et discutées par Pochet et Wolsey \cite{pochet_wolsey}. \\
+	\hspace*{.5cm} Gicquel et al. \cite{gicquel_minoux_dallery} présentent une formulation et dérive des inégalités valides pour le DLSP avec plusieurs articles et des coûts et temps de préparation séquentiels; laquelle est une extension du problème proposé par Wolsey \cite{wolsey}. Dans Gicquel et al. \cite {gicquel_miegeville_minoux_dallery}, les auteurs ont proposé une nouvelle manière de modeler le DLSP avec plusieurs articles et des coûts et temps de préparation séquentiels; qui exploite le fait que les attributs physiques pertinents des articles, tels que la couleur, la dimension, le niveau de qualité. Cela les a permis de réduire significativement le nombre des variables et des contraintes dans les modèles MIP.\\
+	\hspace*{.5cm}Houndji et al. \cite{hvr_stockingCost} ont introduit une nouvelle contrainte globale, qu'ils ont appelée \emph{Stocking Cost} afin d'efficacement résoudre le PSP en programmation par contrainte. Les auteurs l'ont alors testée sur de nouvelles instances et les ont publiées sur CSPlib (Gent et Walsh \cite{gent_walsh}). Les résultats expérimentaux ont montré que le \emph{Stocking cost} est plus efficace en filtrage tout en prenant en compte les autres techniques de décompositions généralement utilisées dans la communauté de la programmation par contrainte. \\
+	\hspace*{.5cm} Plus récemment, Ceschia et al. \cite{ceschia} ont appliqué le recuit simulé sur le PSP. Ils ont implémenté une approche qui prend en charge à la fois la faisabilité de la solution et l'optimisation du coût. Dans le but d'illustrer leur méthode, ils ont introduit une procédure de recuit simulé afin de guider la recherche locale.
 	 
 	\subsection{Description du problème}
 
@@ -302,9 +303,10 @@ période et d(i, t) $ \in $ {0, 1} avec i l’article et t la période.\\
 	Soit \emph{xT} le plan de production qui représente une solution potentielle du problème. Il s’agit d’un tableau de dimension \emph{NT} , contenant à son indice t (avec $t  \in  {1...NT}$) l’article i à produire. Une solution admissible du problème est : $ xT = (2, 1, 2, 0, 1)$ avec un coût de $ q(2, 1) + q(1, 2) + q(2, 1) + 2 * h(2) = 15 $. La solution optimale est : $ xT = (2, 1, 0, 1, 2)$ avec un coût de $q(2, 1) + q(1, 2) + h(1) = 10$.
 		
 		\subsection{Modèles et formulations}
-		Différents modèles ont été proposés afin de représenter, modéliser et résoudre le PSP. Les modèles de programmation mixte en nombres entiers ou MIP proposés par Pochet et Wolsey (2006, §14.4) sont dans la littérature, considérés comme l'état de l'art des méthodes de résolution exactes sur les problèmes de dimensionnement de lot en particulier celui du PSP. Nous présentons donc ici les trois modèles MIP dont les deux derniers sont une reformulation de la première.
+		Différents modèles ont été proposés afin de représenter, modéliser et résoudre le PSP. Il s'agit des modèles de programmation mixte en nombres entiers ou MIP (au nombre de 3) proposés par Pochet et Wolsey \cite{pochet_wolsey}, considérés comme l'état de l'art des méthodes de résolution exactes sur les problèmes de dimensionnement de lot en particulier celui du PSP, du modèle CP et du modèle SA. Nous présentons donc ici le premier modèle MIP dont les deux derniers sont une reformulation, le modèle CP (atleast) ainsi que le modèle SA.
 		\subsubsection{Modèle MIP 1}
 		
+		Le modèle MIP 1 tel qu'exposé par Pochet et Wolsey se présente comme suit:
 		\begin{eqnarray}
 			min \sum_{i,j,t} q^{i,j}ch_{t}^{i,j} + \sum_{i,t} h^{i} s_{t}^{i} \\
 			s_{0}^{i} = 0, \forall i \\
@@ -329,38 +331,42 @@ mais parfois il peut être intéressant de préparer
 la machine pour un article intermédiaire sans le produire. La contrainte (6) assigne les valeurs aux variables de changeover.
 En effet, si $y_{t-1}^{i}$ et $y_{t}^{i}$ valent 1 alors $ch_{t}^{i,j}$ est obligé de prendre la valeur 1 et sinon $ch_{t}^{i,j}$ serait égale à 0 grâce à la fonction objectif qui minimise le coût de changeover.
 		
-		\subsubsection{Modèle MIP 2}
-		En remplaçant l'équation 6 par les équations suivantes, on obtient une deuxième formulations du problème.
+		\subsubsection{Modèle CP (atleast)}
+		Dans ce modèle, l’objectif est d’attribuer à chaque période l’article à produire (l’article 0 pour les périodes où on ne produit rien) tout en respectant les spécifications de base du problème. Reconsidérons l’instance de l’exemple 1 et la Figure \ref{fig:cp_modele_figure} pour avoir une première intuition du modèle. 
 		
-		\begin{eqnarray}
-			Equations \ 1,\ 2,\ 3,\ 4,\ 5 \\
-			\sum_{i} ch_{t}^{i,j} = y_{t}^{j}, \forall j,t \\	
-			\sum_{j} ch_{t}^{i,j} = y_{t-1}^{i}, \forall i,t \\
-			\sum_{i} y_{0}^{i} = 1
-			y_{t}^{j} - z_{t-1}^{j} = y_{t-1}^{j} - w_{t-1}^{j} = ch_{t}^{jj}, \forall j,t		
-		\end{eqnarray}
+		\begin{figure}[h]
+		\begin{center}
+			\includegraphics[scale=.5]{img/cp_modele_figure.png}
+			\caption{Principe du modèle CP (atleast) - Pigment Sequencing problem}
+			\label{fig:cp_modele_figure}
+		\end{center}
+		\end{figure}
 		
-		avec les variables de décisions suivantes: \\
+		\textsl{\textbf{Description de la figure \ref{fig:cp_modele_figure}}} \\
 		\begin{itemize}
-			\item[-] $z_{t}^{i}$ : variable binaire qui vaut 1 si la machine est prête pour l'article i dans la période t mais pas la période t-1 ;
-			\item[-] $w_{t}^{i}$ : variable binaire qui vaut 1 si la machine est prête pour l'article i dans la période t mais pas la période t+1 ;
+			\item[-] le plan de production doit contenir exactement deux articles 1 et deux
+articles 2 ;
+			\item[-] \textbf{\emph{1}} correspond à la période 1, le nombre d’articles 2 dans le plan de production doit être d’au moins 1 
+			\item[-] \textbf{\emph{2}} correspond à la période 2, le nombre d’articles 1 et le nombre d’articles 2 dans le plan de production doivent être d’au moins 1 chacun ;
+			\item[-] \textbf{\emph{3}} correspond à la période 5, le nombre d’articles 1 et le nombre d’articles 2 dans le plan de production doivent être d’au moins 2 chacun.
 		\end{itemize}
-		\vspace*{.3cm}
-		\hspace*{.5cm} L'équation (9) indique qu'à la période t, si une machine a été préparée pour l'article j (c’est-à-dire si $y_{t}^{j} = 1$) alors forcément il y a eu passage d’un article (produit à $t-1$) à l’article j en d’autres termes $\sum_{i} ch_{t}^{i,j} = 1$. De la même manière si $y_{t}^{j} = 0$ alors $\sum_{i} ch_{t}^{i,j} = 0$. L'équation 10, sur le même principe que le raisonnement précédent, on voit que si $y_{t-1}^{i} = 1$ alors $ \sum_{j} ch_{t}^{i,j} = 1$ et $y_{t-1}^{i} = 0$ alors $ \sum_{j} ch_{t}^{i,j} = 0$. Au niveau de l'équation 11, ayant utilisé $y_{t-1}^{i}$ avec $t \in \{1..NT\}$, il faut traiter le cas des $y_{0}^{i}$. L'équation 12 précise qu'intuitivement, s’il n’y a pas de setup de l’article $j$ à la période $t$ ($y_{t}^{j}=0$ et $z_{t}^{j}$), alors il n'y a pas de changeover de $j$ à $j$ ($ch_{t}^{tt} = 0$). Si $y_{t}^{j} = 1$ et $z_{t}^{j} = 0$, alors on est passé de la production de $j$ à $j$ à la période $t$ et $ch_{t}^{jj} = 1$. Dans le cas où $z_{t}^{j} = 1$ alors on a pas produit j à la période $t-1$ et donc $ch_{t}^{jj} = 0$. 
 		
-		\subsubsection{Modèle MIP 3}
-		On obtient une troisième modèle en ajoutant l'inégalité valide suivante.
-		\begin{eqnarray}
-			Formulation \  2 \\
-			s_{t-1} + \sum_{u=t}^{t+p-1} y_{u} + \sum_{u=t+1}^{t+p-1} (d_{ul}-(t+p-u))z_{u} + \sum_{u=t+p}^{l} d_{ul}z_{u} \geq s_{tl}
-		\end{eqnarray}
+		\vspace*{.5cm}
+		\textsl{\textbf{Variables de décision}} \\
 		
-		avec les variables de décisions suivantes: \\
-		\begin{itemize}
-			\item[-] $d_{ul}$ : est la somme des demandes dans l'intervalle [$u,l$];
-			\item[-] $p$ :  le nombre de périodes où il y a une demande dans l'intervalle [$t,l$];
-			\item[-] L'équation 14 indique l'inégalité valide sur l'intervalle [$t,l$] $\subseteq$ [$1,NT$] avec $d_{l}=1$ ($d_{l}$ est la demande à la période $l$)
-		\end{itemize}
+		$xT$ (le plan de production) : Elle définit l’article qui sera produit à la période t. Pour représenter l’état de la machine dans lequel on ne produit rien, on introduit l’article artificiel 0. On a $xT : \{1, ..., N T\} \rightarrow \{0, ..., NI\}$. \\
+		
+		\textsl{\textbf{Variables auxiliaires}} \\
+		\begin{description}
+			\item[$yT : \{1, ..., NT\} \rightarrow \{1, ..., NI\}$ :] Cette variable est utile pour le coût de changeover dans la fonction objectif. En effet, à cause de l’article artificiel 0 présent dans le plan de production $xT$ , nous ne savons pas directement estimer les coûts de changeover avec $xT$ . Le tableau $yT$ , de dimension $NT$ , représente la séquence de setup de la machine pendant l’horizon de planification. $yT$ t est égale à $xT_{t}$ s’il y a production d’un article à la période t et est, en général, égale à $xT_{t-1}$ ou $xT_{t+1}$ sinon.
+			\item[$s : s_{it}$:] avec $i \in {1..NI}$ et $t \in {0..NT}$, variable entière de stockage
+définie comme pour le modèle MIP. Elle est utile pour définir la fonction objectif.
+			\item[$x : x_{it}$:] avec $i \in {1..N I}$ et $t \in {1..N T}$, variable binaire définie comme pour le modèle MIP. On peut facilement déduire $x$ de $xT$ ..
+		\end{description}
+		\hspace*{.5cm} L’utilisation des variables $s$ et $x$ dans ce modèle découle de la "difficulté" d’exprimer simplement les coûts de stockage. Pour une compréhension approfondie de ce modèle, nous pourrons nous référer à Houndji \cite{houndji}
+	
+		\subsubsection{Modèle SA}
+		Dans ce modèle, 
 		
 	\section{Les algorithmes génétiques}
 		
@@ -898,25 +904,36 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
 		
 		\subsection{Données de test}
 		
-		Afin de tester nos deux solutions, nous commençons par utiliser un ensemble de 10 instances proposées par Houndji et al. auxquelles ils ont appliquées le CP. Ces instances sont caractérisées par un nombre de périodes \emph{NT} = 20 et un nombre d'articles \emph{NI} = 20. Les résultats seront comparés à ceux obtenus par Houndji et al. dans leur application de l'approche CP à ces instances. %Ces instances sont considérées comme des instances moyennes. D'autres part, nous avons également testé nos algorithmes sur des instances de plus grande taille considérées comme un peu plus difficiles. Nos critères d'analyse sont de deux ordres. Premièrement, nous les avons analysé sous l'angle de la performance en temps. Il s'agit de voir comme ces algorithmes arrivent à répondre aussi rapidement que possible nos instances de PSP.  Le second angle d'analyse d'est porté sur la performance en terme de la qualité de la solution trouvée. Nous avons calculé l'écart entre la solution trouvée et la solution optimale connue dans la littérature. Nous commençons par décrire nos instances de tests.
+		Afin de tester nos deux solutions, nous commençons dans un premier temps par utiliser un ensemble de 10 instances proposées par Houndji et al. auxquelles ils ont appliquées le CP. Ces instances sont caractérisées par un nombre de périodes \emph{NT} = 20 et un nombre d'articles \emph{NI} = 20. Les résultats seront comparés à ceux obtenus par Houndji et al. dans leur application de l'approche CP à ces instances. \\
+		\hspace*{.5cm} Dans un second temps, nous appliquons nos deux solutions à 9 instances proposées dans la bibliothèque CSPlib sur lesquelles Ceschia et al ont testé son approche de solution : l'approche de recuit simulé. Nos résultats sont donc comparés à ceux obtenus par Ceschia et al dans leur applications du recuit simulé à ces problèmes. \\
+		\hspace*{.5cm} Dans les deux cas, nos critères d'analyse sont de deux ordres. Premièrement, nous les avons analysé sous l'angle de la performance en temps. Il s'agit de voir comment ces algorithmes arrivent à répondre aussi rapidement que possible nos instances de PSP.  Le second angle d'analyse s'est porté sur la performance en terme de la qualité de la solution trouvée. Nous avons calculé l'écart entre la solution trouvée et la solution optimale connue dans la littérature.
 		
 		\subsection{Paramètres de test}
-		Les paramètres de test utilisés afin d'effectuer les test sont les suivants:
-		\begin{itemize}
-			\item[•] Taille de la population : 100 individus;
-			\item[•] Probabilité de mutation : 5\%;
-			\item[•] Probabilité de croisement : 80\%;
-			\item[•] Nombre de migrants : 1 individu;
-			\item[•] Nombre de générations sans amélioration avant arrêt : 7 générations;
-			\item[•] Nombre de processus esclaves (cas du HCM-PGA) : 3 processus;
-			\item[•] Nombre de processus principaux : 3 processus;
-			\item[•] Nombre de générations avant migration : 0 génération.
-		\end{itemize}
-		
-	\section{Brève présentation de la programmation par contrainte}	
-	Un problème de satisfaction de contrainte ou \emph{Constraint Satisfaction Problem} (CSP) est une type spécial de problème qui satisfait certaines propriétés structurelles additionnelles desquelles les conditions basiques requises en général. En CSP, les états sont définis par les valeurs d'un ensemble de variables et le test final constitue en une ensemble de contraintes auxquelles doivent obéir les variables. \\
-	\hspace*{.5cm} Ainsi, un CSP est un ensemble fini de variables $X := x1,...,xn$ définis sur les domaines respectifs $D1,...,Dn$ et un ensemble de fini de contraintes $C$, chacune établissant une relation entre un sous-ensemble de variables. Soit $DE = x1 \in D1,..., xn \in Dn$ l'expression des domaines. On peut noter : $CSP = <C,D,E>$. On dira que $(d1,...,dn) \in D1*...*Dn$ est une relation si elle satisfait toutes les contraintes $c \in C$. Le CSP sera dit \emph{consistant} s'il possède une solution et \emph{inconsistant} sinon.Un exemple est un problème des 8 reines qui peut être vu comme un CSP dans lequel les variables sont les locations de chacune des huit reines. Les valeurs possibles sont les carrés sur le tableaux et les contraintes établissent que deux reines ne peuvent rester sur la même ligne, même colonne et même diagonale. \\
-	\hspace*{.5cm} La programmation par contrainte constitue un moyen de formuler et de résoudre ce type de problèmes à travers des algorithmes spécifiques. La CP vise donc à trouver des solutions faisables qui satisfont aux contraintes et présentant un ensemble de valeurs possibles pour chaque variables de décisions.
+		Les paramètres de test utilisés afin d'effectuer les tests sont présentés comme suit selon que le programme soit HCM-PGA ou HFC-PGA:
+
+		\begin{enumerate}
+			\item HCM-PGA \\
+				\begin{itemize}
+					\item[-] Taille de la population : 100 individus;
+			        \item[-] Probabilité de mutation : 5\%;
+			        \item[-] Probabilité de croisement : 80\%;
+			        \item[-] Nombre de migrants : 1 individu;
+		 	        \item[-] Nombre de processus esclaves (cas du HCM-PGA) : 3 processus;
+			        \item[-] Nombre de processus principaux : 3 processus;
+			        \item[-] Nombre de générations avant migration : 0 génération.
+				\end{itemize}
+				\vspace*{.5cm}
+			\item HFC-PGA \\
+				\begin{itemize}
+					\item[-] Taille de la population : 100 individus;
+			        \item[-] Probabilité de mutation : 5\%;
+			        \item[-] Probabilité de croisement : 80\%;
+			        \item[-] Nombre de migrants : 1 individu;
+		 	        \item[-] Nombre de processus esclaves (cas du HCM-PGA) : 3 processus;
+			        \item[-] Nombre de processus principaux : 3 processus;
+			        \item[-] Nombre de générations avant migration : 0 génération.
+				\end{itemize}
+		\end{enumerate}
 		
 		\section{Résultats expérimentaux des algorithmes génétiques parallèles hiérarchiques "fine-grained" et "coarse-grained"}
 		Nous avons pu tester les algorithmes génétiques parallèles hiérarchiques "fine-grained" et "coarse-grained" sur 10 instances de PSP. Les résultats de ces tests sont consignés dans le tableau \ref{alg:principe_fine_grained} à coté de ceux obtenus de l'approche CP. Ce tableau présente les performances en temps et qualité des solutions des algorithmes génétiques parallèles hiérarchiques "fine-grained" et "coarse-grained". Nous avons effectué nos tests à travers 10 essais sur chacune des instances.
@@ -939,7 +956,28 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
 			\textbf{10} & 1493 & 121.909 & 6.77 & 2.49\% & 1497 & 9.8\\
 			\hline
 		\end{tabular}	
-		\caption{Performances du HFC-PGA sur 10 instances du PSP}	
+		\caption{Performances du HFC-PGA et CP sur 10 instances du PSP}	
+	\end{table}			
+	
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{|c|c|c|c|c|c|c|}
+			\hline
+			\textbf{Instance} & \textbf{Opt cost} & \textbf{CP time} & \textbf{GAs time} & \textbf{GAs result gap} & \textbf{GAs Best Sol} & \textbf{Nb Gen}\\
+			\hline
+			\textbf{1} & 1377 & 9.14 & 9.3 & 0.42\% & 1377 & 23.12 \\
+			\textbf{2} & 1447 & 7.292 & 9.09 & 1.67\% & 1447 & 23.98\\
+			\textbf{3} & 1107 & 2.946 & 8.97 & 1.28\% & 1108 & 24.8\\
+			\textbf{4} & 1182 & 1.784 & 7.42 & 1.70\% & 1189 & 20.9\\
+			\textbf{5} & 1471 & 0.235 & 9.91 & 0.11\% & 1471 & 21.7\\
+			\textbf{6} & 2774 & 11.177 & 4.94 & 0.52\% & 2774 & 21.6\\
+			\textbf{7} & 2655 & 12.846 & 4.73 & 1,40\% & 2670 & 22.4\\
+			\textbf{8} & 1473 & 15.039 & 4.15 & 1.65\% & 1473 & 19.5\\
+			\textbf{9} & 3117 & 25.352 & 8.96 & 0.25\% & 3117 & 23.2\\
+			\textbf{10} & 1493 & 121.909 & 6.77 & 2.49\% & 1497 & 9.8\\
+			\hline
+		\end{tabular}	
+		\caption{Performances du HFC-PGA et SA sur 9 instances du PSP}	
 	\end{table}			
 		
 		\section{Résultats expérimentaux des algorithmes génétiques parallèles hiérarchiques "coarse-grained" et "master-slave"}
@@ -964,12 +1002,34 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
 			\textbf{10} & 1493 & 121.909 & 4.37 & 5\% & 1530 & 9.8\\
 			\hline
 		\end{tabular}	
-		\caption{Performances du HCM-PGA sur 10 instances du PSP}	
-	\end{table}			
+		\caption{Performances du HCM-PGA et CP sur 10 instances du PSP}	
+	\end{table}	
+	
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{|c|c|c|c|c|c|c|}
+			\hline
+			\textbf{Instance} & \textbf{Opt cost} & \textbf{CP time} & \textbf{GAs time} & \textbf{GAs result gap} & \textbf{GAs Best Sol} & \textbf{Nb Gen}\\
+			\hline
+			\textbf{1} & 1377 & 9.14 & 9.3 & 0.42\% & 1377 & 23.12 \\
+			\textbf{2} & 1447 & 7.292 & 9.09 & 1.67\% & 1447 & 23.98\\
+			\textbf{3} & 1107 & 2.946 & 8.97 & 1.28\% & 1108 & 24.8\\
+			\textbf{4} & 1182 & 1.784 & 7.42 & 1.70\% & 1189 & 20.9\\
+			\textbf{5} & 1471 & 0.235 & 9.91 & 0.11\% & 1471 & 21.7\\
+			\textbf{6} & 2774 & 11.177 & 4.94 & 0.52\% & 2774 & 21.6\\
+			\textbf{7} & 2655 & 12.846 & 4.73 & 1,40\% & 2670 & 22.4\\
+			\textbf{8} & 1473 & 15.039 & 4.15 & 1.65\% & 1473 & 19.5\\
+			\textbf{9} & 3117 & 25.352 & 8.96 & 0.25\% & 3117 & 23.2\\
+			\textbf{10} & 1493 & 121.909 & 6.77 & 2.49\% & 1497 & 9.8\\
+			\hline
+		\end{tabular}	
+		\caption{Performances du HCM-PGA et SA sur 9 instances du PSP}	
+	\end{table}					
 	
 		\section{Analyse comparative des résultats}
 		Il s'agit dans cette section d'effectuer une analyse comparative des résultats afin de dégager des conclusions. Il serait par exemple intéressant de d'analyser les performances entre algorithmes génétiques parallèles hiérarchiques \emph{fine-grained} et \emph{coarse-grained} et programmation par contrainte d'une part et d'autre part de pouvoir faire de même entre programmation par contrainte et algorithmes génétiques hiérarchiques \emph{coarse-grained} et \emph{master-slave}. Enfin, répondre à la question de savoir qui des algorithmes génétiques parallèles hiérarchiques \emph{coarse-grained} et \emph{fine-grained} et algorithmes génétiques parallèles \emph{master-slave} et \emph{coarse-grained} est le plus performant serait une bonne façon d'achever cette analyse.
-		\subsection{HCM-PGA et Approche CP}
+		
+		\subsection{HFC-PGA et Approche CP}
 		
 	L'approche CP dans son application au PSP s'est avérée efficace. Nous analysons à présent les résultats obtenus en appliquant le HCM-PGA au PSP. Comme le montre la figure \ref{fig:CP_HCM-PGA_time}, avec pour critère de comparaison le temps de recherche. Nous avons pu constater que le HCM-PGA parcourt bien plus vite l'espace de recherche. Il nous est possible de constater que sur certaines instances le gain de temps est dans le meilleur de cas (instance 10) de 96,41\% . En poursuivant notre analyse, nous pouvons  également faire noter que le temps de recherche est relativement constant. Sur des instances où l'approche CP prend beaucoup plus de temps (instances 6,7,8,9 et 10), notre solution HCM-PGA conserve un temps de recherche stable. En conséquence, l'usage de notre solution HCM-PGA s'avère pertinente en matière de temps en comparaison de la solution CP. Analysons à présent la performance de HCM-PGA en matière de qualité de la meilleure solution trouvée sur nos 10 essais.
 	
@@ -1206,6 +1266,236 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
     \caption{Performances comparées de CP et HFC-PGA en fitness moyen des solution trouvées}
     \end{figure}
     
+		\subsection{HFC-PGA et Approche CP}
+		
+	\begin{figure}[!h]
+	\begin{center}
+	\begin{tikzpicture}[scale=0.7]
+       	\begin{axis}[xlabel=instances des PSP testées, ylabel=temps en secondes]
+        %\addplot {x^2+2*x-1};
+        \addplot coordinates {
+        	(1 ,9.14)
+        	(2 ,7.29)
+        	(3 ,2.94)
+        	(4 ,1.78)
+        	(5 ,0.23)
+       		(6 ,11.17)
+       		(7 ,12.84)
+        	(8 ,15.03)
+        	(9 ,25.35)
+        	(10 ,121.90)
+        	};
+        \addlegendentry{CP}
+        \addplot coordinates {
+        	(1 ,9.3)
+        	(2 ,9.09)
+        	(3 ,8.97)
+        	(4 ,7.42)
+        	(5 ,9.91)
+       		(6 ,4.94)
+       		(7 ,4.73)
+        	(8 ,4.15)
+        	(9 ,8.96)
+        	(10 ,6.77)
+        	};
+        \addlegendentry{HFC-PGA}
+        \end{axis}
+        %\caption{g}
+    \end{tikzpicture}
+    \end{center}
+	\caption{Performances comparées de CP et HFC-PGA en temps}
+    \end{figure}
+    
+    \begin{figure}[!h]
+    \begin{center}
+	\begin{tikzpicture}[scale=0.7]
+       	\begin{axis}[xlabel=instances des PSP testées, ylabel=fitness]
+        %\addplot {x^2+2*x-1};
+        \addplot coordinates {
+        	(1 ,1377)
+        	(2 ,1447)
+        	(3 ,1107)
+        	(4 ,1182)
+        	(5 ,1471)
+       		(6 ,2774)
+       		(7 ,2655)
+        	(8 ,1473)
+        	(9 ,3117)
+        	(10 ,1493)
+        	};
+        \addlegendentry{CP}
+        \addplot coordinates {
+        	(1 ,1377)
+        	(2 ,1447)
+        	(3 ,1108)
+        	(4 ,1189)
+        	(5 ,1471)
+       		(6 ,2774)
+       		(7 ,2670)
+        	(8 ,1473)
+        	(9 ,3117)
+        	(10 ,1497)
+        	};
+        \addlegendentry{HFC-PGA}
+        \end{axis}
+    \end{tikzpicture}
+    \end{center}
+	\caption{Performances comparées de CP et HFC-PGA en fitness de la meilleure solution trouvée}
+    \end{figure}
+    
+    \begin{figure}[!h]
+    \begin{center}
+	\begin{tikzpicture}[scale=0.7]
+       	\begin{axis}[xlabel=instances des PSP testées, ylabel=fitness]
+        %\addplot {x^2+2*x-1};
+        \addplot coordinates {
+        	(1 ,1377)
+        	(2 ,1447)
+        	(3 ,1107)
+        	(4 ,1182)
+        	(5 ,1471)
+       		(6 ,2774)
+       		(7 ,2655)
+        	(8 ,1473)
+        	(9 ,3117)
+        	(10 ,1493)
+        	};
+        \addlegendentry{CP}
+        \addplot coordinates {
+        	(1 ,1382)
+        	(2 ,1471)
+        	(3 ,1121)
+        	(4 ,1202)
+        	(5 ,1472)
+       		(6 ,2788)
+       		(7 ,2692)
+        	(8 ,1497)
+        	(9 ,3124)
+        	(10 ,1530)
+        	};
+        \addlegendentry{HFC-PGA}
+        \end{axis}
+        %\caption{g}
+    \end{tikzpicture}
+    \end{center}
+    \caption{Performances comparées de CP et HFC-PGA en fitness moyen des solution trouvées}
+    \end{figure}
+    
+    \subsection{HFC-PGA et Approche CP}
+		
+	\begin{figure}[!h]
+	\begin{center}
+	\begin{tikzpicture}[scale=0.7]
+       	\begin{axis}[xlabel=instances des PSP testées, ylabel=temps en secondes]
+        %\addplot {x^2+2*x-1};
+        \addplot coordinates {
+        	(1 ,9.14)
+        	(2 ,7.29)
+        	(3 ,2.94)
+        	(4 ,1.78)
+        	(5 ,0.23)
+       		(6 ,11.17)
+       		(7 ,12.84)
+        	(8 ,15.03)
+        	(9 ,25.35)
+        	(10 ,121.90)
+        	};
+        \addlegendentry{CP}
+        \addplot coordinates {
+        	(1 ,9.3)
+        	(2 ,9.09)
+        	(3 ,8.97)
+        	(4 ,7.42)
+        	(5 ,9.91)
+       		(6 ,4.94)
+       		(7 ,4.73)
+        	(8 ,4.15)
+        	(9 ,8.96)
+        	(10 ,6.77)
+        	};
+        \addlegendentry{HFC-PGA}
+        \end{axis}
+        %\caption{g}
+    \end{tikzpicture}
+    \end{center}
+	\caption{Performances comparées de CP et HFC-PGA en temps}
+    \end{figure}
+    
+    \begin{figure}[!h]
+    \begin{center}
+	\begin{tikzpicture}[scale=0.7]
+       	\begin{axis}[xlabel=instances des PSP testées, ylabel=fitness]
+        %\addplot {x^2+2*x-1};
+        \addplot coordinates {
+        	(1 ,1377)
+        	(2 ,1447)
+        	(3 ,1107)
+        	(4 ,1182)
+        	(5 ,1471)
+       		(6 ,2774)
+       		(7 ,2655)
+        	(8 ,1473)
+        	(9 ,3117)
+        	(10 ,1493)
+        	};
+        \addlegendentry{CP}
+        \addplot coordinates {
+        	(1 ,1377)
+        	(2 ,1447)
+        	(3 ,1108)
+        	(4 ,1189)
+        	(5 ,1471)
+       		(6 ,2774)
+       		(7 ,2670)
+        	(8 ,1473)
+        	(9 ,3117)
+        	(10 ,1497)
+        	};
+        \addlegendentry{HFC-PGA}
+        \end{axis}
+    \end{tikzpicture}
+    \end{center}
+	\caption{Performances comparées de CP et HFC-PGA en fitness de la meilleure solution trouvée}
+    \end{figure}
+    
+    \begin{figure}[!h]
+    \begin{center}
+	\begin{tikzpicture}[scale=0.7]
+       	\begin{axis}[xlabel=instances des PSP testées, ylabel=fitness]
+        %\addplot {x^2+2*x-1};
+        \addplot coordinates {
+        	(1 ,1377)
+        	(2 ,1447)
+        	(3 ,1107)
+        	(4 ,1182)
+        	(5 ,1471)
+       		(6 ,2774)
+       		(7 ,2655)
+        	(8 ,1473)
+        	(9 ,3117)
+        	(10 ,1493)
+        	};
+        \addlegendentry{CP}
+        \addplot coordinates {
+        	(1 ,1382)
+        	(2 ,1471)
+        	(3 ,1121)
+        	(4 ,1202)
+        	(5 ,1472)
+       		(6 ,2788)
+       		(7 ,2692)
+        	(8 ,1497)
+        	(9 ,3124)
+        	(10 ,1530)
+        	};
+        \addlegendentry{HFC-PGA}
+        \end{axis}
+        %\caption{g}
+    \end{tikzpicture}
+    \end{center}
+    \caption{Performances comparées de CP et HFC-PGA en fitness moyen des solution trouvées}
+    \end{figure}    	
+    	
 		\subsection{HCM-PGA et HFC-PGA}
 		
 	\begin{figure}[!h]
@@ -1423,7 +1713,7 @@ class GeneticAlgorithm:
     \end{lstlisting}
 	
 	\newpage
-	\section{Résultats des tests de l'application des algorithmes génétiques parallèles aux instances de PSP}
+	\section{Résultats des tests complémentaires de l'application des algorithmes génétiques parallèles aux instances de PSP}
 	
 	\newpage
 	\section{Glossaire}
