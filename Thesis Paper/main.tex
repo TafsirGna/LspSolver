@@ -113,7 +113,7 @@
 	\hspace*{.5cm} \textbf{F-PGA} : Fine-grained Parallel Genetic Algorithm \\
 	\hspace*{.5cm} \textbf{C-PGA} : Coarse-grained Parallel Genetic Algorithm \\
 	\hspace*{.5cm} \textbf{CLSP} : Capacited Lot Sizing Problem \\
-	\hspace*{.5cm} \textbf{DFS} : Depth First Search\\
+	\hspace*{.5cm} \textbf{BFS} : Best First Search\\
 	\hspace*{.5cm} \textbf{MIP} : Mixed Integer Programming \\
 	\hspace*{.5cm} \textbf{CP} : Constraint Programming \\
 	\hspace*{.5cm} \textbf{SA} : Simulated Annealing\\
@@ -366,7 +366,9 @@ définie comme pour le modèle MIP. Elle est utile pour définir la fonction obj
 		\hspace*{.5cm} L’utilisation des variables $s$ et $x$ dans ce modèle découle de la "difficulté" d’exprimer simplement les coûts de stockage. Pour une compréhension approfondie de ce modèle, nous pourrons nous référer à Houndji \cite{houndji}
 	
 		\subsubsection{Modèle SA}
-		Dans ce modèle, 
+		Dans ce modèle, la procédure de recuit simulé conduit à chaque itération à une action aléatoire en utilisant une distribution uniforme. Comme toujours en recuit simulé, l'action est toujours acceptée if elle est facteur d'amélioration. Dans le cas contraire, elle est accepté si elle est basée si une distribution en temps de croissante de façon exponentielle. Dans le détail, une mauvaise action est accepté avec une probabilité de $e^{-\Delta/T}$ où $\Delta$ est la différence du coût total induit par l'action et $T$ est la température. La température commence à une valeur $T_{0}$ et est multiplié par $\alpha$ (avec $0 < \alpha < 1$), après un nombre fixé d'échantillons $n_{s}$, selon la procédure de refroidissement géométrique standard du recuit simulé. \\
+		\hspace*{.5cm} Dans le but d'accélérer les premières étapes de la procédure de recuit simulé,  Ceschia et al. ont utilisé un mécanisme de \emph{cut-off} (Johnson et al. \cite{johnson}). Ils ont ajouté un nouveau paramètre $n_{a}$ représentant le nombre maximal d'actions acceptées à chaque niveau de température. Ainsi, la température diminue lorsque la première des deux conditions suivantes est remplie : ($i$) le nombre d'actions échantillonnées atteint $n_{s}$, ($ii$) le nombre d'actions acceptées atteint $n_{a}$. \\
+		\hspace*{.5cm} Le critère de terminaison est basé sur le nombre total d'itération $I_{max}$, plutôt que sur un seuil de température. De cette manière, le temps d'exécution est approximativement le même pour toutes les configurations des paramètres.
 		
 	\section{Les algorithmes génétiques}
 		
@@ -438,12 +440,11 @@ hasard. Un enfant prend une section avant le point de croisement d’un parent e
 	
 	\subsection{Application des algorithmes génétiques aux problèmes d'optimisation}
 	
-	Les algorithmes génétiques ont été largement utilisées ces dernières années [9, 12, etc.]. L’utilisation des AGs dans de nombreux domaines a fait ses preuves, notamment dans des problèmes combinatoires tels que les problèmes d’ordonnancement [4, 13, 18, 5] et les problèmes de collecte et de distribution. Les problèmes d’ordonnancement d’un atelier classique de type Job-Shop (JSP) ont notamment été largement étudiés et résolus par les AGs [1, 3, 6, 10, 11, 15, etc.]. D’autres algorithmes hybrides ont été aussi proposés [2, 8, 16]. La difficulté principale dans la résolution de ces types de problèmes résulte dans la façon avec laquelle ils sont représentés sous forme algorithmique. Cette phase, la définition du chromosome, représente le point le plus important dans la recherche génétique. Plusieurs approches de représentation
-et différents types d’opérateurs d’AGs ont été proposés, pour résoudre ces problèmes.
+	Les algorithmes génétiques ont été largement utilisées ces dernières années [9, 12, etc.]. L’utilisation des AGs dans de nombreux domaines a fait ses preuves, notamment dans des problèmes combinatoires tels que les problèmes d’ordonnancement [4, 13, 18, 5] et les problèmes de collecte et de distribution. Les problèmes d’ordonnancement d’un atelier classique de type Job-Shop (JSP) ont notamment été largement étudiés et résolus par les AGs [1, 3, 6, 10, 11, 15, etc.]. D’autres algorithmes hybrides ont été aussi proposés [2, 8, 16]. La difficulté principale dans la résolution de ces types de problèmes résulte dans la façon avec laquelle ils sont représentés sous forme algorithmique. Cette phase, la définition du chromosome, représente le point le plus important dans la recherche génétique. Plusieurs approches de représentation et différents types d’opérateurs d’AGs ont été proposés, pour résoudre ces problèmes.
 	
 	\section*{Conclusion}
 	\addcontentsline{toc}{section}{Conclusion}
-	Le dimensionnement de lots en planification de production est un important défi pour les entreprises industrielles. Il consiste à trouver un plan de production qui satisfait aux contraintes spécifiques relatives au système de production. Le PSP constitue en effet une variante NP-Difficile de ces types de problèmes. Plusieurs méthodes peuvent servir à résoudre ce problème. Au nombre de ces méthodes, figurent les algorithmes génétiques. Les AGs, à travers l'exploration et l'exploitation de l'espace de recherche ont permis de résoudre bon nombre de problèmes d'optimisation par le passé. Nous présentons dans la partie suivante le PSP ainsi que les modèles et leur formulation qui ont été utilisés dans sa résolution.		
+	Le dimensionnement de lots en planification de production est un important défi pour les entreprises industrielles. Il consiste à trouver un plan de production qui satisfait aux contraintes spécifiques relatives au système de production. Le PSP constitue en effet une variante NP-Difficile de ces types de problèmes. Plusieurs méthodes peuvent servir à résoudre ce problème. Au nombre de ces méthodes, figurent les algorithmes génétiques. Les AGs, à travers l'exploration et l'exploitation de l'espace de recherche ont permis de résoudre bon nombre de problèmes d'optimisation par le passé. Nous avons également présenté le PSP ainsi que les modèles et leur formulation qui ont été utilisés dans sa résolution.	Dans le partie suivante, nous décrivons les méthodes de résolution proposées ainsi que les algorithmes associés.	
 		
 	\newpage
 	
@@ -495,7 +496,7 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
 	\end{center}
 	\hspace*{.5cm} où $x_{N,T}$ est la variable booléenne qui indique la production ou non d'un article \emph{N} en période \emph{T}.  \\
 	\\
-	\hspace*{.5cm} Dans cette représentation, un chromosome est une chaîne de bits (0 et 1) qui indique la production ou non d'un article \emph{i} et de longueur \emph{nItems * nTimes} (où \emph{nItems} est le nombre d'articles et \emph{nTimes} est le nombre de périodes). Ainsi, l'article 1 est produit dans les périodes 2 et 5; et l'article 2 est produit dans les périodes 1 et 4. Le chromosome représenté ci-dessus est ainsi un plan de production qui satisfait aux contraintes du système de production spécifiques à cette instance du problème. Toutefois, au cours de notre étude, une seconde représentation nous est apparue plus cohérente et facilement manipulable. Cette représentation génétique est présentée à la figure \ref{fig:adopt_gene_repr} et étudiée par Mirshekarian et al.[ref].
+	\hspace*{.5cm} Dans cette représentation, un chromosome est une chaîne de bits (0 et 1) qui indique la production ou non d'un article \emph{i} et de longueur \emph{nItems * nTimes} (où \emph{nItems} est le nombre d'articles et \emph{nTimes} est le nombre de périodes). Ainsi, l'article 1 est produit dans les périodes 2 et 5; et l'article 2 est produit dans les périodes 1 et 4. Le chromosome représenté ci-dessus est ainsi un plan de production qui satisfait aux contraintes du système de production spécifiques à cette instance du problème. Toutefois, au cours de notre étude, une seconde représentation nous est apparue plus cohérente et facilement manipulable. Cette représentation génétique est présentée à la figure \ref{fig:adopt_gene_repr} et étudiée par Mirshekarian et al. \cite{suer}.
 	
 	\begin{figure}[!h]
 		\begin{center}
@@ -508,7 +509,7 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
 	Dans cette représentation, un chromosome est une suite d'entiers correspondant aux articles produits et de longueur \emph{nTimes}. La longueur réduite de ce chromosome réduit dans le même temps la complexité du parcours du chromosome lors des implémentations.
 	\subsection{Initialisation}
 	Le processus d'initialisation consiste à construire la population initiale; c'est à dire celle à partir de laquelle se feront les opérations de sélection, crossover ou encore mutation afin de la faire évoluer sur des générations. L'initialisation en algorithmes génétiques se fait de manière aléatoire dans l'optique de trouver des individus suffisamment différents capables de constituer une population diverse et ainsi que largement couvrir l'espace de recherche. \\
-	\hspace*{.5cm} Une autre approche consiste à créer les individus devant composer la population initiale en se servant de stratégies de recherche déterministes et informés munis de fonctions d'évaluation suffisamment précises menant à des bonnes solutions. Notre approche a été de combiner les deux méthodes: utiliser une stratégie de recherche en l’occurrence le "Depth First Search" (DFS) dotée d'une fonction d'évaluation afin de déterminer lequel des fils à considérer; et utiliser une fonction de \emph{random} afin de rendre le parcours suffisamment aléatoire et conduisant à des individus différents. \\
+	\hspace*{.5cm} Une autre approche consiste à créer les individus devant composer la population initiale en se servant de stratégies de recherche déterministes et informés munis de fonctions d'évaluation suffisamment précises menant à des bonnes solutions. Notre approche a été de combiner les deux méthodes: utiliser une stratégie de recherche en l’occurrence le "Best-First Search" (BFS) dotée d'une fonction d'évaluation afin de déterminer lequel des fils à considérer; et utiliser une fonction de \emph{random} afin de rendre le parcours suffisamment aléatoire et conduisant à des individus différents. \\
 	\hspace*{.5cm} L'algorithme d'initialisation mis en œuvre est ainsi détaillé comme suit: \\
 	
 	\begin{algorithm}[H]
@@ -535,10 +536,10 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
 	\end{algorithm}
 	
 	\vspace*{.5cm}
-	La description de la stratégie de recherche DFS utilisée est effectuée comme suit: \\
+	La description de la stratégie de recherche BFS utilisée est effectuée comme suit: \\
 	
 	\begin{algorithm}[H]
-		\caption{Description du Depth First Search utilisée}
+		\caption{Description du Best First Search utilisée}
  		\KwData{instance de PSP à traiter, taille de la population, root}
  		\BlankLine
  		\KwResult{Population initiale constituée}
@@ -714,7 +715,7 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
 	
 	\subsection{Terminaison}
 	Deux moyens sont utilisés par lesquels les algorithmes génétiques se terminent. Habituellement, une limite est mise sur le nombre de générations après lesquelles le processus se termine. Avec certains problèmes, le processus de recherche se termine quand une solution particulière a été trouvée ou encore lorsque la plus haute valeur de "fitness" dans la population a atteint une valeur particulière. \\
-	\hspace*{.5cm} Deux critères de terminaison sont utilisés dans notre étude afin de terminer une recherche. D'une part, la recherche se termine lorsque l'algorithme converge sur un individu considéré comme une solution optimale. D'autre part, une limite a été fixée sur le nombre de générations parcourues sans aucune amélioration de la valeur de "fitness" du meilleur individu de la population.
+	\hspace*{.5cm} Le critère de terminaison utilisé dans notre étude afin de terminer une recherche est le suivant : la recherche se termine lorsque l'algorithme converge sur un individu considéré comme une solution optimale. A cet optimal local, est appliqué une fonction de recherche locale afin de déterminer dans l'entourage immédiat de cet individu, un autre individu de meilleure qualité. Dans le cas, où un meilleur individu ne serait pas trouvé, la recherche s’arrête donc sur cet optimal local.
 	
 	\subsection{Fonction de faisabilité}
 	Le croisement et la mutation sont tous des opérateurs génétiques qui produisent en sortie des chromosomes. En fonction du gène muté dans le cas de la mutation ou du point de croisement dans le cas du croisement, ces chromosomes peuvent ne pas être faisables; c'est-à-dire qu'ils ne représentent pas des solutions au problème à résoudre. Il importe donc de rendre à nouveau faisable. La fonction de faisabilité permet de rendre un chromosome ou individu à nouveau faisable. Afin d'y parvenir, nous avons réduit le surplus de production dans le cas d'un surplus et augmenter la quantité d'articles produits dans le cas d'un manque de production. L'algorithme utilisé dans cet objectif est présenté comme suit: 
@@ -874,7 +875,7 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
 	\end{figure} 
 	
 	\subsection{Table de Hash}
-	Dans le processus de résolution des problèmes à l'aides algorithmes génétiques, au fur et à mesure que les générations passent, la population évolue et la diversité au sein de cette dernière diminue amenant les mêmes chromosomes à être régulièrement réévalués. Dans les faits, l'effort de calculs dépensé à évaluer le "\emph{fitness}" dépasse celui dépensé sur les opérateurs génétiques. En utilisant une table de hash afin de stocker les chromosomes récemment évalués, une amélioration significative des performances peut être constatée. Nous avons donc utilisé un dictionnaire ou tableau associatif afin de stocker ces derniers.
+	Dans le processus de résolution des problèmes à l'aide algorithmes génétiques, au fur et à mesure que les générations passent, la population évolue et la diversité au sein de cette dernière diminue amenant les mêmes chromosomes à être régulièrement réévalués. Dans les faits, l'effort de calculs dépensé à évaluer le "\emph{fitness}" dépasse celui dépensé sur les opérateurs génétiques. En utilisant une table de hash afin de stocker les chromosomes récemment évalués, une amélioration significative des performances peut être constatée. Nous avons donc utilisé un dictionnaire ou tableau associatif afin de stocker ces derniers.
 	
 	\section*{Conclusion}
 	\addcontentsline{toc}{section}{Conclusion}
@@ -904,8 +905,8 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
 		
 		\subsection{Données de test}
 		
-		Afin de tester nos deux solutions, nous commençons dans un premier temps par utiliser un ensemble de 10 instances proposées par Houndji et al. auxquelles ils ont appliquées le CP. Ces instances sont caractérisées par un nombre de périodes \emph{NT} = 20 et un nombre d'articles \emph{NI} = 20. Les résultats seront comparés à ceux obtenus par Houndji et al. dans leur application de l'approche CP à ces instances. \\
-		\hspace*{.5cm} Dans un second temps, nous appliquons nos deux solutions à 9 instances proposées dans la bibliothèque CSPlib sur lesquelles Ceschia et al ont testé son approche de solution : l'approche de recuit simulé. Nos résultats sont donc comparés à ceux obtenus par Ceschia et al dans leur applications du recuit simulé à ces problèmes. \\
+		Afin de tester nos deux solutions, nous commençons dans un premier temps par utiliser un ensemble de 10 instances proposées par Houndji et al. auxquelles ils ont appliqué le CP. Ces instances sont caractérisées par un nombre de périodes \emph{NT} = 20 et un nombre d'articles \emph{NI} = 20. Les résultats seront comparés à ceux obtenus par Houndji et al. dans leur application de l'approche CP à ces instances. \\
+		\hspace*{.5cm} Dans un second temps, nous appliquons nos deux solutions à 9 instances proposées dans la bibliothèque CSPlib sur lesquelles Ceschia et al \cite{ceschia} ont testé leur approche de solution : l'approche de recuit simulé. Nos résultats sont donc comparés à ceux obtenus par Ceschia et al dans leur application du recuit simulé à ces problèmes. \\
 		\hspace*{.5cm} Dans les deux cas, nos critères d'analyse sont de deux ordres. Premièrement, nous les avons analysé sous l'angle de la performance en temps. Il s'agit de voir comment ces algorithmes arrivent à répondre aussi rapidement que possible nos instances de PSP.  Le second angle d'analyse s'est porté sur la performance en terme de la qualité de la solution trouvée. Nous avons calculé l'écart entre la solution trouvée et la solution optimale connue dans la littérature.
 		
 		\subsection{Paramètres de test}
@@ -914,23 +915,22 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
 		\begin{enumerate}
 			\item HCM-PGA \\
 				\begin{itemize}
-					\item[-] Taille de la population : 100 individus;
+					\item[-] Taille de la population : 25 individus par nœud ;
 			        \item[-] Probabilité de mutation : 5\%;
 			        \item[-] Probabilité de croisement : 80\%;
 			        \item[-] Nombre de migrants : 1 individu;
-		 	        \item[-] Nombre de processus esclaves (cas du HCM-PGA) : 3 processus;
+		 	        \item[-] Nombre de processus esclaves : 3 processus;
 			        \item[-] Nombre de processus principaux : 3 processus;
 			        \item[-] Nombre de générations avant migration : 0 génération.
 				\end{itemize}
 				\vspace*{.5cm}
 			\item HFC-PGA \\
 				\begin{itemize}
-					\item[-] Taille de la population : 100 individus;
+					\item[-] Taille de la population : 25 individus par noeud ;
 			        \item[-] Probabilité de mutation : 5\%;
 			        \item[-] Probabilité de croisement : 80\%;
 			        \item[-] Nombre de migrants : 1 individu;
-		 	        \item[-] Nombre de processus esclaves (cas du HCM-PGA) : 3 processus;
-			        \item[-] Nombre de processus principaux : 3 processus;
+			        \item[-] Nombre de processus principaux : 2 processus;
 			        \item[-] Nombre de générations avant migration : 0 génération.
 				\end{itemize}
 		\end{enumerate}
@@ -982,7 +982,7 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
 		
 		\section{Résultats expérimentaux des algorithmes génétiques parallèles hiérarchiques "coarse-grained" et "master-slave"}
 		
-		Après les tests de l'algorithme génétique parallèle hiérarchique \emph{fine-grained} et \emph{coarse-grained}, nous avons procédé aux tests sur l'algorithme génétique parallèle hiérarchique \emph{master-slave} et \emph{fine-grained} sur les mêmes instances que celles testées ci-dessus. Au bout de 10 essais, les résultats sont consignés dans le tableau \ref{alg:principe_fine_grained} et sont comparés à ceux obtenus en programmation par contrainte.
+		Après les tests de l'algorithme génétique parallèle hiérarchique \emph{fine-grained} et \emph{coarse-grained}, nous avons procédé aux tests sur l'algorithme génétique parallèle hiérarchique \emph{master-slave} et \emph{fine-grained} sur les mêmes instances que celles testées ci-dessus. Au bout de 10 essais, les résultats sont consignés dans le tableau \ref{alg:principe_fine_grained} et sont comparés à ceux obtenus en programmation par contrainte. Nous avons pu ensuite procéder aux essais sur les instances proposées par Ceschia qui nous avons également consigné dans le tableau.
 		
 		\begin{table}[h]
 		\centering
@@ -990,16 +990,16 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
 			\hline
 			\textbf{Instance} & \textbf{Opt cost} & \textbf{CP time} & \textbf{GAs time} & \textbf{GAs result gap} & \textbf{GAs Best Sol} & \textbf{Nb Gen}\\
 			\hline
-			\textbf{1} & 1377 & 9.14 & 4.778 & 3.11\% & 1377 & 10.1 \\
-			\textbf{2} & 1447 & 7.292 & 3.02 & 3.16\% & 1471 & 8.1\\
-			\textbf{3} & 1107 & 2.946 & 2.6 & 5.22\% & 1107 & 7.8\\
-			\textbf{4} & 1182 & 1.784 & 2.48 & 1.90\% & 1189 & 8.2\\
-			\textbf{5} & 1471 & 0.235 & 3.09 & 0.9\% & 1471 & 8.9\\
-			\textbf{6} & 2774 & 11.177 & 4.12 & 1,19\% & 2782 & 8.6\\
-			\textbf{7} & 2655 & 12.846 & 4.33 & 1,9\% & 2670 & 9.6\\
-			\textbf{8} & 1473 & 15.039 & 5.01 & 2.3\% & 1473 & 10.2\\
-			\textbf{9} & 3117 & 25.352 & 5.86 & 2.02\% & 3143 & 9.2\\
-			\textbf{10} & 1493 & 121.909 & 4.37 & 5\% & 1530 & 9.8\\
+			\textbf{1} & 1377 & 9.14 & 3.1 & 0.09\% & 1377 & 9.8 \\
+			\textbf{2} & 1447 & 7.292 & 3.5 & 0\% & 1447 & 8.2\\
+			\textbf{3} & 1107 & 2.946 & 3.2 & 0.03\% & 1107 & 9\\
+			\textbf{4} & 1182 & 1.784 & 2.74 & 1.1\% & 1196 & 8.9\\
+			\textbf{5} & 1471 & 0.235 & 3.5 & 7\% & 1549 & 6\\
+			\textbf{6} & 2774 & 11.177 & 5.1 & 0.04\% & 2774 & 7.7\\
+			\textbf{7} & 2655 & 12.846 & 3.9 & 2.44\% & 2706 & 8.4\\
+			\textbf{8} & 1473 & 15.039 & 3.3 & 3\% & 1506 & 7.2\\
+			\textbf{9} & 3117 & 25.352 & 10.3 & 0\% & 3117 & 9.2\\
+			\textbf{10} & 1493 & 121.909 & 6.5 & 0.6\% & 1502 & 8.7\\
 			\hline
 		\end{tabular}	
 		\caption{Performances du HCM-PGA et CP sur 10 instances du PSP}	
@@ -1009,21 +1009,18 @@ et différents types d’opérateurs d’AGs ont été proposés, pour résoudre
 		\centering
 		\begin{tabular}{|c|c|c|c|c|c|c|}
 			\hline
-			\textbf{Instance} & \textbf{Opt cost} & \textbf{CP time} & \textbf{GAs time} & \textbf{GAs result gap} & \textbf{GAs Best Sol} & \textbf{Nb Gen}\\
+			\textbf{Instance} & \textbf{Opt cost} & \textbf{SA time} & \textbf{GAs time} & \textbf{GAs result gap} & \textbf{GAs Best Sol} & \textbf{Nb Gen}\\
 			\hline
-			\textbf{1} & 1377 & 9.14 & 9.3 & 0.42\% & 1377 & 23.12 \\
-			\textbf{2} & 1447 & 7.292 & 9.09 & 1.67\% & 1447 & 23.98\\
-			\textbf{3} & 1107 & 2.946 & 8.97 & 1.28\% & 1108 & 24.8\\
-			\textbf{4} & 1182 & 1.784 & 7.42 & 1.70\% & 1189 & 20.9\\
-			\textbf{5} & 1471 & 0.235 & 9.91 & 0.11\% & 1471 & 21.7\\
-			\textbf{6} & 2774 & 11.177 & 4.94 & 0.52\% & 2774 & 21.6\\
-			\textbf{7} & 2655 & 12.846 & 4.73 & 1,40\% & 2670 & 22.4\\
-			\textbf{8} & 1473 & 15.039 & 4.15 & 1.65\% & 1473 & 19.5\\
-			\textbf{9} & 3117 & 25.352 & 8.96 & 0.25\% & 3117 & 23.2\\
-			\textbf{10} & 1493 & 121.909 & 6.77 & 2.49\% & 1497 & 9.8\\
+			\textbf{pigment15b} & 1486 & 3.8 & 2.17 & 0.6\% & 1496 & 10.1 \\
+			\textbf{pigment15c} & 1583 & 4.7 & 2.07 & 2\% & 1616 & 10.3\\
+			\textbf{pigment30a} & 1119 & 4.1 & 1.2 & 12\% & 1244 & 9.3\\
+			\textbf{pigment100a} & 1323 & 5 & 7.89 & 6.7\% & 1378 & 8.5\\
+			\textbf{pigment100b} & 1962 & 4.4 & 7.3 & 6.5\% & 2091 & 8\\
+			\textbf{pigment100c} & 1473 & 15.039 & 4.15 & 1.65\% & 1473 & 19.5\\
+			\textbf{pigment200a} & 3117 & 25.352 & 8.96 & 0.25\% & 3117 & 23.2\\
 			\hline
 		\end{tabular}	
-		\caption{Performances du HCM-PGA et SA sur 9 instances du PSP}	
+		\caption{Performances du HCM-PGA et SA sur 7 instances du PSP}	
 	\end{table}					
 	
 		\section{Analyse comparative des résultats}
@@ -1745,9 +1742,15 @@ class GeneticAlgorithm:
 		\item[\emph{Wagner-Whitin}:] Il s'agit d'un problème de \emph{lot sizing} avec une condition supplémentaire $h_{t} + p_{t} \geq p_{t+1}$ où $h$ est le coût de stockage et $p$ le coût de production. En d'autres termes, il sera toujours préférable de produire le plus tard possible.
 		\vspace*{.3cm}
 		\item[\emph{Lot sizing}:] Il s'agit du problème de planification de production de base sans restriction particulière.
-		vspace*{.3cm}
-		\item[\emph{Lot sizing}:]
 		
 	\end{description}
 
+	\newpage
+	
+	\begin{center}
+		\begin{figure}[!h]
+			\includegraphics[scale=.2]{img/thesis_project_qrcode.png}
+		\end{figure}
+	\end{center}
+	
 \end{document}

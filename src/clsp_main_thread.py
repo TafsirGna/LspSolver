@@ -37,7 +37,9 @@ class ClspThread(Thread):
 		self.popLackingDiversity = False
 
 		self.chromosomes = []
+		self.initialChromosomes = []
 		self.listFitnessData = []
+		self.initialChromData = []
 		self.prevChromosomes = []
 		self.prevListFitnessData = []
 
@@ -55,6 +57,8 @@ class ClspThread(Thread):
 			self.getFitnessData()
 			print (self.name, " ", "Initial Population : ", self.chromosomes)
 			print (self.name, " ", "Population Data: ", self.listFitnessData)
+			self.initialChromosomes = copy.deepcopy(self.chromosomes)
+			self.initialChromData = copy.deepcopy(self.listFitnessData)
 
 			
 			# i send the best chromosomes of the population to its neighbors
@@ -79,6 +83,7 @@ class ClspThread(Thread):
 			# After the initial population has been created, i launch the search process
 			self.locker.acquire()
 			if self.immigrants != []:
+				#print(self.threadId,'FUUUUUUUUUUUUUUUUUUUUUUUUUUUUUCK')
 				for chromosome in self.immigrants:
 					self.replace(chromosome)
 				self.listFitnessData = []
@@ -118,10 +123,19 @@ class ClspThread(Thread):
 
 				else:
 
-					self.chromosomes[0] = copy.deepcopy(chromosome)
+					#print("Initial1 -----------------", chromosome)
+					#print("Initial2 -----------------", self.chromosomes)
+					self.chromosomes = copy.deepcopy(self.initialChromosomes)
+					self.listFitnessData = copy.deepcopy(self.initialChromData)
+					self.replace(chromosome)
+
+					#self.chromosomes[0] = copy.deepcopy(chromosome)
+					#print (self.name, " ", self.chromosomes)
+
 					self.listFitnessData = []
 					self.getFitnessData()
 					self.sendMigrants()
+					#self.finished = True
 
 					#self.chromosomes = copy.deepcopy(self.prevChromosomes)
 
@@ -232,7 +246,7 @@ class ClspThread(Thread):
 
 		if chromosome not in self.chromosomes:
 
-			self.chromosomes.append(copy.deepcopy(chromosome))
+			self.chromosomes.insert(0,copy.deepcopy(chromosome))
 
 			# After inserting a new good chromosome into the population, i remove a bad one
 			del self.chromosomes[len(self.chromosomes)-1]

@@ -130,6 +130,8 @@ class GeneticAlgorithm:
 
 			(self.listMainThreads[len(self.listMainThreads)-1]).readyEvent.wait()
 
+			#time.sleep(1.5)
+
 			# once, the current generation has been produced, i check if i should stop the search and i set the event of each thread
 			readyFlag = 0
 			ok = False
