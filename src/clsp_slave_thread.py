@@ -20,6 +20,7 @@ class SlaveThreadsManager:
 		super(SlaveThreadsManager, self).__init__()
 		self.listSlaveThreads = []
 		self.mainThread = mainThread
+		self.currentSlaveThreadId = 0
 
 		i = 0
 		while i < SlaveThreadsManager.nbSlavesThread:
@@ -34,28 +35,15 @@ class SlaveThreadsManager:
 
 			i += 1
 
-	def initPop(self):
+	def initSlaveThread(self, queue):
 		
-		threadQueue = []
-		#print("master : ", self.mainThread.queue)
-		nodePerSlave = math.ceil(len(self.mainThread.queue) / SlaveThreadsManager.nbSlavesThread)
-		counterSlave = 0
-		for node in self.mainThread.queue:
-			threadQueue.append(node)
-			if len(threadQueue) == nodePerSlave:
-				(self.listSlaveThreads[counterSlave]).queue = copy.deepcopy(threadQueue)
-				counterSlave += 1
-				threadQueue = []
-
-		if threadQueue != []:
-			(self.listSlaveThreads[counterSlave]).queue = copy.deepcopy(threadQueue)
-
-		for thread in self.listSlaveThreads:
-			thread.action = 0
-			thread.start()
+		(self.listSlaveThreads[self.currentSlaveThreadId]).action = 0
+		(self.listSlaveThreads[self.currentSlaveThreadId]).queue = queue
+		#print("currentSlaveThreadId ", self.currentSlaveThreadId, self.mainThread.threadId)
+		(self.listSlaveThreads[self.currentSlaveThreadId]).start()
+		self.currentSlaveThreadId += 1
 		
 		#print("Nb Slaves : ", SlaveThreadsManager.nbSlavesThread)
-		(self.listSlaveThreads[SlaveThreadsManager.nbSlavesThread-1]).doneEvent.wait()
 
 	def improvePop(self, chromosomes):
 
@@ -113,7 +101,7 @@ class SlaveThread(Thread):
 		if self.action == 0 and self.queue != []: # if i want to initialize the first population
 
 			#print("slave : ", self.queue)
-			self.mainThread.initSearch(self.queue)
+			self.mainThread.initSearch(self.queue, "slave")
 			self.queue = []
 
 		elif self.action == 1 and self.queue != []: # i want to improve the quality of the initial population

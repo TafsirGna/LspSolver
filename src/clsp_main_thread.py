@@ -19,16 +19,16 @@ class ClspThread(Thread):
 	NbMaxPopulation = 0
 	FITNESS_PADDING = 0
 
-	def __init__(self, threadId, queue):
+	def __init__(self, threadId):
 
 		Thread.__init__(self)
 		self.threadId = threadId
 		self.name = "Thread - " + str(threadId)
-		self.queue = queue
 		self.locker = threading.Lock()
 		self.NbGenerations = 0
 		self.readyFlag = 0
 		self.readyFlagId = 0
+		self.queue = []
 		self.readyEvent = Event()
 		self.action = 1
 		self.finished = False
@@ -50,10 +50,12 @@ class ClspThread(Thread):
 		
 		if self.action == 1:
 
-			self.slaveThreadsManager.initPop()
+			self.initSearch(self.queue)
+			#print("ok")
+			(self.slaveThreadsManager.listSlaveThreads[SlaveThreadsManager.nbSlavesThread-1]).doneEvent.wait()
 			#print (self.name, " ", "Initial Population : ", self.population)
 			
-			self.getPopImproved()
+			#self.getPopImproved()
 			self.getFitnessData()
 			print (self.name, " ", "Initial Population : ", self.chromosomes)
 			print (self.name, " ", "Population Data: ", self.listFitnessData)
@@ -83,7 +85,6 @@ class ClspThread(Thread):
 			# After the initial population has been created, i launch the search process
 			self.locker.acquire()
 			if self.immigrants != []:
-				#print(self.threadId,'FUUUUUUUUUUUUUUUUUUUUUUUUUUUUUCK')
 				for chromosome in self.immigrants:
 					self.replace(chromosome)
 				self.listFitnessData = []
@@ -103,7 +104,7 @@ class ClspThread(Thread):
 
 			self.slaveThreadsManager.crossoverPop()
 
-			#print (self.name, " ", "Population : ", self.chromosomes, " + ", self.listFitnessData)
+			print (self.name, " ", "Population : ", self.chromosomes, " + ", self.listFitnessData)
 			#print (" ")
 
 			if self.popLackingDiversity:
@@ -113,27 +114,30 @@ class ClspThread(Thread):
 			
 				# i store this local optima in the genetic algorithm's memory to remind me that it's already been visited before
 
+				#print("first : ", self.threadId, chromosome, "/ ", self.chromosomes[0])
 				chromosome.advmutate()
+				#print("second : ", self.threadId, chromosome, "/ ", self.chromosomes[0], " / ", chromosome == self.chromosomes[0])
 				
 				if chromosome == self.chromosomes[0]:
 
+					#print("yes")
 					print (self.name, " ", "Solution : ", chromosome)
 					self.result = copy.deepcopy(chromosome)
 					self.finished = True
 
 				else:
 
+					#print("no")
 					#print("Initial1 -----------------", chromosome)
 					#print("Initial2 -----------------", self.chromosomes)
 					self.chromosomes = copy.deepcopy(self.initialChromosomes)
-					self.listFitnessData = copy.deepcopy(self.initialChromData)
 					self.replace(chromosome)
 
 					#self.chromosomes[0] = copy.deepcopy(chromosome)
-					#print (self.name, " ", self.chromosomes)
 
 					self.listFitnessData = []
 					self.getFitnessData()
+					#print (self.name, " ----------------- ", self.chromosomes, " / ", self.listFitnessData)
 					self.sendMigrants()
 					#self.finished = True
 
@@ -152,59 +156,55 @@ class ClspThread(Thread):
 			return
 
 
-	def initSearch(self, queue):
-		
-		#print("Queue : ", queue)
-		queueSize = len(queue)
-		indice = randint(0, queueSize - 1)
-		currentNode = copy.deepcopy(queue[indice])
-		del queue[indice]
+	def initSearch(self, queue, parameter = "main"):
 
+		#print("Queue : ", self.queue)
+		#print("------------------------------")
+
+		currentNode = copy.deepcopy(queue[len(queue)-1])
+		del queue[len(queue)-1]
+
+		i = 0
 		while True:
-
+			
 			if currentNode.isLeaf():
-				#print("Yes : ", currentNode)
-				if currentNode.isGood():
-					c = Chromosome()
-					c.init1(list(currentNode.solution), currentNode.fitnessValue)
-					#c.advmutate()
 
-					self.locker.acquire()
-					#print(self.population.chromosomes)
-					if len(self.chromosomes) >= ClspThread.NbMaxPopulation:
-						self.locker.release()
-						break
-					if c not in self.chromosomes:
-						self.chromosomes.append(copy.deepcopy(c))
+				#print("Chromosome found : ", currentNode)
+				#print("-------------- ok : ", currentNode)
+				chromosome = Chromosome()
+				chromosome.init1(list(currentNode.solution), currentNode.fitnessValue)
+
+				self.locker.acquire()
+				#print(self.population.chromosomes)
+				if len(self.chromosomes) >= ClspThread.NbMaxPopulation:
+					self.chromosomes.sort()
 					self.locker.release()
+					#print("YES")
+					break
+				if chromosome not in self.chromosomes:
+					self.chromosomes.append(copy.deepcopy(chromosome))
+				self.locker.release()
 
-				#print("inter : ", self.queue)
-				
 			else:
 
 				#print ("current Node : ", currentNode)
-				l = currentNode.getChildren()
-				#print("Children : ", l)
-				#print(" ")
-				
-				#queueSize1 = len(queue)
-				queue += l
-				#print("indice : ", currentNode)
-				#print("queue : ", queue)
-
-			queueSize = len(queue)
-			if queueSize == 0:
-				#if self.population.listFitnessData == []:
-				#	self.population.getFitnessData()
+				children = currentNode.getChildren()
+				if len(children) >= 2 and parameter == "main": 
+					if self.slaveThreadsManager.currentSlaveThreadId < SlaveThreadsManager.nbSlavesThread:
+						tab = [children[len(children)-1]]
+						self.slaveThreadsManager.initSlaveThread(copy.deepcopy(tab))
+					#self.slaveCounter += 1
+				#print("Children : ", children)
+				queue += children
+				#print("Queue : ", queue)
+		
+			if queue == []:
+				self.chromosomes.sort()
 				break
-			
-			#queue.sort()
-			#queue = list(reversed(queue))
+			currentNode = copy.deepcopy(queue[len(queue)-1])
+			del queue[len(queue)-1]
 
-			currentNode = copy.copy(queue[queueSize-1])
-			del queue[queueSize-1]
 
-		#print (self.name, " ", "Initial Population : ", self.population)
 
 	def sendMigrants(self):
 		
@@ -266,7 +266,6 @@ class ClspThread(Thread):
 			sumAllFitnessValues = 0
 			tmpSumFitness = 0 #variable used to quantify the lack of diversity in the population
 			max_fitness = (self.chromosomes[len(self.chromosomes)-1]).fitnessValue
-
 			
 			i = 0
 			while i < popSize:
@@ -304,6 +303,7 @@ class ClspThread(Thread):
 				i += 1
 
 			#print("listFitnessData : ", self.listFitnessData)
+			#print("log getfitnessData: ", self.threadId ," / " , self.chromosomes, " / ",self.listFitnessData , " / ", max_fitness)
 
 		#print(" Fitness Data 2 : ", self.listFitnessData)
 

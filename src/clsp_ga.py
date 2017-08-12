@@ -18,9 +18,9 @@ class GeneticAlgorithm:
 	FITNESS_PADDING = 1
 	NumberOfMigrants = 1
 	MigrationRate = 0 # this variable holds the number of generations needed before a migration occurs during the search
-	nbMainThreads = 3
-	nbSlavesThread = 3
-	NbGenToStop = 7
+	nbMainThreads = 2
+	nbSlavesThread = 2
+	#NbGenToStop = 7
 
 	# Builder
 	def __init__(self, inst):
@@ -43,11 +43,13 @@ class GeneticAlgorithm:
 
 		ClspThread.NbMaxPopulation = GeneticAlgorithm.NbMaxPopulation
 		ClspThread.listMainThreads = self.listMainThreads
-		ClspThread.NbGenToStop = GeneticAlgorithm.NbGenToStop
+		#ClspThread.NbGenToStop = GeneticAlgorithm.NbGenToStop
 		SlaveThreadsManager.nbSlavesThread = GeneticAlgorithm.nbSlavesThread
 		ClspThread.NumberOfMigrants = GeneticAlgorithm.NumberOfMigrants
 
-		
+		for i in range(0,GeneticAlgorithm.nbMainThreads):
+			clspThread = ClspThread(i)
+			self.listMainThreads.append(clspThread)
 
 	#--------------------
 	# function : initPopulation
@@ -59,43 +61,35 @@ class GeneticAlgorithm:
 
 		# In order to create this new population, i use the deep first search(DFS) to create some potential good chromosomes
 		#print(Chromosome.problem.deadlineDemandPeriods)
-		rootPerThread = math.ceil((Chromosome.problem.nbItems + 1) / GeneticAlgorithm.nbMainThreads)
-		threadQueue = []
-		threadCounter = 0
 
-		prevThread = 0
-		for item in range(0, Chromosome.problem.nbItems + 1):
 
-			# i initialize the node from which the search of each thread will start
-			root = Node()
-			root.currentItem = item
-			#print("root ", root)
-			threadQueue.append(copy.deepcopy(root))
+		queue = []
+		currentNode = Node()
+		children = currentNode.getChildren()
 
-			#print("Root : ", threadQueue)
+		while len(children) <= 1:
+			queue += children
 
-			if len(threadQueue) == rootPerThread or item == Chromosome.problem.nbItems:
+			if queue == []:
+				break
+			currentNode = copy.deepcopy(queue[len(queue)-1])
+			del queue[len(queue)-1]
+			children = currentNode.getChildren()
 
-				#print(threadQueue)
-				# i initialize the thread and put it into a list of threads created for this purpose
-				clspThread = ClspThread(threadCounter, list(threadQueue))
-				self.listMainThreads.append(clspThread)
+		# i make up the queue of each main thread
+		queue += children
+		for i in range(0, len(queue)):
+			(self.listMainThreads[i%GeneticAlgorithm.nbMainThreads]).queue.append(copy.deepcopy(children[i]))
 
-				threadQueue = []
-				threadCounter += 1
+		for i in range(0, len(self.listMainThreads)):
+			print(str((self.listMainThreads[i%GeneticAlgorithm.nbMainThreads]).queue))
 
-				if threadCounter == 1:
-					prevThread = clspThread
-				elif threadCounter > 1:
-					clspThread.readyFlag = prevThread.readyEvent
-					prevThread = clspThread
-
-				#if threadCounter == 1:
-				#	break
-
-		# want to make sure that the parent process will wait for the child threading before exiting
-		#(self.listMainThreads[2]).start()
-		#(self.listMainThreads[2]).join()
+		# i set the flags
+		prevThread = self.listMainThreads[0]
+		if GeneticAlgorithm.nbMainThreads > 1:
+			for i in range(1, GeneticAlgorithm.nbMainThreads):
+				(self.listMainThreads[i]).readyFlag = prevThread.readyEvent
+				prevThread = self.listMainThreads[i]
 		
 		# first, i initialize the population upon which the search will be applied
 		for thread in self.listMainThreads:
@@ -105,6 +99,7 @@ class GeneticAlgorithm:
 		(self.listMainThreads[len(self.listMainThreads)-1]).readyEvent.wait()
 
 		print("Initialized!!!")
+		
 		
 		readyFlag = 0
 		flagId = -1
@@ -151,6 +146,7 @@ class GeneticAlgorithm:
 
 		
 		self.printResults()
+		
 		
 	
 	#--------------------
