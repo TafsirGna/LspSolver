@@ -318,6 +318,8 @@ class Chromosome(object):
 			else:
 
 				queue += copy.deepcopy(children)
+				#queue.sort()
+				#reversed(queue)
 
 				if queue == []:
 					break
@@ -526,6 +528,12 @@ class Node(object):
 		self._currentPeriod = Chromosome.problem.nbTimes - 1
 		self.fitnessValue = 0
 		self.tab = copy.deepcopy(Chromosome.problem.deadlineDemandPeriods)
+
+		#nbZero = Chromosome.problem.nbTimes
+		#for deadlines in Chromosome.problem.deadlineDemandPeriods:
+		#	nbZero -= len(deadlines)
+		#tabZeros = [0] * nbZero
+		#self.tab.append(tabZeros)
 		
 
 	def __repr__(self):
@@ -537,13 +545,6 @@ class Node(object):
 		if self._currentPeriod == -1:
 			return True
 		return False
-
-	def isGood(self):
-		
-		for deadlines in self.tab:
-			if deadlines != []:
-				return False
-		return True
 		
 
 	def getChildren(self):
@@ -569,6 +570,34 @@ class Node(object):
 			childNode = copy.deepcopy(self)
 			childNode.currentPeriod -= 1
 			childrenQueue.append(copy.deepcopy(childNode))
+
+		'''
+		for i in range(0, len(self.tab)):
+
+			#print("in for : ", i)
+			if i != len(self.tab)-1:
+				#print("in for 1 : ", i, self.tab[i][len(self.tab[i])-1])
+				if self.tab[i] != [] and self.tab[i][len(self.tab[i])-1] >= self._currentPeriod:
+					#print("in for 1 : ", i)
+					childNode = copy.deepcopy(self)
+					solution = copy.deepcopy(self._solution)
+					solution[self._currentPeriod] = i + 1
+					childNode.solution = solution
+					childNode.currentPeriod -= 1
+					del childNode.tab[i][len(self.tab[i])-1]
+
+					childrenQueue.append(copy.deepcopy(childNode))
+
+			else:
+				#print("in for 2 : ", self.tab[i])
+				if self.tab[i] != []:
+					childNode = copy.deepcopy(self)
+					childNode.currentPeriod -= 1
+					#print(childNode.tab, len(childNode.tab))
+					del childNode.tab[i][len(childNode.tab[i])-1]
+
+					childrenQueue.append(copy.deepcopy(childNode))
+		'''
 
 		childrenQueue.sort()
 		return list(reversed(childrenQueue))
@@ -659,6 +688,7 @@ class AdvMutateNode(object):
 			rank = costTab[i][2]
 
 			j = Chromosome.problem.deadlineDemandPeriods[item-1][rank-1]
+			stop = False
 			while j >= indice + 1:
 
 				#if self.chromosome.solution[j] != item and Chromosome.problem.deadlineDemandPeriods[self.chromosome.solution[j]-1][self.chromosome.itemsRank[j]-1] >= indice:
@@ -671,12 +701,18 @@ class AdvMutateNode(object):
 						gap = self.chromosome.fitnessValue - c.fitnessValue
 						child = AdvMutateNode(c, gap)
 						children.append(child)
-				
+						stop = True
+						break
+
 				j -= 1
+
+			if stop:
+				break
 
 			i -= 1
 
 		children.sort()
+		#print(len(children))
 		#print (str(children))
 		return children
 

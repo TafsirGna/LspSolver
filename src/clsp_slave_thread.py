@@ -35,16 +35,6 @@ class SlaveThreadsManager:
 
 			i += 1
 
-	def initSlaveThread(self, queue):
-		
-		(self.listSlaveThreads[self.currentSlaveThreadId]).action = 0
-		(self.listSlaveThreads[self.currentSlaveThreadId]).queue = queue
-		#print("currentSlaveThreadId ", self.currentSlaveThreadId, self.mainThread.threadId)
-		(self.listSlaveThreads[self.currentSlaveThreadId]).start()
-		self.currentSlaveThreadId += 1
-		
-		#print("Nb Slaves : ", SlaveThreadsManager.nbSlavesThread)
-
 	def improvePop(self, chromosomes):
 
 		popSize = len(chromosomes)
@@ -72,6 +62,16 @@ class SlaveThreadsManager:
 			thread.run()
 		
 		(self.listSlaveThreads[SlaveThreadsManager.nbSlavesThread-1]).doneEvent.wait()
+
+	def initSlaveThread(self, queue):
+		
+		(self.listSlaveThreads[self.currentSlaveThreadId]).action = 0
+		(self.listSlaveThreads[self.currentSlaveThreadId]).queue = queue
+		#print("currentSlaveThreadId ", self.currentSlaveThreadId, self.mainThread.threadId)
+		(self.listSlaveThreads[self.currentSlaveThreadId]).start()
+		self.currentSlaveThreadId += 1
+		
+		#print("Nb Slaves : ", SlaveThreadsManager.nbSlavesThread)
 
 	def crossoverPop(self):
 		for thread in self.listSlaveThreads:

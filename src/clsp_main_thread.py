@@ -35,6 +35,7 @@ class ClspThread(Thread):
 		self.result = 0
 		self.memory = []
 		self.popLackingDiversity = False
+		self.nbIdleGens = 0
 
 		self.chromosomes = []
 		self.initialChromosomes = []
@@ -51,11 +52,11 @@ class ClspThread(Thread):
 		if self.action == 1:
 
 			self.initSearch(self.queue)
-			#print("ok")
-			(self.slaveThreadsManager.listSlaveThreads[SlaveThreadsManager.nbSlavesThread-1]).doneEvent.wait()
+
+			if Chromosome.problem.category == 1:
+				self.getPopImproved()
 			#print (self.name, " ", "Initial Population : ", self.population)
 			
-			#self.getPopImproved()
 			self.getFitnessData()
 			print (self.name, " ", "Initial Population : ", self.chromosomes)
 			print (self.name, " ", "Population Data: ", self.listFitnessData)
@@ -104,44 +105,37 @@ class ClspThread(Thread):
 
 			self.slaveThreadsManager.crossoverPop()
 
-			print (self.name, " ", "Population : ", self.chromosomes, " + ", self.listFitnessData)
+			#print (self.name, " ", "Population : ", self.chromosomes, " + ", self.listFitnessData)
 			#print (" ")
 
 			if self.popLackingDiversity:
 
-				#print("LACKING DIVERSITY - ", self.name)
+				print("LACKING DIVERSITY - ", self.name)
 				chromosome = copy.deepcopy(self.chromosomes[0])
 			
 				# i store this local optima in the genetic algorithm's memory to remind me that it's already been visited before
+				chromosome.advmutate()	
+				self.chromosomes = copy.deepcopy(self.initialChromosomes)
+				self.replace(chromosome)
 
-				#print("first : ", self.threadId, chromosome, "/ ", self.chromosomes[0])
-				chromosome.advmutate()
-				#print("second : ", self.threadId, chromosome, "/ ", self.chromosomes[0], " / ", chromosome == self.chromosomes[0])
-				
-				if chromosome == self.chromosomes[0]:
+				self.listFitnessData = []
+				self.getFitnessData()
+				self.sendMigrants()
 
-					#print("yes")
-					print (self.name, " ", "Solution : ", chromosome)
+				self.initialChromosomes = copy.deepcopy(self.chromosomes)
+				self.initialChromData = copy.deepcopy(self.listFitnessData)	
+				self.nbIdleGens += 1		
+
+				# for the first solution found
+				if isinstance(self.result, int):
 					self.result = copy.deepcopy(chromosome)
-					self.finished = True
-
 				else:
-
-					#print("no")
-					#print("Initial1 -----------------", chromosome)
-					#print("Initial2 -----------------", self.chromosomes)
-					self.chromosomes = copy.deepcopy(self.initialChromosomes)
-					self.replace(chromosome)
-
-					#self.chromosomes[0] = copy.deepcopy(chromosome)
-
-					self.listFitnessData = []
-					self.getFitnessData()
-					#print (self.name, " ----------------- ", self.chromosomes, " / ", self.listFitnessData)
-					self.sendMigrants()
-					#self.finished = True
-
-					#self.chromosomes = copy.deepcopy(self.prevChromosomes)
+					if chromosome.fitnessValue < self.result.fitnessValue:
+						self.result = copy.deepcopy(chromosome)
+						self.nbIdleGens = 0
+					if self.nbIdleGens == ClspThread.NbGenToStop:
+						print (self.name, " ", "Solution : ", chromosome)
+						self.finished = True		
 
 			if self.readyFlag != 0:
 				#print(self.readyFlag.isSet(), self.readyFlagId)
@@ -154,6 +148,44 @@ class ClspThread(Thread):
 			#print("Set : ", self.threadId, self.readyEvent.isSet())
 
 			return
+
+	def getPopImproved(self):
+
+		self.slaveThreadsManager.improvePop(self.chromosomes)
+		self.chromosomes.sort()
+		self.listFitnessData = []
+
+	def exploit(self, chromosome):
+
+		print("log exploit : ", chromosome)
+		queue = []
+		currentNode = AdvMutateNode(chromosome)
+
+		#i = 0
+		while True:
+
+			#i += 1
+			#print("current : ", currentNode.chromosome)
+			children = currentNode.getChildren()
+			#print("children : ", children)
+			
+			for child in children:
+				if child.chromosome not in self.chromosomes and len(self.chromosomes) < ClspThread.NbMaxPopulation:
+					self.chromosomes.append(child.chromosome)
+
+			queue += copy.deepcopy(children)
+			#print("queue : ", queue)
+
+			if queue == [] or len(self.chromosomes) > ClspThread.NbMaxPopulation :
+				break
+
+			currentNode = queue[len(queue)-1]
+			del queue[len(queue)-1]
+
+			#if i == 7:
+			#	break
+
+		print("len first : ", len(self.chromosomes), ClspThread.NbMaxPopulation)
 
 
 	def initSearch(self, queue, parameter = "main"):
@@ -170,19 +202,20 @@ class ClspThread(Thread):
 			if currentNode.isLeaf():
 
 				#print("Chromosome found : ", currentNode)
-				#print("-------------- ok : ", currentNode)
 				chromosome = Chromosome()
 				chromosome.init1(list(currentNode.solution), currentNode.fitnessValue)
 
 				self.locker.acquire()
-				#print(self.population.chromosomes)
 				if len(self.chromosomes) >= ClspThread.NbMaxPopulation:
 					self.chromosomes.sort()
+					#if self.chromosomes != []:
+					#	(self.chromosomes[0]).advmutate()
 					self.locker.release()
-					#print("YES")
 					break
 				if chromosome not in self.chromosomes:
+					#chromosome.advmutate()
 					self.chromosomes.append(copy.deepcopy(chromosome))
+					#self.exploit(chromosome)
 				self.locker.release()
 
 			else:
@@ -192,17 +225,23 @@ class ClspThread(Thread):
 				if len(children) >= 2 and parameter == "main": 
 					if self.slaveThreadsManager.currentSlaveThreadId < SlaveThreadsManager.nbSlavesThread:
 						tab = [children[len(children)-1]]
+						del children[len(children)-1]
 						self.slaveThreadsManager.initSlaveThread(copy.deepcopy(tab))
-					#self.slaveCounter += 1
 				#print("Children : ", children)
 				queue += children
 				#print("Queue : ", queue)
 		
 			if queue == []:
 				self.chromosomes.sort()
+				if self.chromosomes != []:
+					(self.chromosomes[0]).advmutate()
 				break
 			currentNode = copy.deepcopy(queue[len(queue)-1])
 			del queue[len(queue)-1]
+
+		if parameter == "main" and self.slaveThreadsManager.currentSlaveThreadId != 0:
+			#print("ok8", self.slaveThreadsManager.currentSlaveThreadId)
+			(self.slaveThreadsManager.listSlaveThreads[self.slaveThreadsManager.currentSlaveThreadId-1]).doneEvent.wait()
 
 
 
@@ -250,12 +289,6 @@ class ClspThread(Thread):
 
 			# After inserting a new good chromosome into the population, i remove a bad one
 			del self.chromosomes[len(self.chromosomes)-1]
-
-	def getPopImproved(self):
-
-		self.slaveThreadsManager.improvePop(self.chromosomes)
-		self.chromosomes.sort()
-		self.listFitnessData = []
 
 	def getFitnessData(self):
 

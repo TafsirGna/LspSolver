@@ -12,7 +12,7 @@ from clsp_main_thread import *
 class GeneticAlgorithm:
 
 	#	Class' variables
-	NbMaxPopulation = 25
+	NbMaxPopulation = 30
 	mutationRate = 0.05
 	crossOverRate = 0.80
 	FITNESS_PADDING = 1
@@ -20,7 +20,7 @@ class GeneticAlgorithm:
 	MigrationRate = 0 # this variable holds the number of generations needed before a migration occurs during the search
 	nbMainThreads = 2
 	nbSlavesThread = 2
-	#NbGenToStop = 7
+	NbGenToStop = 10
 
 	# Builder
 	def __init__(self, inst):
@@ -43,7 +43,7 @@ class GeneticAlgorithm:
 
 		ClspThread.NbMaxPopulation = GeneticAlgorithm.NbMaxPopulation
 		ClspThread.listMainThreads = self.listMainThreads
-		#ClspThread.NbGenToStop = GeneticAlgorithm.NbGenToStop
+		ClspThread.NbGenToStop = GeneticAlgorithm.NbGenToStop
 		SlaveThreadsManager.nbSlavesThread = GeneticAlgorithm.nbSlavesThread
 		ClspThread.NumberOfMigrants = GeneticAlgorithm.NumberOfMigrants
 
@@ -67,6 +67,8 @@ class GeneticAlgorithm:
 		currentNode = Node()
 		children = currentNode.getChildren()
 
+		#print ("start!!")
+		i = 0
 		while len(children) <= 1:
 			queue += children
 
@@ -74,15 +76,24 @@ class GeneticAlgorithm:
 				break
 			currentNode = copy.deepcopy(queue[len(queue)-1])
 			del queue[len(queue)-1]
+			#print("current : ", currentNode)
 			children = currentNode.getChildren()
+			#print("children : ", children)
 
+			i += 1
+			#if i == 3:
+			#	return
+
+		#print("children ", children)
+
+		
 		# i make up the queue of each main thread
 		queue += children
 		for i in range(0, len(queue)):
 			(self.listMainThreads[i%GeneticAlgorithm.nbMainThreads]).queue.append(copy.deepcopy(children[i]))
 
-		for i in range(0, len(self.listMainThreads)):
-			print(str((self.listMainThreads[i%GeneticAlgorithm.nbMainThreads]).queue))
+		#for i in range(0, len(self.listMainThreads)):
+		#	print(str((self.listMainThreads[i%GeneticAlgorithm.nbMainThreads]).queue))
 
 		# i set the flags
 		prevThread = self.listMainThreads[0]
@@ -144,9 +155,7 @@ class GeneticAlgorithm:
 
 			it += 1
 
-		
 		self.printResults()
-		
 		
 	
 	#--------------------

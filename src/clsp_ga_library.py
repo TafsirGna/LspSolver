@@ -322,6 +322,19 @@ class Instance:
 			self.deadlineDemandPeriods.append(getDemandPeriods(demandsGrid[i]))
 			i+=1
 
+		# at this point, i want to determine what category the problem submitted, belongs to
+		# to do so, the number of zeros to be present in a solution is a good factor
+		nbZero = self.nbTimes
+		for deadlines in self.deadlineDemandPeriods:
+			nbZero -= len(deadlines)
+
+		if nbZero == 0:
+			self.category = 1
+		else:
+			self.zerosRow = [0] * nbZero
+			self.category = 2
+
+		#print("category : ", self.category)
 		# Additionnal variables
 		#self.manufactItemsPeriods = getManufactPeriodsGrid(nbItems, self.deadlineDemandPeriods)
 
