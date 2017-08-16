@@ -110,11 +110,13 @@ class ClspThread(Thread):
 
 			if self.popLackingDiversity:
 
-				print("LACKING DIVERSITY - ", self.name)
+				#print("LACKING DIVERSITY - ", self.name)
 				chromosome = copy.deepcopy(self.chromosomes[0])
 			
 				# i store this local optima in the genetic algorithm's memory to remind me that it's already been visited before
 				chromosome.advmutate()	
+				if not chromosome.isFeasible():
+					print("OOOOOOOOOOOOOOOOOOOOOOOOOOOO")
 				self.chromosomes = copy.deepcopy(self.initialChromosomes)
 				self.replace(chromosome)
 

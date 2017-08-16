@@ -344,6 +344,55 @@ class Chromosome(object):
 			self._hashSolution = copy.deepcopy(result.chromosome.hashSolution)
 
 
+	def advmutate2(self):
+		# In order to implement this local search, i try to find out the gene that i call the critical gene, that's to say, the gene
+		# with the highest cost depending on the changeover cost and the holding cost	
+		
+		# We're gonna search the nearby era to find out a better solution to this problem
+		nbResults = 1
+		resultQueue = []
+		queue = []
+		currentNode = AdvMutateNode(self)
+
+		while True:
+
+			children = currentNode.getChildren()
+
+			if children == []:
+
+				resultQueue.append(copy.deepcopy(currentNode))
+				if len(resultQueue) >= nbResults:
+					break
+
+			else:
+
+				queue += copy.deepcopy(children)
+				#queue.sort()
+				#reversed(queue)
+
+				if queue == []:
+					break
+
+				currentNode = queue[len(queue)-1]
+				del queue[len(queue)-1]
+
+		#print("Result Queue : ", resultQueue)
+
+		if resultQueue != []:
+
+			result = resultQueue[len(resultQueue)-1]
+			#print ("Result : ", result)
+			for r in resultQueue:
+				if r.chromosome.fitnessValue < result.chromosome.fitnessValue:
+					result = r
+			#print ("Result : ", result)
+
+			self._solution = copy.deepcopy(result.chromosome.solution)
+			self._itemsRank = copy.deepcopy(result.chromosome.itemsRank)
+			self._fitnessValue = result.chromosome.fitnessValue
+			self._hashSolution = copy.deepcopy(result.chromosome.hashSolution)
+
+
 	def getFeasible(self):
 
 		#print(" In Chromosome 1 : ", self._solution)

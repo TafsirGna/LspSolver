@@ -76,7 +76,7 @@
 	\hspace*{.5cm}Je remercie particulièrement : \\
 	\begin{itemize}
 		\item[•] Pr. Eugène EZIN, Directeur de l'Institut de Formation et de Recherche en Informatique (IFRI) ainsi que tous les membres du corps enseignant et administratif de l'IFRI;
-		\item[•] Pr. Norbert HOUNKONNOU, pour avoir accepté de superviser mes travaux ainsi que Dr. Ratheil HOUNDJI pour l'encadrement et les conseils apportés;
+		\item[•] Pr. Norbert HOUNKONNOU, pour avoir accepté de superviser mes travaux ainsi que Dr-Ing. Vinasétan Ratheil HOUNDJI pour l'encadrement et les conseils apportés;
 		\item[•] Mon père, ma mère et par extension toute ma famille et mes proches pour leur soutien et leurs encouragements. 
 	\end{itemize}
 	
@@ -113,7 +113,6 @@
 	\hspace*{.5cm} \textbf{F-PGA} : Fine-grained Parallel Genetic Algorithm \\
 	\hspace*{.5cm} \textbf{C-PGA} : Coarse-grained Parallel Genetic Algorithm \\
 	\hspace*{.5cm} \textbf{CLSP} : Capacited Lot Sizing Problem \\
-	\hspace*{.5cm} \textbf{BFS} : Best First Search\\
 	\hspace*{.5cm} \textbf{MIP} : Mixed Integer Programming \\
 	\hspace*{.5cm} \textbf{CP} : Constraint Programming \\
 	\hspace*{.5cm} \textbf{SA} : Simulated Annealing\\
@@ -121,7 +120,8 @@
 \hspace*{.5cm} \textbf{HCM-PGA} : Hierarchical Coarse-grained and master-slave Parallel Genetic Algorithms \\
 	\hspace*{.5cm} \textbf{WW} : Wagner-Whitin \\
 	\hspace*{.5cm} \textbf{EOQ} : Economic Order Quantity \\
-	\hspace*{.5cm} \textbf{ELSP} : Economic Lot Scheduling Problem
+	\hspace*{.5cm} \textbf{ELSP} : Economic Lot Scheduling Problem \\
+	\hspace*{.5cm} \textbf{ATSP} : Asymmetric Traveling Salesman Problem
 	
 	\newpage % Page du résumé en français
 	
@@ -130,9 +130,9 @@
 	
 	\vspace{1cm}
 	
-	Le dimensionnement de lot est la tâche la plus difficile et la plus importante dans les problèmes de planification de production en industrie. Il consiste à identifier, sur un horizon de planification, le nombre (et le type) d’articles à produire et à quel moment produire de façon à minimiser le coût total de production. De récentes recherches ont expérimenté une variante NP-Difficile du problème de dimensionnement de lot : le “Pigment Sequencing Problem” (PSP). Aussi, les algorithmes génétiques ont montré leur efficacité sur des problèmes d’optimisation difficiles en trouvant de relativement bonnes solutions par rapport aux solutions optimales. Ce travail vise à donc travers l'application deux méthodes de recherche basées sur les algorithmes génétiques au “Pigment Sequencing Problem”, à identifier un plan de production qui respecte les capacités de production des machines tout en minimisant les coûts de stockage et de transition d’une production à une autre. \\
+	Le dimensionnement de lots est la tâche la plus difficile et la plus importante dans les problèmes de planification de production en industrie. Il consiste à identifier, sur un horizon de planification, le nombre (et le type) d’articles à produire et à quel moment produire de façon à minimiser le coût total de production. De récentes recherches ont expérimenté une variante NP-Difficile du problème de dimensionnement de lots : le “Pigment Sequencing Problem” (PSP). Aussi, les algorithmes génétiques ont montré leur efficacité sur des problèmes d’optimisation difficiles en trouvant de relativement bonnes solutions par rapport aux solutions optimales. Ce travail vise donc à travers l'application de deux méthodes de recherche basées sur les algorithmes génétiques au “Pigment Sequencing Problem”, à identifier un plan de production qui respecte les capacités de production des machines tout en minimisant les coûts de stockage et de transition d’une production à une autre. \\
 	\\
-	\hspace*{.5cm}\textsl{\textbf{Mots clés :}} Algorithme génétique, planification de production, pigment sequencing problem, dimensionnement de lot.
+	\hspace*{.5cm}\textsl{\textbf{Mots clés :}} Algorithme génétique, planification de production, pigment sequencing problem, dimensionnement de lots.
 	
 	\newpage % Page du résumé en anglais
 	
@@ -141,7 +141,7 @@
 	
 	\vspace{1cm}
 	
-	The lot sizing is the most difficult and important task in production planning problems in industry field. It involves determining through a planning horizon the number (and the type) of the items to manufacture and when to manufacture these items in order to minimize the overall cost of manufacturing. Some recent researches have experienced a NP-hard variant of lot sizing problem called "Pigment Sequencing Problem" (PSP). Besides, Genetic Algorithms (GA) have shown how effecient they are, in finding some relatively good solutions in comparison to the optimal ones. Thus, This work aims to apply two heuristic approaches based on genetic algorithms to the Pigment Sequencing Problem, to find a solution that fits into the machine capacity restrictions and that minimizes the stocking costs and change-over costs from one item to another one.\\
+	The lot sizing is the most difficult and important task in production planning problems in industry field. It involves determining through a planning horizon the number (and the type) of the items to manufacture and when to manufacture these items in order to minimize the overall cost of manufacturing. Some recent researches have experienced an NP-hard variant of lot sizing problem called "Pigment Sequencing Problem" (PSP). Besides, Genetic Algorithms (GA) have shown how effecient they are, in finding some relatively good solutions in comparison to the optimal ones. Thus, This work aims to apply two heuristic approaches based on genetic algorithms to the Pigment Sequencing Problem, to find a solution that fits into the machine capacity restrictions and that minimizes the stocking costs and change-over costs from one item to another one.\\
 	\\
 	\hspace*{.5cm}\textsl{\textbf{Key words :}} Genetic algorithm, production planning, pigment sequencing problem, lot sizing.
 	
@@ -157,19 +157,19 @@
 de lots (lot sizing) qui consiste à identifier les articles à produire, quand il
 faut les produire et sur quelle machine de façon à satisfaire les demandes
 tout en considérant les objectifs financiers, est l’activité la plus importante
-et la plus difficile. En effet, de la qualité des décisions qui seront prises
+et la plus difficile. En effet, de la qualité des décisions qui seront prises,
 dépendent la performance et la compétitivité de l’entreprise. Connu dans la
 littérature sous le nom de problème de lot sizing, il a été beaucoup étudié
 ces dernières décennies depuis les travaux de Wagner et Within en 1958. \\
 	\hspace*{.5cm} Différentes versions de dimensionnement de lots ont été proposées dans le littérature, chacune étant spécifique à leur domaine d'application. Récemment, Houndji et al. \cite{hvr_stockingCost} et Ceschia et al. \cite{opthub} ont expérimenté une variante NP-Difficile du problème de dimensionnement de lots. Cette version est connue comme le “Pigment Sequencing Problem” (Pochet et Wolsey \cite{pochet_wolsey}) et a été récemment inclue à la bibliothèque CSPlib (Gent and Walsh, \cite{gent_walsh}) . Il s'agit de produire plusieurs articles avec une seule machine dont la capacité de production est limitée à un article par période. L'horizon de planification est discret et fini, et il y a des coûts de stockage et des coûts de transition d'une production à une autre. Par ailleurs, les demandes sont normalisées et donc binaires. \\
-	\hspace*{.5cm} Dans la plupart des cas, un problème d’optimisation tel que le problème de dimensionnement de lots se divise naturellement en deux phases : recherche des solutions admissibles puis recherche de la solution à coût optimal parmi ces dernières. Suivant la méthode employée, ce découpage est plus ou moins apparent dans la résolution. L’usage d’un algorithme génétique est adapté à une exploration rapide et globale d’un espace de recherche de taille importante et est capable de fournir plusieurs solutions. Des calculs effectués ont révélé que l'utilisation des algorithmes génétiques pour des problèmes de dimensionnement de lots semble raisonnable dans le cas de grands problèmes où trouver la solution avec d'autres algorithmes reste encore problématique en temps. Ainsi, Il est possible qu'un algorithme génétique convenablement construit et paramétré puisse trouver de bien meilleurs résultats comparativement à ceux trouvés par d'autres algorithmes tels que le programmation en nombre entier et cela pour un même laps de temps considéré.
+	\hspace*{.5cm} Dans la plupart des cas, un problème d’optimisation tel que le problème de dimensionnement de lots se divise naturellement en deux phases : recherche des solutions admissibles puis recherche de la solution à coût optimal parmi ces dernières. Suivant la méthode employée, ce découpage est plus ou moins apparent dans la résolution. L’usage d’un algorithme génétique est adapté à une exploration rapide et globale d’un espace de recherche de taille importante et est capable de fournir plusieurs solutions. Des calculs effectués ont révélé que l'utilisation des algorithmes génétiques pour des problèmes de dimensionnement de lots semble raisonnable dans le cas de grands problè-mes où trouver la solution avec d'autres algorithmes reste encore problématique en temps. Ainsi, Il est possible qu'un algorithme génétique convenablement construit et paramétré puisse trouver de bien meilleurs résultats comparativement à ceux trouvés par d'autres algorithmes tels que le programmation en nombre entier et cela pour un même laps de temps considéré.
 	
 	\section*{Notre contribution}
-	Le "Pigment Sequencing Problem" est un problème NP-Difficile d'optimisation combinatoire pour lequel les instances de taille moyenne peuvent être efficacement résolues en utilisant une formulation appropriée de programmation en nombre mixte. Cependant, dans notre revue de littérature, aucun modèle basé sur les algorithmes génétiques n'a encore été proposé pour ce problème. Nous proposons donc deux méthodes basées sur les algorithmes génétiques pour le problème. La première est une méthode appelée "hierarchical coarsed-grained and master slave parallel genetic algorithm" qui divise la population globale en sous-populations. La seconde, appelée "hierarchical fine-grained and coarse-grained parallel genetic algorithm" qui réduit le champ de croisement à l'environnement immédiat. Les tests que nous avons menés afin de valider nos deux méthodes ont produit des résultats satisfaisants et confirmé le fait que les algorithmes génétiques sont efficaces quant il s'agit de résoudre des problèmes d'optimisation. 
+	Le "Pigment Sequencing Problem" est un problème NP-Difficile d'optimisation combinatoire pour lequel les instances de taille moyenne peuvent être efficacement résolues en utilisant une formulation appropriée de programmation en nombre mixte. Cependant, dans notre revue de littérature, aucun modèle basé sur les algorithmes génétiques n'a encore été proposé pour ce problème. Nous proposons donc deux métho-des basées sur les algorithmes génétiques pour le problème. La première est une méthode appelée "Hierarchical Coarsed-grained and Master-slave Parallel Genetic Algorithm" (HCM-PGA) qui divise la population globale en sous-populations et qui confie l'évalua-tion des différents chromosomes à des processus fils. La seconde, appelée "Hierarchical Fine-grained and Coarse-grained Parallel Genetic Algorithm" (HFC-PGA) qui réduit le champ de croisement à l'environnement immédiat tout en échangeant des individus avec les processus voisins. Les tests que nous avons menés afin de valider nos deux méthodes ont produit des résultats satisfaisants et confirmé le fait que les algorithmes génétiques sont efficaces quant il s'agit de résoudre des problèmes d'optimisation. 
 	 
 	\section*{Organisation du travail}
 
-	Le travail effectué est organisé dans ce document en 3 parties. Le première partie présente une revue de littérature des problèmes de dimensionnement de lots en planification de production en nous concentrant sur les classes de problèmes qui nous concernent dans notre étude. Ensuite, nous présentons le PSP, le décrivons et présentons les modèles utilisés dans sa résolution. Nous présentons également dans cette partie les algorithmes génétiques, leurs étapes ainsi que leurs fonctionnement. En deuxième partie, nous détaillons les deux méthodes de recherche utilisées ainsi que les algorithmes associés utilisés. Ensuite, en dernière et troisième partie, nous expérimentons  nos deux méthodes, présentons les résultats obtenus et comparons ces résultats à l'état de l'art en la matière. Pour finir, nous tirons une conclusion du travail effectué et dressons les perspectives possibles en vue d'améliorer ce qui a été fait.
+	Le travail effectué est organisé dans ce document en 3 parties. Le première partie présente une revue de littérature des problèmes de dimensionnement de lots en planification de production en nous concentrant sur les classes de problèmes qui nous concernent dans notre étude. Ensuite, nous présentons le PSP, le décrivons et présentons les modèles utilisés dans sa résolution. Nous présentons également dans cette partie les algorithmes génétiques, leurs étapes ainsi que leur fonctionnement. En deuxième partie, nous détaillons les deux méthodes de recherche utilisées ainsi que les algorithmes associés utilisés. Ensuite, en dernière et troisième partie, nous expérimentons  nos deux méthodes, présentons les résultats obtenus et comparons ces résultats à l'état de l'art en la matière. Pour finir, nous tirons une conclusion du travail effectué et dressons les perspectives possibles en vue d'améliorer ce qui a été fait.
 	
 	\newpage
 	
@@ -178,7 +178,7 @@ ces dernières décennies depuis les travaux de Wagner et Within en 1958. \\
 	\section*{Introduction}
 	\addcontentsline{toc}{section}{Introduction}
 		
-		L'état de l'art revêt une grande importance dans la conduite d'un travail de recherche. Elle permet de fixer les idées quant au travail qui a été déjà fait dans le domaine. Il s'agira donc principalement dans cette première partie de présenter la revue de littérature des problèmes de dimensionnement de lot en planification de production, d'exposer les travaux sur les algorithmes génétiques et de montrer en quoi les algorithmes génétiques sont particulièrement adaptés à ces genres de problèmes.
+		L'état de l'art revêt une grande importance dans la conduite d'un travail de recherche. Elle permet de fixer les idées quant au travail qui a été déjà fait dans le domaine. Il s'agira donc principalement dans cette première partie de présenter la revue de littérature des problèmes de dimensionnement de lots en planification de production dont fait parti le PSP, d'exposer les méthodes de recherche déjà appliquées dans la résolution du PSP et de souligner les travaux sur les algorithmes génétiques ainsi que de montrer en quoi les algorithmes génétiques sont particulièrement adaptés à ces genres de problèmes.
 		
 	\section{Le dimensionnement de lot en planification de production}
 	La planification de production est un processus qui consiste à déterminer un plan qui indique quelle quantité d'articles produire durant un intervalle de temps appelé "horizon de planification". Il est un important défi pour les entreprises industrielles car il a un fort impact sur leur performance en terme de qualité du service-client et des coûts d'exploitation.	
@@ -198,26 +198,25 @@ ces dernières décennies depuis les travaux de Wagner et Within en 1958. \\
 	
 \subsection{Critères de classification}
 
-Différents critères interviennent dans la classification des problèmes de dimensionnement de lot, notamment : 
+Différents critères interviennent dans la classification des problèmes de dimensionnement de lots, notamment : 
 \begin{description}
-	\item[\textsl{L'échelle de temps}:] La planification peut être effectuée soit sur des périodes discrètes soit sur un horizon de temps continu. Dans le premier cas, la longueur des périodes peut
+	\item[\textsl{L'échelle de temps}:] La planification peut être effectuée soit sur des périodes discrè-tes soit sur un horizon de temps continu. Dans le premier cas, la longueur des périodes peut
 être soit de petite taille (Small time buckets) correspondant à des heures ou jours, soit de grande taille (Big time buckets) correspondant à des jours ou semaines, soit de très grande taille (Very big time buckets) correspondant à des mois ou trimestres.
 
-	\item[\textsl{Le nombre de niveaux}:] Dans le cas où seules les demandes venant de l'extérieur du système sont considérées, on parle de problèmes à un niveau. Un état de l'art sur ce type de problème est proposé par Karimi et al. \cite{karimi} . Lorsqu'il existe une relation entre les produits, on considère des problèmes à plusieurs niveaux. Ce dernier type de problèmes se retrouve fréquemment dans l'industrie.
+	\item[\textsl{Le nombre de niveaux}:] On distingue les problèmes à un niveau. Un état de l'art sur ce type de problème est proposé par Karimi et al. \cite{karimi} . Lorsqu'il existe une relation entre les produits, on considère des problèmes à plusieurs niveaux. Ce dernier type de problèmes se retrouve fréquemment dans l'industrie.
 
 	\item[\textsl{Le nombre de produits}:] Dans le cas où il n'y a pas de dépendance entre les produits, en particulier, s'il n'y a pas d'utilisation commune de la capacité, nous considérons des problèmes à un seul produit. Dans le cas inverse, on parle de problèmes à plusieurs produits. Un état de l'art sur les problèmes à un produit est proposé par Brahimi et al. \cite{brahimi}.
 
-	\item[\textsl{Les contraintes de capacité}:] Les contraintes de capacité incluent le nombre d'employés, la capacité des machines, la capacité de stockage, etc. Lorsque les contraintes de capacité sont
+	\item[\textsl{Les contraintes de capacité}:] Les contraintes de capacité incluent le nombre d'employés, la capacité des machines, la capacité de stockage, etc. Lorsque les contrain-tes de capacité sont
 introduites dans le modèle, elles rendent le problème plus difficile à résoudre,
 puisqu'elles lient les produits entre eux.
 
 	\item[\textsl{Les demandes}:] Il existe plusieurs types de demandes qui peuvent être réparties selon trois
 groupes :
 	\begin{itemize}
-		\item[•] Demandes constantes , les valeurs des demandes ne changent pas sur l'horizon de temps, ou demandes dynamiques , les valeurs varient au cours du temps.
-		\item[•] Demandes certaines , les valeurs sont connues à l'avance, ou demandes stochastiques , les valeurs sont basées sur des probabilités.
-		\item[•] Demandes indépendantes , lorsqu'un produit n'a pas besoin d'autres produits comme composants, ou demandes dépendantes , lorsqu'il existe une relation
-entre les produits.
+		\item[•] les demandes constantes, les valeurs des demandes ne changent pas sur l'horizon de temps, ou demandes dynamiques , les valeurs varient au cours du temps.
+		\item[•] les demandes certaines, les valeurs sont connues à l'avance, ou demandes stochastiques , les valeurs sont basées sur des probabilités.
+		\item[•] les demandes indépendantes, lorsqu'un produit n'a pas besoin d'autres produits comme composants, ou demandes dépendantes, lorsqu'il existe une relation entre les produits.
 	\end{itemize}
 
 	\item[\textsl{Les coûts et temps de lancement ou préparation (setup)}:] Une ressource peut exécuter des produits de types différents. Ainsi, il est parfois nécessaire de reconfigurer celle-ci à chaque changement de produits. Les coûts et temps induits par le lancement de la ressource sont souvent importants car
@@ -236,7 +235,7 @@ période. Si un article est fabriqué sur une période, alors toute la capacité
 		\item[\textsl{Continuous setup lot-sizing problem :}]
 		Ce problème noté CSLP est similaire au précédent problème. La différence réside dans le fait que lorsqu'un article est produit sur une période, on utilise la capacité nécessaire pour produire cet article et non la capacité entière comme pour le problème précèdent.
 		\item[\textsl{Proportional lot-sizing and scheduling problem : }] 
-		Dans ce problème, que l'on notera PSLP, la capacité restante pour une période donnée est réutilisée pour produire un second article. Ce problème a été étudié par Drexl et Haase \cite{drexl_haase} et Kimms et Drexl \cite{drexl_kimms}. Il existe des extensions pour ce problème, par exemple, le cas à plusieurs niveaux et plusieurs machines. Dans \cite{kimms}, Kimms propose de calculer des bornes inférieures, et il résout ce problème à l'aide d'un algorithme génétique dans \cite{kimms2}.
+		Dans ce problème, que l'on notera PLSP, la capacité restante pour une période donnée est réutilisée pour produire un second article. Ce problème a été étudié par Drexl et Haase \cite{drexl_haase} et Kimms et Drexl \cite{drexl_kimms}. Il existe des extensions pour ce problème, par exemple, le cas à plusieurs niveaux et plusieurs machines. Dans \cite{kimms}, Kimms propose de calculer des bornes inférieures, et il résout ce problème à l'aide d'un algorithme génétique dans \cite{kimms2}.
 		\item[\textsl{General lot-sizing and scheduling problem : }] 
 		Ce problème noté GLSP, est plus général que les problèmes précédents, puisque le nombre d'articles à produire par période n'est pas restrictif. Il est étudié par Fleischmann et Meyr \cite{fleischmann_meyr}. Il existe des extensions de ce problème, par exemple en intégrant des temps de lancement de production dépendant de la séquence des lots à produire (\cite{meyr}).
 	\end{description}
@@ -284,14 +283,14 @@ problèmes à un produit et sans capacité, chacun solvable en temps polynomial.
 	\subsection{Description du problème}
 
 		\label{sec:problem_description}
-		Le PSP consiste à trouver un plan de production de plusieurs articles à partir d’une machine avec des coûts de changeover. Les coûts de changeover sont les coûts encourus lors du passage de la production de l’article i à celui de l’article j avec $i \neq j$. Le plan de production doit satisfaire les demandes des clients tout en :
+		Le PSP consiste à trouver un plan de production de plusieurs articles à partir d’une machine avec des coûts de transition. Les coûts de transition sont les coûts encourus lors du passage de la production de l’article $i$ à celui de l’article $j$ avec $i \neq j$. Le plan de production doit satisfaire les demandes des clients tout en :
 	\begin{itemize}
 		\item[•] respectant la capacité de production de la machine;
-		\item[•] minimisant les coûts de stockage et de changeover.
+		\item[•] minimisant les coûts de stockage et de transition.
 	\end{itemize}
 	\hspace*{.5cm} On suppose que la période de production est suffisamment courte pour ne produire qu’au plus un article par période et que les demandes sont normalisées : la capacité de production de la machine est limitée à un article par
 période et d(i, t) $ \in $ {0, 1} avec i l’article et t la période.\\
-	\hspace*{.5cm} Il s’agit d’un problème de planification de production ayant les caractéristiques suivantes : un horizon de planification discret et fini ; des contraintes de capacité ; une demande statique et déterministe ; multi-item et small bucket, des coûts de changeover; un seul niveau; sans shortage.\\
+	\hspace*{.5cm} Il s’agit d’un problème de planification de production ayant les caractéristiques suivantes : un horizon de planification discret et fini ; des contraintes de capacité ; une demande statique et déterministe ; multi-item et small bucket, des coûts de transition; un seul niveau; sans shortage.\\
 
 	\textbf{\textsl{Illustration}} : Soit un problème avec les données ci-dessous : \\
 	\begin{itemize}
@@ -303,7 +302,7 @@ période et d(i, t) $ \in $ {0, 1} avec i l’article et t la période.\\
 	Soit \emph{xT} le plan de production qui représente une solution potentielle du problème. Il s’agit d’un tableau de dimension \emph{NT} , contenant à son indice t (avec $t  \in  {1...NT}$) l’article i à produire. Une solution admissible du problème est : $ xT = (2, 1, 2, 0, 1)$ avec un coût de $ q(2, 1) + q(1, 2) + q(2, 1) + 2 * h(2) = 15 $. La solution optimale est : $ xT = (2, 1, 0, 1, 2)$ avec un coût de $q(2, 1) + q(1, 2) + h(1) = 10$.
 		
 		\subsection{Modèles et formulations}
-		Différents modèles ont été proposés afin de représenter, modéliser et résoudre le PSP. Il s'agit des modèles de programmation mixte en nombres entiers ou MIP (au nombre de 3) proposés par Pochet et Wolsey \cite{pochet_wolsey}, considérés comme l'état de l'art des méthodes de résolution exactes sur les problèmes de dimensionnement de lot en particulier celui du PSP, du modèle CP et du modèle SA. Nous présentons donc ici le premier modèle MIP dont les deux derniers sont une reformulation, le modèle CP (atleast) ainsi que le modèle SA.
+		Différents modèles ont été proposés afin de représenter, modéliser et résoudre le PSP. Il s'agit des modèles de programmation mixte en nombres entiers ou MIP (au nombre de 3) proposés par Pochet et Wolsey \cite{pochet_wolsey}, considérés comme l'état de l'art des méthodes de résolution exactes sur les problèmes de dimensionnement de lots en particulier celui du PSP, du modèle CP et du modèle SA. Nous présentons donc ici le premier modèle MIP dont les deux derniers sont une reformulation, le modèle CP ainsi que le modèle SA.
 		\subsubsection{Modèle MIP 1}
 		
 		Le modèle MIP 1 tel qu'exposé par Pochet et Wolsey se présente comme suit:
@@ -322,53 +321,48 @@ période et d(i, t) $ \in $ {0, 1} avec i l’article et t la période.\\
 			\item[-] $x_{t}^{i}$ : variable binaire de production qui vaut 1 si l’article i est produit à la période t et 0 sinon ;
 			\item[-] $y_{t}^{i}$ : variable binaire de setup qui vaut 1 si la machine est préparée pour la production de l’article i et 0 sinon ;
 			\item[-] $s_{t}^{i}$ : variable entière de stockage qui contient le nombre d’articles i stockés à la période t ; 
-			\item[-] $ch_{t}^{i,j}$ : variable binaire de changeover qui vaut 1 si à la période t, on est passé de la production de l’article i à l’article j et 0 sinon.
+			\item[-] $ch_{t}^{i,j}$ : variable binaire de transition qui vaut 1 si à la période t, on est passé de la production de l’article i à l’article j et 0 sinon.
 		\end{itemize}
 		\vspace*{.3cm}
-	\hspace*{.5cm} L'objectif est de minimiser la somme des coûts de stockage et des coûts de changeover et est exprimé par la contrainte (1). La contrainte (2) rappelle qu'il n'y a pas de stock initial. La contrainte (3) exprime la règle de la conservation de flot. La contrainte (4) vise à forcer la variable de setup $y_{t}^{i}$ à prendre la valeur 1 s’il y a production de l’article i à la période t. La contrainte (5) s'assure qu'il y a toujours un article qui est préparé. En accord avec la fonction objectif, $y_{t}^{i}$ va prendre la valeur qui minimise le coût de changeover. En général s’il n’y a pas de production à la période t,
+	\hspace*{.5cm} L'objectif est de minimiser la somme des coûts de stockage et des coûts de transition et est exprimé par la contrainte (1). La contrainte (2) rappelle qu'il n'y a pas de stock initial. La contrainte (3) exprime la règle de la conservation de flot. La contrainte (4) vise à forcer la variable de setup $y_{t}^{i}$ à prendre la valeur 1 s’il y a production de l’article i à la période t. La contrainte (5) s'assure qu'il y a toujours un article qui est préparé. En accord avec la fonction objectif, $y_{t}^{i}$ va prendre la valeur qui minimise le coût de transition. En général s’il n’y a pas de production à la période t,
 $y_{t}^{i} = y_{t-1}^{i}$ ou $y_{t}^{i} = y_{t+1}^{i}$
 mais parfois il peut être intéressant de préparer
-la machine pour un article intermédiaire sans le produire. La contrainte (6) assigne les valeurs aux variables de changeover.
-En effet, si $y_{t-1}^{i}$ et $y_{t}^{i}$ valent 1 alors $ch_{t}^{i,j}$ est obligé de prendre la valeur 1 et sinon $ch_{t}^{i,j}$ serait égale à 0 grâce à la fonction objectif qui minimise le coût de changeover.
+la machine pour un article intermédiaire sans le produire. La contrainte (6) assigne les valeurs aux variables de transition.
+En effet, si $y_{t-1}^{i}$ et $y_{t}^{i}$ valent 1 alors $ch_{t}^{i,j}$ est obligé de prendre la valeur 1 et sinon $ch_{t}^{i,j}$ serait égale à 0 grâce à la fonction objectif qui minimise le coût de transition.
 		
-		\subsubsection{Modèle CP (atleast)}
-		Dans ce modèle, l’objectif est d’attribuer à chaque période l’article à produire (l’article 0 pour les périodes où on ne produit rien) tout en respectant les spécifications de base du problème. Reconsidérons l’instance de l’exemple 1 et la Figure \ref{fig:cp_modele_figure} pour avoir une première intuition du modèle. 
+		\subsubsection{Modèle CP}
+		Dans ce modèle, l’objectif est d’attribuer à chacune des demandes, une période qui respecte la date limite de satisfaction de la demande. On note $date(p) \in [1,...,T],\ \forall p \in [1,...,n]$ la période dans laquelle la demande $p$ a été satisfaite, $dueDate(p) \in [1,...,T]$ la date limite de la demande $p$ et $I(p)$ l'article correspondant à la demande $p$. Afin de s'assurer de la faisabilité de la solution, les principales contraintes sont les suivantes:
+		\begin{eqnarray}
+			date(p) \leq duedate(p), \forall p \\
+			alldifferent(date)
+		\end{eqnarray}
 		
-		\begin{figure}[h]
-		\begin{center}
-			\includegraphics[scale=.5]{img/cp_modele_figure.png}
-			\caption{Principe du modèle CP (atleast) - Pigment Sequencing problem}
-			\label{fig:cp_modele_figure}
-		\end{center}
-		\end{figure}
-		
-		\textsl{\textbf{Description de la figure \ref{fig:cp_modele_figure}}} \\
+		dans lesquelles:
 		\begin{itemize}
-			\item[-] le plan de production doit contenir exactement deux articles 1 et deux
-articles 2 ;
-			\item[-] \textbf{\emph{1}} correspond à la période 1, le nombre d’articles 2 dans le plan de production doit être d’au moins 1 
-			\item[-] \textbf{\emph{2}} correspond à la période 2, le nombre d’articles 1 et le nombre d’articles 2 dans le plan de production doivent être d’au moins 1 chacun ;
-			\item[-] \textbf{\emph{3}} correspond à la période 5, le nombre d’articles 1 et le nombre d’articles 2 dans le plan de production doivent être d’au moins 2 chacun.
+			\item[-] Equation 8: chaque demande doit être satisfaite avant sa date limite;
+			\item[-] Equation 9: Puisque la capacité d'une machine est limitée à 1, chaque demande doit être satisfaite à différente période.
+		\end{itemize}
+		Il est possible de modeler la partie des coûts de transition comme un ATSP, chaque demande représente une ville qui doit être visitée et les coûts de transition sont les distances entre deux villes. Ainsi, on ajoute une demande artificielle $n+1$ de sorte que $date(n+1) = T+1$ avec $q^{I(p), I(n+1)} = q^{I(n+1), I(p)} = 0, \forall p \in [1,...,n]$. On note alors $successor(p), \forall p \in [1,...,n]$, la demande satisfaite juste après la satisfaction de la demande $p$. Les contraintes suivantes additionnelles peuvent être alors ajoutées:
+		\begin{eqnarray}
+			circuit(successor) \\
+			date(p) \leq date(successor(p)), \forall p \in [1,...,n]
+		\end{eqnarray}
+		dans lesquelles:
+		\begin{itemize}
+			\item[-] Equation 10: il garantit l'existence d'un circuit hamiltonien;
+			\item[-] Equation 11: la demande $p$ doit être satisfaite avant ses successeurs.
 		\end{itemize}
 		
-		\vspace*{.5cm}
-		\textsl{\textbf{Variables de décision}} \\
+		Enfin, l'objectif est de minimiser les coûts de stockage et les coûts de transition.
+		\[
+			\sum_{p}{(dueDate(p)-date(p))} * h_{I(p)} + \sum_{p}{q^{I(p),I(successor(p))}}
+		\]
 		
-		$xT$ (le plan de production) : Elle définit l’article qui sera produit à la période t. Pour représenter l’état de la machine dans lequel on ne produit rien, on introduit l’article artificiel 0. On a $xT : \{1, ..., N T\} \rightarrow \{0, ..., NI\}$. \\
-		
-		\textsl{\textbf{Variables auxiliaires}} \\
-		\begin{description}
-			\item[$yT : \{1, ..., NT\} \rightarrow \{1, ..., NI\}$ :] Cette variable est utile pour le coût de changeover dans la fonction objectif. En effet, à cause de l’article artificiel 0 présent dans le plan de production $xT$ , nous ne savons pas directement estimer les coûts de changeover avec $xT$ . Le tableau $yT$ , de dimension $NT$ , représente la séquence de setup de la machine pendant l’horizon de planification. $yT$ t est égale à $xT_{t}$ s’il y a production d’un article à la période t et est, en général, égale à $xT_{t-1}$ ou $xT_{t+1}$ sinon.
-			\item[$s : s_{it}$:] avec $i \in {1..NI}$ et $t \in {0..NT}$, variable entière de stockage
-définie comme pour le modèle MIP. Elle est utile pour définir la fonction objectif.
-			\item[$x : x_{it}$:] avec $i \in {1..N I}$ et $t \in {1..N T}$, variable binaire définie comme pour le modèle MIP. On peut facilement déduire $x$ de $xT$ ..
-		\end{description}
-		\hspace*{.5cm} L’utilisation des variables $s$ et $x$ dans ce modèle découle de la "difficulté" d’exprimer simplement les coûts de stockage. Pour une compréhension approfondie de ce modèle, nous pourrons nous référer à Houndji \cite{houndji}
 	
 		\subsubsection{Modèle SA}
-		Dans ce modèle, la procédure de recuit simulé conduit à chaque itération à une action aléatoire en utilisant une distribution uniforme. Comme toujours en recuit simulé, l'action est toujours acceptée if elle est facteur d'amélioration. Dans le cas contraire, elle est accepté si elle est basée si une distribution en temps de croissante de façon exponentielle. Dans le détail, une mauvaise action est accepté avec une probabilité de $e^{-\Delta/T}$ où $\Delta$ est la différence du coût total induit par l'action et $T$ est la température. La température commence à une valeur $T_{0}$ et est multiplié par $\alpha$ (avec $0 < \alpha < 1$), après un nombre fixé d'échantillons $n_{s}$, selon la procédure de refroidissement géométrique standard du recuit simulé. \\
+		Dans ce modèle, la procédure de recuit simulé conduit à chaque itération à une action aléatoire en utilisant une distribution uniforme. Comme toujours en recuit simulé, l'action est toujours acceptée si elle est facteur d'amélioration. Dans le cas contraire, elle est accepté, si elle est basée sur une distribution en temps de croissante de façon exponentielle. Dans le détail, une mauvaise action est acceptée avec une probabilité de $e^{-\Delta/T}$ où $\Delta$ est la différence du coût total induit par l'action et $T$ est la température. La température commence à une valeur $T_{0}$ et est multipliée par $\alpha$ (avec $0 < \alpha < 1$), après un nombre fixé d'échantillons $n_{s}$, selon la procédure de refroidissement géométrique standard du recuit simulé. \\
 		\hspace*{.5cm} Dans le but d'accélérer les premières étapes de la procédure de recuit simulé,  Ceschia et al. ont utilisé un mécanisme de \emph{cut-off} (Johnson et al. \cite{johnson}). Ils ont ajouté un nouveau paramètre $n_{a}$ représentant le nombre maximal d'actions acceptées à chaque niveau de température. Ainsi, la température diminue lorsque la première des deux conditions suivantes est remplie : ($i$) le nombre d'actions échantillonnées atteint $n_{s}$, ($ii$) le nombre d'actions acceptées atteint $n_{a}$. \\
-		\hspace*{.5cm} Le critère de terminaison est basé sur le nombre total d'itération $I_{max}$, plutôt que sur un seuil de température. De cette manière, le temps d'exécution est approximativement le même pour toutes les configurations des paramètres.
+		\hspace*{.5cm} Le critère de terminaison est basé sur le nombre total d'itérations $I_{max}$, plutôt que sur un seuil de température. De cette manière, le temps d'exécution est approximativement le même pour toutes les configurations des paramètres.
 		
 	\section{Les algorithmes génétiques}
 		
@@ -380,7 +374,7 @@ un choix aléatoire comme outil pour guider une exploration intelligente dans l�
 	Les algorithmes génétiques emploient un vocabulaire emprunté à la génétique naturelle. Ils travaillent sur un ensemble d’individus appelé population. Un individu a deux représentations appelées phénotype et génotype. Le phénotype représente une solution potentielle du problème à optimiser en utilisant la formulation originale du problème. Le génotype donne une représentation codée
 d’une solution potentielle sous la forme d’un chromosome. Un chromosome est formé de gènes disposés en une succession linéaire et chaque gène peut prendre plusieurs
 valeurs appelées allèles. Par exemple, un chromosome se compose d’une succession de 0 et de 1 (c.-à-d. une chaîne binaire), et la valeur pour une certaine position correspond à "on" (la valeur = 1) ou à "off" (la valeur = 0) d’un certain dispositif. Des formes plus compliquées, telles qu’un ordre des symboles et une permutation des alphabets, sont choisies pour décrire les chromosomes du problème à optimiser. Chaque individu a une fonction objectif f (fonction « fitness ») qui mesure l’adaptation de l’individu à son environnement local. La théorie darwinienne indique que, parmi des individus d’une population, celui qui est le mieux adapté à l’environnement local a le plus de chance de survivre et d’avoir un plus grand nombre de descendants : c’est la règle de la « survie du plus fort ». Ainsi, la
-fonction objectif f du problème d’optimisation joue le rôle d’un critère d’adaptation [18]. Un des points les plus importants des algorithmes génétiques est la flexibilité dans la fonction objectif.
+fonction objectif f du problème d’optimisation joue le rôle d’un critère d’adaptation. Un des points les plus importants des algorithmes génétiques est la flexibilité dans la fonction objectif.
 
 	\subsection{Fonctionnement}
 	
@@ -430,7 +424,7 @@ hasard. Un enfant prend une section avant le point de croisement d’un parent e
 		
 		\item[\textsl{Le croisement à deux points :}]Le croisement à deux points place deux points de croisement au hasard, et prend une section entre les points d’un parent et les autres sections en dehors des points de l’autre parent puis les recombine. 
 	
-		\item[\textsl{Le croisement uniforme :}]Ce type de croisement a été proposé par Syswerda [14]. Il consiste à choisir avec la même probabilité un allèle de l’un ou de l’autre parent, pour transmettre sa valeur à la même position, aux enfants. 
+		\item[\textsl{Le croisement uniforme :}]Ce type de croisement a été proposé par Syswerda \cite{Syswerda}. Il consiste à choisir avec la même probabilité un allèle de l’un ou de l’autre parent, pour transmettre sa valeur à la même position, aux enfants. 
 	
 	\end{description}
 	
@@ -440,7 +434,7 @@ hasard. Un enfant prend une section avant le point de croisement d’un parent e
 	
 	\subsection{Application des algorithmes génétiques aux problèmes d'optimisation}
 	
-	Les algorithmes génétiques ont été largement utilisées ces dernières années [9, 12, etc.]. L’utilisation des AGs dans de nombreux domaines a fait ses preuves, notamment dans des problèmes combinatoires tels que les problèmes d’ordonnancement [4, 13, 18, 5] et les problèmes de collecte et de distribution. Les problèmes d’ordonnancement d’un atelier classique de type Job-Shop (JSP) ont notamment été largement étudiés et résolus par les AGs [1, 3, 6, 10, 11, 15, etc.]. D’autres algorithmes hybrides ont été aussi proposés [2, 8, 16]. La difficulté principale dans la résolution de ces types de problèmes résulte dans la façon avec laquelle ils sont représentés sous forme algorithmique. Cette phase, la définition du chromosome, représente le point le plus important dans la recherche génétique. Plusieurs approches de représentation et différents types d’opérateurs d’AGs ont été proposés, pour résoudre ces problèmes.
+	Les algorithmes génétiques ont été largement utilisées ces dernières années \cite{jawahar}. L’utilisation des AGs dans de nombreux domaines a fait ses preuves, notamment dans des problèmes combinatoires tels que les problèmes d’ordonnancement \cite{davis} et les problèmes de collecte et de distribution. Les problèmes d’ordonnancement d’un atelier classique de type Job-Shop (JSP) ont notamment été largement étudiés et résolus par les AGs \cite{boukef}. D’autres algorithmes hybrides ont été aussi proposés \cite{cavalieri}. La difficulté principale dans la résolution de ces types de problèmes résulte dans la façon avec laquelle ils sont représentés sous forme algorithmique. Cette phase, la définition du chromosome, représente le point le plus important dans la recherche génétique. Plusieurs approches de représentation et différents types d’opérateurs d’AGs ont été proposés, pour résoudre ces problèmes.
 	
 	\section*{Conclusion}
 	\addcontentsline{toc}{section}{Conclusion}
@@ -480,7 +474,7 @@ hasard. Un enfant prend une section avant le point de croisement d’un parent e
 	\subsection{Représentation génétique}
 	Différentes représentations peuvent être utilisées avec les techniques évolutionnaires telles que les algorithmes génétiques. La représentation la plus simple pour les algorithmes génétiques est celle utilisée par John Holland: une chaîne de bits. Une chaîne de bits est connue comme un chromosome, et chaque bit est un gène. En début d'étude, nous avons donc commencé par représenter un chromosome en chaîne de bits. \\
 	\textsl{\textbf{Exemple}}:\\
-	\hspace*{.5cm} En suivant l'exemple d'une instance de PSP en \pageref{sec:problem_description}, nous pouvons représenter un chromosome conformément à la figure \ref{fig:init_gene_repr}.
+	\hspace*{.5cm} En suivant l'exemple d'une instance de PSP en page \pageref{sec:problem_description}, nous pouvons représenter un chromosome conformément à la figure \ref{fig:init_gene_repr}.
 	
 	\begin{figure}[h]
 		\begin{center}
@@ -492,9 +486,9 @@ hasard. Un enfant prend une section avant le point de croisement d’un parent e
 	
 	Autrement dit:
 	\begin{center}
-		$ch_{n} = \{(x_{1,1}),..., (x_{1,t+1}),..., ( x_{1,T}), (x_{j+1,1}),...,(x_{j+1, t+1}),..., (x_{j+1,T}),..., (x_{N,T})\}$ \\
+		$ch_{n} = \{(x_{1,1}),..., (x_{1,t+1}),..., ( x_{1,T}), (x_{i+1,1}),...,(x_{i+1, t+1}),..., (x_{i+1,T}),..., (x_{I,T})\}$ \\
 	\end{center}
-	\hspace*{.5cm} où $x_{N,T}$ est la variable booléenne qui indique la production ou non d'un article \emph{N} en période \emph{T}.  \\
+	\hspace*{.5cm} où $x_{I,T}$ est la variable booléenne qui indique la production ou non d'un article \emph{I} en période \emph{T}.  \\
 	\\
 	\hspace*{.5cm} Dans cette représentation, un chromosome est une chaîne de bits (0 et 1) qui indique la production ou non d'un article \emph{i} et de longueur \emph{nItems * nTimes} (où \emph{nItems} est le nombre d'articles et \emph{nTimes} est le nombre de périodes). Ainsi, l'article 1 est produit dans les périodes 2 et 5; et l'article 2 est produit dans les périodes 1 et 4. Le chromosome représenté ci-dessus est ainsi un plan de production qui satisfait aux contraintes du système de production spécifiques à cette instance du problème. Toutefois, au cours de notre étude, une seconde représentation nous est apparue plus cohérente et facilement manipulable. Cette représentation génétique est présentée à la figure \ref{fig:adopt_gene_repr} et étudiée par Mirshekarian et al. \cite{suer}.
 	
@@ -506,97 +500,88 @@ hasard. Un enfant prend une section avant le point de croisement d’un parent e
 		\end{center}
 	\end{figure}
 	
-	Dans cette représentation, un chromosome est une suite d'entiers correspondant aux articles produits et de longueur \emph{nTimes}. La longueur réduite de ce chromosome réduit dans le même temps la complexité du parcours du chromosome lors des implémentations.
+	Dans cette représentation, un chromosome est une suite d'entiers correspondant aux articles produits et de longueur \emph{nTimes}. La longueur réduite de ce chromosome réduit dans le même temps la complexité du parcours du chromosome lors des implé-mentations.
 	\subsection{Initialisation}
-	Le processus d'initialisation consiste à construire la population initiale; c'est à dire celle à partir de laquelle se feront les opérations de sélection, crossover ou encore mutation afin de la faire évoluer sur des générations. L'initialisation en algorithmes génétiques se fait de manière aléatoire dans l'optique de trouver des individus suffisamment différents capables de constituer une population diverse et ainsi que largement couvrir l'espace de recherche. \\
-	\hspace*{.5cm} Une autre approche consiste à créer les individus devant composer la population initiale en se servant de stratégies de recherche déterministes et informés munis de fonctions d'évaluation suffisamment précises menant à des bonnes solutions. Notre approche a été de combiner les deux méthodes: utiliser une stratégie de recherche en l’occurrence le "Best-First Search" (BFS) dotée d'une fonction d'évaluation afin de déterminer lequel des fils à considérer; et utiliser une fonction de \emph{random} afin de rendre le parcours suffisamment aléatoire et conduisant à des individus différents. \\
-	\hspace*{.5cm} L'algorithme d'initialisation mis en œuvre est ainsi détaillé comme suit: \\
+	Le processus d'initialisation consiste à construire la population initiale; c'est à dire celle à partir de laquelle se feront les opérations de sélection, croisement ou encore mutation afin de la faire évoluer sur des générations. L'initialisation en algorithmes génétiques se fait de manière aléatoire dans l'optique de trouver des individus suffisamment différents capables de constituer une population diverse et ainsi que largement couvrir l'espace de recherche. \\
+	\hspace*{.5cm} Une autre approche consiste à créer les individus devant composer la population initiale en se servant de stratégies de recherche déterministes et informés munis de fonctions d'évaluation suffisamment précises menant à des bonnes solutions. Notre approche a été donc d'utiliser une stratégie de recherche en l’occurrence le "Hill Climbing" dotée d'une fonction d'évaluation afin de déterminer lequel des fils à considérer.\\
+	\hspace*{.5cm} \textbf{\textsl{Principe:}}\\
+	Le principe d'initialisation de la population est le suivant : remplir un chromosome en commençant par le dernier gène et en finissant par le premier. Cela permet de s'assurer de la faisabilité des solutions que nous trouvons au bout de processus. Ainsi, pour chaque gène visité, nous disposons de la liste des allèles qui peuvent prétendre occuper ce dernier, nous pouvons alors choisir l'allèle qui minimise le "fitness" du chromosome entrain d'être constitué.\\
+	\hspace*{.5cm} \textbf{\textsl{Algorithme:}}\\	
+	L'algorithme d'initialisation mis en œuvre est ainsi détaillé comme suit: \\
 	
 	\begin{algorithm}[H]
- 		\caption{Processus de génération de la population initiale}
+		\caption{Processus de génération de la population initiale}
  		\KwData{instance de PSP à traiter, taille de la population}
  		\BlankLine
  		\KwResult{Population initiale constituée}
- 		\BlankLine
- 	    $populationInitiale \gets tableau vide$  \\
- 	    \BlankLine
- 	    $item \gets random(1, nbItems)$ \\
- 	    \BlankLine
- 	    $listeDemandes \gets demandes(item)$ \\
- 	    \BlankLine
- 	    $demande \gets random(listeDemandes)$ \\
- 	    \BlankLine
- 	    $individu.satisfaireDemande(item, demande)$\\
- 	    \BlankLine
- 	    $root \gets creerNode(individu)$ \\
- 	    \BlankLine
- 	    $DFS(populationInitiale, individu, taillePopulation)$ \\
- 	    \BlankLine
- 	    \Return {$populationInitiale$}
-	\end{algorithm}
-	
-	\vspace*{.5cm}
-	La description de la stratégie de recherche BFS utilisée est effectuée comme suit: \\
-	
-	\begin{algorithm}[H]
-		\caption{Description du Best First Search utilisée}
- 		\KwData{instance de PSP à traiter, taille de la population, root}
- 		\BlankLine
- 		\KwResult{Population initiale constituée}
 		\BlankLine 		
+		$queue \gets []$
+		\BlankLine
+		$noeud \gets nouveauNoeud()$ \\
+		\BlankLine
  		\While{taille(populationInitiale) est inférieure à taillePopulation}{
  			\BlankLine
- 			\If{individu est faisable}{
+ 			\eIf{noeud.chromosome est prêt}{
  				\BlankLine
- 				$populationInitiale.ajouter(individu)$\\
- 				\BlankLine
- 				$individu \gets nouveauChromosome()$
- 				\BlankLine
- 			}
- 			\BlankLine
- 			//Générer les noeuds suivants \\
- 			\BlankLine
- 			\For { $ i \gets 1 $ \KwTo $ nbItems $ }{
- 				\BlankLine
- 				$item \gets random(1, nbItems)$ \\
- 				\BlankLine
- 				$listeDemandes \gets demandes(item)$ \\
- 				\BlankLine
- 				\For {demande in listeDemandes}{
- 					\BlankLine
- 					\For {period $\gets$ 0 \KwTo demande}{
- 						\BlankLine
- 						individu.insererItem(item, period)
- 						\BlankLine
- 						$node \gets creerNode(individu)$ \\
- 						\BlankLine
- 						$queue.inserer(individu)$
- 						\BlankLine
- 					}
- 					\BlankLine
- 				}
- 				\BlankLine
- 			}
- 			\If{queue est vide}{
- 				\BlankLine
- 				arrêter \\
- 				\BlankLine
- 			}
- 			\BlankLine
- 			$node \gets queue.retirerDernier()$ 
- 			\BlankLine	
+ 			 	populationInitiale.ajouter(noeud.chromosome)
+ 			 	\BlankLine
+ 			 }
+ 			 {
+ 			 	\BlankLine
+ 			 	$noeudFils \gets noeud.getSuccessors()$ \\
+ 			 	\BlankLine
+ 			 	noeudFils.trier(decroissant) \\
+ 			 	\BlankLine
+ 			 	queue.ajouter(noeudFils)
+ 			 	\BlankLine
+ 			 	\If {queue est vide}
+ 			 	{
+ 			 		\BlankLine
+ 			 		\Return populationInitiale
+ 			 		\BlankLine
+ 			 	}
+ 			 	\BlankLine
+ 			 	$noeud \gets  queue.dernier()$
+ 			 }	
 	}
+	\Return populationInitiale
+	\end{algorithm}	
+	\vspace*{.5cm}
+	L'algorithme suivi afin de générer les successeurs d'un noeud donné est le suivant:
+	\begin{algorithm}[H]
+		\caption{Processus de génération des successeurs d'un noeud}
+ 		\KwData{noeud}
+ 		\BlankLine
+ 		\KwResult{liste des successeurs constituée}
+		\BlankLine 		
+		$successeurs \gets []$
+		\BlankLine
+		\For{ item $\gets$ 1 $\KwTo$ nbItems}
+		{
+			\BlankLine
+			\If{item.dernierDeadline $>=$ noeud.currentPosition}
+			{
+				\BlankLine
+				noeudFils = copie(noeud)
+				\BlankLine
+				noeudFils.currentPosition -= 1
+				\BlankLine
+				successeurs.ajouter(noeudFils)
+				\BlankLine
+			}
+		}
+	\Return successeurs
 	\end{algorithm}	
 	
 	\subsection{Opérateurs génétiques}
 		\subsubsection{Sélection}
 		
-		La sélection est le processus qui consiste à choisir dans la génération actuelle, les chromosomes ou individus qui seront reproduits afin de former la prochaine génération. Différentes méthodes de sélection existent. On distingue entre autres, la selection par tournoi et la sélection par "\emph{roulette wheel}". \\
-		\hspace*{.5cm} Dans notre étude, nous choisissons de nous interesser à la plus connue et commune d'entre les méthodes de sélection: le \emph{"Roulette Wheel"}. Dans la sélection par "\emph{roulette wheel}", les individus se voient attribués une probabilité d'être sélectionnés. Cette probabilité est directement proportionnelle à leur fonction d'évaluation. Les individus sont donc choisis aléatoirement en se basant sur leur probabilité et se reproduisent en générant des individus "\emph{fils}". Ces "\emph{fils}" sont ainsi de nouvelles solutions au problème et forme une nouvelle population.		
+		La sélection est le processus qui consiste à choisir dans la génération actuelle, les chromosomes ou individus qui seront reproduits afin de former la prochaine génération. Différentes méthodes de sélection existent. On distingue entre autres, la sélection par tournoi et la sélection par "\emph{roulette wheel}". \\
+		\hspace*{.5cm} Dans notre étude, nous choisissons de nous intéresser à la plus connue et commune d'entre les méthodes de sélection: le \emph{"Roulette Wheel"}. Dans la sélection par "\emph{roulette wheel}", les individus se voient attribués une probabilité d'être sélectionnés. Cette probabilité est directement proportionnelle à leur fonction d'évaluation. Les individus sont donc choisis aléatoirement en se basant sur leur probabilité et se reproduisent en générant des individus "\emph{fils}". Ces "\emph{fils}" sont ainsi de nouvelles solutions au problème et forme une nouvelle population.		
 		
 		\subsubsection{Croisement}
 		
-		Une fois les individus sélectionnés, intervient le croisement. Le croisement en un point a été choisi afin de reproduire ces individus. Cette forme de croisement reste une des plus simples et répandues. La figure \ref{fig:used_cross_over} présente une illustration du croisement appliqué à l'instance de PSP introduite à la page \pageref{ex:psp}. \\
+		Une fois les individus sélectionnés, intervient le croisement. Le croisement en un point a été choisi afin de reproduire ces individus. Cette forme de croisement reste une des plus simples et répandues. La figure \ref{fig:used_cross_over} présente une illustration du croisement appliqué à l'instance de PSP introduite à la page \pageref{sec:problem_description}. \\
 		\begin{figure}[!h]
 			\begin{center}
 				\includegraphics[scale=.5]{img/cross_over_fig.png}
@@ -617,7 +602,7 @@ hasard. Un enfant prend une section avant le point de croisement d’un parent e
  		child2 $\gets$ $nouveau\ chromosome()$ \\
  		$probabilite \gets random(1,99)$ \\
  		\BlankLine
- 		\If{probabilite $\geq$ seuil\_probabilite}
+ 		\If{probabilite $\leq$ seuil\_probabilite}
  		{
  			$nbGenes \gets NombreDeGenes(parent1)$\\
  			$indice\_gene \gets random(1, nbGenes)$\\
@@ -641,7 +626,7 @@ hasard. Un enfant prend une section avant le point de croisement d’un parent e
 		\end{algorithm}
 		  
 	\subsubsection{Mutation}
-	Après la sélection et le croisement, une nouvelle population d'individus est prête. Certains ont été copiés directement et d'autres se sont reproduits par croisement. Dans le but de s'assurer que les individus ne sont pas exactement les mêmes, une mutation est appliquée à chacun des individus "\emph{fils}". A chaque gène, on attribue une chance de muter. Dans le cas, où la mutation se produit, la valeur du gène muté change de période. Un visuel de la mutation est présenté à la figure \ref{fig:used_mutation}. La mutation est une élément vital de la garantie d'une diversité au sein de la population. L'algorithme \ref{alg:mutation} détaille le processus utilisé afin de faire muter un chromosome. 
+	Après la sélection et le croisement, une nouvelle population d'individus est prête. Certains ont été copiés directement et d'autres se sont reproduits par croisement. Dans le but de s'assurer que les individus ne sont pas exactement les mêmes, une mutation est appliquée à chacun des individus "\emph{fils}". A chaque gène, on attribue une chance de muter. Dans le cas, où la mutation se produit, la valeur du gène muté change de période. Un visuel de la mutation est présenté à la figure \ref{fig:used_mutation}. La mutation est un élément vital de la garantie d'une diversité au sein de la population. L'algorithme \ref{alg:mutation} détaille le processus utilisé afin de faire muter un chromosome. 
 	
 	\begin{figure}[!h]
 		\begin{center}
@@ -659,19 +644,29 @@ hasard. Un enfant prend une section avant le point de croisement d’un parent e
  		\BlankLine
  		$probabilite \gets random(1,99)$ \\
  		\BlankLine
- 		\If{probabilite $\geq$ seuil\_probabilite}
+ 		\If{probabilite $\leq$ seuil\_probabilite}
  		{
+ 			\BlankLine
  			$nbGenes \gets NombreDeGenes(chromosome)$\\
+ 			\BlankLine
  			$indice\_gene \gets random(1, nbGenes)$\\
+ 			\BlankLine
+ 			$gene1 \gets getGene(chromosome, indice\_gene)$ \\
+ 			\BlankLine
  			//$ Le \ nombre \ de \ genes \ du \ parent1 \ est \ le \ meme \ que \ celui \ du \ parent2 $\\
- 			\For{ i $\gets$ 0 \KwTo indice\_gene}
+ 			\BlankLine
+ 			\For{ i $\gets$ indice\_gene \KwTo 0}
  			{
- 				$gene1 \gets getGene(chromosome, i)$ \\
- 				\If{gene est disponible}
+ 				\BlankLine
+ 				$gene2 \gets getGene(chromosome, i)$\\
+ 				\BlankLine
+ 				\If{deadline(gene2) $>=$ indice\_gene}
  				{
- 					$gene2 \gets getGene(indice\_gene)$\\
+ 					\BlankLine
  					$deplacer(gene1, gene2, chromosome)$ \\
+ 					\BlankLine
  					$arret$
+ 					\BlankLine
  				}
  			}
  		}
@@ -681,8 +676,8 @@ hasard. Un enfant prend une section avant le point de croisement d’un parent e
 	\subsection{Évaluation}
 	L'évaluation dans notre étude, se réfère à la fonction objectif. Il s'agit de minimiser les coûts d'exploitation et de production. Deux types de coût sont à prendre en compte:
 	\begin{itemize}
-		\item[•] Les coûts de preparation ou \emph{setup} sont des coûts induis au moment d'un changement dans le configuration d'une ressource d'un type d'article à un autre. Il s'agit de perte potentielle de production durant le période de préparation, de force de travail additionnelle ou encore de ressources additionnelles brutes consommées durant la préparation.
-		\item[•] Les coûts de stockage qui sont induis lors du conditionnement et d’entreposage.
+		\item[•] Les coûts de preparation ou \emph{setup} sont des coûts induits au moment d'un changement dans le configuration d'une ressource d'un type d'article à un autre. Il s'agit de perte potentielle de production durant le période de préparation, de force de travail additionnelle ou encore de ressources additionnelles brutes consommées durant la préparation.
+		\item[•] Les coûts de stockage qui sont induits lors du conditionnement et d’entreposage.
 	\end{itemize}
 	
 	\begin{algorithm}[H]
@@ -749,7 +744,7 @@ hasard. Un enfant prend une section avant le point de croisement d’un parent e
 	\end{algorithm}
 	
 	\section{Algorithmes génétiques parallèles}	
-	Les algorithmes génétiques sont des techniques de recherche qui ont été utilisées avec succès dans la résolution de problèmes dans différents disciplines. Cependant, la recherche permanente de performance dans l'exécution des algorithmes et le développement constant d'ordinateurs toujours plus performants et parallèles ont conduit à émergence d'un type d'algorithmes génétiques plus performants que les algorithmes génétiques standards. A propos des algorithmes génétiques parallèles, on distingue généralement trois classes : les "\emph{master-slave} parallel genetic algorithms", les "\emph{ coarsed-grained} parallel genetic algorithms" et les "\emph{fine-grained} parallel genetic algorithms". Les "master-slave parallel genetic algorithms" sont le type le plus simples d'algorithmes génétiques parallèles. Elles consistent essentiellement à distribuer l'évaluation de la population globale entre plusieurs processeurs. Le processeur qui conserve la population et exécute l'algorithme génétique est le maître et les processus qui évaluent la population sont les esclaves. La figure \ref{fig:master_slave_ga} montre un schéma de l'algorithme génétique parallèle "coarse-grained". Nous nous intéressons dans notre étude aux deux autres types, plus compliqués mais également plus intéressants dans leur fonctionnement et performances.
+	Les algorithmes génétiques sont des techniques de recherche qui ont été utilisées avec succès dans la résolution de problèmes dans différents disciplines. Cependant, la recherche permanente de performance dans l'exécution des algorithmes et le dévelop-pement constant d'ordinateurs toujours plus performants et parallèles ont conduit à l'émergence d'un type d'algorithmes génétiques plus performants que les algorithmes génétiques standards. A propos des algorithmes génétiques parallèles, on distingue généralement trois classes : les "\emph{master-slave} parallel genetic algorithms", les "\emph{ coarsed-grained} parallel genetic algorithms" et les "\emph{fine-grained} parallel genetic algorithms". Les "master-slave parallel genetic algorithms" sont le type le plus simple d'algorithmes génétiques parallèles. Elles consistent essentiellement à distribuer l'évaluation de la population globale entre plusieurs processeurs. Le processeur qui conserve la population et exécute l'algorithme génétique est le maître et les processus qui évaluent la population sont les esclaves. La figure \ref{fig:master_slave_ga} montre un schéma de l'algorithme génétique parallèle "master-slave". Nous nous intéressons dans notre étude aux deux autres types, plus compliqués mais également plus intéressants dans leur fonctionnement et performances.
 	
 	\begin{figure}[!h]
 		\begin{center}
@@ -764,12 +759,12 @@ hasard. Un enfant prend une section avant le point de croisement d’un parent e
 	\subsection{Algorithmes génétiques parallèles de type "\emph{coarse-grained}"}
 	Les algorithmes génétiques de type "\emph{coarse-grained}" ou encore "\emph{modèle de l'île}" consiste en un ensemble de sous-populations qui échangent des individus de manière fréquente. Il s'agit probablement du type d'algorithmes génétiques le plus populaire bien qu'il nécessite de contrôler beaucoup de paramètres. La complète compréhension des effets de ces paramètres sur la qualité et la vitesse de recherche nous échappe encore. Cependant, Il a été démontré théoriquement que plus de sous-populations sont utilisées, leur taille peut être réduite sans sacrifier la qualité de la recherche. Vu que chaque processus s'exécute en parallèle, il en résulte une réduction du temps dédié aux calculs. Cependant, utiliser plus de sous-populations et donc de processus augmente la communication dans le système. Un compromis doit donc être effectué entre le temps de calculs et le temps de communication. L'implémentation des algorithmes génétiques parallèles soulève générale trois problématiques principalement sur la migration qui est l'échange d'individus entre processus. Il s'agit: de la fréquence de migration, du nombre d'individus à échanger, de la topologie des connections entre processus et de la méthode d'intégration des migrants.
 	\subsubsection{Fréquence de migration}
-	La migration affecte la qualité de la recherche et l'efficacité de l'algorithme en plusieurs points. Ainsi, de fréquentes migrations entraîne l'échange massif de potentiels bons matériels génétiques, mais il affecte aussi négativement la performance dans le mesure où les communications sont coûteuses. La même chose se produit dans les topologies densément connectées où chaque processus communique avec les autres. Le but ultime des algorithmes génétiques parallèles est de trouver de bonnes solutions assez rapidement. Il est donc nécessaire de trouver l'équilibre entre le coût de la migration et l'augmentation des chances de trouver de bonnes solutions. \\
+	La migration affecte la qualité de la recherche et l'efficacité de l'algorithme en plusieurs points. Ainsi, de fréquentes migrations entraînent l'échange massif de potentiellement bons matériels génétiques, mais il affecte aussi négativement la performance dans le mesure où les communications sont coûteuses. La même chose se produit dans les topologies densément connectées où chaque processus communique avec les autres. Le but ultime des algorithmes génétiques parallèles est de trouver de bonnes solutions assez rapidement. Il est donc nécessaire de trouver l'équilibre entre le coût de la migration et l'augmentation des chances de trouver de bonnes solutions. \\
 	\hspace*{.5cm} Afin d'implémenter l'algorithme, nous avons donné à l'utilisateur la possibilité d'entrer l'intervalle de générations en les migrations. Cependant, le comportement par défaut de l'algorithme est de migrer uniquement lorsque la population a convergé complètement.  
 	\subsubsection{Nombre de migrants}
-	La migration envoie une nombre prédéterminé d'individus d'un processus à ces processus voisins logiques sur le graphe de communications. Ces individus ou "\emph{migrants}" seront ainsi intégrés dans le population des processus auxquels ils ont été envoyés. Il est possible de choisir les "migrants" de façon aléatoire ou alors de meilleurs individus de la population actuelle. La sélection aléatoire a l'avantage de disséminer plus diversité et les chances d'explorer de nouvelles régionsde l'espace de recherche peuvent être améliorer. La sélection des meilleurs individus peut aider à disséminer un matériel génétique qui a déjà été tester et qui serait doc intéressant. Dans la suite de notre étude, nous avons choisir d'échanger les meilleurs individus.
+	La migration envoie un nombre prédéterminé d'individus d'un processus à ces processus voisins logiques sur le graphe de communications. Ces individus ou "\emph{migrants}" seront ainsi intégrés dans le population des processus auxquels ils ont été envoyés. Il est possible de choisir les "migrants" de façon aléatoire ou alors de meilleurs individus de la population actuelle. La sélection aléatoire a l'avantage de disséminer plus de diversité et les chances d'explorer de nouvelles régions de l'espace de recherche peuvent être améliorées. La sélection des meilleurs individus peut aider à disséminer un matériel génétique qui a déjà été testé et qui serait donc intéressant. Dans la suite de notre étude, nous avons choisi d'échanger les meilleurs individus.
 	\subsubsection{Topologie de connections}
-	La topologie est également une importante partie des algorithmes génétiques de type \emph{"coarse-grained"}. En théorie, toute les topologies arbitraires peuvent être utilisées. Cependant, certains modèles sont fréquents. il s'agit : des topologies linéaires, des anneaux, des hypercubes. des densément connectés, des isolés. La topologie utilisé a été celle densément connectée présentée à la figure \ref{fig:topology_fig} 
+	La topologie est également une importante partie des algorithmes génétiques de type \emph{"coarse-grained"}. En théorie, toute les topologies arbitraires peuvent être utilisées. Cependant, certains modèles sont fréquents. il s'agit : des topologies linéaires, des anneaux, des hypercubes. des densément connectés, des isolés. La topologie utilisée a été celle densément connectée présentée à la figure \ref{fig:topology_fig} 
 	
 	\begin{figure}[!h]
 		\begin{center}
@@ -780,22 +775,22 @@ hasard. Un enfant prend une section avant le point de croisement d’un parent e
 	\end{figure}
 	
 	\subsubsection{Méthode d'intégration des migrants}
- 	Différentes alternatives existent pour incorporer les "\emph{migrants}". Deux d'entre elles sont récurrentes. Il s'agit: du remplacement aléatoire des individus de la population actuelle par les "\emph{migrants}" et du remplacement compétitif ou élitiste. Dans le remplacement aléatoire, les individus devant être remplacés sont désignés de manière aléatoire. Dans le remplacement compétitif, seules les individus avec les plus mauvais scores de "fitness" sont remplacés par les nouveaux arrivants. \\
+ 	Différentes alternatives existent pour incorporer les "\emph{migrants}". Deux d'entre elles sont récurrentes. Il s'agit: du remplacement aléatoire des individus de la population actuelle par les "\emph{migrants}" et du remplacement compétitif ou élitiste. Dans le remplacement aléatoire, les individus devant être remplacés sont désignés de manière aléatoire. Dans le remplacement compétitif, seules les individus avec les plus mauvais scores de "fitness" sont remplacés par les nouveaux arrivants. Un remplacement compétitif a été appliqué à notre programme. Il s'est agi d'identifier les plus mauvais chromosomes en terme de fitness et de les remplacer par les nouveaux arrivants.\\
  	\subsubsection{Algorithme hiérarchique entre \emph{coarse-grained} et \emph{master-slave}}
- 	\hspace*{.5cm} Une fois, ces problématiques abordées, la question de l'implémentation rapide des algorithmes génétiques de type "\emph{coarse-grained}" revient. Une des réponses serait en effet de combiner ce type d'algorithmes génétiques avec un autre type, le "\emph{master-slave}" par exemple. On obtient alors un nouvelle classe d'algorithmes génétiques que sont les algorithmes génétiques hiérarchiques avec au niveau supérieur un algorithme génétique de type \emph{coarse-grained} et au niveau inférieur un algorithme génétique de type \emph{master-slave} comme le présente la figure \ref{fig:hierarchical_gene1_fig}. Il s'agit ainsi de cette combinaison que nous avons utilisée pour nos tests
+ 	\hspace*{.5cm} Une fois, ces problématiques abordées, la question de l'implémentation rapide des algorithmes génétiques de type "\emph{coarse-grained}" revient. Une des réponses serait en effet de combiner ce type d'algorithmes génétiques avec un autre type, le "\emph{master-slave}" par exemple. On obtient alors un nouvelle classe d'algorithmes génétiques que sont les algorithmes génétiques parallèles hiérarchiques avec au niveau supérieur un algorithme génétique parallèle de type \emph{coarse-grained} et au niveau inférieur un algorithme génétique parallèle de type \emph{master-slave} comme le présente la figure \ref{fig:hierarchical_gene1_fig}. Il s'agit ainsi de cette combinaison que nous avons utilisée pour notre implémentation du programme et nos tests.
  	
 	\begin{figure}[!h]
 		\begin{center}
 			\includegraphics[scale=.3]{img/hierarchical_gene1_fig.png}
-			\caption{Algorithmes génétiques hierarchiques avec au niveau supérieur un algorithme génétique de type \emph{coarse-grained} et au niveau inférieur un algorithme génétique de type \emph{master-slave}}
+			\caption{Algorithmes génétiques parallèle et hierarchiques avec au niveau supérieur un algorithme génétique de type \emph{coarse-grained} et au niveau inférieur un algorithme génétique de type \emph{master-slave}}
 			\label{fig:hierarchical_gene1_fig}
 		\end{center}
 	\end{figure} 	
  	
 	\subsection{Algorithmes génétiques parallèles de type "\emph{fine-grained}"}
-	les algorithmes génétiques de type "\emph{fine-grained}" ont seulement une population, mais la structure spatiale limite les interactions entre les individus. Un individu ne peut compétir et se reproduire qu'avec ses individus voisins. Vu que les voisinages se chevauchent, les bonnes solutions peuvent ainsi se disséminer à travers la population entière. Le choix le plus important dans l'implémentation de ce type d'algorithmes génétiques sont : la topologie de connections.
+	les algorithmes génétiques de type "\emph{fine-grained}" ont seulement une population, mais la structure spatiale limite les interactions entre les individus. Un individu ne peut compétir et se reproduire qu'avec ses individus voisins. Vu que les voisinages se chevauchent, les bonnes solutions peuvent ainsi se disséminer à travers la population entière. Le choix le plus important dans l'implémentation de ce type d'algorithmes génétiques parallèles sont : la topologie de connections.
 	\subsubsection{Topologie de connections}
-	Différentes topologies de connections sont valables. Il s'agit entre autres des grilles 2-D, des hypercubes, le torus, le cube. Il est cependant répandu de placer les individus dans un algorithme génétique de type "\emph{fine-grained}" dans une grille 2-Dimension. En effet, dans la plupart des ordinateurs massivement parallèles, les éléments de traitement et de calculs sont connectés en suivant cette topologie. La figure \ref{fig:fine_grained_fig} présente la topologie utilisée afin d'implémenter l'algorithme génétique de type \emph{"fine-grained"}.
+	Différentes topologies de connections sont valables. Il s'agit entre autres des grilles 2-D, des hypercubes, le torus, le cube. Il est cependant répandu de placer les individus dans un algorithme génétique parallèle de type "\emph{fine-grained}" dans une grille 2-Dimension. En effet, dans la plupart des ordinateurs massivement parallèles, les éléments de traitement et de calculs sont connectés en suivant cette topologie. La figure \ref{fig:fine_grained_fig} présente la topologie utilisée afin d'implémenter l'algorithme génétique parallèle de type \emph{"fine-grained"}.
 	
 	\subsubsection{Principe de fonctionnement}
 	Le principe de fonctionnement des algorithmes génétiques de type "\emph{fine-grained}" est différent de ceux de type \emph{coarse-grained} et \emph{master-slave} est détaillé à l'algorithme \ref{alg:principe_fine_grained}. \\
@@ -824,7 +819,7 @@ hasard. Un enfant prend une section avant le point de croisement d’un parent e
 	\begin{figure}[!h]
 		\begin{center}
 			\includegraphics[scale=.3]{img/fine_grained_fig.png}
-			\caption{Topologie utilisée en algorithme génétique de type "\emph{fine-grained}"}
+			\caption{Topologie utilisée en algorithme génétique parallèle de type "\emph{fine-grained}"}
 			\label{fig:fine_grained_fig}
 		\end{center}
 	\end{figure} 
@@ -841,12 +836,12 @@ hasard. Un enfant prend une section avant le point de croisement d’un parent e
 	\end{figure} 
 	\section{Autres implémentations}
 	\subsection{Hybridation}
-	L'hybridation consiste à combiner deux méthodes de recherche afin d'engendrer une nouvelle méthode de recherche dit \emph{hybride}. Les algorihmes génétiques facilite l'hybridation avec les autres techniques de recherche local afin d'obtenir la solution optimale. De façon basique, la recherche locale et les algorithmes génétiques sont complémentaires. Les algorithmes génétiques sont efficaces lorsqu'il s'agit de parcourir un espace de recherche global, dans le mesure où elles sont capables de rapidement des régions prometteuses. Cependant, elles prennent relativement beaucoup de temps à trouver des optimums dans ces régions. La recherche local est capable de trouver des optimums locaux avec une grande précision. \\
+	L'hybridation consiste à combiner deux méthodes de recherche afin d'engendrer une nouvelle méthode de recherche dit \emph{hybride}. Les algorihmes génétiques facilite l'hybridation avec les autres techniques de recherche local afin d'obtenir la solution optimale. De façon basique, la recherche locale et les algorithmes génétiques sont complé-mentaires. Les algorithmes génétiques sont efficaces lorsqu'il s'agit de parcourir un espace de recherche global, dans la mesure où elles sont capables de rapidement trouver des régions prometteuses. Cependant, elles prennent relativement beaucoup de temps à trouver des optimums dans ces régions. La recherche local est capable de trouver des optimums avec une grande précision. \\
 	\hspace*{.5cm} Dans notre étude, il s'est agi de mettre au point un algorithme de recherche qui est utilisé à chaque fois que l'algorithme génétique converge sur une solution optimale afin de parcourir l'espace de recherche immédiat à cette solution et ainsi améliorer cette solution optimale.  \\
 	\\
 	\begin{algorithm}[H]
 		%\label{alg:principe_fine_grained}
- 		\caption{Algorithme de recherche d'une meilleure solution}
+ 		\caption{Algorithme de recherche locale d'une meilleure solution}
  		\KwData{individu à améliorer}
  		\BlankLine
  		\For{chaque gène du chromosome}{
@@ -879,7 +874,7 @@ hasard. Un enfant prend une section avant le point de croisement d’un parent e
 	
 	\section*{Conclusion}
 	\addcontentsline{toc}{section}{Conclusion}
-	Cette deuxième partie a été l'occasion dans un premier temps d'expliciter les aspects communs aux deux solutions proposées. Dans un second temps, nous avons présenté et détaillé deux approches heuristiques basées sur les algorithmes génétiques utilisée afin de résoudre le problème. La troisième partie sera l'occasion de tester nos deux approches et d'analyser les résultats afin de les comparer à l'état de l'art en la matière.
+	Cette deuxième partie a été l'occasion dans un premier temps d'expliciter les aspects communs aux deux solutions proposées. Dans un second temps, nous avons présenté et détaillé deux approches heuristiques basées sur les algorithmes génétiques parallèles utilisées afin de résoudre le problème. La troisième partie sera l'occasion de tester nos deux approches et d'analyser les résultats afin de les comparer à l'état de l'art en la matière.
 	
 	\newpage
 	
@@ -906,7 +901,7 @@ hasard. Un enfant prend une section avant le point de croisement d’un parent e
 		\subsection{Données de test}
 		
 		Afin de tester nos deux solutions, nous commençons dans un premier temps par utiliser un ensemble de 10 instances proposées par Houndji et al. auxquelles ils ont appliqué le CP. Ces instances sont caractérisées par un nombre de périodes \emph{NT} = 20 et un nombre d'articles \emph{NI} = 20. Les résultats seront comparés à ceux obtenus par Houndji et al. dans leur application de l'approche CP à ces instances. \\
-		\hspace*{.5cm} Dans un second temps, nous appliquons nos deux solutions à 9 instances proposées dans la bibliothèque CSPlib sur lesquelles Ceschia et al \cite{ceschia} ont testé leur approche de solution : l'approche de recuit simulé. Nos résultats sont donc comparés à ceux obtenus par Ceschia et al dans leur application du recuit simulé à ces problèmes. \\
+		\hspace*{.5cm} Dans un second temps, nous appliquons nos deux solutions à 6 autres instances proposées par Ceschia et al \cite{ceschia} dans leur bibliothèque Opthub. En effet, dans le but de tester leur approche de solution basée sur le recuit simulé aux instances de PSP, Ceschia et al ont  développé un generateur paramétré produisant de nouvelles instances plus complexes. Le générateur travaille de sorte que l'instance produite est faisable, c'est à dire qu'elle satisfait aux contraintes de \emph{NoBacklog}. Nous testons donc notre approche de solution à ces nouvelles instances complexes et comparons nos résultats à ceux obtenus par Ceschia et al dans leur application du recuit simulé à ces instances. \\
 		\hspace*{.5cm} Dans les deux cas, nos critères d'analyse sont de deux ordres. Premièrement, nous les avons analysé sous l'angle de la performance en temps. Il s'agit de voir comment ces algorithmes arrivent à répondre aussi rapidement que possible nos instances de PSP.  Le second angle d'analyse s'est porté sur la performance en terme de la qualité de la solution trouvée. Nous avons calculé l'écart entre la solution trouvée et la solution optimale connue dans la littérature.
 		
 		\subsection{Paramètres de test}
@@ -919,8 +914,8 @@ hasard. Un enfant prend une section avant le point de croisement d’un parent e
 			        \item[-] Probabilité de mutation : 5\%;
 			        \item[-] Probabilité de croisement : 80\%;
 			        \item[-] Nombre de migrants : 1 individu;
-		 	        \item[-] Nombre de processus esclaves : 3 processus;
-			        \item[-] Nombre de processus principaux : 3 processus;
+		 	        \item[-] Nombre de processus esclaves : 2 processus;
+			        \item[-] Nombre de processus principaux : 2 processus;
 			        \item[-] Nombre de générations avant migration : 0 génération.
 				\end{itemize}
 				\vspace*{.5cm}
@@ -936,7 +931,7 @@ hasard. Un enfant prend une section avant le point de croisement d’un parent e
 		\end{enumerate}
 		
 		\section{Résultats expérimentaux des algorithmes génétiques parallèles hiérarchiques "fine-grained" et "coarse-grained"}
-		Nous avons pu tester les algorithmes génétiques parallèles hiérarchiques "fine-grained" et "coarse-grained" sur 10 instances de PSP. Les résultats de ces tests sont consignés dans le tableau \ref{alg:principe_fine_grained} à coté de ceux obtenus de l'approche CP. Ce tableau présente les performances en temps et qualité des solutions des algorithmes génétiques parallèles hiérarchiques "fine-grained" et "coarse-grained". Nous avons effectué nos tests à travers 10 essais sur chacune des instances.
+		Nous avons ainsi pu tester les algorithmes génétiques parallèles hiérarchiques "fine-grained" et "coarse-grained" dans un premier temps sur 10 instances de PSP proposées par Houndji et dans un second temps sur 6 autres instances de PSP plus complexes proposées par Ceschia. Les résultats de ces tests sont consignés dans les tableaux \ref{alg:principe_fine_grained} et \ref{alg:principe_fine_grained} à coté de ceux obtenus de l'approche CP et de ceux obtenus de l'approche de recuit simulé. Ces tableaux présentent les performances en temps et qualité des solutions des algorithmes génétiques parallèles hiérarchiques "fine-grained" et "coarse-grained". Nous avons effectué nos tests à travers 10 essais sur chacune des instances.
 		
 	\begin{table}[h]
 		\centering
@@ -965,24 +960,20 @@ hasard. Un enfant prend une section avant le point de croisement d’un parent e
 			\hline
 			\textbf{Instance} & \textbf{Opt cost} & \textbf{CP time} & \textbf{GAs time} & \textbf{GAs result gap} & \textbf{GAs Best Sol} & \textbf{Nb Gen}\\
 			\hline
-			\textbf{1} & 1377 & 9.14 & 9.3 & 0.42\% & 1377 & 23.12 \\
-			\textbf{2} & 1447 & 7.292 & 9.09 & 1.67\% & 1447 & 23.98\\
-			\textbf{3} & 1107 & 2.946 & 8.97 & 1.28\% & 1108 & 24.8\\
-			\textbf{4} & 1182 & 1.784 & 7.42 & 1.70\% & 1189 & 20.9\\
-			\textbf{5} & 1471 & 0.235 & 9.91 & 0.11\% & 1471 & 21.7\\
-			\textbf{6} & 2774 & 11.177 & 4.94 & 0.52\% & 2774 & 21.6\\
-			\textbf{7} & 2655 & 12.846 & 4.73 & 1,40\% & 2670 & 22.4\\
-			\textbf{8} & 1473 & 15.039 & 4.15 & 1.65\% & 1473 & 19.5\\
-			\textbf{9} & 3117 & 25.352 & 8.96 & 0.25\% & 3117 & 23.2\\
-			\textbf{10} & 1493 & 121.909 & 6.77 & 2.49\% & 1497 & 9.8\\
+			\textbf{ps-200-10-80} & 18089 & 72.2 & 11.2 & 10\% & 19799 & 24.4 \\
+			\textbf{ps-200-20-80} & 19190 & 73.8 & 11.5 & 11.2\% & 21345 & 18.2 \\
+			\textbf{ps-300-10-80} & 26343 & 78.4 & 32.2 & 33\% & 34985 & 20.7 \\
+			\textbf{ps-300-20-80} & 30206 & 68.3 & 30.8 & 7\% & 32207 & 22.2 \\
+			\textbf{ps-400-10-80} & 34206 & 85.5 & 37.8 & 18.4\% & 40433 & 23.9 \\
+			\textbf{ps-400-20-80} & 41329 & 69.5 & 60.9 & 10.3\% & 45647 & 22.9 \\
 			\hline
 		\end{tabular}	
-		\caption{Performances du HFC-PGA et SA sur 9 instances du PSP}	
+		\caption{Performances du HFC-PGA et SA sur 6 instances du PSP}	
 	\end{table}			
 		
 		\section{Résultats expérimentaux des algorithmes génétiques parallèles hiérarchiques "coarse-grained" et "master-slave"}
 		
-		Après les tests de l'algorithme génétique parallèle hiérarchique \emph{fine-grained} et \emph{coarse-grained}, nous avons procédé aux tests sur l'algorithme génétique parallèle hiérarchique \emph{master-slave} et \emph{fine-grained} sur les mêmes instances que celles testées ci-dessus. Au bout de 10 essais, les résultats sont consignés dans le tableau \ref{alg:principe_fine_grained} et sont comparés à ceux obtenus en programmation par contrainte. Nous avons pu ensuite procéder aux essais sur les instances proposées par Ceschia qui nous avons également consigné dans le tableau.
+		Après les tests de l'algorithme génétique parallèle hiérarchique \emph{fine-grained} et \emph{coarse-grained}, nous avons procédé aux tests sur l'algorithme génétique parallèle hiérarchique \emph{master-slave} et \emph{fine-grained} sur les mêmes instances que celles testées ci-dessus. Au bout de 10 essais, les résultats sont consignés dans les tableaux \ref{alg:principe_fine_grained}  et \ref{alg:principe_fine_grained}; et sont comparés à ceux obtenus en programmation par contrainte et en recuit simulé.
 		
 		\begin{table}[h]
 		\centering
@@ -990,16 +981,16 @@ hasard. Un enfant prend une section avant le point de croisement d’un parent e
 			\hline
 			\textbf{Instance} & \textbf{Opt cost} & \textbf{CP time} & \textbf{GAs time} & \textbf{GAs result gap} & \textbf{GAs Best Sol} & \textbf{Nb Gen}\\
 			\hline
-			\textbf{1} & 1377 & 9.14 & 3.1 & 0.09\% & 1377 & 9.8 \\
-			\textbf{2} & 1447 & 7.292 & 3.5 & 0\% & 1447 & 8.2\\
-			\textbf{3} & 1107 & 2.946 & 3.2 & 0.03\% & 1107 & 9\\
-			\textbf{4} & 1182 & 1.784 & 2.74 & 1.1\% & 1196 & 8.9\\
-			\textbf{5} & 1471 & 0.235 & 3.5 & 7\% & 1549 & 6\\
-			\textbf{6} & 2774 & 11.177 & 5.1 & 0.04\% & 2774 & 7.7\\
-			\textbf{7} & 2655 & 12.846 & 3.9 & 2.44\% & 2706 & 8.4\\
-			\textbf{8} & 1473 & 15.039 & 3.3 & 3\% & 1506 & 7.2\\
-			\textbf{9} & 3117 & 25.352 & 10.3 & 0\% & 3117 & 9.2\\
-			\textbf{10} & 1493 & 121.909 & 6.5 & 0.6\% & 1502 & 8.7\\
+			\textbf{1} & 1377 & 9.14 & 1.73 & 0.07\% & 1378 & 19.2 \\
+			\textbf{2} & 1447 & 7.292 & 1.4 & 0.2\% & 1447 & 21.3\\
+			\textbf{3} & 1107 & 2.946 & 1.6 & 0\% & 1107 & 17.1\\
+			\textbf{4} & 1182 & 1.784 & 1.3 & 1.1\% & 1196 & 21.1\\
+			\textbf{5} & 1471 & 0.235 & 2.4 & 8\% & 1601 & 16.5\\
+			\textbf{6} & 2774 & 11.177 & 2.6 & 0\% & 2774 & 18.3\\
+			\textbf{7} & 2655 & 12.846 & 2.6 & 0.2\% & 2655 & 26\\
+			\textbf{8} & 1473 & 15.039 & 1.9 & 0\% & 1473 & 20\\
+			\textbf{9} & 3117 & 25.352 & 4.08 & 0\% & 3117 & 18.9\\
+			\textbf{10} & 1493 & 121.909 & 3.4 & 0\% & 1502 & 20.5\\
 			\hline
 		\end{tabular}	
 		\caption{Performances du HCM-PGA et CP sur 10 instances du PSP}	
@@ -1011,20 +1002,19 @@ hasard. Un enfant prend une section avant le point de croisement d’un parent e
 			\hline
 			\textbf{Instance} & \textbf{Opt cost} & \textbf{SA time} & \textbf{GAs time} & \textbf{GAs result gap} & \textbf{GAs Best Sol} & \textbf{Nb Gen}\\
 			\hline
-			\textbf{pigment15b} & 1486 & 3.8 & 2.17 & 0.6\% & 1496 & 10.1 \\
-			\textbf{pigment15c} & 1583 & 4.7 & 2.07 & 2\% & 1616 & 10.3\\
-			\textbf{pigment30a} & 1119 & 4.1 & 1.2 & 12\% & 1244 & 9.3\\
-			\textbf{pigment100a} & 1323 & 5 & 7.89 & 6.7\% & 1378 & 8.5\\
-			\textbf{pigment100b} & 1962 & 4.4 & 7.3 & 6.5\% & 2091 & 8\\
-			\textbf{pigment100c} & 1473 & 15.039 & 4.15 & 1.65\% & 1473 & 19.5\\
-			\textbf{pigment200a} & 3117 & 25.352 & 8.96 & 0.25\% & 3117 & 23.2\\
+			\textbf{ps-200-10-80} & 18089 & 72.2 & 11.2 & 10\% & 19799 & 24.4 \\
+			\textbf{ps-200-20-80} & 19190 & 73.8 & 11.5 & 11.2\% & 21345 & 18.2 \\
+			\textbf{ps-300-10-80} & 26343 & 78.4 & 32.2 & 33\% & 34985 & 20.7 \\
+			\textbf{ps-300-20-80} & 30206 & 68.3 & 30.8 & 7\% & 32207 & 22.2 \\
+			\textbf{ps-400-10-80} & 34206 & 85.5 & 37.8 & 18.4\% & 40433 & 23.9 \\
+			\textbf{ps-400-20-80} & 41329 & 69.5 & 60.9 & 10.3\% & 45647 & 22.9 \\
 			\hline
 		\end{tabular}	
-		\caption{Performances du HCM-PGA et SA sur 7 instances du PSP}	
+		\caption{Performances du HCM-PGA et SA sur 6 instances du PSP}	
 	\end{table}					
 	
 		\section{Analyse comparative des résultats}
-		Il s'agit dans cette section d'effectuer une analyse comparative des résultats afin de dégager des conclusions. Il serait par exemple intéressant de d'analyser les performances entre algorithmes génétiques parallèles hiérarchiques \emph{fine-grained} et \emph{coarse-grained} et programmation par contrainte d'une part et d'autre part de pouvoir faire de même entre programmation par contrainte et algorithmes génétiques hiérarchiques \emph{coarse-grained} et \emph{master-slave}. Enfin, répondre à la question de savoir qui des algorithmes génétiques parallèles hiérarchiques \emph{coarse-grained} et \emph{fine-grained} et algorithmes génétiques parallèles \emph{master-slave} et \emph{coarse-grained} est le plus performant serait une bonne façon d'achever cette analyse.
+		Il s'agit dans cette section d'effectuer une analyse comparative des résultats afin de dégager des conclusions. Il serait par exemple intéressant de d'analyser les performances entre algorithmes génétiques parallèles hiérarchiques \emph{fine-grained} et \emph{coarse-grained} et programmation par contrainte ainsi que recuit simulé d'une part et d'autre part de pouvoir faire de même entre programmation par contrainte et algorithmes génétiques hiérarchiques \emph{coarse-grained} et \emph{master-slave} ainsi que recuit simulé. Enfin, répondre à la question de savoir qui des algorithmes génétiques parallèles hiérarchiques \emph{coarse-grained} et \emph{fine-grained} et algorithmes génétiques parallèles \emph{master-slave} et \emph{coarse-grained} est le plus performant serait une bonne façon d'achever cette analyse.
 		
 		\subsection{HFC-PGA et Approche CP}
 		
