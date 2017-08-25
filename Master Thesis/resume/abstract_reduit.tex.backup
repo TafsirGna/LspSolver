@@ -1,0 +1,18 @@
+\begin{abstract}
+Games are very studied in Artificial Intelligence. Researchers are trying
+every time to find algorithms to solve them faster and easily. Most existing methods require the use of a evaluation function to improve the final result. Despite
+that many games are alike, we must often determine an evaluation function for each game. In this work, we define a new class of games called <<n-alignés>>. We propose for games of this
+class an heuristic to evaluate the nodes of their research trees. MCTS is a recent algorithms family for games resolution which is very successful. Although UCT is part of the MCTS
+family, it is struggling to win <<n-alignés>> games because of the big size of theirs states spaces. We use it the heuristic proposed for this class, but the results are degraded compared to the
+standard version
+% We became aware that the scores system tracking at the University of Abomey-Calavi is faulty and to improve this, we thought during this work to the
+% realization of a system handling this. First, we located the problem. Then, we made a study
+% criticism of the existing prior to deploying our measure which is a web solution where the particularity is that is the teacher himself who connects
+% to register scores of students
+% having followed its course. Also, the student without moving can already inquire scores that there
+% obtained.
+% \Huge{This part is intentionaly let blank. Do not fear. It will be filled before next saturday ;-)}
+% \paragraph{}
+% \textbf{Mots clés}: \emph{Platform, management, scores, web, IFRI, UAC}.
+\end{abstract}
+

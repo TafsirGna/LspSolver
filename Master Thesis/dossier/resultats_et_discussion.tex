@@ -1,0 +1,573 @@
+\section*{Introduction}
+		\addcontentsline{toc}{section}{Introduction}
+		L'expérimentation lors d'une étude est une étape importante du travail de recherche. Il s'agit le plus souvent donc de tester les théories émises et d'analyser les résultats obtenus de tests afin de valider nos approches de solution du problème énoncées. Dans cette partie, nous présentons d'abord l'environnement de test, les instances utilisées. Ensuite, nous expérimentons nos solutions et à partir des résultats obtenus, nous comparons nos approches heuristiques basées sur les algorithmes génétiques à celles déjà appliquées à ce problème.
+		
+		\section{Résultats expérimentaux des algorithmes génétiques parallèles hiérarchiques "fine-grained" et "coarse-grained"}
+		Nous avons ainsi pu tester les algorithmes génétiques parallèles hiérarchiques "fine-grained" et "coarse-grained" dans un premier temps sur 10 instances de PSP proposées par Houndji et dans un second temps sur 6 autres instances de PSP plus complexes proposées par Ceschia. Les résultats de ces tests sont consignés dans les tableaux \ref{tab:hfc_pga_cp} et \ref{tab:hfc_pga_sa} à coté de ceux obtenus respectivement de l'approche CP et de l'approche de recuit simulé. Ces tableaux présentent les performances en temps et qualité des solutions des algorithmes génétiques parallèles hiérarchiques "fine-grained" et "coarse-grained". Nous avons effectué nos tests à travers 10 essais sur chacune des instances.
+		
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{|c|c|c|c|c|c|c|}
+			\hline
+			\textbf{Instance} & \textbf{Opt cost} & \textbf{CP time} & \textbf{GAs time} & \textbf{GAs result gap} & \textbf{GAs Best Sol} & \textbf{Nb Gen}\\
+			\hline
+			\textbf{1} & 1377 & 9.14 & 3.9 & 0.2\% & 1378 & 15 \\
+			\textbf{2} & 1447 & 7.292 & 1.7 & 1.67\% & 1447 & 12.8\\
+			\textbf{3} & 1107 & 2.946 & 3.2 & 0.07\% & 1108 & 20.2\\
+			\textbf{4} & 1182 & 1.784 & 2.4 & 1.4\% & 1199 & 17\\
+			\textbf{5} & 1471 & 0.235 & 4.5 & 0\% & 1471 & 17.8\\
+			\textbf{6} & 2774 & 11.177 & 2.2 & 0\% & 2774 & 16.3\\
+			\textbf{7} & 2655 & 12.846 & 2.5 & 0.5\% & 2670 & 16.4\\
+			\textbf{8} & 1473 & 15.039 & 6.1 & 0\% & 1473 & 13\\
+			\textbf{9} & 3117 & 25.352 & 10.3 & 0.25\% & 3117 & 15.4\\
+			\textbf{10} & 1493 & 121.909 & 6.5 & 0\% & 1493 & 18.3\\
+			\hline
+		\end{tabular}	
+		\caption{Performances du HFC-PGA et CP sur 10 instances du PSP}	
+		\label{tab:hfc_pga_cp}
+	\end{table}			
+	
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{|c|c|c|c|c|c|c|}
+			\hline
+			\textbf{Instance} & \textbf{Opt cost} & \textbf{SA time} & \textbf{GAs time} & \textbf{GAs result gap} & \textbf{GAs Best Sol} & \textbf{Nb Gen}\\
+			\hline
+			\textbf{ps-200-10-80} & 18089 & 72.2 & 9.9 & 8.7\% & 19484 & 18.2 \\
+			\textbf{ps-200-20-80} & 19190 & 73.8 & 18.8 & 11.6\% & 21302 & 18.9 \\
+			\textbf{ps-300-10-80} & 26343 & 78.4 & 56.8 & 16.5\% & 30452 & 17.3 \\
+			\textbf{ps-300-20-80} & 30206 & 68.3 & 96.8 & 7.4\% & 32289 & 20 \\
+			\textbf{ps-400-10-80} & 34206 & 85.5 & 117.9 & 19.5\% & 40775 & 25.9 \\
+			\textbf{ps-400-20-80} & 41329 & 69.5 & 120.3 & 10.1\% & 45521 & 22.9 \\
+			\hline
+		\end{tabular}	
+		\caption{Performances du HFC-PGA et SA sur 6 instances du PSP}
+		\label{tab:hfc_pga_sa}	
+	\end{table}			
+		
+		\section{Résultats expérimentaux des algorithmes génétiques parallèles hiérarchiques "coarse-grained" et "master-slave"}
+		
+		Après les tests de l'algorithme génétique parallèle hiérarchique \emph{fine-grained} et \emph{coarse-grained}, nous avons procédé aux tests sur l'algorithme génétique parallèle hiérarchique \emph{master-slave} et \emph{coarse-grained} sur les mêmes instances que celles testées ci-dessus. Au bout de 10 essais, les résultats sont consignés dans les tableaux \ref{tab:hcm_pga_cp}  et \ref{tab:hcm_pga_sa}; et sont comparés respectivement à ceux obtenus en programmation par contrainte et en recuit simulé.
+		
+		\begin{table}[h]
+		\centering
+		\begin{tabular}{|c|c|c|c|c|c|c|}
+			\hline
+			\textbf{Instance} & \textbf{Opt cost} & \textbf{CP time} & \textbf{GAs time} & \textbf{GAs result gap} & \textbf{GAs Best Sol} & \textbf{Nb Gen}\\
+			\hline
+			\textbf{1} & 1377 & 9.14 & 1.73 & 0.07\% & 1378 & 19.2 \\
+			\textbf{2} & 1447 & 7.292 & 1.4 & 0.2\% & 1447 & 21.3\\
+			\textbf{3} & 1107 & 2.946 & 1.6 & 0\% & 1107 & 17.1\\
+			\textbf{4} & 1182 & 1.784 & 1.3 & 1.1\% & 1196 & 21.1\\
+			\textbf{5} & 1471 & 0.235 & 2.4 & 8\% & 1601 & 16.5\\
+			\textbf{6} & 2774 & 11.177 & 2.6 & 0\% & 2774 & 18.3\\
+			\textbf{7} & 2655 & 12.846 & 2.6 & 0.2\% & 2655 & 26\\
+			\textbf{8} & 1473 & 15.039 & 1.9 & 0\% & 1473 & 20\\
+			\textbf{9} & 3117 & 25.352 & 4.08 & 0\% & 3117 & 18.9\\
+			\textbf{10} & 1493 & 121.909 & 3.4 & 0\% & 1502 & 20.5\\
+			\hline
+		\end{tabular}	
+		\caption{Performances du HCM-PGA et CP sur 10 instances du PSP}	
+		\label{tab:hcm_pga_cp}	
+	\end{table}	
+	
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{|c|c|c|c|c|c|c|}
+			\hline
+			\textbf{Instance} & \textbf{Opt cost} & \textbf{SA time} & \textbf{GAs time} & \textbf{GAs result gap} & \textbf{GAs Best Sol} & \textbf{Nb Gen}\\
+			\hline
+			\textbf{ps-200-10-80} & 18089 & 72.2 & 11.2 & 10\% & 19799 & 24.4 \\
+			\textbf{ps-200-20-80} & 19190 & 73.8 & 11.5 & 11.2\% & 21345 & 18.2 \\
+			\textbf{ps-300-10-80} & 26343 & 78.4 & 32.2 & 33\% & 34985 & 20.7 \\
+			\textbf{ps-300-20-80} & 30206 & 68.3 & 30.8 & 7\% & 32207 & 22.2 \\
+			\textbf{ps-400-10-80} & 34206 & 85.5 & 37.8 & 18.4\% & 40433 & 23.9 \\
+			\textbf{ps-400-20-80} & 41329 & 69.5 & 60.9 & 10.3\% & 45647 & 22.9 \\
+			\hline
+		\end{tabular}	
+		\caption{Performances du HCM-PGA et SA sur 6 instances du PSP}	
+		\label{tab:hcm_pga_sa}	
+	\end{table}					
+	
+		\section{Discussion}
+		Il s'agit dans cette section d'effectuer une analyse comparative des résultats afin de dégager des conclusions. Il serait par exemple intéressant de tenter une analyse des performances entre algorithmes génétiques parallèles hiérarchiques \emph{fine-grained} et \emph{coarse-grained} et programmation par contrainte ainsi que recuit simulé d'une part et d'autre part de pouvoir faire de même entre programmation par contrainte et algorithmes génétiques hiérarchiques \emph{coarse-grained} et \emph{master-slave} ainsi que recuit simulé. Enfin, tenter de répondre à la question de savoir lequel des algorithmes génétiques parallèles hiérarchiques \emph{coarse-grained} et \emph{fine-grained} et algorithmes génétiques parallèles hiérarchiques \emph{master-slave} et \emph{coarse-grained} est le plus performant serait une bonne façon d'achever cette analyse. Nous tenons en effet à rappeler que l'approche CP ne saurait être comparée dans l'absolue à l'approche basée sur les algorithmes génétiques, dans la mesure où l'approche CP est une approche exacte et déterministe tandis que celle basée sur les algorithmes génétiques est stochastique. De même, toute comparaison et conclusion dans les performances entre approche SA et approche basée sur les algorithmes génétiques, ne pourra être lue qu'à la lumière des résultats obtenus dans le cadre de notre étude.
+		
+		\subsection{HCM-PGA et Approche CP}
+		
+	L'approche CP dans son application au PSP s'est avérée efficace. Nous analysons à présent les résultats obtenus en appliquant le HCM-PGA au PSP. La figure \ref{fig:CP_HCM-PGA_best_fitness} nous présente sous forme de graphique les résultats des tests de performance en matière de qualité de la meilleure solution trouvée. L'analyse de ce graphique nous permet de remarquer que la courbe de performance de HCM-PGA est sensiblement la même que celle de CP. Ces deux courbes présentent la même allure et aussi sensiblement les mêmes valeurs de performance. Notre méthode HCM-PGA présente donc les mêmes performances à quelques petites différences près que l'approche de référence (approche CP). 
+	
+	\begin{figure}[!h]
+    \begin{center}
+	\begin{tikzpicture}[scale=0.7]
+       	\begin{axis}[xlabel=instances des PSP testées, ylabel=fitness]
+        %\addplot {x^2+2*x-1};
+        \addplot coordinates {
+        	(1 ,1377)
+        	(2 ,1447)
+        	(3 ,1107)
+        	(4 ,1182)
+        	(5 ,1471)
+       		(6 ,2774)
+       		(7 ,2655)
+        	(8 ,1473)
+        	(9 ,3117)
+        	(10 ,1493)
+        	};
+        \addlegendentry{CP}
+        \addplot coordinates {
+        	(1 ,1378)
+        	(2 ,1447)
+        	(3 ,1107)
+        	(4 ,1196)
+        	(5 ,1601)
+       		(6 ,2774)
+       		(7 ,2655)
+        	(8 ,1473)
+        	(9 ,3117)
+        	(10 ,1502)
+        	};
+        \addlegendentry{HCM-PGA}
+        \end{axis}
+        %\caption{g}
+    \end{tikzpicture}
+    \end{center}
+    \caption{Performances comparées de CP et HCM-PGA en fitness de la meilleure solution trouvée}
+    \label{fig:CP_HCM-PGA_best_fitness}
+    \end{figure}	
+	
+	Nous analysons ensuite la performance de HCM-PGA en matière de temps de la meilleure solution trouvée sur nos 10 essais; comme le montre la figure \ref{fig:CP_HCM-PGA_time}, avec pour critère de comparaison le temps de recherche. Nous avons pu constater que le HCM-PGA parcourt bien plus vite l'espace de recherche. Il nous est possible de constater que sur certaines instances le gain de temps est dans le meilleur des cas (instance 10) de 97,21\% . En poursuivant notre analyse, nous pouvons  également faire noter que le temps de recherche est relativement constant. Sur des instances où l'approche CP prend beaucoup plus de temps (instances 6,7,8,9 et 10), notre méthode HCM-PGA conserve un temps de recherche stable. En conséquence, l'usage de notre méthode HCM-PGA s'avère pertinent en matière de temps en comparaison à la méthode CP.	
+	
+	\begin{figure}[!h]
+	\begin{center}
+	\begin{tikzpicture}[scale=0.7]
+       	\begin{axis}[xlabel=instances des PSP testées, ylabel=temps en secondes]
+        \addplot coordinates {
+        	(1 ,9.14)
+        	(2 ,7.29)
+        	(3 ,2.94)
+        	(4 ,1.78)
+        	(5 ,0.23)
+       		(6 ,11.17)
+       		(7 ,12.84)
+        	(8 ,15.03)
+        	(9 ,25.35)
+        	(10 ,121.90)
+        	};
+        \addlegendentry{CP}
+        \addplot coordinates {
+        	(1 ,1.73)
+        	(2 ,1.4)
+        	(3 ,1.6)
+        	(4 ,1.3)
+        	(5 ,2.4)
+       		(6 ,2.6)
+       		(7 ,2.6)
+        	(8 ,1.9)
+        	(9 ,4.08)
+        	(10 ,3.4)
+        	};
+        \addlegendentry{HCM-PGA}
+        \end{axis}
+        %\caption{g}
+    \end{tikzpicture}
+    \caption{Performances comparées de CP et HCM-PGA en temps}
+    \label{fig:CP_HCM-PGA_time}
+    \end{center}
+    \end{figure}
+    
+    \hspace*{.5cm} En combinant cette analyse ainsi que la précédente, nous pouvons déduire que notre solution HCM-PGA réussit à parcourir l'espace de recherche plus vite que notre approche de référence tout en trouvant sur nos 10 essais tests à trouver la solution optimale ou une solution approchant cette dernière de très près; excepté l'instance 5 où notre approche HCM-PGA performe vraiment moins bien que l'approche CP. Nous allons pour la suite, analyser la moyenne des solutions trouvées en matière de performance de fitness.    
+    
+    \newpage
+	Trouver une solution proche ou exacte sur un essai, est une chose. Arriver à prouver que notre approche trouve des solutions voisines ou proches à la solution exacte sur de nombreux essais est encore une autre chose. La figure \ref{fig:CP_HCM-PGA_moy_fitness} apporte la preuve que notre méthode HCM-PGA est valide dans la résolution des 10 instances présentées et plus largement des instances proposées par Houndji.
+    
+    \begin{figure}[!h]
+    \begin{center}
+	\begin{tikzpicture}[scale=0.7]
+       	\begin{axis}[xlabel=instances des PSP testées, ylabel=fitness moyen]
+        %\addplot {x^2+2*x-1};
+        \addplot coordinates {
+        	(1 ,1377)
+        	(2 ,1447)
+        	(3 ,1107)
+        	(4 ,1182)
+        	(5 ,1471)
+       		(6 ,2774)
+       		(7 ,2655)
+        	(8 ,1473)
+        	(9 ,3117)
+        	(10 ,1493)
+        	};
+        \addlegendentry{CP}
+        \addplot coordinates {
+        	(1 ,1378)
+        	(2 ,1450)
+        	(3 ,1107)
+        	(4 ,1196)
+        	(5 ,1601)
+       		(6 ,2774)
+       		(7 ,2662)
+        	(8 ,1473)
+        	(9 ,3117)
+        	(10 ,1493)
+        	};
+        \addlegendentry{HCM-PGA}
+        \end{axis}
+        %\caption{g}
+    \end{tikzpicture}
+    \end{center}
+    \caption{Performances comparées de CP et HCM-PGA en fitness moyen des solutions trouvées}
+    \label{fig:CP_HCM-PGA_moy_fitness}
+	\end{figure}    
+	
+	\newpage    
+	\subsection{HFC-PGA et Approche CP}
+		Une fois, notre première approche HCM-PGA validée pour les instances proposées par Houndji; nous passons à la seconde méthode de HFC-PGA. La procédure utilisée est similaire à celle utilisée afin de valider notre approche HCM-PGA. Nous avons donc analysé les performances en terme de qualité des solutions fournies par notre méthode HFC-PGA. La figure \ref{fig:CP_HFC-PGA_best_fitness} présente les courbes des deux méthodes CP et HFC-PGA. Il en ressort que notre approche HFC-PGA performe aussi bien que l'approche de référence c'est à dire l'approche CP. En effet, la déviation maximale sur les 10 instances testées est de  1,4\% (instance 2). Une telle déviation que nous considérons comme faible, nous permet de dire que les performances en qualité des meilleures solutions obtenues de l'approche HFC-PGA sont sensiblement égales à celles obtenues de l'approche CP.
+    
+    \begin{figure}[!h]
+    \begin{center}
+	\begin{tikzpicture}[scale=0.7]
+       	\begin{axis}[xlabel=instances des PSP testées, ylabel=fitness]
+        %\addplot {x^2+2*x-1};
+        \addplot coordinates {
+        	(1 ,1377)
+        	(2 ,1447)
+        	(3 ,1107)
+        	(4 ,1182)
+        	(5 ,1471)
+       		(6 ,2774)
+       		(7 ,2655)
+        	(8 ,1473)
+        	(9 ,3117)
+        	(10 ,1493)
+        	};
+        \addlegendentry{CP}
+        \addplot coordinates {
+        	(1 ,1377)
+        	(2 ,1447)
+        	(3 ,1108)
+        	(4 ,1189)
+        	(5 ,1471)
+       		(6 ,2774)
+       		(7 ,2670)
+        	(8 ,1473)
+        	(9 ,3117)
+        	(10 ,1497)
+        	};
+        \addlegendentry{HFC-PGA}
+        \end{axis}
+    \end{tikzpicture}
+    \end{center}
+	\caption{Performances comparées de CP et HFC-PGA en fitness de la meilleure solution trouvée}
+	\label{fig:CP_HFC-PGA_best_fitness}
+    \end{figure}
+    
+	La figure \ref{fig:CP_HFC-PGA_time} nous présente les résultats en temps des essais de l'approche HFC-PGA comparés à ceux de l'approche CP. Ainsi, l'approche HFC-PGA parcourt également bien plus vite l'espace de recherche en comparaison à l'approche CP. Un gain de 94,67\% est notamment constaté sur l'instance 10 justifiant la performance en temps de notre solution.    
+    
+	\begin{figure}[!h]
+	
+	\begin{center}
+	\begin{tikzpicture}[scale=0.7]
+       	\begin{axis}[xlabel=instances des PSP testées, ylabel=temps en secondes]
+        %\addplot {x^2+2*x-1};
+        \addplot coordinates {
+        	(1 ,9.14)
+        	(2 ,7.29)
+        	(3 ,2.94)
+        	(4 ,1.78)
+        	(5 ,0.23)
+       		(6 ,11.17)
+       		(7 ,12.84)
+        	(8 ,15.03)
+        	(9 ,25.35)
+        	(10 ,121.90)
+        	};
+        \addlegendentry{CP}
+        \addplot coordinates {
+        	(1 ,3.9)
+        	(2 ,1.7)
+        	(3 ,3.2)
+        	(4 ,2.4)
+        	(5 ,4.5)
+       		(6 ,2.2)
+       		(7 ,2.5)
+        	(8 ,6.1)
+        	(9 ,10.3)
+        	(10 ,6.5)
+        	};
+        \addlegendentry{HFC-PGA}
+        \end{axis}
+        %\caption{g}
+    \end{tikzpicture}
+    \end{center}
+	\caption{Performances comparées de CP et HFC-PGA en temps}
+	\label{fig:CP_HFC-PGA_time}
+    \end{figure}
+	
+	
+	Afin de prouver que notre méthode arrive à trouver en général des solutions proches de la solution optimale, une moyenne de résultats obtenus a été effectuée sur les 10 essais de test. Comme le montre la figure \ref{fig:CP_HFC-PGA_moy_fitness} qui présente les courbes des résultats moyens en terme de qualité du HFC-PGA; nous pouvons remarquer que notre méthode arrive à trouver sur les différents essais effectués des solutions très proches de la solution optimale. En effet, la déviation maximale observée est de 1.4\%. Des observations précédentes et de celle-ci, nous pouvons conjecturer que notre méthode HFC-PGA comme sa seconde HCM-PGA parcourt bien plus vite l'espace de recherche tout en trouvant de solutions optimales sinon très proches de ces dernières.
+    \begin{figure}[!h]
+    \begin{center}
+	\begin{tikzpicture}[scale=0.7]
+       	\begin{axis}[xlabel=instances des PSP testées, ylabel=fitness]
+        %\addplot {x^2+2*x-1};
+        \addplot coordinates {
+        	(1 ,1377)
+        	(2 ,1447)
+        	(3 ,1107)
+        	(4 ,1182)
+        	(5 ,1471)
+       		(6 ,2774)
+       		(7 ,2655)
+        	(8 ,1473)
+        	(9 ,3117)
+        	(10 ,1493)
+        	};
+        \addlegendentry{CP}
+        \addplot coordinates {
+        	(1 ,1380)
+        	(2 ,1459)
+        	(3 ,1107)
+        	(4 ,1199)
+        	(5 ,1471)
+       		(6 ,2774)
+       		(7 ,2670)
+        	(8 ,1473)
+        	(9 ,3119)
+        	(10 ,1493)
+        	};
+        \addlegendentry{HFC-PGA}
+        \end{axis}
+        %\caption{g}
+    \end{tikzpicture}
+    \end{center}
+    \caption{Performances comparées de CP et HFC-PGA en fitness moyen des solutions trouvées}
+    \label{fig:CP_HFC-PGA_moy_fitness}
+    \end{figure}
+    
+    	\newpage
+		\subsection{HCM-PGA et Approche SA}
+		
+		Les analyses précédentes nous ont permis de dire que nos deux approches basées sur les algorithmes génétiques performent aussi bien en qualité que l'approche CP, tout en parcourant bien plus vite l'espace de recherche. Nous allons dans la suite tenter d'analyser les résultats issus des tests effectués sur des instances bien plus complexes de la bibliothèque Opthub. Ces instances sont en effet plus complexes dans la mesure où les contraintes sont plus importantes et l'horizon de planification est bien supérieur (c'est à dire supérieur à 200 périodes). La figure \ref{fig:SA_HCM-PGA_time} montre les courbes décrivant l'allure des résultats en temps des deux approches HCM-PGA et SA; et nous permet ainsi de comparer les résultats obtenus. \\
+		\hspace*{.5cm} (Sur les figures en rapport à l'approche SA, les instances 1,2,3,4,5 et 6 correspondent respectivement aux instances ps-200-10-80, ps-200-20-80, ps-300-10-80, ps-300-20-80, ps-400-10-80 et ps-400-20-80)
+		
+		
+	\begin{figure}[!h]
+    \begin{center}
+	\begin{tikzpicture}[scale=0.7]
+       	\begin{axis}[xlabel=instances des PSP testées, ylabel=fitness]
+        %\addplot {x^2+2*x-1};
+        \addplot coordinates {
+        	(1 ,18089)
+        	(2 ,19190)
+        	(3 ,26343)
+        	(4 ,30206)
+        	(5 ,34206)
+       		(6 ,42329)
+        	};
+        \addlegendentry{SA}
+        \addplot coordinates {
+        	(1 ,19799)
+        	(2 ,21345)
+        	(3 ,34985)
+        	(4 ,32207)
+        	(5 ,40433)
+       		(6 ,45647)
+        	};
+        \addlegendentry{HCM-PGA}
+        \end{axis}
+    \end{tikzpicture}
+    \end{center}
+	\caption{Performances comparées de SA et HCM-PGA en fitness de la meilleure solution trouvée}
+	\label{fig:SA_HCM-PGA_best_fitness}
+    \end{figure}	
+    
+	En observant la figure \ref{fig:SA_HCM-PGA_best_fitness}, on constate que les résultats de notre méthode HCM-PGA différent nettement de celles optimales de la méthode SA. On remarque en effet, que la méthode de résolution HCM-PGA trouve des solutions dont le coût est différent de 32\% dans le pire des cas (instance ps-300-10-80). Nous pouvons cependant retenir comme point positif que notre méthode HCM-PGA réussit à approcher de 6.6\% dans le meilleur des cas (instance ps-300-20-80) la solution optimale.
+	
+	\begin{figure}[!h]
+	\begin{center}
+	\begin{tikzpicture}[scale=0.7]
+       	\begin{axis}[xlabel=instances des PSP testées, ylabel=temps en secondes]
+        %\addplot {x^2+2*x-1};
+        \addplot coordinates {
+        	(1 ,72.2)
+        	(2 ,73.8)
+        	(3 ,78.4)
+        	(4 ,68.3)
+        	(5 ,85.5)
+       		(6 ,69.5)
+        	};
+        \addlegendentry{SA}
+        \addplot coordinates {
+        	(1 ,11.2)
+        	(2 ,11.5)
+        	(3 ,32.2)
+        	(4 ,30.8)
+        	(5 ,37.8)
+       		(6 ,60.9)
+        	};
+        \addlegendentry{HFC-PGA}
+        \end{axis}
+        %\caption{g}
+    \end{tikzpicture}
+    \end{center}
+	\caption{Performances comparées de SA et HCM-PGA en temps}
+	\label{fig:SA_HCM-PGA_time}
+    \end{figure} 
+    
+	Nous remarquons que notre méthode HCM-PGA ne performe pas aussi bien qu'attendu sur les instances plus complexes lorsqu'on parle de qualité de la meilleure solution trouvée. Nous analysons à présent ses performances en temps. La figure \ref{fig:SA_HCM-PGA_time} nous indique que notre méthode HCM-PGA parcourt toujours aussi vite l'espace de recherche (jusqu'à 84\% de gain en temps dans le meilleur des cas). Nous résumons donc de nos deux analyses en terme de temps et de qualité, que notre méthode HCM-PGA explore toujours aussi vite l'espace de recherche mais ne réussit pas à mieux approcher la solution au delà de 6.6\%.    
+    
+    \newpage
+    \subsection{HFC-PGA et Approche SA}	
+
+	La figure \ref{fig:SA_HFC-PGA_best_fitness} présente les résultats des tests effectués en terme de qualité de la solution trouvée. Une analyse similaire à celle menée entre SA et HCM-PGA peut être menée dans le sens où les performances en terme de qualité des solutions obtenues des essais de la méthode HFC-PGA sur les 6 instances plus complexes, ne sont pas aussi intéressantes qu’espérées. En effet, notre méthode de HFC-PGA ne fait pas mieux que 6.4\% dans le meilleur des cas (instance ps-300-20-80). Il est à noter cependant comme point positif que notre méthode HFC-PGA ne fait pas moins bien que 19.2\% de déviation maximale. 
+	
+	\begin{figure}[!h]
+    \begin{center}
+	\begin{tikzpicture}[scale=0.7]
+       	\begin{axis}[xlabel=instances des PSP testées, ylabel=fitness]
+        %\addplot {x^2+2*x-1};
+        \addplot coordinates {
+        	(1 ,18089)
+        	(2 ,19190)
+        	(3 ,26343)
+        	(4 ,30206)
+        	(5 ,34206)
+       		(6 ,42329)
+        	};
+        \addlegendentry{SA}
+        \addplot coordinates {
+        	(1 ,19484)
+        	(2 ,21302)
+        	(3 ,30452)
+        	(4 ,32289)
+        	(5 ,40775)
+       		(6 ,45521)
+        	};
+        \addlegendentry{HCM-PGA}
+        \end{axis}
+    \end{tikzpicture}
+    \end{center}
+	\caption{Performances comparées de SA et HFC-PGA en fitness de la meilleure solution trouvée}
+	\label{fig:SA_HFC-PGA_best_fitness}
+    \end{figure} 	
+	
+	Du point de vue de la performance en temps de notre méthode comparée à la méthode SA, plus l'horizon de planification s'étend plus, l'efficacité en temps se dégrade. En effet, elle est de 9.9 secondes sur un horizon de 200 périodes et de 120 secondes sur un horizon de 400 périodes; environ deux fois plus que le temps pris par la méthode SA pour cette dernière instance comme le montre la figure \ref{fig:SA_HFC-PGA_time}.
+	\begin{figure}[!h]
+	\begin{center}
+	\begin{tikzpicture}[scale=0.7]
+       	\begin{axis}[xlabel=instances des PSP testées, ylabel=temps en secondes]
+        %\addplot {x^2+2*x-1};
+        \addplot coordinates {
+        	(1 ,72.2)
+        	(2 ,73.8)
+        	(3 ,78.4)
+        	(4 ,68.3)
+        	(5 ,85.5)
+       		(6 ,69.5)
+        	};
+        \addlegendentry{SA}
+        \addplot coordinates {
+        	(1 ,9.9)
+        	(2 ,18.8)
+        	(3 ,56.8)
+        	(4 ,96.8)
+        	(5 ,117.9)
+       		(6 ,120.3)
+        	};
+        \addlegendentry{HFC-PGA}
+        \end{axis}
+        %\caption{g}
+    \end{tikzpicture}
+    \end{center}
+	\caption{Performances comparées de SA et HFC-PGA en temps}
+	\label{fig:SA_HFC-PGA_time}
+    \end{figure}
+        	
+    	\newpage
+		\subsection{HCM-PGA et HFC-PGA}
+
+	Dans cette sous-section, nous tentons de répondre à la question de savoir laquelle des méthodes HCM-PGA et HFC-PGA est la plus pertinente dans la résolution des problèmes du PSP en nous basant sur les résultats des tests effectués sur les instances proposées par Houndji. Les figures \ref{fig:HCM-PGA_HFC-PGA_time} et \ref{fig:HCM-PGA_HFC-PGA_moy_fitness} présentent repectivement les resultats en terme de temps et de qualité. On note ainsi globalement que la méthode de HCM-PGA est plus rapide que celle du HFC-PGA cepandant la méthode du HFC-PGA est plus précise que celle du HCM-PGA losrqu'on parle de qualité des solutions trouvées.
+		
+		
+	\begin{figure}[!h]
+	\begin{center}
+	\begin{tikzpicture}[scale=0.7]
+       	\begin{axis}[xlabel=axe $x$, ylabel=axe $y$]
+        %\addplot {x^2+2*x-1};
+        \addplot coordinates {
+        	(1 ,1378)
+        	(2 ,1450)
+        	(3 ,1107)
+        	(4 ,1196)
+        	(5 ,1601)
+       		(6 ,2774)
+       		(7 ,2662)
+        	(8 ,1473)
+        	(9 ,3117)
+        	(10 ,1493)
+        	};
+        \addlegendentry{HCM-PGA}
+        \addplot coordinates {
+        	(1 ,1380)
+        	(2 ,1459)
+        	(3 ,1107)
+        	(4 ,1199)
+        	(5 ,1471)
+       		(6 ,2774)
+       		(7 ,2670)
+        	(8 ,1473)
+        	(9 ,3119)
+        	(10 ,1493)
+        	};
+        \addlegendentry{HFC-PGA}
+        \end{axis}
+        %\caption{g}
+    \end{tikzpicture}
+    \end{center}
+    \caption{Performances comparées de HCM-PGA et HFC-PGA en temps}
+    \label{fig:HCM-PGA_HFC-PGA_moy_fitness}
+    \end{figure}
+    
+    \begin{figure}[!h]
+	
+	\begin{center}
+	\begin{tikzpicture}[scale=0.7]
+       	\begin{axis}[xlabel=instances des PSP testées, ylabel=temps en secondes]
+        %\addplot {x^2+2*x-1};
+        \addplot coordinates {
+        	(1 ,1.73)
+        	(2 ,1.4)
+        	(3 ,1.6)
+        	(4 ,1.3)
+        	(5 ,2.4)
+       		(6 ,2.6)
+       		(7 ,2.6)
+        	(8 ,1.9)
+        	(9 ,4.08)
+        	(10 ,3.4)
+        	};
+        \addlegendentry{HCM-PGA}
+        \addplot coordinates {
+        	(1 ,3.9)
+        	(2 ,1.7)
+        	(3 ,3.2)
+        	(4 ,2.4)
+        	(5 ,4.5)
+       		(6 ,2.2)
+       		(7 ,2.5)
+        	(8 ,6.1)
+        	(9 ,10.3)
+        	(10 ,6.5)
+        	};
+        \addlegendentry{HFC-PGA}
+        \end{axis}
+    \end{tikzpicture}
+    \end{center}
+    
+	\caption{Performances comparées de HCM-PGA et HFC-PGA en fitness moyen des solutions trouvées}
+	\label{fig:HCM-PGA_HFC-PGA_time}
+    \end{figure} 
+    
+		\section*{Conclusion}
+		\addcontentsline{toc}{section}{Conclusion}
+		Les expérimentations et tests effectués dans cette partie ont été l'occasion de valider nos deux méthodes de résolution proposées basées sur les algorithmes génétiques. Nous avons ainsi pu comparer chacune d'elles aux approches CP et SA et avons pu tirer des conclusions. Il ne nous reste plus qu'à conclure notre étude et à présenter les perspectives envisagées.

@@ -1,0 +1,20 @@
+\begin{abstract}
+Les jeux sont très étudiés en \gls{ia}.
+Ils représentent des environnements concurrentiels où les concurrents veulent chacun maximiser leur profit. Les chercheurs tentent à chaque fois de trouver des algorithmes
+pour résoudre plus rapidement mais aussi plus facilement ces problèmes. La plupart des méthodes existants nécessitent l'utilisation d'une fonction d'évaluation
+permettant de parfaire le résultat final. Malgré qu'il y a beaucoup de jeux qui se ressemblent, il faut bien souvent déterminer une fonction d'évaluation pour chaque jeu.
+Dans ce travail, nous définissons une nouvelle classe de jeux appelée \textit{<<n-alignés>>}. Nous proposons pour tous les jeux de cette classe une heuristique permettant d'évaluer
+les nœuds de leur arbre de recherche. \gls{mcts} est une nouvelle famille d'algorithmes de résolution de jeux qui connaît beaucoup de succès. Malgré que \textit{Upper Confidence
+Bound for Trees} (UCT) fait partie de la famille \gls{mcts}, il a du mal à gagner les jeux <<n-alignés>> à cause de la taille très grande de leur arbre de recherche.
+Nous l'utilisons en commun avec l'heuristique proposée pour cette classe mais les résultats sont dégradés par rapport à sa version standard.
+\end{abstract}
+% Nous avons pris conscience de ce que le système de suivi des notes à l'Université d'Abomey-Calavi est perfectible. Pour
+% améliorer cela, nous avons réalisé au cours de ce travail une application qui intègre un bon nombre de fonctionnalités dans le but de suppléer à l'ancien.
+% D'abord, nous avons situé le problème. Ensuite, nous avons fait une étude critique de l'existant avant de 
+% déployer notre mesure qui est une solution web où la particularité est que c'est l'enseignant lui-même
+% qui se connecte pour enregistrer les notes des étudiants ayant suivi son cours. Aussi, l'étudiant sans se
+% déplacer peut-il s'enquérir des notes qu'il a obtenues. Tout cela a été possible grâce à l'utilisation des langages tels que PHP, JavaScript, XML, HTML ; des librairies telles
+% que Swiftmailer ; des frameworks tels que Jquery et Bootstrap ; du moteur de template Twig, etc.
+% \Huge{Cette partie est intentionnellement laisser vide. Elle sera remplie avant samedi ;-)}
+% \paragraph{}
+% \textbf{Mots clés}: \emph{Plateforme, gestion, notes, web, IFRI, UAC}.

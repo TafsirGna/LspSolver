@@ -1,0 +1,92 @@
+% \begin{abstract}
+% 
+%  Ma contribution
+% \end{abstract}
+
+\paragraph{}
+Les jeux
+constituent le point focal des recherches en situation d'adversité. L'intelligence artificielle se fonde essentiellement sur le parcours d'arbre pour la résolution de ces derniers.
+Beaucoup d'algorithmes de recherche se sont succédés dès lors jusqu'à maintenant, partant du minimax \cite{mini} au alpha-beta \cite{alfab} (ainsi que ses améliorations). Bien que ces
+méthodes aient connu
+beaucoup de succès, aucune d'elles ne permet d'office de parvenir à résoudre un problème car elles nécessitent toutes une fonction pouvant évaluer les positions de l'arbre de
+recherche et la détermination de celle-ci peut être difficile suivant la complexité du problème.
+
+Monte Carlo Tree Search (MCTS) est une méthode de recherche d'arbre créée par Remi Coulom en 2006 \cite{i} qui s'utilise dans plusieurs domaines dont la recherche en situation
+d'adversité. Le principe de \gls{mcts} est de procéder à
+plusieurs simulations aléatoires afin de déterminer le degré de confiance d'un coup. Il est connu aussi bien pour son efficacité que pour son caractère \textit{Aheuristic}
+\footnote{Elle s'utilise également sans des connaissances expertes}.
+Les succès notables qu'il a fait connaître aux ordinateurs dans le cas de certains jeux ont accru l'intérêt des chercheurs pour lui, qui tentent de démontrer son très grand domaine
+d'efficacité. Toutefois, pour les jeux comme le Go aussi bien que pour les jeux que nous appelons <<n-alignés>>\footnote{La catégorie "test" de jeux que nous avons
+choisi pour ce travail et qui est composée
+des jeux Tic Tac Toe, Gomoku, Connect Four, etc.}, cette efficacité est perdue à cause de l'espace des états qui peut être très grand. Dans ces cas, les nœuds
+sont visités un très petit nombre de fois et les choix des coups aléatoires lors de la simulation produisent une mauvaise estimation de la valeur théorique des nœuds
+donc un mauvais jeu.
+
+
+\subsection*{Hypothèses}
+L'algorithme peut être amélioré par l'utilisation d'une fonction d'évaluation heuristique qui aiderait le choix des coups lors de la simulation mais il perdrait dans le même temps
+son caractère générique.
+
+% \paragraph{}
+% Une méthode récente; le \gls{mcts}, a revolutionné le domaine de la recherche en adversité car son efficacité permet de resoudre la plupart des problèmes
+% sans nécessairement une fonction propre à l'utilisateur devant évaluer les différentes positions de l'arbre de recherche. Cette efficacité lui est procurée par la
+% valeur \gls{ucb} des nœuds qu'elle utilise à chaque niveau de l'arbre pour choisir son coup suivant et qui s'assimile à une fonction d'évaluation assez générale.
+% Other commonly used approaches include the Monte Carlo Tree Search
+% algorithm. However, for a game such as Gomoku or Go, due to the large
+% search space involved, light random playouts do not always play well and
+% as such the algorithm can be improved with a strong heuristic evaluation to
+% help with e.g. move selection in the simulation phase [5].
+
+% Cette implémentation du \gls{mcts} est appelée \gls{uct}.
+
+% \paragraph{}
+% Dans ce travail, nous étudions les paramètres de la formule \gls{ucb} pour étudier leur influence sur les coups choisis à chaque étape de la recherche.
+% Ainsi nous proposons une substitution de cette formule par une autre que nous proposons qui y ajoute d'autres paramètres pour un cas
+% particuliers de jeux que nous appelons <<les n-alignés>>\footnote{La catégorie \textgravedbl test\textacutedbl de jeux que nous avons choisi pour ce travail et qui est composée
+% des jeux TicTacToe, Gomoku et Connect4} et nous comparons les résultats à ceux que produisent la version originale de l'\gls{uct} pour les mêmes jeux.
+% Ce travail traite de l'aspect générique de la fonction d'évaluation que nous introduisons dans la version standard de la formule \gls{ucb} (Auer et al. 2002).
+% Il traite également de la correlation des nouveaux paramètres que nous ajoutons avec les existants. Un travail pareil permet de comprendre nettement le fonctionnement
+% du \gls{mcts}, ce qui peut susciter des éventuelles améliorations.
+
+\subsection*{Objectifs}
+Nous avons pour objectif de déterminer une fonction d'évaluation générique qui permettra d'évaluer avec une bonne estimation les nœuds des arbres de recherche pour
+tous les jeux <<n-alignés>>. Nous voudrons également améliorer \gls{mcts} intégrer cette fonction au sein du \gls{mcts}, plus précisément dans la phase de simulation de \textit{Upper Confidence Bound
+for Trees} (UCT) dans le but d'aboutir à de meilleures estimations du degré de confiance des coups possibles.
+
+
+Dans ce travail, nous présentons d'abord les jeux de type <<n-alignés>> afin de déterminer les ressemblances notoires pouvant servir à l'écriture d'une seule
+heuristique (générique) qui les régit tous.
+Ensuite, nous étudions l'intégration de cette heuristique au sein du \gls{mcts}, plus précisément dans la phase de simulation de \textit{Upper Confidence Bound for Trees}
+(UCT) dans le but d'aboutir à de meilleures estimations du degré de confiance des coups possibles. Enfin, nous comparons les résultats à ceux que produisent UCT dans sa version
+originale pour les mêmes jeux.
+
+% \paragraph{}
+\subsection*{Motivation}
+Un tel travail permet d'orienter les regards vers les heuristiques génériques afin de pouvoir redonner à \gls{mcts} une part de son caractère générique qu'il perd lors de
+l'usage des heuristiques dans le but d'accroître ses performances. La générécité obtenue dans ces cas s'étendra
+uniquement aux jeux que couvre l'heuristique. Cela réduira ainsi le temps de développement pour des programmes de jeux similaires car le seul algorithme servira pour elles toutes.
+
+\subsection*{Organisation du travail}
+La suite de ce document est organisée comme suit. Le chapitre 1 fait l'état de l'art des recherches effectuées dans le cadre de UCT et de la résolution des jeux en étude.
+Le chapitre 2 présentera le matériel ainsi que les méthodes que nous utilisons dans le cadre de l'implémentation de la solution proposée tandis que le chapitre 3 se chargera de
+détailler ladite solution. Enfin, nous présentons dans le chapitre 4 les résultats obtenus après les tests de notre solution ainsi que l'analyse de ces résultats.
+
+
+
+% Dès les débuts de l'informatique est né le domaine de l'intelligence artificielle. Les chercheurs ont voulu modéliser ou simuler le comportement intellectuel des hommes
+% afin de construire des machines capables de substituer la réflexion des hommes. Mieux, ils voulaient optimaliser cette décision car l'homme non plus n'est
+% pas exempt d'erreurs. L'intelligence humaine s'orientant dans beaucoup de sens a fait émerger beaucoup de disciplines dans ce domaine au sein desquelles
+% figure la recherche en situation d'adversité. Ce domaine s'interesse aux jeux et plus particulièrement aux jeux combinatoires\footnote{Jeux à somme nulle, déterministes,
+% séquentiels, discrets, à informations parfaites} et se fonde essentiellement sur la recherche pour la résolution de ces derniers.
+
+% \paragraph{}
+% Une méthode récente; le <<Monte Carlo Tree Search>> (MCTS), a revolutionné le domaine de la recherche en adversité car son efficacité permet de resoudre la plupart des problèmes
+% sans une fonction pour en évaluer les positions mais son implémentation quoique presque identique pour la plupart des problèmes est souvent faite pour un problème précis.
+% Une de ses améliorations introduit la notion de fonction d'évaluation mais elle ne nous intéresse pas ici car elle lui ôte son caractère générique.
+% 
+% \paragraph{}
+% Dans ce travail, nous faisons une implémentation générique de l'algorithme afin qu'elle puisse à la fois résoudre plusieurs problèmes
+% et pour le cas d'espèces, il s'agit des jeux combinatoires de plateaux. Notre travail ne s'oriente pas dans le sens de la recherche des heuristiques génériques\footnote{Une nouvelle
+% piste de recherche consiste à déterminer des heuristiques génériques afin d'améliorer les performances du MCTS mais de conserver son caractère générique} mais plutôt dans le sens de
+% l'implémentation logicielle (implémentation améliorée de l'algorithme, généralisation de l'état du plateau, choix des structures). Un travail pareil améliorera le développement
+% des programmes de jeux combinatoires de plateaux tant sur le plan de la rapidité que celui la diminution des erreurs rencontrées.

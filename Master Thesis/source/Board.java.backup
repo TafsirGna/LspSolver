@@ -1,0 +1,71 @@
+package main;
+import java.awt.Point;
+import java.util.ArrayList;
+public abstract class Board {
+    protected int currentPlayer;
+    protected int winner;
+    protected boolean draw;
+    protected boolean gameWon;
+    protected int freeslots;
+    protected ArrayList<Piece> playerOnePieces;
+    protected ArrayList<Piece> playerTwoPieces;
+    protected int xlength;
+    protected int ylength;
+    protected int number;
+    /**
+     * Convertit l'etat du plateau en un tableau bidimensionnel
+     * @return le tableau resultant
+     */
+    public char[][] makeTab() {
+    }
+    /**
+     * Cree une copie du plateau. Il est important que les copies ne stockent
+     * pas les references des objets contenus dans l'objet Board a moins que
+     * ces objets soient immuables.
+     * @return
+     */
+    public abstract Board duplicate();
+    /**
+     * Recupere la liste des coups possibles dans l'etat courant.
+     * @return la liste resultant
+     */
+    public ArrayList<Move> getMoves() {
+    }
+    /**
+     * Joue le coup move donc change les attributs du plateau.
+     * @param move
+     */
+    public void makeMove(Move move) {
+    }
+    /**
+     * Verifie si la partie est terminee.
+     * @return VRAI si oui et NON si non.
+     */
+    public boolean isGameOver() {
+    }
+    /**
+     * Verifie si le jeu est resolu
+     * @return VRAI si oui et NON si non.
+     */
+    public boolean isSolved() {
+    }
+    /**
+     * Retourne le numero du joueur qui a le tour
+     * @return 1 pour le joueur un et 2 pour le joueur deux.
+     */
+    public int getCurrentPlayer() {
+    }
+    /**
+     * Retourne un tableau pour le score. [1.0, 0.0] indique la victoire du joueur 1.
+     * [0.0, 1.0] indique la victoire du joueur 2
+     * [0.5, 0.5] indique une partie nulle
+     * @return le tableau de score
+     */
+    public double[] getScore() {
+    }
+    /**
+     * Affiche le plateau dans son etat actuel
+     */
+    public void bPrint() {
+    }
+}

@@ -1,0 +1,166 @@
+\documentclass[12pt]{report}
+\usepackage{style}
+\usepackage{array}
+\usepackage{colortbl}
+\usepackage{tikz}
+\usepackage{shorttoc}
+\usepackage{abstract,lipsum}
+\usepackage{indentfirst}
+\usepackage{wasysym}
+\usepackage{pgfplots}
+
+\typeMemoire{Master en Informatique}
+%\optionFormation{Informatique Générale}
+\etudiant{Tafsir \textsc{GNA}}{gnatafsir@gmail.com}
+\titreDuMemoire{Résolution du \emph{Pigment Sequencing Problem} avec les algorithmes génétiques}
+\anneeScolaire{2016-2017}
+
+% Plusieurs encadrants décommenté la ligne suivante
+\encadrants{Dr Ing. Vinasétan Ratheil \textsc{Houndji} \\ \& \\ Professeur Mahouton Norbert \textsc{Hounkonnou}}
+
+% Un seul encadrant décommenté la ligne suivante
+% \encadrants{Prof Eugène C. \textbf{EZIN}}
+
+\renewenvironment{abstract}
+{\begin{quote}
+ \noindent \rule{\linewidth}{1pt}\par{\bfseries \abstractname.}}
+ {\medskip \noindent \newline \rule{\linewidth}{1pt}
+\end{quote}
+}
+
+
+
+
+\hypersetup{
+ pdftitle={Résolution du \emph{Pigment Sequencing Problem} avec les algorithmes génétiques},
+ pdfauthor={Tafsir GNA, gnatafsir@gmail.com},
+ pdfsubject={Intelligence Artificielle, Algorithmes génétiques, Pigment Sequencing Problem},
+ pdfkeywords={Algorithme génétique, planification de production, pigment sequencing problem, dimensionnement de lots} 
+ }
+\setcounter{tocdepth}{2}
+% \setcounter{secnumdepth}{2}
+% \loadglsentries[\newacronym]{glossaire/glossaire_reduit}
+\input{glossaire/glossaire_reduit}
+\begin{document}
+%Décommenter ou commenter pour afficher ou non le logo en filigrane sur la 1ère page
+% \AddToShipoutPicture*{\BackgroundPic}
+\begin{onehalfspace}
+
+\pageDeGarde
+
+\selectlanguage{french}
+
+% sommaire
+\pagenumbering{roman}
+%les trois succession des 3 commandes permet de creer un page vide en latex
+\newpage
+\strut 
+\newpage
+%\chapter*{}
+
+
+
+\newpage
+%liste des figures
+{
+% \let\clearpage\newpage
+\let\cleardoublepage\clearpage
+\listoffigures 
+
+\newpage
+%liste des tableaux
+\listoftables
+
+% \dominitoc
+\shorttableofcontents{Sommaire}{1}
+\addcontentsline{toc}{chapter}{Sommaire}   %insertion ligne "sommaire" dans la table des matières
+% \tableofcontents
+
+
+%\include{dedicace/dedicace}
+%% remerciements
+\include{remerciements/remerciements}
+
+
+
+
+%liste des algo
+\selectlanguage{french}
+\listofalgorithms
+\addcontentsline{toc}{chapter}{Liste des algorithmes}
+
+
+% glossaire
+\selectlanguage{french}
+\glsaddall
+\printglossaries\addcontentsline{toc}{chapter}{Liste des sigles et abréviations}
+% \printglossary[type=\acronymtype , title={Liste des acronymes}, toctitle={Liste des acronymes}]
+\clearpage
+}
+
+\clearpage
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+
+
+% résumé
+\resume
+    \input{resume/resume_reduit}
+    
+% abstract
+\selectlanguage{english}
+    \resum
+    \input{resume/abstract_reduit}
+
+\selectlanguage{french}
+%introduction
+\lhead[]{} \rhead[]{} \chead[]{}
+
+
+
+\fancyhead[L]{\tiny \leftmark}
+\fancyhead[R]{\scriptsize \rightmark}
+\fancyfoot[C]{\thepage}
+
+\introduction
+	\input{introduction/introduction_reduit}
+\chapter{État de l'art}
+	\input{dossier/revue_litterature}
+
+\chapter{Matériel et solutions}
+	\input{dossier/materiel_et_solutions}
+	
+\chapter{Résultats et Discussion}
+	\input{dossier/resultats_et_discussion}
+
+%%conclusion
+\lhead[]{} \rhead[]{} \chead[]{}
+\conclusion
+	\input{conclusion/concl}
+
+%%biblio
+\include{biblio/biblio}
+%
+
+%\appendix
+%\include{annexe/annexe_mise_en_place}
+
+\clearpage
+\pagenumbering{gobble}
+\setcounter{tocdepth}{1}
+\tableofcontents
+\addcontentsline{toc}{chapter}{Table des matières}
+
+% i add a last page to put on it a qr code that redirect to the github repository of the projet showed above
+\vspace*{1cm}	
+	\begin{center}
+		\begin{figure}[!h]
+			\includegraphics[scale=.2]{images/thesis_project_qrcode.png}
+		\end{figure}
+	\end{center}
+
+
+\end{onehalfspace}
+\end{document}
+

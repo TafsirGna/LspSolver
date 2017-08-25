@@ -1,0 +1,206 @@
+\begin{thebibliography}{9}\addcontentsline{toc}{chapter}{Bibliographie}
+  
+% \bibitem{A}
+%   Alex TüRK ,
+%     \emph{La vie privée en péril}, Éditions Odile Jacob, 2011, 272 p.
+
+\bibitem{a}
+Billings D., Davidson A., Schaeffer J. and Szafron D.,
+\emph{The challenge of poker}, 2002, AI 134(1):201–240.
+
+\bibitem{b}
+G. Chaslot, S. Bakkes, I. Szita and P. Spronck,
+\emph{Monte-Carlo Tree Search: A New Framework for Game AI}, in Proc. Artif. Intell. Interact. Digital Entert. Conf., Stanford Univ., California, 2008, p. 216-217.
+
+\bibitem{c}
+H. Baier and P. D. Drake,
+\emph{The Power of Forgetting: Improving the Last-Good-Reply Policy in Monte Carlo Go},IEEE Trans. Comp. Intell. AI Games, vol. 2, n\degres 4, 2010, p. 303-309.
+
+\bibitem{d}
+Nicholas Metropolis,
+\emph{The Beginning of the Monte Carlo Method}, Los Alamos Science, n\degres 15,‎ 1987, p. 125-130.
+
+     \bibitem{puissancesrc}
+ Puissance 4
+     \url{https://fr.wikipedia.org/wiki/Puissance_4} consulté le 25 août 2016.
+
+\bibitem{e}
+ Nicholas Metropolis et Stanislaw Ulam,
+ \emph{The Monte Carlo Method}, Journal of the American Statistical Association, vol. 44, n\degres 247,‎ septembre 1949, p. 335-341.
+ 
+ \bibitem{f}
+ Méthode de Monte-Carlo, sur
+     \url{https://fr.wikipedia.org/wiki/Méthode_de_Monte-Carlo} consulté le 22 mai 2016.
+
+ \bibitem{h}
+B. Abramson,
+ \emph{Expected-Outcome: A General Model of Static Evaluation}, IEEE Trans. Pattern Anal. Mach. Intell., vol. 12, 1990, p. 182-193.
+
+\bibitem{g}
+S. Gelly and D. Silver,
+ \emph{Monte-Carlo tree search and rapid action value estimation in computer Go}, Artif. Intell., vol. 175, n\degres 11, Jul. 2011, p. 1856-1875.
+ 
+  \bibitem{ticsrc}
+ Tic tac toe - Arcade Fever
+     \url{www.arcadefever.fr} consulté le 25 août 2016.
+ 
+\bibitem{i}
+R. Coulom,
+ \emph{Efficient Selectivity and Backup Operators in Monte-Carlo Tree Search}, in Proc. 5th Int. Conf. Comput. and Games, Turin, Italy, 2006, p. 72–83
+ 
+ \bibitem{rer}
+ AlphaGo arrive en tête du classement des meilleurs joueurs de Go au monde,
+ \url{www.developpez.com/actu/101454/AlphaGo-arrive-en-tête-du-classement-des-meilleurs-joueurs-de-Go-au-monde-la-premiere-fois-pour-un-programme-informatique} consulté le 22 août 2016
+
+\bibitem{j}
+C. Browne, E. Powley, D. Whitehouse, S. Lucas, P. I. Cowling, P. Rohlfshagen, S. Tavener, D. Perez, S. Samothrakis and S. Colton,
+ \emph{A Survey of Monte Carlo Tree Search Methods}, IEEE Transactions on computational intelligence and AI in games, VOL. 4, NO. 1, MARCH 2012.
+ 
+ \bibitem{k}
+ G. Chaslot, M Winands, H. van den Herik, J. Uiterwijk, and B. Bouzy,
+ \emph{Progressive Strategies for Monte-Carlo Tree Search}, INew Math. Nat. Comput., vol. 4, no. 3, 2008, p. 343–357.
+
+ \bibitem{l}
+L. Kocsis and C. Szepesvári,
+ \emph{Bandit based Monte-Carlo Planning}, in Euro. Conf. Mach. Learn. Berlin, Germany: Springer, 2006, p. 282–293.
+ 
+  \bibitem{m}
+P. Auer, N. Cesa-Bianchi, and P. Fischer,
+ \emph{Finite-time Analysis of the Multiarmed Bandit Problem}, Mach. Learn., vol. 47, no. 2, 2002, p. 235–256.
+ 
+  \bibitem{n}
+ AlphaGo Match Details, sur
+     \url{https://deepmind.com/research/alphago/} consulté le 18 août 2016.
+  
+  \bibitem{nn}
+ AlphaGo, sur
+     \url{https://fr.wikipedia.org/wiki/AlphaGo} consulté le 18 août 2016.
+
+\bibitem{o}
+L.V. Allis, H.J. van den Herik, and M.P.H. Huntjens,
+\emph{Go-moku solved by new search techniques}, Report, AAAI, 1993.
+
+\bibitem{p}
+L.V. Allis,
+ \emph{A Knowledge-based Approach of Connect-Four}, 1988, Thèse sur la résolution du jeu.
+ 
+  \bibitem{q}
+ What is Renju, sur
+     \url{http://www.renju.net/study/rules.php} consulté le 10 août 2016.
+     
+  \bibitem{r}
+Rongxiao Zhang,
+ \emph{Convolutional and Recurrent Neural Network for Gomoku}, Stanford University, 2016, p. 6.    
+
+  \bibitem{s}
+ Kai Sun Academic Home Page, sur
+     \url{www.kaisun.org} consulté le 28 août 2016.
+
+  \bibitem{t}
+Daniel Ford,
+ \emph{Gomoku AI Player}, Cardiff University, Final year project, May 2016, p. 58.
+ 
+ \bibitem{minia}
+ Claude G. Diderich, Marc Gengler,
+ \emph{A survey of Minimax trees and associated algorithms}, Computer Science Department, Swiss Federal Institute of Technology - Lausanne, 1995.
+ 
+  \bibitem{vv}
+     Conception informatique,
+     \url{www.conception-informatique.com/cycle-en-v/4-cycle-en-v}, consulté le 2 septembre 2016.
+ 
+  \bibitem{mini}
+ Stephen Simons
+ \emph{Minimax therems and their proofs}, Department oh Mathematics, University of California, Santa Barbara, CA, p.23.
+ 
+  \bibitem{alfab}
+ Samuel H. Fuller, John G. Gaschnig
+ \emph{Analysis of the alpha-beta pruning algorithm}, Computer Science Department, Carnegie Mellon University, 1973, p.51.
+ 
+  \bibitem{combin}
+ Brit C. A. Milvang-Jensen,
+ \emph{Combinatorial Games, Theory and Applications}, PhD thesis, Frebruary 2000, p.98.
+ 
+  \bibitem{focus}
+     Le cycle en V,
+     \url{https://www.focus-emploi.com/1555975/le-cycle-en-v}, consulté le 25 août 2016.
+ 
+ \bibitem{deville}
+ Yves Deville,
+ \emph{Adversarial search}, LINGI 2261 Artificial Intelligence, Université Catholique de Louvain, p. 64.
+ 
+ \bibitem{monmon}
+ Laure Elie, Bernard Lapeyre,
+ \emph{Introduction aux méthodes de Monte-Carlo}, Septembre 2001.
+ 
+ \bibitem{qq}
+ Pierre-Arnaud Coquelin, Rémi Munos,
+ \emph{Bandit algorithms for tree search}, UAI 2000, P. 67-74.
+ 
+   \bibitem{gomosrc}
+ Gomoku,
+     \url{https://github.com/dtcristo/gomoku} consulté le 25 août 2016.
+     
+     \bibitem{proof}
+     H. Jaap van den Herik, Mark H.M. Winands
+     \emph{Proof-Number Search and its Variants}, MICC-IKAT, Maastricht, The Netherlands.
+     
+    
+     
+    
+% \bibitem{b}
+% Pater Auer et al.,
+% \emph{Using Confidence Bounds for Exploitation-Exploration Trade-offs}
+    
+% \bibitem{a} 
+%   \emph{Généralités sur le système L.M.D pour l’Enseignement Supérieur au Bénin}, 6 p, [Document PDF].
+%   
+% \bibitem{b}
+%      \url{http://uac.bj/accueil/index.php/universite/historique-de-l-universite} [archive] Historique de l'université] sur le site officiel de l'université d'Abomey-Calavi.
+% 
+% \bibitem{c}
+%     \url{http://uac.bj/accueil/docs/Rapport_Rectorat2012_VF.pdf} [archive], [Document PDF].
+% 
+% \bibitem{e}
+%     Victor AYETOLA,
+%     \emph{Infrastructures TIC et services en ligne à l’Université d’Abomey-Calavi}, \url{https://indico.wacren.net/event/14/session/0/contribution/2/material/slides/0.pdf}, 29 p, [Document PDF].
+% 
+% \bibitem{f}
+%     \url{http://uac.bj/accueil/index.php/formations/decouvrir-nos-formations} [archive]
+%     
+% \bibitem{g}
+%     \url{http://www.uac.bj/home/index.php?id=70}, consulté le 29 novembre 2015 à 16h15.
+%     
+% \bibitem{h}
+%     RAPPORT DE GESTION ACADEMIQUE EXERCICE 2013, \url{http://www.uac.bj/public/document/Rapport_Rectorat_UAC_2013_22_04_2014_Distribue.pdf}, [Document PDF].
+%     
+% \bibitem{i}
+%     \url{https://openclassrooms.com/courses/debutez-l-analyse-logicielle-avec-uml/uml-c-est-quoi}, consulté le 20 novembre 2015 à 6h40.
+%     
+% \bibitem{j}
+%     \url{http://php.net/manual/fr/intro-whatis.php}, consulté le 22 novembre 2015 à 7h14.
+%     
+% \bibitem{k}
+%     \url{https://fr.wikipedia.org/wiki/PHP}, consulté le 22 novembre 2015 à 7h22.
+%     
+% \bibitem{l}
+%     \url{https://fr.wikibooks.org/wiki/Le_langage_CSS}, consulté le 22 novembre à 9h12.
+%     
+% \bibitem{m}
+%     \url{https://fr.wikipedia.org/wiki/JavaScript}, consulté le 22 novembre à 8h07.
+%     
+% \bibitem{n}
+%     \url{https://openclassrooms.com/courses/un-site-web-dynamique-avec-jquery/jquery-l-histoire-d-un-framework}, consulté le 21 novembre 2015 à 2h29.
+%     
+% \bibitem{o}
+%     \url{https://fr.wikipedia.org/wiki/Twitter_Bootstrap}, cosulté le 21 novembre 2015 à 17h01.
+%     
+% \bibitem{p}
+%     \url{http://www.json.org/jsonfr.html}, consulté le 21 novembre 2015 à 16h.
+% 
+% \bibitem{q}
+%     \url{http://antistatique.net/fr/nous/bloggons/2009/10/07/envoi-demail-avec-php-grace-swift-mailer}, consulté le 23 novembre 2015 à 3h24.
+%     
+% \bibitem{r}
+%     \url{https://www.wareziens.net/forum/image.php?url=https://user.oc-static.com/files/386001_387000/386515.png}
+%     
+\end{thebibliography}

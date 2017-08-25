@@ -1,0 +1,21 @@
+\paragraph{}
+Dans ce travail, nous avons défini dans un premier temps une nouvelle classe de jeux : les jeux <<n-alignés>>.
+% Les <<n-alignés>> sont des jeux de plateaux à deux joueurs, à somme nulle, à coups alternatifs qui consiste à poser à chaque coup une pierre de la couleur du joueur courant
+% (Blanc ou Noir) sur un plateau carré de taille $X \times X$. 
+L'environnement de ce type de jeux est complètement observable, déterministe et discret. Ce sont des jeux combinatoires.
+Ils sont une version assez simplifiée du jeu de Go; véritable challenge \cite{r} \cite{t}.
+Si ces jeux ont l'air simples, ils le sont moins pour les ordinateurs lorsque la taille du plateau augmente car l'espace de recherche augmente considérablement.
+\gls{mcts} est une famille d'algorithmes assez réputée pour son succès dans le domaine des jeux et sa particularité est qu'elle s'en sort, quoique moyennement,
+sans des connaissances expertes. Elle a même connu un grand succès en 2016 en occupant à l'aide d'un programme l'implémentant, le premier rang mondial des meilleurs joueurs
+de Go. Toutefois, dans sa version la plus utilisée (\gls{uct}), elle s'en sort difficilement avec les <<n-alignés>> dont la taille du plateau est grande.
+
+Dans ce document, nous
+avons voulu contribuer à son amélioration dans le cadre de ces jeux en proposant une fonction d'évaluation générique et en la couplant avec, de sorte que ce même travail
+ne soit pas repris pour ces différents jeux de la même catégorie. Mais les résultats n'ont pas été satisfaisants quoique la fonction utilisée ait été jugée intéressante dans les
+conditions expérimentales.
+
+En cette fin de notre travail, nous nous posons la question de savoir pourquoi une fonction d'évaluation jugée intéressante face un joueur n'a pas donnée
+de bon résultats face à ce même joueur lorsqu'on la couple avec \gls{uct}. Et si nous devrions poursuivre les recherches, nous nous appesantisserons tant sur ce point
+que sur l'amélioration de la fonction d'évaluation proposée en y ajoutant la notion de \textit{double attaque}.
+Aussi, essayerons-nous d'aborder le même problème avec les réseaux de neurones qui semblent être très intéressants pour ce type de problèmes à en croire son
+utilisation dans le programme AlphaGo et à en croire les recherches actuelles\cite{r}.
