@@ -1,1 +1,240 @@
 \chapter{Annexe 1}
+
+\section{Struture et implémentation}
+	
+	Dans cette section, nous présentons ici la structure du programme suivant qu'il implémente le HFC-PGA et le HCM-PGA.
+	
+	\subsection{HCM-PGA}
+	
+	\begin{lstlisting}[language=python]
+class Chromosome(object):
+
+	mutationRate = 0
+	problem = 0
+	hashTable = {}
+
+	# Builder 
+	def __init__(self):
+		#Code de la fonction ici
+	
+	def init2(self, solution, itemsRank):
+		#Code de la fonction ici
+	
+	def __lt__(self, chromosome):
+		#Code de la fonction ici
+	
+	def _get_fitnessValue(self):
+		#Code de la fonction ici
+	
+	def _get_solution(self):
+		#Code de la fonction ici
+	
+	def _get_itemsRanks(self):
+		#Code de la fonction ici
+	
+	def _get_hashSolution(self):
+		#Code de la fonction ici
+	
+	def _set_hashSolution(self, new_value):
+		#Code de la fonction ici
+	
+	def _set_itemsRanks(self, new_value):
+		#Code de la fonction ici
+	
+	def _set_solution(self, new_solution):
+		#Code de la fonction ici
+	
+	def _set_fitnessValue(self, new_value):
+		#Code de la fonction ici
+	
+	def __repr__(self):
+		#Code de la fonction ici
+	
+	def __eq__(self, chromosome):
+		#Code de la fonction ici
+	
+	def __ne__(self, chromosome):
+		#Code de la fonction ici
+	
+	def isFeasible(self):
+		#Code de la fonction ici
+	
+	def mutate(self):
+		#Code de la fonction ici
+	
+	def advmutate(self):
+		#Code de la fonction ici
+	
+	def getFeasible(self):
+		#Code de la fonction ici
+	
+	def getCostof(cls, indice, item, rank,solution, secondIndice = -1):
+		#Code de la fonction ici
+	
+	# Class' methods
+	getCostof = classmethod(getCostof)
+
+	# Properties
+	solution = property(_get_solution,_set_solution)
+	fitnessValue = property(_get_fitnessValue,_set_fitnessValue)
+	itemsRank = property(_get_itemsRanks, _set_itemsRanks)
+	hashSolution = property(_get_hashSolution, _set_hashSolution) 
+
+    \end{lstlisting}
+    
+    \begin{lstlisting}[language=python]
+class ClspThread(Thread):
+
+	listMainThreads = 0
+	NumberOfMigrants = 0
+	NbGenToStop = 0
+	crossOverRate = 0
+	MigrationRate = 0
+	NbMaxPopulation = 0
+	FITNESS_PADDING = 0
+
+	def __init__(self, threadId):
+		#Code de la fonction ici	
+	
+	def run(self):
+		#Code de la fonction ici	
+	
+	def getPopImproved(self):
+		#Code de la fonction ici	
+	
+	def exploit(self, chromosome):
+		#Code de la fonction ici	
+	
+	def initSearch(self, queue, parameter = "main"):
+		#Code de la fonction ici	
+	
+	def sendMigrants(self):
+		#Code de la fonction ici	
+	
+	def receiveMigrants(self, chromosomes):
+		#Code de la fonction ici	
+	
+	def replace(self, chromosome):
+		#Code de la fonction ici	
+	
+	def getFitnessData(self):
+		#Code de la fonction ici	
+	
+	def mate(self, chromosome1, chromosome2):
+		#Code de la fonction ici	
+	
+	def crossover(self, randValue1, randValue2):
+		#Code de la fonction ici
+	
+	def crossPopulation(self):
+		#Code de la fonction ici	
+
+	def insert(self, chromosome):
+		#Code de la fonction ici		
+		
+    \end{lstlisting}
+    
+    \begin{lstlisting}[language=python]
+class GeneticAlgorithm:
+
+	#	Class' variables
+	NbMaxPopulation = 25
+	mutationRate = 0.05
+	crossOverRate = 0.80
+	FITNESS_PADDING = 1
+	NumberOfMigrants = 1
+	MigrationRate = 0 
+	nbMainThreads = 3
+	nbSlavesThread = 3
+	NbGenToStop = 7
+
+	# Builder
+	def __init__(self, inst):
+		#Code de la fonction ici
+	
+	def start(self):
+		#Code de la fonction ici
+	
+	def printResults(self):
+		#Code de la fonction ici
+		
+    \end{lstlisting}
+	
+	\subsection{HFC-PGA}	
+	
+	\begin{lstlisting}[language=python]
+lass ClspThread(Thread):
+
+	NbMaxPopulation = 0
+	crossOverRate = 0
+	listMainThreads = 0
+	NumberOfMigrants = 0
+
+	# Builder 
+def __init__(self, threadId):
+		#Code de la fonction ici	
+	
+	def run(self):
+		#Code de la fonction ici	
+	
+	def dispatchPop(self, chromosomes):
+		#Code de la fonction ici	
+	
+	def resetPop(self):
+		#Code de la fonction ici	
+	
+	def initSearch(self):
+		#Code de la fonction ici	
+	
+	def assignToThread(self, chromosome):	
+		#Code de la fonction ici	
+	
+	def sendMigrants(self):
+		#Code de la fonction ici	
+
+	def isValidPop(self):	
+		#Code de la fonction ici
+	
+	def receiveImmigrants(self, immigrants):
+		#Code de la fonction ici	
+	
+	def putThreadsInRank(self):
+		#Code de la fonction ici	
+	
+	def lacksDiversity(self):
+		#Code de la fonction ici	
+
+	def printRangedThreads(self):
+		#Code de la fonction ici		
+		
+    \end{lstlisting}	
+	
+		\begin{lstlisting}[language=python]
+class MeshThread(Thread):
+
+	"""docstring for MeshThread"""
+
+	def __init__(self, mainThread):
+		#Code de la fonction ici	
+	
+	def run(self):
+		#Code de la fonction ici	
+	
+	def mateWith(self, chromosome):
+		#Code de la fonction ici	
+	
+	def __lt__(self, thread):
+		#Code de la fonction ici	
+	
+	def __gt__(self, thread):
+		#Code de la fonction ici	
+	
+	def _set_chromosome(self, new_value):	
+		#Code de la fonction ici	
+	
+	def _get_chromosome(self):
+		#Code de la fonction ici	
+
+	# Class' Properties
+	chromosome = property(_get_chromosome, _set_chromosome)	
+    \end{lstlisting}

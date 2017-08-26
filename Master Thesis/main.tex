@@ -8,6 +8,9 @@
 \usepackage{indentfirst}
 \usepackage{wasysym}
 \usepackage{pgfplots}
+\usepackage{footnote}
+\makesavenoteenv{tabular}
+\makesavenoteenv{table}
 
 \typeMemoire{Master en Informatique}
 %\optionFormation{Informatique Générale}
@@ -93,8 +96,10 @@
 % glossaire
 \selectlanguage{french}
 \glsaddall
-\printglossaries\addcontentsline{toc}{chapter}{Liste des sigles et abréviations}
-% \printglossary[type=\acronymtype , title={Liste des acronymes}, toctitle={Liste des acronymes}]
+%\printglossaries\addcontentsline{toc}{chapter}{Liste des sigles et abréviations}
+\printglossary[type=\acronymtype , title={Liste des sigles et abréviations}, toctitle={Liste des sigles et abréviations}]
+\addcontentsline{toc}{chapter}{Liste des sigles et abréviations}
+
 \clearpage
 }
 
@@ -128,7 +133,7 @@
 \chapter{État de l'art}
 	\input{dossier/revue_litterature}
 
-\chapter{Matériel et solutions}
+\chapter{Matériel et solutions}{\label{chap:materiel_et_solutions}}
 	\input{dossier/materiel_et_solutions}
 	
 \chapter{Résultats et Discussion}
@@ -143,8 +148,8 @@
 \include{biblio/biblio}
 %
 
-%\appendix
-%\include{annexe/annexe_mise_en_place}
+\appendix
+\include{annexe/annexe_mise_en_place}
 
 \clearpage
 \pagenumbering{gobble}

@@ -12,6 +12,12 @@ N.~Brahimi, S.~DAUZERE-PERES, N.~NAJID, and A.~NORDILI.
 \newblock {\em European journal of Operational Research 168}, pages 1--16,
   2006.
 
+\bibitem{dauzere}
+Nadjib Brahimi, Stéphane Dauzère-Pérès, Najib.M. Najid, and Atle Nordli.
+\newblock Etat de l'art sur les problemes de dimensionnement des lots avec
+  contraintes de capacite.
+\newblock 04 2003.
+
 \bibitem{cant2}
 E.~Cantu-Paz.
 \newblock A survey of parallel genetic algorithms.
@@ -34,7 +40,7 @@ S~Ceschia.
 \bibitem{ceschia}
 S.~Ceschia, L.~Di~Gaspero, and A.~Schaerf.
 \newblock Solving discrete lot-sizing and scheduling by simulated annealing.
-\newblock {\em Computers and Operations Research}, pages 8--9, 2016.
+\newblock 2016.
 
 \bibitem{davis}
 L.~Davis.
@@ -88,6 +94,11 @@ C.~Gicquel, N.~Miègeville, M.~Minoux, and Y.~Dallery.
   attributes.
 \newblock {\em Computers and Operations Research 36}, pages 2690--2698, 2009.
 
+\bibitem{holland2}
+D.E. Goldberg and J.H. Holland.
+\newblock Classifier systems and genetic algorithms.
+\newblock {\em The University of Michigan Press}, pages 235--282, 1989.
+
 \bibitem{Goncalves}
 J.~F. Gonçalves and J.~J. de~Magalhaes~Mendes.
 \newblock A hybrid genetic algorithm for the job shop scheduling problem.
@@ -96,6 +107,11 @@ J.~F. Gonçalves and J.~J. de~Magalhaes~Mendes.
 \bibitem{denny}
 D.~Hermawanto.
 \newblock Genetic algorithm for solving simple mathematical equality problem.
+
+\bibitem{holland1}
+J.H. Holland.
+\newblock Adaptation in natural and artificial system.
+\newblock {\em The University of Michigan Press}, 1975.
 
 \bibitem{hvr_stockingCost}
 N.~R. Houndji, P.~Wolsey, R.~Schaus, and Y.~Deville.
@@ -109,6 +125,17 @@ V.~R. Houndji.
   Résolution par Programmation en Nombres Entiers et par Programmation par
   Contraintes}.
 \newblock PhD thesis, Ecole Polytechnique de Louvain, 2013.
+
+\bibitem{houndji_thesis}
+V.~R. Houndji.
+\newblock {\em cost-based filtering algorithms for a capacitated lot sizing
+  problem and the constrained arborescence problem}.
+\newblock PhD thesis, Université Catholique de Louvain, 2017.
+
+\bibitem{wikipedia_python}
+Wikimedia~Foundation .Inc.
+\newblock Python (langage), 2017.
+\newblock fr.wikipedia.org.
 
 \bibitem{jawahar}
 N.~Jawahar, S.~ARAVINDAN, and G.~PONNAMBALAM.
@@ -126,18 +153,6 @@ D.~S. Johnson, C.~R. Aragon, L.~A. McGeoch, and C.~Schevon.
 B.~KARIMI, S.~FATEMI~GHOMI, and J.~WILSON.
 \newblock Single item lot sizing problems.
 \newblock {\em European journal of Operational Research 168}, 1:1--16, 2006.
-
-\bibitem{kimms}
-A.~Kimms.
-\newblock Improved lower bounds for the propertional lot-sizing and scheduling
-  problem.
-\newblock {\em Working Paper 414}, pages 85--101, 1996.
-
-\bibitem{kimms2}
-A.~Kimms.
-\newblock Genetic algorithms for multi-level, multi-machine lot-sizing and
-  scheduling.
-\newblock {\em Computers and Operations Research 26}, pages 829--848, 1999.
 
 \bibitem{manne}
 A.~Manne.

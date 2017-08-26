@@ -105,7 +105,7 @@ class ClspThread(Thread):
 
 			self.slaveThreadsManager.crossoverPop()
 
-			#print (self.name, " ", "Population : ", self.chromosomes, " + ", self.listFitnessData)
+			#print (self.name, " ", self.NbGenerations,  " ", "Population : ", self.chromosomes, " + ", self.listFitnessData)
 			#print (" ")
 
 			if self.popLackingDiversity:
@@ -116,7 +116,9 @@ class ClspThread(Thread):
 				# i store this local optima in the genetic algorithm's memory to remind me that it's already been visited before
 				chromosome.advmutate()	
 				if not chromosome.isFeasible():
+					#chromosome.getFeasible()
 					print("OOOOOOOOOOOOOOOOOOOOOOOOOOOO")
+
 				self.chromosomes = copy.deepcopy(self.initialChromosomes)
 				self.replace(chromosome)
 
