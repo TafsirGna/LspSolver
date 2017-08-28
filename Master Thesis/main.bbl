@@ -1,26 +1,27 @@
 \begin{thebibliography}{10}
 
 \bibitem{boukef}
-H.~BOUKEF, M.~BENREJEB, and P.~BORNE.
+H.~Boukef, M.~Benrejeb, and P.~Borne.
 \newblock A proposed genetic algorithm coding for flow-shop scheduling
   problems.
 \newblock {\em International journal of computers}, pages 229--240, 2007.
 
 \bibitem{brahimi}
-N.~Brahimi, S.~DAUZERE-PERES, N.~NAJID, and A.~NORDILI.
+N.~Brahimi, S.~Dauzère-Pérès, N.~Najid, and A.~Nordili.
 \newblock Single item lot sizing problems.
 \newblock {\em European journal of Operational Research 168}, pages 1--16,
   2006.
 
 \bibitem{dauzere}
 Nadjib Brahimi, Stéphane Dauzère-Pérès, Najib.M. Najid, and Atle Nordli.
-\newblock Etat de l'art sur les problemes de dimensionnement des lots avec
-  contraintes de capacite.
+\newblock Etat de l'art sur les problèmes de dimensionnement des lots avec
+  contraintes de capacité.
 \newblock 04 2003.
 
 \bibitem{cant2}
-E.~Cantu-Paz.
+Erick Cant-paz.
 \newblock A survey of parallel genetic algorithms.
+\newblock 06 1999.
 
 \bibitem{cant}
 E.~Cantu-Paz.
@@ -28,7 +29,7 @@ E.~Cantu-Paz.
 \newblock 1999.
 
 \bibitem{cavalieri}
-S.~Cavalieri and P.~caiardelli.
+S.~Cavalieri and P.~Caiardelli.
 \newblock Hybrid genetic algorithms for a multiple-objective scheduling
   problem.
 \newblock {\em Journal of Intelligent manufacturing}, pages 361--367, 1998.
@@ -113,12 +114,6 @@ J.H. Holland.
 \newblock Adaptation in natural and artificial system.
 \newblock {\em The University of Michigan Press}, 1975.
 
-\bibitem{hvr_stockingCost}
-N.~R. Houndji, P.~Wolsey, R.~Schaus, and Y.~Deville.
-\newblock The stockingcost constraint.
-\newblock {\em Principles and Practice of Constraint Programming - CP}, pages
-  382--397, 2014.
-
 \bibitem{ratheil_master}
 V.~R. Houndji.
 \newblock {\em Deux Problèmes de Planification de Production : Formulations et
@@ -128,9 +123,15 @@ V.~R. Houndji.
 
 \bibitem{houndji_thesis}
 V.~R. Houndji.
-\newblock {\em cost-based filtering algorithms for a capacitated lot sizing
+\newblock {\em Cost-based filtering algorithms for a capacitated lot sizing
   problem and the constrained arborescence problem}.
 \newblock PhD thesis, Université Catholique de Louvain, 2017.
+
+\bibitem{hvr_stockingCost}
+V.~R. Houndji, P.~Wolsey, R.~Schaus, and Y.~Deville.
+\newblock The stockingcost constraint.
+\newblock {\em Principles and Practice of Constraint Programming - CP}, pages
+  382--397, 2014.
 
 \bibitem{wikipedia_python}
 Wikimedia~Foundation .Inc.
@@ -138,7 +139,7 @@ Wikimedia~Foundation .Inc.
 \newblock fr.wikipedia.org.
 
 \bibitem{jawahar}
-N.~Jawahar, S.~ARAVINDAN, and G.~PONNAMBALAM.
+N.~Jawahar, S.~Aravindan, and G.~Ponnambalam.
 \newblock A genetic algorithm for scheduling flexible manufacturing systems.
 \newblock {\em internation journal of advanced manufacturing technology}, pages
   588--607, 1998.
@@ -150,7 +151,7 @@ D.~S. Johnson, C.~R. Aragon, L.~A. McGeoch, and C.~Schevon.
 \newblock {\em Operations Research 37}, pages 865--892, 2014.
 
 \bibitem{karimi}
-B.~KARIMI, S.~FATEMI~GHOMI, and J.~WILSON.
+B.~Karimi, S.~Fatemi~Ghomi, and J.~Wilson.
 \newblock Single item lot sizing problems.
 \newblock {\em European journal of Operational Research 168}, 1:1--16, 2006.
 
@@ -181,7 +182,7 @@ Y.~Pochet and L.~A. Wolsey.
 \newblock {\em Springer Science and Business Media}, 2006.
 
 \bibitem{povinelli}
-J.~R. POVINELLI and X.~FENG.
+J.~R. Povinelli and X.~Feng.
 \newblock Improving genetic algorithms performance by hashing fitness values.
 \newblock 1998.
 

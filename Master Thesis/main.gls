@@ -12,6 +12,9 @@
 		\setentrycounter[]{page}\glsnumberformat{viii}}}%
 \glossentry{cp}{\glossaryentrynumbers{\relax 
 		\setentrycounter[]{page}\glsnumberformat{viii}}}\glsgroupskip
+\glsgroupheading{D}\relax \glsresetentrylist %
+\glossentry{dlsp}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{viii}}}\glsgroupskip
 \glsgroupheading{E}\relax \glsresetentrylist %
 \glossentry{elsp}{\glossaryentrynumbers{\relax 
 		\setentrycounter[]{page}\glsnumberformat{viii}}}%
@@ -26,6 +29,8 @@
 \glossentry{hfc-pga}{\glossaryentrynumbers{\relax 
 		\setentrycounter[]{page}\glsnumberformat{viii}}}\glsgroupskip
 \glsgroupheading{M}\relax \glsresetentrylist %
+\glossentry{m-pga}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{viii}}}%
 \glossentry{mip}{\glossaryentrynumbers{\relax 
 		\setentrycounter[]{page}\glsnumberformat{viii}}}\glsgroupskip
 \glsgroupheading{P}\relax \glsresetentrylist %

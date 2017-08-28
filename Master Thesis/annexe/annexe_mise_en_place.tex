@@ -1,12 +1,14 @@
 \chapter{Annexe 1}
 
-\section{Struture et implémentation}
+\section{Classes et implémentation}
 	
-	Dans cette section, nous présentons ici la structure du programme suivant qu'il implémente le HFC-PGA et le HCM-PGA.
+	Dans cette section, nous présentons ici la structure et quelques classes du programme (HFC-PGA) et nous détaillons les codes de quelques fonctions utilisées.
 	
-	\subsection{HCM-PGA}
+	\subsection{Classes}
 	
 	\begin{lstlisting}[language=python]
+	#Classe représentant un chromosome	
+	
 class Chromosome(object):
 
 	mutationRate = 0
@@ -83,6 +85,8 @@ class Chromosome(object):
     \end{lstlisting}
     
     \begin{lstlisting}[language=python]
+    // Classe représentant un thread principal en HFC-PGA
+    
 class ClspThread(Thread):
 
 	listMainThreads = 0
@@ -160,81 +164,171 @@ class GeneticAlgorithm:
 		
     \end{lstlisting}
 	
-	\subsection{HFC-PGA}	
+	\subsection{Fonctions}	
 	
 	\begin{lstlisting}[language=python]
-lass ClspThread(Thread):
+	# Fonction d'évaluation d'un chromosome
+	
+def evaluate(cls, sol):
+			
+		solution = list(sol)
 
-	NbMaxPopulation = 0
-	crossOverRate = 0
-	listMainThreads = 0
-	NumberOfMigrants = 0
+		fitnessValue = 0
+		# Calculation of all the change-over costs
+		itemsRank = [1] * Chromosome.problem.nbItems
+		i = 0
+		for gene in solution:
+			#print("gene : ", gene, " cost : ", Chromosome.getCostof(i, gene, itemsRank[gene-1], solution))
+			fitnessValue += Chromosome.getCostof(i, gene, itemsRank[gene-1], solution)
+			if gene != 0:
+				itemsRank[gene-1] += 1
+			i += 1
 
-	# Builder 
-def __init__(self, threadId):
-		#Code de la fonction ici	
-	
-	def run(self):
-		#Code de la fonction ici	
-	
-	def dispatchPop(self, chromosomes):
-		#Code de la fonction ici	
-	
-	def resetPop(self):
-		#Code de la fonction ici	
-	
-	def initSearch(self):
-		#Code de la fonction ici	
-	
-	def assignToThread(self, chromosome):	
-		#Code de la fonction ici	
-	
-	def sendMigrants(self):
-		#Code de la fonction ici	
-
-	def isValidPop(self):	
-		#Code de la fonction ici
-	
-	def receiveImmigrants(self, immigrants):
-		#Code de la fonction ici	
-	
-	def putThreadsInRank(self):
-		#Code de la fonction ici	
-	
-	def lacksDiversity(self):
-		#Code de la fonction ici	
-
-	def printRangedThreads(self):
-		#Code de la fonction ici		
-		
+return fitnessValue		
     \end{lstlisting}	
 	
 		\begin{lstlisting}[language=python]
-class MeshThread(Thread):
+		# Fonction de faisabilité d'un chromosome
+		
+def getFeasible(self):
 
-	"""docstring for MeshThread"""
+		#print(" In Chromosome 1 : ", self._solution)
+		#print(self._solution)
 
-	def __init__(self, mainThread):
-		#Code de la fonction ici	
-	
-	def run(self):
-		#Code de la fonction ici	
-	
-	def mateWith(self, chromosome):
-		#Code de la fonction ici	
-	
-	def __lt__(self, thread):
-		#Code de la fonction ici	
-	
-	def __gt__(self, thread):
-		#Code de la fonction ici	
-	
-	def _set_chromosome(self, new_value):	
-		#Code de la fonction ici	
-	
-	def _get_chromosome(self):
-		#Code de la fonction ici	
+		#if self.isFeasible() is False:
 
-	# Class' Properties
-	chromosome = property(_get_chromosome, _set_chromosome)	
+		#print(" grid : ", grid)
+		copy_solution = list(self._solution)
+
+		# i make sure that the number of goods producted isn't superior to the number expected
+		i = 0
+		while i < Chromosome.problem.nbTimes:
+
+			if self._solution[i] != 0:
+
+				item = self._solution[i]
+				#print(" ok : ", self._solution, self._itemsRank)
+				#print(" item picked : ", item)
+				rank = self._itemsRank[i]
+				#print(i, item-1, rank-1, self.manufactItemsPeriods)
+				value = self.manufactItemsPeriods[item-1][rank-1]
+
+				if value == -1:
+					itemDemandPeriods = self.manufactItemsPeriods[item-1]
+					itemDemandPeriods[rank-1] = i
+					#print(" It isn't yet in the tab")
+					#print(" == -1 ", item, i, rank)
+
+				else:
+
+					#print(" != -1 ", item, i, rank)
+					#print(" It is already in the tab")
+					cost1 = Chromosome.getCostof(value, item, rank, copy_solution, i)
+					cost2 = Chromosome.getCostof(i, item, rank, copy_solution, value)
+
+					#print(" cost 1 : ", cost1, " cost2 : ", cost2)
+					if cost2 < cost1 :
+						itemDemandPeriods = self.manufactItemsPeriods[item-1]
+						itemDemandPeriods[rank-1] = i
+
+						#print(" cost2 < cost1 : ", value, item)
+						self._solution[value] = 0
+
+					else:
+						self._solution[i] = 0
+			i+=1
+
+		#print(" in middle getFeasible : ", self._solution, ", ", self._itemsRank)
+		#print()
+		# i make sure that the number of items producted isn't inferior to the number expected
+		i = 0
+		while i < Chromosome.problem.nbItems:
+
+			j = 0
+			nbmanufactItemsPeriods = len(self.manufactItemsPeriods[i])
+			while j < nbmanufactItemsPeriods:
+
+				if self.manufactItemsPeriods[i][j] == -1:
+					if j == 0:
+						lbound = 0
+					else:
+						lbound = self.manufactItemsPeriods[i][j-1]
+					
+					zeroperiods = []
+					k = lbound+1
+					while k <= Chromosome.problem.deadlineDemandPeriods[i][j]:
+						if self._solution[k] == 0:
+							zeroperiods.append(k)
+						k+=1
+
+					#print("zeroperiods : ", zeroperiods)
+					nbZeroPeriods = len(zeroperiods)
+
+					if nbZeroPeriods > 0:
+
+						cost1 = Chromosome.getCostof(zeroperiods[0], i+1, j+1, copy_solution)
+						#print(" cost1 : ", cost1 )
+
+						k = 1 
+						indice = zeroperiods[0]
+						while k < nbZeroPeriods:
+							cost2 = Chromosome.getCostof(zeroperiods[k], i+1, j+1, copy_solution)
+							#print(" cost2 : ", cost2 , zeroperiods[k])
+							if cost2 < cost1:
+								#print(" cost2 < cost1 : ", cost1 , cost2 )
+								indice = zeroperiods[k]
+							k+=1
+
+						self._solution[indice] = i+1
+
+						itemDemandPeriods = self.manufactItemsPeriods[i]
+						itemDemandPeriods[j] = indice
+
+					else:
+						
+						# experimental code 
+
+						# if there's no place to put this item, then i check all the other times in order to put this item there
+						
+						lbound = 0
+						p = 1
+						for deadline in Chromosome.problem.deadlineDemandPeriods[i]:
+
+							zeroperiods = []
+							k = lbound
+							while k <= deadline:
+								if self._solution[k] == 0:
+									zeroperiods.append(k)
+								k += 1
+							lbound = deadline + 1
+
+							nbZeroPeriods = len(zeroperiods)
+							if nbZeroPeriods > 0:
+
+								cost1 = Chromosome.getCostof(zeroperiods[0], i+1, p, copy_solution)
+								#print(" cost1 : ", cost1 )
+
+								k = 1 
+								indice = zeroperiods[0]
+								while k < nbZeroPeriods:
+									cost2 = Chromosome.getCostof(zeroperiods[k], i+1, p, copy_solution)
+									#print(" cost2 : ", cost2 , zeroperiods[k])
+									if cost2 < cost1:
+										#print(" cost2 < cost1 : ", cost1 , cost2 )
+										indice = zeroperiods[k]
+									k+=1
+
+								self._solution[indice] = i+1
+
+								itemDemandPeriods = self.manufactItemsPeriods[i]
+								itemDemandPeriods[j] = indice
+
+bre
+ak
+							p += 1
+
+
+				j+=1
+			i+=1
+
     \end{lstlisting}

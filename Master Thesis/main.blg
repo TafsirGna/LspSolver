@@ -8,41 +8,40 @@ A level-1 auxiliary file: annexe/annexe_mise_en_place.aux
 Database file #1: main.bib
 Warning--empty journal in dauzere
 Warning--empty journal in cant2
-Warning--empty year in cant2
 Warning--empty journal in cant
 Warning--empty note in ceschia
 Warning--empty note in denny
 Warning--empty note in povinelli
 You've used 38 entries,
             2118 wiz_defined-function locations,
-            686 strings with 8968 characters,
-and the built_in function-call counts, 12622 in all, are:
-= -- 1288
+            688 strings with 8990 characters,
+and the built_in function-call counts, 12628 in all, are:
+= -- 1290
 > -- 479
 < -- 22
 + -- 197
 - -- 152
-* -- 688
-:= -- 2016
-add.period$ -- 111
+* -- 687
+:= -- 2018
+add.period$ -- 112
 call.type$ -- 38
 change.case$ -- 187
 chr.to.int$ -- 0
-cite$ -- 45
+cite$ -- 44
 duplicate$ -- 566
 empty$ -- 946
 format.name$ -- 152
-if$ -- 2793
+if$ -- 2795
 int.to.chr$ -- 0
 int.to.str$ -- 38
 missing$ -- 29
-newline$ -- 190
+newline$ -- 191
 num.names$ -- 76
-pop$ -- 196
+pop$ -- 194
 preamble$ -- 1
 purify$ -- 152
 quote$ -- 0
-skip$ -- 515
+skip$ -- 516
 stack$ -- 0
 substring$ -- 788
 swap$ -- 219
@@ -50,8 +49,8 @@ text.length$ -- 22
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 152
-warning$ -- 7
+warning$ -- 6
 while$ -- 121
 width$ -- 40
-write$ -- 396
-(There were 7 warnings)
+write$ -- 398
+(There were 6 warnings)
