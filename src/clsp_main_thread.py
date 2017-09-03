@@ -205,7 +205,7 @@ class ClspThread(Thread):
 			
 			if currentNode.isLeaf():
 
-				#print("Chromosome found : ", currentNode)
+				# i create a chromosome from the solution, i've just found
 				chromosome = Chromosome()
 				chromosome.init1(list(currentNode.solution), currentNode.fitnessValue)
 
@@ -248,6 +248,8 @@ class ClspThread(Thread):
 			(self.slaveThreadsManager.listSlaveThreads[self.slaveThreadsManager.currentSlaveThreadId-1]).doneEvent.wait()
 
 
+	def advMutate(chromosome):
+		pass
 
 	def sendMigrants(self):
 		

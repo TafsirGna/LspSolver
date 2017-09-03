@@ -528,12 +528,8 @@ class Node(object):
 		self.fitnessValue = 0
 		self.tab = copy.deepcopy(Chromosome.problem.deadlineDemandPeriods)
 
-		#nbZero = Chromosome.problem.nbTimes
-		#for deadlines in Chromosome.problem.deadlineDemandPeriods:
-		#	nbZero -= len(deadlines)
-		#tabZeros = [0] * nbZero
-		#self.tab.append(tabZeros)
-		
+		self.tab.append(copy.deepcopy(Chromosome.problem.zerosRow))
+		self.branches = copy.deepcopy(Chromosome.problem.orderedPrecs)		
 
 	def __repr__(self):
 		#return "Chromosome : " + str(self._solution) + ", " + str(self.fitnessValue) +  ", " + str(self._currentPeriod) + ", " + str(self.tab) + " : ranks - " + str(self.itemsRank) +" ;" 
@@ -549,35 +545,14 @@ class Node(object):
 	def getChildren(self):
 
 		childrenQueue = []
+		tabSize = len(self.tab)
 
-		for i in range(0, len(self.tab)):
+		for i in range(0, tabSize):
 
-			if self.tab[i] != [] and self.tab[i][len(self.tab[i])-1] >= self._currentPeriod:
-
-				#print(i,':')
-				childNode = copy.deepcopy(self)
-				solution = copy.deepcopy(self._solution)
-				solution[self._currentPeriod] = i + 1
-				childNode.solution = solution
-				childNode.currentPeriod -= 1
-				del childNode.tab[i][len(self.tab[i])-1]
-
-				childrenQueue.append(copy.deepcopy(childNode))
-
-		if childrenQueue == []:
-
-			childNode = copy.deepcopy(self)
-			childNode.currentPeriod -= 1
-			childrenQueue.append(copy.deepcopy(childNode))
-
-		'''
-		for i in range(0, len(self.tab)):
-
-			#print("in for : ", i)
-			if i != len(self.tab)-1:
-				#print("in for 1 : ", i, self.tab[i][len(self.tab[i])-1])
+			if i < tabSize - 1:
 				if self.tab[i] != [] and self.tab[i][len(self.tab[i])-1] >= self._currentPeriod:
-					#print("in for 1 : ", i)
+
+					#print(i,':')
 					childNode = copy.deepcopy(self)
 					solution = copy.deepcopy(self._solution)
 					solution[self._currentPeriod] = i + 1
@@ -588,19 +563,27 @@ class Node(object):
 					childrenQueue.append(copy.deepcopy(childNode))
 
 			else:
-				#print("in for 2 : ", self.tab[i])
+
 				if self.tab[i] != []:
 					childNode = copy.deepcopy(self)
 					childNode.currentPeriod -= 1
-					#print(childNode.tab, len(childNode.tab))
 					del childNode.tab[i][len(childNode.tab[i])-1]
 
 					childrenQueue.append(copy.deepcopy(childNode))
-		'''
+
+		if childrenQueue == []:
+
+			childNode = copy.deepcopy(self)
+			childNode.currentPeriod -= 1
+			childrenQueue.append(copy.deepcopy(childNode))
 
 		childrenQueue.sort()
 		return list(reversed(childrenQueue))
 		#return list(childrenQueue)
+
+	def getSuccessors(self):
+		
+		pass
 
 	def _get_currentPeriod(self):
 		return self._currentPeriod

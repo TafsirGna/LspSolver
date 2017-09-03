@@ -2,7 +2,7 @@
 
 \section{Classes et implémentation}
 	
-	Dans cette section, nous présentons ici la structure et quelques classes du programme (HFC-PGA) et nous détaillons les codes de quelques fonctions utilisées.
+	Nous présentons ici la structure et quelques classes du programme (HFC-PGA) et nous détaillons les codes de quelques fonctions utilisées.
 	
 	\subsection{Classes}
 	
@@ -17,61 +17,61 @@ class Chromosome(object):
 
 	# Builder 
 	def __init__(self):
-		#Code de la fonction ici
+		# Fonction d'initialisation de chromosome
 	
 	def init2(self, solution, itemsRank):
-		#Code de la fonction ici
+		# Autre fonction d'initialisation de chromosome
 	
 	def __lt__(self, chromosome):
-		#Code de la fonction ici
+		# Fonction utilisée dans le comparaison entre deux chromosomes
 	
 	def _get_fitnessValue(self):
-		#Code de la fonction ici
+		# Fonction de calcul du fitness d'un chromosome
 	
 	def _get_solution(self):
-		#Code de la fonction ici
+		# Fonction de récupération du genotype d'un chromosome
 	
 	def _get_itemsRanks(self):
-		#Code de la fonction ici
+		# Fonction de récupération de la période de satisfaction d'une production
 	
 	def _get_hashSolution(self):
-		#Code de la fonction ici
+		# Fonction de récupération du hash du génotype
 	
 	def _set_hashSolution(self, new_value):
-		#Code de la fonction ici
+		# Fonction d'attribution du hash d'un genotype
 	
 	def _set_itemsRanks(self, new_value):
-		#Code de la fonction ici
+		# Fonction d'attribution de la liste des rangs des productions
 	
 	def _set_solution(self, new_solution):
-		#Code de la fonction ici
+		# Fonction d'attribution du genotype d'un chromosome
 	
 	def _set_fitnessValue(self, new_value):
-		#Code de la fonction ici
+		# Fonction d'attribution de la valeur de fitness a un chromosome
 	
 	def __repr__(self):
-		#Code de la fonction ici
+		# Fonction d'affichage d'un chromosome
 	
 	def __eq__(self, chromosome):
-		#Code de la fonction ici
+		# Fonction utilisée dans le comparaison entre deux chromosomes
 	
 	def __ne__(self, chromosome):
-		#Code de la fonction ici
+		# Fonction utilisée dans le comparaison entre deux chromosomes
 	
 	def isFeasible(self):
-		#Code de la fonction ici
+		# Fonction de vérification de la faisabilité d'un chromosome
 	
 	def mutate(self):
-		#Code de la fonction ici
+		# Fonction utilisée afin de faire muter un chromosome
 	
 	def advmutate(self):
-		#Code de la fonction ici
+		# Fonction utilisée comme fonction de recherche locale
 	
 	def getFeasible(self):
-		#Code de la fonction ici
+		# Fonction utilisée afin de rendre faisable un chromosome
 	
 	def getCostof(cls, indice, item, rank,solution, secondIndice = -1):
-		#Code de la fonction ici
+		# Fonction de détermination du cout d'un gene dans le génotype d'un chromosome
 	
 	# Class' methods
 	getCostof = classmethod(getCostof)
@@ -98,43 +98,44 @@ class ClspThread(Thread):
 	FITNESS_PADDING = 0
 
 	def __init__(self, threadId):
-		#Code de la fonction ici	
+		# Constructeur de la classe	
 	
 	def run(self):
-		#Code de la fonction ici	
+		# Fonction d'exécution du thread	
 	
 	def getPopImproved(self):
-		#Code de la fonction ici	
+		# Fonction utilisée dans l'amélioration de la qualité de la population initiale	
 	
 	def exploit(self, chromosome):
-		#Code de la fonction ici	
-	
+		# Fonction utilisée afin d'exploiter un chromosome apres exploration 
+		
 	def initSearch(self, queue, parameter = "main"):
-		#Code de la fonction ici	
+		# Fonction d'execution de la formation de la population initiale	
 	
 	def sendMigrants(self):
-		#Code de la fonction ici	
+		# Fonction utilisee afin d'envoyer des chromosomes aux threads voisins	
 	
 	def receiveMigrants(self, chromosomes):
-		#Code de la fonction ici	
+		# Fonction utilisee dans la reception des chromosomes de threads voisins	
 	
 	def replace(self, chromosome):
 		#Code de la fonction ici	
 	
 	def getFitnessData(self):
-		#Code de la fonction ici	
+		# Fonction utilisee dans la procedure de Roulette Wheel	
 	
 	def mate(self, chromosome1, chromosome2):
-		#Code de la fonction ici	
+		# Fonction utilisee afin de reproduire deux chromosomes	
 	
 	def crossover(self, randValue1, randValue2):
-		#Code de la fonction ici
+		# Fonction utilisee dans le croisement de deux chromosomes
 	
 	def crossPopulation(self):
-		#Code de la fonction ici	
+		# Fonction utilisee afin de lancer le croisement a travers toute la population	
 
 	def insert(self, chromosome):
-		#Code de la fonction ici		
+		# Fonction utilisee afin d'inserer un chromosome dans la population initiale	
+		
 		
     \end{lstlisting}
     
@@ -154,13 +155,13 @@ class GeneticAlgorithm:
 
 	# Builder
 	def __init__(self, inst):
-		#Code de la fonction ici
+		# Constructeur de la classe
 	
 	def start(self):
-		#Code de la fonction ici
+		# Fonction utilisée afin de lancer l'exécution de l'algorithme génétique
 	
 	def printResults(self):
-		#Code de la fonction ici
+		# Fonction utilisée afin d'afficher les résultats
 		
     \end{lstlisting}
 	

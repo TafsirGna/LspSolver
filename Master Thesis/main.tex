@@ -75,7 +75,7 @@
 \listoftables
 
 % \dominitoc
-\shorttableofcontents{Sommaire}{1}
+\shorttableofcontents{Sommaire}{2}
 \addcontentsline{toc}{chapter}{Sommaire}   %insertion ligne "sommaire" dans la table des matières
 % \tableofcontents
 
@@ -130,10 +130,10 @@
 
 \introduction
 	\input{introduction/introduction_reduit}
-\chapter{État de l'art}
+\chapter{État de l'art}{\label{chap:literature_review}}
 	\input{dossier/revue_litterature}
 
-\chapter{Matériel et solutions}{\label{chap:materiel_et_solutions}}
+\chapter{Matériel et Méthodes}{\label{chap:materiel_et_solutions}}
 	\input{dossier/materiel_et_solutions}
 	
 \chapter{Résultats et Discussion}
@@ -153,11 +153,11 @@
 
 \clearpage
 \pagenumbering{gobble}
-\setcounter{tocdepth}{1}
+\setcounter{tocdepth}{5}
 \tableofcontents
 \addcontentsline{toc}{chapter}{Table des matières}
 
-% i add a last page to put on it a qr code that redirect to the github repository of the projet showed above
+% i add a last page to put on it a qr code that redirects to the github repository of the projet showed above
 \vspace*{1cm}	
 	\begin{center}
 		\begin{figure}[!h]

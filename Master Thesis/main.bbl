@@ -125,13 +125,19 @@ V.~R. Houndji.
 V.~R. Houndji.
 \newblock {\em Cost-based filtering algorithms for a capacitated lot sizing
   problem and the constrained arborescence problem}.
-\newblock PhD thesis, Université Catholique de Louvain, 2017.
+\newblock PhD thesis, Université Catholique de Louvain \& Université
+  d'Abomey-Calavi, 2017.
 
 \bibitem{hvr_stockingCost}
 V.~R. Houndji, P.~Wolsey, R.~Schaus, and Y.~Deville.
 \newblock The stockingcost constraint.
 \newblock {\em Principles and Practice of Constraint Programming - CP}, pages
   382--397, 2014.
+
+\bibitem{wikipedia_np_difficile}
+Wikimedia~Foundation .Inc.
+\newblock Problème np-complet, 2017.
+\newblock fr.wikipedia.org.
 
 \bibitem{wikipedia_python}
 Wikimedia~Foundation .Inc.

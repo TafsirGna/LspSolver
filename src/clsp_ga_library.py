@@ -19,6 +19,9 @@ import time
 def getCostTabKey(item):
 	return item[3]
 
+def getPrecsTabKey(item):
+	return item[1]
+
 def previousPeriodItemOf(indice, solution):
 
 	if indice > 0:
@@ -334,6 +337,19 @@ class Instance:
 			self.zerosRow = [0] * nbZero
 			self.category = 2
 
+		# 
+
+		self.orderedPrecs = []
+
+		for i in range(0, self.nbItems):
+			row = []
+			row.append([0,0])
+			for j in range(0, self.nbItems):
+				if int(self.chanOverGrid[j][i]) != 0:
+					row.append(list([j+1, int(self.chanOverGrid[j][i])]))
+			row = sorted(row ,key = getPrecsTabKey)
+			self.orderedPrecs.append(row)
+
 		#print("category : ", self.category)
 		# Additionnal variables
 		#self.manufactItemsPeriods = getManufactPeriodsGrid(nbItems, self.deadlineDemandPeriods)
@@ -344,4 +360,5 @@ class Instance:
 		"Number of Times is : {} \n".format(self.nbTimes) + \
 		"Demands for each item are : {} \n".format(self.demandsGrid) + \
 		"Holding costs for each item are : {} \n".format(self.holdingGrid) + \
-		"Changeover costs from one item to another one are : {} \n".format(self.chanOverGrid)
+		"Changeover costs from one item to another one are : {} \n".format(self.chanOverGrid) + \
+		"Changeover : {} \n".format(self.orderedPrecs)

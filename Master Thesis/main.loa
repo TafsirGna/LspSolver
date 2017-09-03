@@ -1,13 +1,14 @@
 \addvspace {10\p@ }
-\contentsline {algocf}{\numberline {1}{\ignorespaces Algorithme g\IeC {\'e}n\IeC {\'e}tique standard \cite {Goncalves}\relax }}{15}{algocf.1}
+\contentsline {algocf}{\numberline {1}{\ignorespaces Algorithme g\IeC {\'e}n\IeC {\'e}tique standard \cite {Goncalves}\relax }}{14}{algocf.1}
+\contentsline {algocf}{\numberline {2}{\ignorespaces Principe des algorithmes g\IeC {\'e}n\IeC {\'e}tiques parall\IeC {\`e}les de type "\emph {fine-grained}" \cite {nayak}\relax }}{19}{algocf.2}
 \addvspace {10\p@ }
-\contentsline {algocf}{\numberline {2}{\ignorespaces Processus de g\IeC {\'e}n\IeC {\'e}ration de la population initiale\relax }}{22}{algocf.2}
-\contentsline {algocf}{\numberline {3}{\ignorespaces Processus de g\IeC {\'e}n\IeC {\'e}ration des successeurs d'un noeud\relax }}{22}{algocf.3}
-\contentsline {algocf}{\numberline {4}{\ignorespaces Algorithme de croisement utilis\IeC {\'e}\relax }}{24}{algocf.4}
-\contentsline {algocf}{\numberline {5}{\ignorespaces Algorithme de mutation utilis\IeC {\'e}\relax }}{25}{algocf.5}
-\contentsline {algocf}{\numberline {6}{\ignorespaces Algorithme utilis\IeC {\'e} dans le processus d'\IeC {\'e}valuation d'un chromosome\relax }}{26}{algocf.6}
-\contentsline {algocf}{\numberline {7}{\ignorespaces Algorithme utilis\IeC {\'e} comme fonction de faisabilit\IeC {\'e}\relax }}{27}{algocf.7}
-\contentsline {algocf}{\numberline {8}{\ignorespaces Principe des algorithmes g\IeC {\'e}n\IeC {\'e}tiques parall\IeC {\`e}les de type "\emph {fine-grained}" \cite {nayak}\relax }}{31}{algocf.8}
-\contentsline {algocf}{\numberline {9}{\ignorespaces Algorithme de recherche locale d'une meilleure solution\relax }}{33}{algocf.9}
+\contentsline {algocf}{\numberline {3}{\ignorespaces Processus de g\IeC {\'e}n\IeC {\'e}ration de la population initiale\relax }}{26}{algocf.3}
+\contentsline {algocf}{\numberline {4}{\ignorespaces Processus de g\IeC {\'e}n\IeC {\'e}ration des successeurs d'un noeud\relax }}{26}{algocf.4}
+\contentsline {algocf}{\numberline {5}{\ignorespaces Algorithme de croisement utilis\IeC {\'e}\relax }}{28}{algocf.5}
+\contentsline {algocf}{\numberline {6}{\ignorespaces Algorithme de mutation utilis\IeC {\'e}\relax }}{30}{algocf.6}
+\contentsline {algocf}{\numberline {7}{\ignorespaces Algorithme utilis\IeC {\'e} dans le processus d'\IeC {\'e}valuation d'un chromosome\relax }}{31}{algocf.7}
+\contentsline {algocf}{\numberline {8}{\ignorespaces Algorithme utilis\IeC {\'e} comme fonction de faisabilit\IeC {\'e}\relax }}{33}{algocf.8}
+\contentsline {algocf}{\numberline {9}{\ignorespaces Algorithme de recherche locale d'une meilleure solution\relax }}{36}{algocf.9}
+\contentsline {algocf}{\numberline {10}{\ignorespaces Algorithme impl\IeC {\'e}mentant l'utilisation de la table de hash dans nos m\IeC {\'e}thodes propos\IeC {\'e}es\relax }}{37}{algocf.10}
 \addvspace {10\p@ }
 \addvspace {10\p@ }
