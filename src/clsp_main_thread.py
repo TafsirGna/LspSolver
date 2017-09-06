@@ -170,7 +170,7 @@ class ClspThread(Thread):
 
 			#i += 1
 			#print("current : ", currentNode.chromosome)
-			children = currentNode.getChildren()
+			children = currentNode.getChildren1()
 			#print("children : ", children)
 			
 			for child in children:
@@ -191,7 +191,49 @@ class ClspThread(Thread):
 
 		print("len first : ", len(self.chromosomes), ClspThread.NbMaxPopulation)
 
+	def initSearch(self, queue):
 
+		currentNode = copy.deepcopy(queue[len(queue)-1])
+		del queue[len(queue)-1]
+
+		i = 0
+		while True:
+
+			if currentNode.isLeaf():
+
+				# i create a chromosome from the solution, i've just found
+				chromosome = Chromosome()
+				chromosome.init1(list(currentNode.solution), currentNode.fitnessValue)
+
+				self.locker.acquire()
+				if len(self.chromosomes) >= ClspThread.NbMaxPopulation:
+					self.chromosomes.sort()
+					#print("yes1")
+					self.locker.release()
+					break
+
+				if chromosome not in self.chromosomes:
+					self.chromosomes.append(copy.deepcopy(chromosome))
+					#self.exploit(chromosome)
+				self.locker.release()
+
+			#else:
+			#print ("current Node : ", currentNode)
+			child = currentNode.getChild()
+			#print("Child : ", child)
+			if child != []:
+				queue.append(child)
+			#print("Queue : ", queue)
+		
+			if queue == []:
+				self.chromosomes.sort()
+				#print("yes2")
+				break
+
+			currentNode = copy.deepcopy(queue[len(queue)-1])
+			del queue[len(queue)-1]
+
+	'''
 	def initSearch(self, queue, parameter = "main"):
 
 		#print("Queue : ", self.queue)
@@ -203,6 +245,7 @@ class ClspThread(Thread):
 		i = 0
 		while True:
 			
+			child = currentNode.getChild()
 			if currentNode.isLeaf():
 
 				# i create a chromosome from the solution, i've just found
@@ -212,12 +255,10 @@ class ClspThread(Thread):
 				self.locker.acquire()
 				if len(self.chromosomes) >= ClspThread.NbMaxPopulation:
 					self.chromosomes.sort()
-					#if self.chromosomes != []:
-					#	(self.chromosomes[0]).advmutate()
 					self.locker.release()
 					break
+
 				if chromosome not in self.chromosomes:
-					#chromosome.advmutate()
 					self.chromosomes.append(copy.deepcopy(chromosome))
 					#self.exploit(chromosome)
 				self.locker.release()
@@ -246,7 +287,7 @@ class ClspThread(Thread):
 		if parameter == "main" and self.slaveThreadsManager.currentSlaveThreadId != 0:
 			#print("ok8", self.slaveThreadsManager.currentSlaveThreadId)
 			(self.slaveThreadsManager.listSlaveThreads[self.slaveThreadsManager.currentSlaveThreadId-1]).doneEvent.wait()
-
+	'''
 
 	def advMutate(chromosome):
 		pass

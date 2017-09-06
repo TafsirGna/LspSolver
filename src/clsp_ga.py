@@ -18,7 +18,7 @@ class GeneticAlgorithm:
 	FITNESS_PADDING = 1
 	NumberOfMigrants = 1
 	MigrationRate = 0 # this variable holds the number of generations needed before a migration occurs during the search
-	nbMainThreads = 2
+	nbMainThreads = 1
 	nbSlavesThread = 2
 	NbGenToStop = 10
 
@@ -62,7 +62,6 @@ class GeneticAlgorithm:
 		# In order to create this new population, i use the deep first search(DFS) to create some potential good chromosomes
 		#print(Chromosome.problem.deadlineDemandPeriods)
 
-
 		queue = []
 		currentNode = Node()
 		children = currentNode.getChildren()
@@ -81,19 +80,11 @@ class GeneticAlgorithm:
 			#print("children : ", children)
 
 			i += 1
-			#if i == 3:
-			#	return
-
-		#print("children ", children)
-
 		
 		# i make up the queue of each main thread
-		queue += children
-		for i in range(0, len(queue)):
+		nbChildren = len(children)
+		for i in range(0, nbChildren):
 			(self.listMainThreads[i%GeneticAlgorithm.nbMainThreads]).queue.append(copy.deepcopy(children[i]))
-
-		#for i in range(0, len(self.listMainThreads)):
-		#	print(str((self.listMainThreads[i%GeneticAlgorithm.nbMainThreads]).queue))
 
 		# i set the flags
 		prevThread = self.listMainThreads[0]

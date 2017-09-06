@@ -529,27 +529,175 @@ class Node(object):
 		self.tab = copy.deepcopy(Chromosome.problem.deadlineDemandPeriods)
 
 		self.tab.append(copy.deepcopy(Chromosome.problem.zerosRow))
-		self.branches = copy.deepcopy(Chromosome.problem.orderedPrecs)		
+
+		self.branches = []
+		for i in range(0, Chromosome.problem.nbTimes):
+			self.branches.append([])
+
 
 	def __repr__(self):
 		#return "Chromosome : " + str(self._solution) + ", " + str(self.fitnessValue) +  ", " + str(self._currentPeriod) + ", " + str(self.tab) + " : ranks - " + str(self.itemsRank) +" ;" 
-		return "Chromosome : " + str(self._solution) + ", " + str(self.fitnessValue) +  ", " + str(self._currentPeriod)  + ", " + str(self.tab) +" ;" 
+		return "Chromosome : " + str(self._solution) + ", " + str(self.fitnessValue) +  ", " + str(self._currentPeriod)  + ", " + str(self.tab) + \
+		" / " + str(self.branches) + " ;" 
 
 	def isLeaf(self):
 		
 		if self._currentPeriod == -1:
 			return True
 		return False
+
+	def formChild(self, branch_row):
+
+		child = []
+		if len(branch_row) == 1:
+
+			if branch_row[0][0] != 0:
+
+				child = copy.deepcopy(self)
+				solution = copy.deepcopy(self._solution)
+				solution[self._currentPeriod] = branch_row[0][0]
+				child.solution = solution
+				child.currentPeriod -= 1
+				del child.tab[branch_row[0][0]-1][len(self.tab[branch_row[0][0]-1])-1]
+
+			else:
+
+				child = copy.deepcopy(self)
+				child.currentPeriod -= 1
+				del child.tab[Chromosome.problem.nbItems][len(child.tab[Chromosome.problem.nbItems])-1]
+
+
+		elif branch_row[0] == [0, 0] :
+
+			if randint(1,2) == 1:
+				
+				child = copy.deepcopy(self)
+
+				child.branches[self._currentPeriod] = copy.deepcopy(branch_row)
+				(child.branches[self._currentPeriod]).remove([0,0])
+
+				child.currentPeriod -= 1
+				del child.tab[Chromosome.problem.nbItems][len(child.tab[Chromosome.problem.nbItems])-1]
+
+			else:
+				
+				child = copy.deepcopy(self)
+				solution = copy.deepcopy(self._solution)
+				solution[self._currentPeriod] = branch_row[1][0]
+				child.solution = solution
+				
+				child.branches[self._currentPeriod] = copy.deepcopy(branch_row)
+				for element in child.branches[self._currentPeriod]:
+					if element[0] == branch_row[1][0]:
+						(child.branches[self._currentPeriod]).remove(element)
+				
+				child.currentPeriod -= 1
+				del child.tab[branch_row[1][0]-1][len(self.tab[branch_row[1][0]-1])-1]
+
+		else:
+			
+			child = copy.deepcopy(self)
+			solution = copy.deepcopy(self._solution)
+			solution[self._currentPeriod] = branch_row[0][0]
+			child.solution = solution
+			
+			child.branches[self._currentPeriod] = copy.deepcopy(branch_row)
+			for element in child.branches[self._currentPeriod]:
+				if element[0] == branch_row[0][0]:
+					(child.branches[self._currentPeriod]).remove(element)
+			
+			child.currentPeriod -= 1
+			del child.tab[branch_row[0][0]-1][len(self.tab[branch_row[0][0]-1])-1]
+
+		return child
 		
+
+	def getChild(self):
+
+		if self.currentPeriod > -1:
+
+			branch_row = []
+
+			for i in range(0, Chromosome.problem.nbItems):
+
+				if self.tab[i] != [] and self.tab[i][len(self.tab[i])-1] >= self._currentPeriod:
+
+					#print("ok", i + 1, Chromosome.problem.orderedPrecs[self.solution[self._currentPeriod+1]-1])
+					#print("ante : ", self.solution[self._currentPeriod+1], i+1, Chromosome.problem.orderedPrecs[self.solution[self._currentPeriod+1]-1])
+					for element in Chromosome.problem.orderedPrecs[self.solution[self._currentPeriod+1]-1]:
+						#print ("	in : ", Chromosome.problem.orderedPrecs[], )
+						if element[0] == i + 1:
+							branch_row.append([i+1, element[1]])
+							break
+
+			if self.tab[Chromosome.problem.nbItems] != []:
+				branch_row.append([0, 0])
+
+			branch_row = sorted(branch_row, key = getPrecsTabKey)
+
+			return self.formChild(branch_row)
+
+		else:
+			
+			#print(self, self.currentPeriod)
+			currentPeriod = self._currentPeriod + 1
+			#print(self, self.currentPeriod, currentPeriod)
+			solution = copy.deepcopy(self._solution)
+			tab = copy.deepcopy(self.tab)
+
+			counterTab = [0] * (Chromosome.problem.nbItems + 1)
+			while self.branches[currentPeriod] == []:
+
+				item = solution[currentPeriod]
+				if item != 0:
+					counterTab[item-1] += 1
+					deadline = Chromosome.problem.deadlineDemandPeriods[item-1][counterTab[item-1]-1]
+					(tab[item-1]).append(deadline)
+					(tab[item-1]).sort()
+				else:
+					counterTab[Chromosome.problem.nbItems] += 1
+					(tab[Chromosome.problem.nbItems]).append(0)
+					(tab[Chromosome.problem.nbItems]).sort()
+
+				solution[currentPeriod] = 0
+				currentPeriod += 1
+				#print("in while : ", self.branches[currentPeriod], currentPeriod)
+
+			item = solution[currentPeriod]
+			if item != 0:
+				counterTab[item-1] += 1
+				deadline = Chromosome.problem.deadlineDemandPeriods[item-1][counterTab[item-1]-1]
+				(tab[item-1]).append(deadline)
+				(tab[item-1]).sort()
+			else:
+				counterTab[Chromosome.problem.nbItems] += 1
+				(tab[Chromosome.problem.nbItems]).append(0)
+				(tab[Chromosome.problem.nbItems]).sort()
+
+			#print("solution 1 : ", solution, currentPeriod)
+			child = copy.deepcopy(self)
+			solution[currentPeriod] = self.branches[currentPeriod][0][0]
+			#print("solution 2 : ", solution, currentPeriod)
+			child.solution = solution
+			del child.branches[currentPeriod][0]
+			
+			child.currentPeriod = currentPeriod - 1
+			child.tab = copy.deepcopy(tab)
+			#print("solution 3 : ", child.tab, " / ", self.branches[currentPeriod][0])
+			del child.tab[self.branches[currentPeriod][0][0]-1][len(self.tab[self.branches[currentPeriod][0][0]-1])-1]
+
+			self = copy.deepcopy(child)
+
+			return self.getChild()
+
 
 	def getChildren(self):
 
 		childrenQueue = []
-		tabSize = len(self.tab)
 
-		for i in range(0, tabSize):
+		for i in range(0, Chromosome.problem.nbItems + 1):
 
-			if i < tabSize - 1:
+			if i < Chromosome.problem.nbItems:
 				if self.tab[i] != [] and self.tab[i][len(self.tab[i])-1] >= self._currentPeriod:
 
 					#print(i,':')
@@ -580,6 +728,7 @@ class Node(object):
 		childrenQueue.sort()
 		return list(reversed(childrenQueue))
 		#return list(childrenQueue)
+
 
 	def getSuccessors(self):
 		
@@ -678,7 +827,7 @@ class AdvMutateNode(object):
 					
 					c = Chromosome()
 					c.init1(switchGenes(self.chromosome.solution, indice, j))
-					#print("		j : ", j, c.solution, c.fitnessValue)
+					#print("	j : ", j, c.solution, c.fitnessValue)
 					if c.fitnessValue < self.chromosome.fitnessValue:
 						gap = self.chromosome.fitnessValue - c.fitnessValue
 						child = AdvMutateNode(c, gap)

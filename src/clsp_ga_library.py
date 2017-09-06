@@ -333,6 +333,7 @@ class Instance:
 
 		if nbZero == 0:
 			self.category = 1
+			self.zerosRow = []
 		else:
 			self.zerosRow = [0] * nbZero
 			self.category = 2
@@ -345,8 +346,7 @@ class Instance:
 			row = []
 			row.append([0,0])
 			for j in range(0, self.nbItems):
-				if int(self.chanOverGrid[j][i]) != 0:
-					row.append(list([j+1, int(self.chanOverGrid[j][i])]))
+				row.append(list([j+1, int(self.chanOverGrid[j][i])]))
 			row = sorted(row ,key = getPrecsTabKey)
 			self.orderedPrecs.append(row)
 

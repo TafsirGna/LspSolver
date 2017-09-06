@@ -5,7 +5,7 @@
 \section*{Introduction}
 	\addcontentsline{toc}{section}{Introduction}
 		
-		Dans ce chapitre, nous présentons la revue de littérature des problèmes de dimensionnement de lots en planification de production dont fait parti le PSP. Nous exposons les méthodes de recherche déjà appliquées dans la résolution du PSP et soulignons les travaux effectués sur les algorithmes génétiques. Nous montrons également en quoi les algorithmes génétiques pourraient être particulièrement adaptés à ce genre de problèmes.
+		Dans ce chapitre, nous présentons la revue de littérature des problèmes de dimensionnement de lots en planification de production dont fait partie le PSP. Nous exposons les méthodes de recherche déjà appliquées dans la résolution du PSP et soulignons les travaux effectués sur les algorithmes génétiques. Nous montrons également en quoi les algorithmes génétiques pourraient être particulièrement adaptés à ce genre de problèmes.
 		
 	\section{Le dimensionnement de lots en planification de production}
 	La planification de production est un processus qui consiste à déterminer un plan qui indique quelle quantité d'articles produire durant un intervalle de temps appelé "horizon de planification". La planification de production occupe donc une place stratégique en industrie aussi bien en terme de performance que de coûts d'exploitation.\\
@@ -15,7 +15,7 @@
 
 Différents critères interviennent dans la classification des problèmes de dimensionnement de lots, notamment : 
 \begin{description}
-	\item[\textsl{L'échelle de temps}:] L'horizon de planification peut être soit discret ou continu. Lorsqu'il est discret, on distingue alors les problèmes de petite taille ou \emph{Small time buckets}, les problèmes de grande taille ou \emph{Big time Buckets} et enfin les problèmes de très grandes taille ou \emph{Very big time buckets}.
+	\item[\textsl{L'échelle de temps}:] L'horizon de planification peut être soit discret ou continu. Lorsqu'il est discret, on distingue alors les problèmes de petite taille ou \emph{Small time buckets}, les problèmes de grande taille ou \emph{Big time Buckets} et enfin les problèmes de très grande taille ou \emph{Very big time buckets}.
 
 	\item[\textsl{Le nombre de niveaux}:] Suivant qu'une relation ou non soit définie entre les articles, on distingue les problèmes à un niveau et les problèmes à plusieurs niveaux. Dans les problèmes à plusieurs niveaux, la production d'un article est conditionnée par celle d'un autre article. 
 
@@ -26,7 +26,7 @@ Différents critères interviennent dans la classification des problèmes de dim
 	\item[\textsl{Les demandes}:] Les demandes peuvent être aussi bien:
 	\begin{itemize}
 		\item[•] constantes avec des valeurs qui ne changent pas sur l'horizon de temps ou dynamiques avec  des valeurs qui sont fonction du temps.
-		\item[•] certaines avec des valeurs connues à l'avance sou stochastiques avec des valeurs basées sur des probabilités.
+		\item[•] certaines avec des valeurs connues à l'avance ou stochastiques avec des valeurs basées sur des probabilités.
 		\item[•] indépendantes sans lien entre les articles à produire ou dépendantes en cas de relation entre articles.
 	\end{itemize}
 
@@ -34,9 +34,9 @@ Différents critères interviennent dans la classification des problèmes de dim
 	
 \end{description}
 
-	Nous avons choisi dans cette étude de décrire les problèmes de dimensionnement de lots selon la longueur de la période de l'horizon de temps. Nous allons donc nous intéresser aux problèmes à courtes et longues périodes.
+	Nous avons choisi dans cette étude de décrire les problèmes de dimensionnement de lots suivant l'échelle de temps. Nous allons donc nous intéresser aux deux premiers c'est à dire les problèmes de petite et grande taille.
 \subsection{Classes de problèmes de dimensionnement de lots}
-	\subsubsection{Problèmes à courtes périodes}
+	\subsubsection{Problèmes de petite taille ou à courtes périodes}
 	Ces problèmes (\emph{Small time bucket problems}) sont caractérisés par des périodes de l'ordre de quelques heures, et la séquence des lots lors de la production est prise en compte. Quatre types de problèmes sont étudiés dans la littérature. Ces différents types de problèmes sont donc:
 	\begin{description}
 		\item[\textsl{Discrete lot-sizing and scheduling problem (DLSP):}] Dans ce problème \cite{fleischmann}, au plus un article peut être produit par période. Dans le cas où un article est produit sur une période, alors toute la capacité disponible sur cette période sera utilisée. Les coûts de lancement sont en général pris en compte seulement lorsqu'un nouveau lot commence et non à chaque période.
@@ -48,7 +48,7 @@ Différents critères interviennent dans la classification des problèmes de dim
 		Dans ce problème \cite{fleischmann_meyr}, Aucune restriction n'est appliquée sur le nombre d'articles à produire par période. En intégrant des temps de lancement de production dépendants de la séquence des lots à produire, on obtient des extensions du GLSP \cite{meyr}.
 	\end{description}
 	
-	\subsubsection{Problèmes à longues périodes}
+	\subsubsection{Problèmes de grande taille ou à longues périodes}
 	Dans les problèmes de grande taille (\emph{Big time bucket problems}), l'horizon va de quelques jours à quelques semaines. De même, un produit peut être fabriqué par période. Nous proposons dans cette section, une étude concise de ces problèmes.
 	
 	\begin{description}
@@ -63,7 +63,7 @@ Différents critères interviennent dans la classification des problèmes de dim
 		
 	\end{description}
 	
-	Un exemple d'un problème de "\emph{Big time bucket}" est le cas où différents articles peuvent être produit sur une même ressource en une seule période. Ce problème est connu sous le nom de "Capacited Lot Sizing Problem" (CLSP). Le CLSP consiste à déterminer le coût et le temps de production des articles dans l'horizon de planification. La figure \ref{fig:classification_dimensionnement_lots} présente un exemple de classification des modèles de dimensionnement de lots.
+	Un exemple d'un problème de "\emph{Big time bucket}" est le cas où différents articles peuvent être produits sur une même ressource en une seule période. Ce problème est connu sous le nom de "Capacited Lot Sizing Problem" (CLSP). Le CLSP consiste à déterminer le coût et le temps de production des articles dans l'horizon de planification. La figure \ref{fig:classification_dimensionnement_lots} présente un exemple de classification des modèles de dimensionnement de lots.
 	
 	\begin{center}
 		\begin{figure}[!h]
@@ -75,7 +75,7 @@ Différents critères interviennent dans la classification des problèmes de dim
 
 	\newpage
 	
-	\section{Le \emph{Pigment sequencing problem} (PSP)}
+	\section{Le \emph{Pigment Sequencing Problem} (PSP)}
 	
 	\subsection{Revue de littérature}
 	Le PSP appartient à la catégorie des DLSP. En effet, il s'agit d'un problème où toute la capacité disponible sur cette période sera utilisée si un article est fabriqué. Nous présentons dans cette section une brève revue de littérature des différents travaux effectués autour du PSP. \\
@@ -86,21 +86,21 @@ Différents critères interviennent dans la classification des problèmes de dim
 	 
 	\subsection{Description du problème}{\label{sec:problem_description}}
 
-		Des différentes études \cite{ratheil_master} \cite{ceschia} déjà effectuées sur le PSP, nous pouvons le décrire comme une problème qui consiste à trouver un plan de production de plusieurs articles à partir d’une machine avec des coûts de transition. Les coûts de transition sont les coûts encourus lors du passage de la production de l’article $i$ à celui de l’article $j$ avec $i \neq j$. Le plan de production doit satisfaire les demandes des clients tout en :
+		Des différentes études \cite{ratheil_master} \cite{ceschia} déjà effectuées sur le PSP, nous pouvons le décrire comme un problème qui consiste à trouver un plan de production de plusieurs articles à partir d’une machine avec des coûts de transition. Les coûts de transition sont les coûts encourus lors du passage de la production de l’article $i$ à celui de l’article $j$ avec $i \neq j$. Le plan de production doit satisfaire les demandes des clients tout en :
 	\begin{itemize}
 		\item[•] respectant la capacité de production de la machine;
 		\item[•] minimisant les coûts de stockage et de transition.
 	\end{itemize}
 	\hspace*{.5cm} On suppose que la période de production est suffisamment courte pour ne produire qu’au plus un article par période et que les demandes sont normalisées : la capacité de production de la machine est limitée à un article par
 période et d($i$, $t$) $ \in $ {0, 1} avec $i$ l’article et $t$ la période.\\
-	\hspace*{.5cm} Il s’agit d’un problème de planification de production ayant les caractéristiques suivantes : un horizon de planification discret et fini ; des contraintes de capacité ; une demande statique et déterministe ; multi-item et small bucket, des coûts de transition; un seul niveau; sans shortage.\\
+	\hspace*{.5cm} Il s’agit d’un problème de planification de production ayant les caractéristiques suivantes : un horizon de planification discret et fini ; des contraintes de capacité ; une demande statique et déterministe ; multi-item et small bucket, des coûts de transition; un seul niveau; sans shortage \footnote{On parle de shortage lorsque c'est possible de ne pas satisfaire toutes les demandes \cite{ratheil_master}}.\\
 
 	\textbf{\textsl{Illustration}} : Soit un problème avec les données ci-dessous : \\
 	\begin{itemize}
 		\item[•] Nombre d’articles : $NI = 2$;
 		\item[•] Nombre de périodes : $NT = 5$;
 		\item[•] Demande par période. Soit d($i$, $t$) la demande de l’article $i$ à la période $t$ : $d(1, t) = (0, 1, 0, 0, 1)$ et $d(2, t) = (1, 0, 0, 0, 1)$;
-		\item[•] Coût de stockage. Soit $h(i)$ le coût de stockage de l’article $i$ : $h(1) = h(2) = 2$;
+		\item[•] Coût de stockage. Soit $h(i)$ le coût de stockage de l’article $i$ : $h(1) = h(2) = 2$.
 	\end{itemize}
 	Soit \emph{xT} le plan de production qui représente une solution potentielle du problème. Il s’agit d’un tableau de dimension \emph{NT} , contenant à son indice $t$ (avec $t  \in  {1...NT}$) l’article $i$ à produire. Une solution admissible du problème est : $ xT = (2, 1, 2, 0, 1)$ avec un coût de $ q(2, 1) + q(1, 2) + q(2, 1) + 2 * h(2) = 15 $. La solution optimale est : $ xT = (2, 1, 0, 1, 2)$ avec un coût de $q(2, 1) + q(1, 2) + h(1) = 10$.
 		
@@ -127,10 +127,7 @@ période et d($i$, $t$) $ \in $ {0, 1} avec $i$ l’article et $t$ la période.\
 			\item[-] $\chi_{t}^{i,j}$ : variable binaire de transition qui vaut 1 si à la période $t$, on est passé de la production de l’article $i$ à l’article $j$ et 0 sinon.
 		\end{itemize}
 		\vspace*{.3cm}
-	\hspace*{.5cm} L'objectif est de minimiser la somme des coûts de stockage et des coûts de transition et est exprimé par la contrainte (1). La contrainte (2) rappelle qu'il n'y a pas de stock initial. La contrainte (3) exprime la règle de la conservation de flot. La contrainte (4) vise à forcer la variable de setup $y_{t}^{i}$ à prendre la valeur 1 s’il y a production de l’article $i$ à la période $t$. La contrainte (5) s'assure qu'il y a toujours un article qui est préparé. En accord avec la fonction objectif, $y_{t}^{i}$ va prendre la valeur qui minimise le coût de transition. En général s’il n’y a pas de production à la période $t$,
-$y_{t}^{i} = y_{t-1}^{i}$ ou $y_{t}^{i} = y_{t+1}^{i}$
-mais parfois il peut être intéressant de préparer la machine pour un article intermédiaire sans le produire. La contrainte (6) assigne les valeurs aux variables de transition.
-En effet, si $y_{t-1}^{i}$ et $y_{t}^{i}$ valent 1 alors $\chi_{t}^{i,j}$ est obligé de prendre la valeur 1 et sinon $\chi_{t}^{i,j}$ serait égale à 0 grâce à la fonction objectif qui minimise le coût de transition.
+	\hspace*{.5cm} L'objectif est de minimiser la somme des coûts de stockage et des coûts de transition. Il est exprimé par la contrainte (1.1). La contrainte (1.2) rappelle qu'il n'y a pas de stock initial. La contrainte (1.3) exprime la règle de la conservation de flot. La contrainte (1.4) vise à forcer la variable de setup $y_{t}^{i}$ à prendre la valeur 1 s’il y a production de l’article $i$ à la période $t$. La contrainte (1.5) s'assure qu'il y a toujours un article qui est préparé. En accord avec la fonction objectif, $y_{t}^{i}$ va prendre la valeur qui minimise le coût de transition. En général s’il n’y a pas de production à la période $t$, $y_{t}^{i} = y_{t-1}^{i}$ ou $y_{t}^{i} = y_{t+1}^{i}$ mais parfois il peut être intéressant de préparer la machine pour un article intermédiaire sans le produire. La contrainte (1.6) assigne les valeurs aux variables de transition. En effet, si $y_{t-1}^{i}$ et $y_{t}^{i}$ valent 1 alors $\chi_{t}^{i,j}$ est obligé de prendre la valeur 1 et sinon $\chi_{t}^{i,j}$ serait égal à 0 grâce à la fonction objectif qui minimise le coût de transition.
 		
 		\subsubsection{Modèle CP}
 		Dans ce modèle \cite{ratheil_master}, l’objectif est d’attribuer à chacune des demandes, une période qui respecte la date limite de satisfaction de la demande. On note $date(p) \in [1,...,T],\ \forall p \in [1,...,n]$ la période dans laquelle la demande $p$ a été satisfaite, $dueDate(p) \in [1,...,T]$ la date limite de la demande $p$ et $I(p)$ l'article correspondant à la demande $p$. Afin de s'assurer de la faisabilité de la solution, les principales contraintes sont les suivantes:
@@ -141,8 +138,8 @@ En effet, si $y_{t-1}^{i}$ et $y_{t}^{i}$ valent 1 alors $\chi_{t}^{i,j}$ est ob
 		
 		dans lesquelles:
 		\begin{itemize}
-			\item[-] Equation 8: chaque demande doit être satisfaite avant sa date limite;
-			\item[-] Equation 9: Puisque la capacité d'une machine est limitée à 1, chaque demande doit être satisfaite à différente période.
+			\item[-] Equation 1.8: chaque demande doit être satisfaite avant sa date limite;
+			\item[-] Equation 1.9: Puisque la capacité d'une machine est limitée à 1, chaque demande doit être satisfaite à différente période.
 		\end{itemize}
 		Il est possible de modéliser la partie des coûts de transition comme un ATSP, chaque demande représente une ville qui doit être visitée et les coûts de transition sont les distances entre deux villes. Ainsi, on ajoute une demande artificielle $n+1$ de sorte que $date(n+1) = T+1$ avec $q^{I(p), I(n+1)} = q^{I(n+1), I(p)} = 0, \forall p \in [1,...,n]$. On note alors $successor(p), \forall p \in [1,...,n]$, la demande satisfaite juste après la satisfaction de la demande $p$. Les contraintes suivantes additionnelles peuvent être alors ajoutées:
 		\begin{eqnarray}
@@ -151,8 +148,8 @@ En effet, si $y_{t-1}^{i}$ et $y_{t}^{i}$ valent 1 alors $\chi_{t}^{i,j}$ est ob
 		\end{eqnarray}
 		dans lesquelles:
 		\begin{itemize}
-			\item[-] Equation 10: il garantit l'existence d'un circuit hamiltonien;
-			\item[-] Equation 11: la demande $p$ doit être satisfaite avant ses successeurs.
+			\item[-] Equation 1.10: il garantit l'existence d'un circuit hamiltonien;
+			\item[-] Equation 1.11: la demande $p$ doit être satisfaite avant ses successeurs.
 		\end{itemize}
 		
 		Enfin, l'objectif est de minimiser les coûts de stockage et les coûts de transition.
@@ -163,7 +160,7 @@ En effet, si $y_{t-1}^{i}$ et $y_{t}^{i}$ valent 1 alors $\chi_{t}^{i,j}$ est ob
 	
 		\subsubsection{Modèle SA}
 		Dans ce modèle \cite{ceschia}, la procédure de recuit simulé conduit à chaque itération à une action aléatoire en utilisant une distribution uniforme. En recuit simulé, l'action est toujours acceptée si elle est facteur d'amélioration. Dans le cas contraire, elle est acceptée, si elle est basée sur une distribution en temps croissant de façon exponentielle. Dans le détail, une mauvaise action est acceptée avec une probabilité de $e^{-\Delta/T}$ où $\Delta$ est la différence du coût total induit par l'action et $T$ est la température. La température commence à une valeur $T_{0}$ et est multipliée par $\alpha$ (avec $0 < \alpha < 1$), après un nombre fixé d'échantillons $n_{s}$, selon la procédure de refroidissement géométrique standard du recuit simulé. \\
-		\hspace*{.5cm} Dans le but d'accélérer les premières étapes de la procédure de recuit simulé,  Ceschia et al. ont utilisé un mécanisme de \emph{cut-off} (Johnson et al. \cite{johnson}). Ils ont ajouté un nouveau paramètre $n_{a}$ représentant le nombre maximal d'actions acceptées à chaque niveau de température. Ainsi, la température diminue lorsque la première des deux conditions suivantes est remplie : ($i$) le nombre d'actions échantillonnées atteint $n_{s}$, ($ii$) le nombre d'actions acceptées atteint $n_{a}$. \\
+		\hspace*{.5cm} Dans le but d'accélérer les premières étapes de la procédure de recuit simulé,  Ceschia et al.\cite{ceschia} ont utilisé un mécanisme de \emph{cut-off} (Johnson et al. \cite{johnson}). Ils ont ajouté un nouveau paramètre $n_{a}$ représentant le nombre maximal d'actions acceptées à chaque niveau de température. Ainsi, la température diminue lorsque la première des deux conditions suivantes est remplie : ($i$) le nombre d'actions échantillonnées atteint $n_{s}$, ($ii$) le nombre d'actions acceptées atteint $n_{a}$. \\
 		\hspace*{.5cm} Le critère de terminaison est basé sur le nombre total d'itérations $I_{max}$, plutôt que sur un seuil de température. De cette manière, le temps d'exécution est approximativement le même pour toutes les configurations des paramètres.
 		
 	\section{Les algorithmes génétiques}
@@ -171,7 +168,7 @@ En effet, si $y_{t-1}^{i}$ et $y_{t}^{i}$ valent 1 alors $\chi_{t}^{i,j}$ est ob
 	Les algorithmes génétiques sont des algorithmes qui tirent leur origine de l'analogie avec l'évolution naturelle des espèces vivantes et des mécanismes de reproduction. Ils ont été proposés pour la première fois par John Holland \cite{holland1} en 1970. Un des principes fondamentaux des algorithmes génétiques est celui de la survie du "mieux adapté". Selon ce principe, un individu avec des caractéristiques en adéquation avec le milieu dans lequel il évolue à beaucoup plus de chances de survivre. Au même titre que l'évolution naturelle, les algorithmes génétiques simulent l'échange aléatoire de matériel génétique à travers les différents individus de la population. Dans ses travaux, Holland développa un formalisme permettant de prédire la qualité de la prochaine génération. Ce théorème est plus connu comme le théorème de schémas.  
 	
 	\subsection{Concepts de base}
-	Le processus de recherche au niveau des algorithmes génétiques se déroule suivant deux phases : l’exploration et l’exploitation. L'exploration consiste à parcourir l'espace de recherche à la quête de solutions optimales au problème à résoudre. Afin de guider l'exploration intelligente de l'espace de recherche, les algorithmes génétiques procèdent par choix aléatoires dans le parcourt de cet espace. L'objectif global des algorithmes génétiques est d'optimiser une fonction coût connue comme fonction de "fitness".
+	Le processus de recherche au niveau des algorithmes génétiques se déroule suivant deux phases : l’exploration et l’exploitation. L'exploration consiste à parcourir l'espace de recherche à la quête de solutions optimales au problème à résoudre. Afin de guider l'exploration intelligente de l'espace de recherche, les algorithmes génétiques procèdent par choix aléatoires dans le parcours de cet espace. L'objectif global des algorithmes génétiques est d'optimiser une fonction coût connue comme fonction de "fitness".
 	Différents termes empruntés de la génétique naturelle sont employés au niveau des algorithmes génétiques pour nommer des processus et objets. Ainsi, les algorithmes génétiques travaillent sur une population qui est un ensemble d'individus ou de chromosomes. Chaque chromosome possède une représentation codée appelée génotype. Le génotype est un ensemble de gènes disposés en une succession linéaire et un allèle est une des valeurs que peut prendre un gène. La fonction de fitness mesure l'adaptation d'un individu à l'environnement dans lequel il évolue. Plus un individu est adapté à son environnement, plus ses chances de survie sont élevées.
 
 	\subsection{Fonctionnement}
@@ -214,7 +211,7 @@ En effet, si $y_{t-1}^{i}$ et $y_{t}^{i}$ valent 1 alors $\chi_{t}^{i,j}$ est ob
 		L'opérateur de sélection désigne le processus par lequel les individus d'une population sont choisis en fonction de leur fonction de \emph{fitness} dans le but de former une nouvelle génération. Le choix d'un individu est proportionnel à sa fonction de fitness. Un individu avec une valeur de \emph{fitness} plus élevée aura plus de chance d’être sélectionné qu’un autre avec une valeur de \emph{fitness} inférieure. Un opérateur simple de sélection est la méthode du \emph{Roulette Wheel} ou roulette pondérée où chaque individu d’une population dispose d'une probabilité d'être choisi proportionnelle à sa valeur de fitness. Le choix des individus devant se reproduire est alors effectué sur la base de ces probabilités et est aléatoire. En effet, l'aspect aléatoire tend à protéger la population d'un manque de diversité en évitant de privilégier d'un individu ou d'un groupe d'individu sur le reste de la population.
 		
 	\subsubsection{L’opérateur de croisement}
-	Le croisement s'applique sur deux individus. Sa principale composante est le transfert de gènes des deux individus sélectionnés dans le but de produire de nouveaux chromosomes dits chromosomes "\emph{fils}". Chacun des enfants héritent donc d'une partie du patrimoine génétique des parents. Différentes formes de croisement existent au nombre desquels nous pouvons citer:
+	Le croisement s'applique sur deux individus. Sa principale composante est le transfert de gènes des deux individus sélectionnés dans le but de produire de nouveaux chromosomes dits chromosomes "\emph{fils}". Chacun des enfants héritent donc d'une partie du patrimoine génétique des parents. Différentes formes de croisement existent au nombre desquelles nous pouvons citer:
 	\begin{description}
 		\item[\textsl{Le croisement à un point :}] Il consiste à désigner au hasard un point du génotype. Ce point divise donc le génotype des parents en deux parties distinctes. Ainsi, un des enfants prend une partie "\emph{avant}" d'un des parents et le recombine avec la partie "\emph{arrière}" de l'autre parent. Le second fait de même en prenant la partie "\emph{arrière}" du premier parent et le recombine avec la partie "\emph{avant}" du second parent.
 		
@@ -226,7 +223,7 @@ En effet, si $y_{t-1}^{i}$ et $y_{t}^{i}$ valent 1 alors $\chi_{t}^{i,j}$ est ob
 	
 	\subsubsection{L'opérateur de mutation}
 	
-	La mutation est une opération qui n'intervient que sur un unique individu. La mutation consiste à altérer la valeur d'un gène pour un individu. Il s'agit d'un remplacement de la valeur d'un gène par une autre valeur. La mutation est un élément important dans la conservation de la diversité au sein d'une population. En règle général, la mutation n'intervient que très rarement et n'améliore pas le qualité d'un individu. La mutation vise à reproduire l'erreur qui survient dans le nature lorsqu'un chromosome est reproduit ou copié.
+	La mutation est une opération qui n'intervient que sur un unique individu. La mutation consiste à altérer la valeur d'un gène pour un individu. Il s'agit d'un remplacement de la valeur d'un gène par une autre valeur. La mutation est un élément important dans la conservation de la diversité au sein d'une population. En règle générale, la mutation n'intervient que très rarement et n'améliore pas le qualité d'un individu. La mutation vise à reproduire l'erreur qui survient dans le nature lorsqu'un chromosome est reproduit ou copié.
 	
 	\subsection{Les algorithmes génétiques parallèles}
 	
@@ -246,29 +243,29 @@ En effet, si $y_{t-1}^{i}$ et $y_{t}^{i}$ valent 1 alors $\chi_{t}^{i,j}$ est ob
  
 	\subsubsection{Les algorithmes génétiques parallèles \emph{coarse-grained}}
 	
-	Les algorithmes génétiques de type "\emph{coarse-grained}" ou encore "\emph{modèle de l'île}" consistent en un ensemble de sous-populations qui échangent des individus de manière fréquente. La complexité de ces algorithmes réside dans le fait qu'ils nécessitent de contrôler beaucoup de paramètres. Cependant, plus les sous-populations sont utilisées, plus leur taille peut être réduite sans sacrifier la qualité de la recherche. Vu que chaque processus s'exécute en parallèle, il en résulte une réduction du temps dédié aux calculs. Cependant, utiliser plus de sous-populations et donc de processus augmente la communication dans le système. Un compromis doit donc être trouvé entre le temps de calculs et le temps de communication. L'implémentation des algorithmes génétiques parallèles de type \emph{"coarse-grained"} soulève généralement trois problématiques principalement sur la migration qui est l'échange d'individus entre processus. Il s'agit de la fréquence de migration, du nombre d'individus à échanger, de la topologie des connexions entre processus et de la méthode d'intégration des migrants.\\
+	Les algorithmes génétiques de type "\emph{coarse-grained}" ou encore "\emph{modèle de l'île}" ou encore \emph{coarse-grained parallel genetic algorithms} (C-PGA) consistent en un ensemble de sous-populations qui échangent des individus de manière fréquente. La complexité de ces algorithmes réside dans le fait qu'ils nécessitent de contrôler beaucoup de paramètres. Cependant, plus les sous-populations sont utilisées, plus leur taille peut être réduite sans sacrifier la qualité de la recherche. Vu que chaque processus s'exécute en parallèle, il en résulte une réduction du temps dédié aux calculs. Cependant, utiliser plus de sous-populations et donc de processus augmente la communication dans le système. Un compromis doit donc être trouvé entre le temps de calculs et le temps de communication. L'implémentation des algorithmes génétiques parallèles de type \emph{"coarse-grained"} soulève généralement des problématiques concernant principalement la migration qui est l'échange d'individus entre processus. Il s'agit de la fréquence de migration, du chois et du nombre d'individus à échanger, de la topologie des connexions entre processus et de la méthode d'intégration des migrants.\\
 
 	\textsl{\textbf{Fréquence de migration}} \\
-	La migration affecte la qualité de la recherche et l'efficacité de l'algorithme en plusieurs points. Ainsi, de fréquentes migrations entraînent l'échange massif de potentiellement bons matériels génétiques, mais il affecte aussi négativement la performance dans la mesure où les communications sont coûteuses. La même chose se produit dans les topologies densément connectées où chaque processus communique avec les autres. Le but ultime des algorithmes génétiques parallèles est de trouver de bonnes solutions assez rapidement. Il est donc nécessaire de trouver l'équilibre entre le coût de la migration et l'augmentation des chances de trouver de bonnes solutions.\\
+	\hspace*{.5cm} La migration affecte la qualité de la recherche et l'efficacité de l'algorithme en plusieurs points. Ainsi, de fréquentes migrations entraînent l'échange massif de potentiellement bons matériels génétiques, mais il affecte aussi négativement la performance dans la mesure où les communications sont coûteuses. La même chose se produit dans les topologies densément connectées où chaque processus communique avec les autres. Le but ultime des algorithmes génétiques parallèles est de trouver de bonnes solutions assez rapidement. Il est donc nécessaire de trouver l'équilibre entre le coût de la migration et l'augmentation des chances de trouver de bonnes solutions.\\
 	
 	\textsl{\textbf{Choix et nombre de migrants}} \\
-	La migration envoie un nombre prédéterminé d'individus d'un processus à ces processus voisins logiques sur le graphe de communications. Ces individus ou "\emph{migrants}" seront ainsi intégrés dans la population des processus auxquels ils ont été envoyés. Il est possible de choisir les "migrants" de façon aléatoire ou alors parmi les meilleurs individus de la population actuelle. La sélection aléatoire a l'avantage de disséminer plus de diversité et les chances d'explorer de nouvelles régions de l'espace de recherche peuvent être améliorées. La sélection des meilleurs individus peut aider à disséminer un matériel génétique qui a déjà été testé et qui serait donc intéressant.\\
+	\hspace*{.5cm}La migration envoie un nombre prédéterminé d'individus d'un processus à ces processus voisins logiques sur le graphe de communications. Ces individus ou "\emph{migrants}" seront ainsi intégrés dans la population des processus auxquels ils ont été envoyés. Il est possible de choisir les "migrants" de façon aléatoire ou alors parmi les meilleurs individus de la population actuelle. La sélection aléatoire a l'avantage de disséminer plus de diversité et les chances d'explorer de nouvelles régions de l'espace de recherche peuvent être améliorées. La sélection des meilleurs individus peut aider à disséminer un matériel génétique qui a déjà été testé et qui serait donc intéressant.\\
 	
 	\textsl{\textbf{Topologie de connexions}}\\
-	La topologie est également une importante partie des algorithmes génétiques de type \emph{"coarse-grained"}. En théorie, toutes les topologies arbitraires peuvent être utilisées. Cependant, certains modèles sont fréquents. Il s'agit : des topologies linéaires, des anneaux, des hypercubes. des densément connectés, des isolés.\\
+	\hspace*{.5cm} La topologie est également une importante partie des algorithmes génétiques de type \emph{"coarse-grained"}. En théorie, toutes les topologies arbitraires peuvent être utilisées. Cependant, certains modèles sont fréquents. Il s'agit : des topologies linéaires, des anneaux, des hypercubes. des densément connectés, des isolés.\\
 	
 	\textsl{\textbf{Méthode d'intégration des migrants}}\\
- 	Différentes alternatives existent pour incorporer les "\emph{migrants}". Deux d'entre elles sont récurrentes. Il s'agit: du remplacement aléatoire des individus de la population actuelle par les "\emph{migrants}" et du remplacement compétitif ou élitiste. Dans le remplacement aléatoire, les individus devant être remplacés sont désignés de manière aléatoire. Dans le remplacement compétitif, seuls les individus avec les plus mauvais scores de "fitness" sont remplacés par les nouveaux arrivants.
+ 	\hspace*{.5cm} Différentes alternatives existent pour incorporer les "\emph{migrants}". Deux d'entre elles sont récurrentes. Il s'agit: du remplacement aléatoire des individus de la population actuelle par les "\emph{migrants}" et du remplacement compétitif ou élitiste. Dans le remplacement aléatoire, les individus devant être remplacés sont désignés de manière aléatoire. Dans le remplacement compétitif, seuls les individus avec les plus mauvais scores de "fitness" sont remplacés par les nouveaux arrivants.
 	
 	\subsubsection{Les algorithmes génétiques parallèles \emph{fine-grained}}
 	
-	Les algorithmes génétiques parallèles de type "\emph{fine-grained}" ont seulement une population, mais la structure spatiale limite les interactions entre les individus. Un individu ne peut compétir et se reproduire qu'avec ses individus voisins. Vu que les voisinages se chevauchent, les bonnes solutions peuvent ainsi se disséminer à travers la population entière. Le choix le plus important dans l'implémentation de ce type d'algorithmes génétiques parallèles est : la topologie de connexions.\\
+	Les algorithmes génétiques parallèles de type "\emph{fine-grained}" ou \emph{fine-grained parallel genetic algorithms} (F-PGA) ont seulement une population, mais la structure spatiale limite les interactions entre les individus. Un individu ne peut compétir et se reproduire qu'avec ses individus voisins. Vu que les voisinages se chevauchent, les bonnes solutions peuvent ainsi se disséminer à travers la population entière. Le choix le plus important dans l'implémentation de ce type d'algorithmes génétiques parallèles est : la topologie de connexions.\\
 	
 	\textsl{\textbf{Topologie de connexions}}\\
-	Différentes topologies de connexions sont valables. Il s'agit entre autres des grilles 2-D, des hypercubes, le torus, le cube. Il est cependant répandu de placer les individus dans un algorithme génétique parallèle de type "\emph{fine-grained}" dans une grille 2-Dimension. En effet, dans la plupart des ordinateurs massivement parallèles, les éléments de traitement et de calculs sont connectés en suivant cette topologie \cite{cant2}.\\
+	\hspace*{.5cm}Différentes topologies de connexions sont valables. Il s'agit entre autres des grilles 2-D, des hypercubes, le torus, le cube. Il est cependant répandu de placer les individus dans un algorithme génétique parallèle de type "\emph{fine-grained}" dans une grille 2-Dimension. En effet, dans la plupart des ordinateurs massivement parallèles, les éléments de traitement et de calculs sont connectés en suivant cette topologie \cite{cant2}.\\
 	
 	\textsl{\textbf{Principe de fonctionnement}}\\
-	Le principe de fonctionnement des algorithmes génétiques parallèles de type "\emph{fine-grained}" est différent de celui de type \emph{coarse-grained} et \emph{master-slave} et est détaillé à l'algorithme \ref{alg:principe_fine_grained}. \\
+	\hspace*{.5cm}Le principe de fonctionnement des algorithmes génétiques parallèles de type "\emph{fine-grained}" est différent de celui de type \emph{coarse-grained} et \emph{master-slave} et est détaillé à l'algorithme \ref{alg:principe_fine_grained}. \\
 	\\
 	\begin{algorithm}[H]
  		\caption{Principe des algorithmes génétiques parallèles de type "\emph{fine-grained}" \cite{nayak}}
@@ -326,4 +323,4 @@ En effet, si $y_{t-1}^{i}$ et $y_{t}^{i}$ valent 1 alors $\chi_{t}^{i,j}$ est ob
 	
 	\section*{Conclusion}
 	\addcontentsline{toc}{section}{Conclusion}
-	Le dimensionnement de lots en planification de production est un important défi pour les entreprises industrielles. Il consiste à trouver un plan de production qui satisfait aux contraintes spécifiques relatives au système de production. Le PSP constitue en effet une variante NP-Difficile de ces types de problèmes. Plusieurs méthodes peuvent servir à résoudre ce problème. Au nombre de ces méthodes, figurent les algorithmes génétiques. Les AGs, à travers l'exploration et l'exploitation de l'espace de recherche ont permis de résoudre bon nombre de problèmes d'optimisation par le passé. Nous avons également présenté le PSP ainsi que les modèles et leur formulation qui ont été utilisés dans sa résolution.	Dans le partie suivante, nous décrivons les outils de test, les méthodes de résolution proposées ainsi que les algorithmes associés.
+	Le dimensionnement de lots en planification de production est un important défi pour les entreprises industrielles. Il consiste à trouver un plan de production qui satisfait aux contraintes spécifiques relatives au système de production. Le PSP constitue en effet une variante NP-Difficile de ces types de problèmes. Plusieurs méthodes peuvent servir à résoudre ce problème. Au nombre de ces méthodes, figurent les algorithmes génétiques. Les AGs, à travers l'exploration et l'exploitation de l'espace de recherche ont permis de résoudre bon nombre de problèmes d'optimisation par le passé. Nous avons également présenté le PSP ainsi que les modèles et leur formulation qui ont été utilisés dans sa résolution. Dans la partie suivante, nous décrivons les outils de test, les méthodes de résolution proposées ainsi que les algorithmes associés.
