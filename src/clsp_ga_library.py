@@ -22,6 +22,23 @@ def getCostTabKey(item):
 def getPrecsTabKey(item):
 	return item[1]
 
+def getNextItem(solution, size, indice):
+		
+		for i in range(indice + 1, size):
+			if solution[i] != 0:
+				return solution[i], i
+		return 0,0
+
+def getPrevItem(solution, indice):
+	
+	i = indice - 1
+	while i >= 0:
+		#print("in prev : ", i , solution)
+		if solution[i] != 0:
+			return solution[i], i
+		i -= 1
+	return 0,0
+
 def previousPeriodItemOf(indice, solution):
 
 	if indice > 0:
@@ -86,9 +103,9 @@ def getManufactPeriodsGrid(nbItems, deadlineDemandPeriods):
 	return resultGrid
 
 def switchGenes(chromosome,indice_gene1,indice_gene2):
+
 	c = list(chromosome)
-	c[indice_gene1] = chromosome[indice_gene2]
-	c[indice_gene2] = chromosome[indice_gene1]
+	c[indice_gene1], c[indice_gene2] = c[indice_gene2], c[indice_gene1]
 	return c
 
 def getManufactPeriods(chromosome,item):
@@ -117,7 +134,7 @@ def getDemandPeriods(demand):
 	i=0
 	result = []
 	size_demand = len(demand)
-	while i< size_demand:
+	while i < size_demand:
 		if int(demand[i]) == 1:
 			result.append(i)
 		i+=1 
@@ -349,6 +366,9 @@ class Instance:
 				row.append(list([j+1, int(self.chanOverGrid[j][i])]))
 			row = sorted(row ,key = getPrecsTabKey)
 			self.orderedPrecs.append(row)
+
+
+		# // The next step is to record in a table fork each item the different periods in which it could be produce
 
 		#print("category : ", self.category)
 		# Additionnal variables

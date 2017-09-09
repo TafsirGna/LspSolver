@@ -286,14 +286,16 @@ class Chromosome(object):
 
 				rec = []
 				rec.append(self._solution[i])
-				rec.append(i)
+				rec.append(Chromosome.problem.deadlineDemandPeriods[self._solution[i]-1][self._itemsRank[i]-1])
 				rec.append(self._itemsRank[i])
+				rec.append(i)
 				#print (i, " : ", self._solution, self.)
-				rec.append(Chromosome.getCostof(i, self._solution[i], self._itemsRank[i], self._solution))
+				#rec.append(Chromosome.getCostof(i, self._solution[i], self._itemsRank[i], self._solution))
 				costTab.append(rec)
 
-		costTab = sorted(costTab, key = getCostTabKey)
+		#costTab = sorted(costTab, key = getCostTabKey)
 		return costTab
+
 
 	def advmutate(self):
 		# In order to implement this local search, i try to find out the gene that i call the critical gene, that's to say, the gene
@@ -301,47 +303,53 @@ class Chromosome(object):
 		
 		# We're gonna search the nearby era to find out a better solution to this problem
 		nbResults = 1
-		resultQueue = []
 		queue = []
 		currentNode = AdvMutateNode(self)
 
+		#resultQueue.append(copy.deepcopy(currentNode))
+		#if len(resultQueue) >= nbResults:
+		
 		while True:
 
-			children = currentNode.getChildren()
+			child = currentNode.getChild()
 
-			if children == []:
+			if child == []:
 
-				resultQueue.append(copy.deepcopy(currentNode))
-				if len(resultQueue) >= nbResults:
-					break
+				self._solution = copy.deepcopy(currentNode.chromosome.solution)
+				self._itemsRank = copy.deepcopy(currentNode.chromosome.itemsRank)
+				self._fitnessValue = currentNode.chromosome.fitnessValue
+				self._hashSolution = copy.deepcopy(currentNode.chromosome.hashSolution)
 
-			else:
+				return
 
-				queue += copy.deepcopy(children)
-				#queue.sort()
-				#reversed(queue)
+			#print("Current node : ", currentNode)
+			#child = currentNode.getChild()
+			#print("Child : ", child)
 
-				if queue == []:
-					break
+			queue.append(child)
 
-				currentNode = queue[len(queue)-1]
-				del queue[len(queue)-1]
+			if queue == []:
+				break
 
-		#print("Result Queue : ", resultQueue)
+			currentNode = queue[len(queue)-1]
+			del queue[len(queue)-1]
+			
 
-		if resultQueue != []:
+	def getProductionPeriodsByItem(self):
 
-			result = resultQueue[len(resultQueue)-1]
-			#print ("Result : ", result)
-			for r in resultQueue:
-				if r.chromosome.fitnessValue < result.chromosome.fitnessValue:
-					result = r
-			#print ("Result : ", result)
+		
+		data = []
 
-			self._solution = copy.deepcopy(result.chromosome.solution)
-			self._itemsRank = copy.deepcopy(result.chromosome.itemsRank)
-			self._fitnessValue = result.chromosome.fitnessValue
-			self._hashSolution = copy.deepcopy(result.chromosome.hashSolution)
+		for i in range(0, Chromosome.problem.nbItems):
+			data.append([])
+
+		for i in range(0, Chromosome.problem.nbTimes):
+
+			if self._solution[i] != 0:
+
+				(data[self._solution[i] - 1]).append([i, Chromosome.problem.deadlineDemandPeriods[self._solution[i] - 1][self.itemsRank[i] - 1]])
+
+		return data
 
 	def getFeasible(self):
 
@@ -641,12 +649,12 @@ class Node(object):
 			
 			#print(self, self.currentPeriod)
 			currentPeriod = self._currentPeriod + 1
-			#print(self, self.currentPeriod, currentPeriod)
+			#print(self, " :: ", self.branches, " :: ",currentPeriod, len(self.branches[currentPeriod]))
 			solution = copy.deepcopy(self._solution)
 			tab = copy.deepcopy(self.tab)
 
 			counterTab = [0] * (Chromosome.problem.nbItems + 1)
-			while self.branches[currentPeriod] == []:
+			while currentPeriod < Chromosome.problem.nbTimes and self.branches[currentPeriod] == []:
 
 				item = solution[currentPeriod]
 				if item != 0:
@@ -662,6 +670,9 @@ class Node(object):
 				solution[currentPeriod] = 0
 				currentPeriod += 1
 				#print("in while : ", self.branches[currentPeriod], currentPeriod)
+
+			if currentPeriod == Chromosome.problem.nbTimes:
+				return []
 
 			item = solution[currentPeriod]
 			if item != 0:
@@ -729,11 +740,6 @@ class Node(object):
 		return list(reversed(childrenQueue))
 		#return list(childrenQueue)
 
-
-	def getSuccessors(self):
-		
-		pass
-
 	def _get_currentPeriod(self):
 		return self._currentPeriod
 
@@ -797,58 +803,102 @@ class Node(object):
 	solution = property(_get_solution, _set_solution)
 
 class AdvMutateNode(object):
+
 	"""docstring for AdvMutateNode"""
-	def __init__(self, chromosome, gap = 0):
+	def __init__(self, chromosome):
 		super(AdvMutateNode, self).__init__()
 		#self.arg = arg
 
 		self.chromosome = copy.deepcopy(chromosome)
-		self.gap = gap
+		#self.path = []
+		#self.tab = chromosome.getProductionPeriodsByItem()
+		#self.currentItem = Chromosome.problem.nbItems 
+		#self.pointer = [0,0,0] #[self.currentItem, len(self.tab[self.currentItem-1])-1, self.tab[self.currentItem-1][len(self.tab[self.currentItem-1])-1][1]]
+		#print(self.pointer)
 
-	def getChildren(self):
+	def isLeaf(self):
+		if self.currentItem == 0:
+			return True
+		return False
 
-		children = []
-		costTab = self.chromosome.getCostTab()
-		#print("iterator : ", it, costTab)
-		i = len(costTab) - 1
-		
+	def getChild(self):
+
+		i = Chromosome.problem.nbTimes - 1
 		while i >= 0:
 
-			item = costTab[i][0]
-			indice = costTab[i][1]
-			rank = costTab[i][2]
+			if self.chromosome.solution[i] != 0:
 
-			j = Chromosome.problem.deadlineDemandPeriods[item-1][rank-1]
-			stop = False
-			while j >= indice + 1:
+				deadlineItem = Chromosome.problem.deadlineDemandPeriods[self.chromosome.solution[i]-1][self.chromosome.itemsRank[i]-1]
 
-				#if self.chromosome.solution[j] != item and Chromosome.problem.deadlineDemandPeriods[self.chromosome.solution[j]-1][self.chromosome.itemsRank[j]-1] >= indice:
-				if self.chromosome.solution[j] != item:
-					
+				j = deadlineItem
+				while j > i:
 					c = Chromosome()
-					c.init1(switchGenes(self.chromosome.solution, indice, j))
-					#print("	j : ", j, c.solution, c.fitnessValue)
+					c.solution = switchGenes(self.chromosome.solution, i, j)
+					c.itemsRank = switchGenes(self.chromosome.itemsRank, i, j)
+					c.fitnessValue = self.evalSwitchedChrom(self.chromosome.solution, self.chromosome.fitnessValue, self.chromosome.itemsRank, i, j)
+
 					if c.fitnessValue < self.chromosome.fitnessValue:
-						gap = self.chromosome.fitnessValue - c.fitnessValue
-						child = AdvMutateNode(c, gap)
-						children.append(child)
-						stop = True
-						break
 
-				j -= 1
+						return AdvMutateNode(c)
 
-			if stop:
-				break
+					j -= 1
 
-			i -= 1
+			i -= 1 
+		
+		return []
 
-		children.sort()
-		#print(len(children))
-		#print (str(children))
-		return children
+	def evalSwitchedChrom(self, solution, fitnessValue, itemsRank, indice1, indice2):
 
-	def __lt__(self, node):
-		return self.gap < node.gap
+		#print("ok")
+		# i set the value of the period of "indice" to 0
+		# i decrease the overall cost of the cost of the first item to be switched
+		fitnessValue -= Chromosome.getCostof(indice1, solution[indice1], itemsRank[indice1], solution)
+		prevItem1, prevIndice1 = getPrevItem(solution, indice1)
+		nextItem1, nextIndice1 = getNextItem(solution, Chromosome.problem.nbTimes, indice1)
+
+		prevItem2, prevIndice2 = getPrevItem(solution, indice2)
+		nextItem2, nextIndice2 = getNextItem(solution, Chromosome.problem.nbTimes, indice2)
+
+		# and increase it of the cost of the new gene value
+		if solution[indice2] != 0:
+			fitnessValue += (Chromosome.problem.deadlineDemandPeriods[solution[indice2]-1][itemsRank[indice2]-1] - indice1) * int(Chromosome.problem.holdingGrid[solution[indice2]-1])
+			fitnessValue += int(Chromosome.problem.chanOverGrid[prevItem1-1][solution[indice2]-1])
+
+		if nextItem1 != 0 and nextIndice1 != 0:
+			fitnessValue -= int(Chromosome.problem.chanOverGrid[solution[indice1]-1][nextItem1-1])
+			if solution[indice2] != 0:
+				fitnessValue += int(Chromosome.problem.chanOverGrid[solution[indice2]-1][nextItem1-1])
+			else:
+				fitnessValue += int(Chromosome.problem.chanOverGrid[solution[prevItem1]-1][nextItem1-1])
+
+		# i do the same for the second item to be swiched
+		if nextItem1 == solution[indice2] and nextIndice1 == indice2:
+
+			fitnessValue -= (Chromosome.problem.deadlineDemandPeriods[solution[indice2]-1][itemsRank[indice2]-1] - indice2) * int(Chromosome.problem.holdingGrid[solution[indice2]-1])
+
+			# and increase it of the cost of the new gene value
+			fitnessValue += (Chromosome.problem.deadlineDemandPeriods[solution[indice1]-1][itemsRank[indice1]-1] - indice2) * int(Chromosome.problem.holdingGrid[solution[indice1]-1])
+			fitnessValue += int(Chromosome.problem.chanOverGrid[solution[indice2]-1][solution[indice1]-1])
+
+		else:
+			fitnessValue -= Chromosome.getCostof(indice2, solution[indice2], itemsRank[indice2], solution)
+			fitnessValue += (Chromosome.problem.deadlineDemandPeriods[solution[indice1]-1][itemsRank[indice1]-1] - indice2) * int(Chromosome.problem.holdingGrid[solution[indice1]-1])
+			fitnessValue += int(Chromosome.problem.chanOverGrid[prevItem2-1][solution[indice1]-1])
+
+		if nextItem2 != 0 and nextIndice2 != 0:
+			#print("yo : ", int(Chromosome.problem.chanOverGrid[solution[indice2]-1][nextItem2-1]))
+			if solution[indice2] == 0:
+				fitnessValue -= int(Chromosome.problem.chanOverGrid[prevItem2-1][nextItem2-1])
+			else:
+				fitnessValue -= int(Chromosome.problem.chanOverGrid[solution[indice2]-1][nextItem2-1])
+			fitnessValue += int(Chromosome.problem.chanOverGrid[solution[indice1]-1][nextItem2-1])
+
+		#fitnessValue -= Chromosome.getCostof(nextIndice, nextItem, itemsRank[nextIndice], solution)
+		#print ("nI : ", nextItem, itemsRank[nextIndice] , Chromosome.problem.deadlineDemandPeriods[nextItem-1][1])#[itemsRank[nextIndice]])
+
+		#print(indice1, indice2, prevItem, prevIndice, nextItem, nextIndice)
+		return fitnessValue
+
 
 	def __repr__(self):
-		return str(self.chromosome) + " : " + str(self.gap)
+		return str(self.chromosome) + " / " + str(self.tab) + " / " + str(self.path)

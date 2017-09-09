@@ -55,6 +55,8 @@ class ClspThread(Thread):
 
 			if Chromosome.problem.category == 1:
 				self.getPopImproved()
+			#else:
+			#	(self.chromosomes[0]).advmutate()
 			#print (self.name, " ", "Initial Population : ", self.population)
 			
 			self.getFitnessData()
@@ -233,64 +235,8 @@ class ClspThread(Thread):
 			currentNode = copy.deepcopy(queue[len(queue)-1])
 			del queue[len(queue)-1]
 
-	'''
-	def initSearch(self, queue, parameter = "main"):
-
-		#print("Queue : ", self.queue)
-		#print("------------------------------")
-
-		currentNode = copy.deepcopy(queue[len(queue)-1])
-		del queue[len(queue)-1]
-
-		i = 0
-		while True:
-			
-			child = currentNode.getChild()
-			if currentNode.isLeaf():
-
-				# i create a chromosome from the solution, i've just found
-				chromosome = Chromosome()
-				chromosome.init1(list(currentNode.solution), currentNode.fitnessValue)
-
-				self.locker.acquire()
-				if len(self.chromosomes) >= ClspThread.NbMaxPopulation:
-					self.chromosomes.sort()
-					self.locker.release()
-					break
-
-				if chromosome not in self.chromosomes:
-					self.chromosomes.append(copy.deepcopy(chromosome))
-					#self.exploit(chromosome)
-				self.locker.release()
-
-			else:
-
-				#print ("current Node : ", currentNode)
-				children = currentNode.getChildren()
-				if len(children) >= 2 and parameter == "main": 
-					if self.slaveThreadsManager.currentSlaveThreadId < SlaveThreadsManager.nbSlavesThread:
-						tab = [children[len(children)-1]]
-						del children[len(children)-1]
-						self.slaveThreadsManager.initSlaveThread(copy.deepcopy(tab))
-				#print("Children : ", children)
-				queue += children
-				#print("Queue : ", queue)
-		
-			if queue == []:
-				self.chromosomes.sort()
-				if self.chromosomes != []:
-					(self.chromosomes[0]).advmutate()
-				break
-			currentNode = copy.deepcopy(queue[len(queue)-1])
-			del queue[len(queue)-1]
-
-		if parameter == "main" and self.slaveThreadsManager.currentSlaveThreadId != 0:
-			#print("ok8", self.slaveThreadsManager.currentSlaveThreadId)
-			(self.slaveThreadsManager.listSlaveThreads[self.slaveThreadsManager.currentSlaveThreadId-1]).doneEvent.wait()
-	'''
-
-	def advMutate(chromosome):
-		pass
+	#def advMutate(chromosome):
+	#	pass
 
 	def sendMigrants(self):
 		
