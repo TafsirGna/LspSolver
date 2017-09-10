@@ -102,7 +102,7 @@ class GeneticAlgorithm:
 
 		print("Initialized!!!")
 		
-		'''readyFlag = 0
+		readyFlag = 0
 		flagId = -1
 		for mainThread in self.listMainThreads:
 			if not mainThread.finished:
@@ -145,7 +145,7 @@ class GeneticAlgorithm:
 
 			it += 1
 
-		self.printResults()'''
+		self.printResults()
 		
 	
 	#--------------------

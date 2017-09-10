@@ -311,7 +311,9 @@ class Chromosome(object):
 		
 		while True:
 
+			#print("Current node : ", currentNode)
 			child = currentNode.getChild()
+			#print("Child : ", child)
 
 			if child == []:
 
@@ -321,10 +323,6 @@ class Chromosome(object):
 				self._hashSolution = copy.deepcopy(currentNode.chromosome.hashSolution)
 
 				return
-
-			#print("Current node : ", currentNode)
-			#child = currentNode.getChild()
-			#print("Child : ", child)
 
 			queue.append(child)
 
@@ -859,6 +857,7 @@ class AdvMutateNode(object):
 		prevItem2, prevIndice2 = getPrevItem(solution, indice2)
 		nextItem2, nextIndice2 = getNextItem(solution, Chromosome.problem.nbTimes, indice2)
 
+		#print("eval 1 : ", fitnessValue)
 		# and increase it of the cost of the new gene value
 		if solution[indice2] != 0:
 			fitnessValue += (Chromosome.problem.deadlineDemandPeriods[solution[indice2]-1][itemsRank[indice2]-1] - indice1) * int(Chromosome.problem.holdingGrid[solution[indice2]-1])
@@ -869,8 +868,9 @@ class AdvMutateNode(object):
 			if solution[indice2] != 0:
 				fitnessValue += int(Chromosome.problem.chanOverGrid[solution[indice2]-1][nextItem1-1])
 			else:
-				fitnessValue += int(Chromosome.problem.chanOverGrid[solution[prevItem1]-1][nextItem1-1])
+				fitnessValue += int(Chromosome.problem.chanOverGrid[prevItem1-1][nextItem1-1])
 
+		#print("eval 2 : ", fitnessValue)
 		# i do the same for the second item to be swiched
 		if nextItem1 == solution[indice2] and nextIndice1 == indice2:
 
@@ -881,16 +881,43 @@ class AdvMutateNode(object):
 			fitnessValue += int(Chromosome.problem.chanOverGrid[solution[indice2]-1][solution[indice1]-1])
 
 		else:
+
 			fitnessValue -= Chromosome.getCostof(indice2, solution[indice2], itemsRank[indice2], solution)
 			fitnessValue += (Chromosome.problem.deadlineDemandPeriods[solution[indice1]-1][itemsRank[indice1]-1] - indice2) * int(Chromosome.problem.holdingGrid[solution[indice1]-1])
-			fitnessValue += int(Chromosome.problem.chanOverGrid[prevItem2-1][solution[indice1]-1])
+
+			if solution[indice2] == 0:
+
+				empty = True
+				for i in range(indice1 + 1, indice2):
+					if solution[i] != 0:
+						empty = False
+
+				if empty:
+					fitnessValue += int(Chromosome.problem.chanOverGrid[prevItem1-1][solution[indice1]-1])
+				else:
+					fitnessValue += int(Chromosome.problem.chanOverGrid[nextItem1-1][solution[indice1]-1])
+
+			else:
+				fitnessValue += int(Chromosome.problem.chanOverGrid[prevItem2-1][solution[indice1]-1])
+			#print("eval 3 : ", fitnessValue)
 
 		if nextItem2 != 0 and nextIndice2 != 0:
 			#print("yo : ", int(Chromosome.problem.chanOverGrid[solution[indice2]-1][nextItem2-1]))
 			if solution[indice2] == 0:
-				fitnessValue -= int(Chromosome.problem.chanOverGrid[prevItem2-1][nextItem2-1])
+
+				empty = True
+				for i in range(indice1 + 1, indice2):
+					if solution[i] != 0:
+						empty = False
+
+				if empty:
+					fitnessValue -= int(Chromosome.problem.chanOverGrid[prevItem1-1][nextItem2-1])
+				else:
+					fitnessValue -= int(Chromosome.problem.chanOverGrid[prevItem2-1][nextItem2-1])
+
 			else:
 				fitnessValue -= int(Chromosome.problem.chanOverGrid[solution[indice2]-1][nextItem2-1])
+			#print("eval 3 : ", fitnessValue)
 			fitnessValue += int(Chromosome.problem.chanOverGrid[solution[indice1]-1][nextItem2-1])
 
 		#fitnessValue -= Chromosome.getCostof(nextIndice, nextItem, itemsRank[nextIndice], solution)
@@ -901,4 +928,4 @@ class AdvMutateNode(object):
 
 
 	def __repr__(self):
-		return str(self.chromosome) + " / " + str(self.tab) + " / " + str(self.path)
+		return str(self.chromosome) #+ " / " + str(self.tab) + " / " + str(self.path)

@@ -117,6 +117,7 @@ class ClspThread(Thread):
 			
 				# i store this local optima in the genetic algorithm's memory to remind me that it's already been visited before
 				chromosome.advmutate()	
+				
 				if not chromosome.isFeasible():
 					#chromosome.getFeasible()
 					print("OOOOOOOOOOOOOOOOOOOOOOOOOOOO")
