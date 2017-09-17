@@ -174,6 +174,98 @@ class Chromosome(object):
 		#print("Feasible False")
 		return False
 
+	def mutate2(self):
+
+		mutated = False
+
+		while mutated is False:
+
+			randomIndice = randint(0,(Chromosome.problem.nbTimes-1))
+
+			item1 = self._solution[randomIndice]
+
+			# i make sure that the randomIndice variable never corresponds to a zero indice
+			while item1 == 0:
+				randomIndice = randint(0,(Chromosome.problem.nbTimes-1))
+				# i get the item corresponding the gene to be flipped
+				item1 = self._solution[randomIndice]
+
+			#print(" randomIndice : ", randomIndice)
+
+			visitedItems = []
+
+			i = randomIndice-1
+			itemsRank = self.itemsRank
+			while i >= 0:
+				if self._solution[i] != item1 and self._solution[i] != 0:
+
+					item2 = self._solution[i]
+					#print(" item2 : ", item2)
+
+					if item2 not in visitedItems:
+
+						visitedItems.append(item2)
+
+						item2DemandPeriod = Chromosome.problem.deadlineDemandPeriods[item2-1][itemsRank[i]-1]
+
+						if item2DemandPeriod >= randomIndice:
+							#print(i, randomIndice)
+							#solution = switchGenes(self._solution, randomIndice, i)
+							#ir = switchGenes(self._itemsRank, randomIndice, i)
+
+							c = Chromosome()
+							c.solution = switchGenes(self.solution, randomIndice, i)
+							c.itemsRank = switchGenes(self.itemsRank, randomIndice, i)
+							c.fitnessValue = AdvMutateNode.evalSwitchedChrom(self.solution, self.fitnessValue, self.itemsRank, randomIndice, i)
+							self.manufactItemsPeriods = list(self.manufactItemsPeriods)
+							
+							'''
+							c = Chromosome()
+							c.init1(solution)
+							self._solution = c.solution
+							self._fitnessValue = c.fitnessValue
+							self._hashSolution = c.hashSolution
+							self._itemsRank = c.itemsRank
+							self.manufactItemsPeriods = list(c.manufactItemsPeriods)
+							'''
+							mutated = True
+							break
+				i-=1
+
+			# if the first approach doesn't work ,then i apply another one in order to leave the current chromosome actually mutated
+
+			if mutated is False:
+
+				visitedItems = []
+
+				i = randomIndice + 1
+				while i < Chromosome.problem.nbTimes:
+
+					if self._solution[i] != item1 and self._solution[i] != 0:
+
+						item2 = self._solution[i]
+
+						if item2 not in visitedItems:
+
+							item1DemandPeriod = Chromosome.problem.deadlineDemandPeriods[item1-1][itemsRank[randomIndice]-1]
+
+							if item1DemandPeriod >= i:
+								#print(i, randomIndice)
+								solution = switchGenes(self._solution, randomIndice, i)
+								#ir = switchGenes(self._itemsRank, randomIndice, i)
+								c = Chromosome()
+								c.init1(solution)
+								self._solution = c.solution
+								self._fitnessValue = c.fitnessValue
+								self._hashSolution = c.hashSolution
+								self._itemsRank = c.itemsRank
+								self.manufactItemsPeriods = list(c.manufactItemsPeriods)
+								mutated = True
+								break					
+
+					i += 1
+		
+
 	#--------------------
 	# function : mutate
 	# Class : Chromosome
@@ -188,87 +280,7 @@ class Chromosome(object):
 
 		if (randint(0,100) < (Chromosome.mutationRate*100)): # then the chromsome has been selected for mutation 
 
-			mutated = False
-
-			while mutated is False:
-
-				randomIndice = randint(0,(Chromosome.problem.nbTimes-1))
-
-				item1 = self._solution[randomIndice]
-
-				# i make sure that the randomIndice variable never corresponds to a zero indice
-				while item1 == 0:
-					randomIndice = randint(0,(Chromosome.problem.nbTimes-1))
-					# i get the item corresponding the gene to be flipped
-					item1 = self._solution[randomIndice]
-
-				#print(" randomIndice : ", randomIndice)
-
-				visitedItems = []
-
-				i = randomIndice-1
-				itemsRank = self.itemsRank
-				while i >= 0:
-					if self._solution[i] != item1 and self._solution[i] != 0:
-
-						item2 = self._solution[i]
-						#print(" item2 : ", item2)
-
-						if item2 not in visitedItems:
-
-							visitedItems.append(item2)
-
-							item2DemandPeriod = Chromosome.problem.deadlineDemandPeriods[item2-1][itemsRank[i]-1]
-
-							if item2DemandPeriod >= randomIndice:
-								#print(i, randomIndice)
-								solution = switchGenes(self._solution, randomIndice, i)
-								#ir = switchGenes(self._itemsRank, randomIndice, i)
-
-								c = Chromosome()
-								c.init1(solution)
-								self._solution = c.solution
-								self._fitnessValue = c.fitnessValue
-								self._hashSolution = c.hashSolution
-								self._itemsRank = c.itemsRank
-								self.manufactItemsPeriods = list(c.manufactItemsPeriods)
-								mutated = True
-								break
-					i-=1
-
-				# if the first approach doesn't work ,then i apply another one in order to leave the current chromosome actually mutated
-
-				if mutated is False:
-
-					visitedItems = []
-
-					i = randomIndice + 1
-					while i < Chromosome.problem.nbTimes:
-
-						if self._solution[i] != item1 and self._solution[i] != 0:
-
-							item2 = self._solution[i]
-
-							if item2 not in visitedItems:
-
-								item1DemandPeriod = Chromosome.problem.deadlineDemandPeriods[item1-1][itemsRank[randomIndice]-1]
-
-								if item1DemandPeriod >= i:
-									#print(i, randomIndice)
-									solution = switchGenes(self._solution, randomIndice, i)
-									#ir = switchGenes(self._itemsRank, randomIndice, i)
-									c = Chromosome()
-									c.init1(solution)
-									self._solution = c.solution
-									self._fitnessValue = c.fitnessValue
-									self._hashSolution = c.hashSolution
-									self._itemsRank = c.itemsRank
-									self.manufactItemsPeriods = list(c.manufactItemsPeriods)
-									mutated = True
-									break					
-
-						i += 1
-			
+			self.mutate2()
 
 		#print("F Start : ", self._solution)
 
@@ -833,10 +845,11 @@ class AdvMutateNode(object):
 					c = Chromosome()
 					c.solution = switchGenes(self.chromosome.solution, i, j)
 					c.itemsRank = switchGenes(self.chromosome.itemsRank, i, j)
-					c.fitnessValue = self.evalSwitchedChrom(self.chromosome.solution, self.chromosome.fitnessValue, self.chromosome.itemsRank, i, j)
+					c.fitnessValue = AdvMutateNode.evalSwitchedChrom(self.chromosome.solution, self.chromosome.fitnessValue, self.chromosome.itemsRank, i, j)
 
 					if c.fitnessValue < self.chromosome.fitnessValue:
 
+						#print ("i, j : ", i, j)
 						return AdvMutateNode(c)
 
 					j -= 1
@@ -845,7 +858,7 @@ class AdvMutateNode(object):
 		
 		return []
 
-	def evalSwitchedChrom(self, solution, fitnessValue, itemsRank, indice1, indice2):
+	def evalSwitchedChrom(cls, solution, fitnessValue, itemsRank, indice1, indice2):
 
 		#print("ok")
 		# i set the value of the period of "indice" to 0
@@ -854,6 +867,7 @@ class AdvMutateNode(object):
 		prevItem1, prevIndice1 = getPrevItem(solution, indice1)
 		nextItem1, nextIndice1 = getNextItem(solution, Chromosome.problem.nbTimes, indice1)
 
+		#print("deadlineItem : ", Chromosome.problem.deadlineDemandPeriods[solution[indice1]-1][itemsRank[indice1]-1], Chromosome.getCostof(indice1, solution[indice1], itemsRank[indice1], solution))
 		prevItem2, prevIndice2 = getPrevItem(solution, indice2)
 		nextItem2, nextIndice2 = getNextItem(solution, Chromosome.problem.nbTimes, indice2)
 
@@ -884,7 +898,7 @@ class AdvMutateNode(object):
 
 			fitnessValue -= Chromosome.getCostof(indice2, solution[indice2], itemsRank[indice2], solution)
 			fitnessValue += (Chromosome.problem.deadlineDemandPeriods[solution[indice1]-1][itemsRank[indice1]-1] - indice2) * int(Chromosome.problem.holdingGrid[solution[indice1]-1])
-
+			#print("eval 3 : ", fitnessValue)
 			if solution[indice2] == 0:
 
 				empty = True
@@ -895,7 +909,8 @@ class AdvMutateNode(object):
 				if empty:
 					fitnessValue += int(Chromosome.problem.chanOverGrid[prevItem1-1][solution[indice1]-1])
 				else:
-					fitnessValue += int(Chromosome.problem.chanOverGrid[nextItem1-1][solution[indice1]-1])
+					#print("not empty : ", int(Chromosome.problem.chanOverGrid[prevItem2-1][solution[indice1]-1]), nextItem1, solution[indice1])
+					fitnessValue += int(Chromosome.problem.chanOverGrid[prevItem2-1][solution[indice1]-1])
 
 			else:
 				fitnessValue += int(Chromosome.problem.chanOverGrid[prevItem2-1][solution[indice1]-1])
@@ -917,9 +932,9 @@ class AdvMutateNode(object):
 
 			else:
 				fitnessValue -= int(Chromosome.problem.chanOverGrid[solution[indice2]-1][nextItem2-1])
-			#print("eval 3 : ", fitnessValue)
+			#print("eval 4 : ", fitnessValue)
 			fitnessValue += int(Chromosome.problem.chanOverGrid[solution[indice1]-1][nextItem2-1])
-
+			#print("eval 5 : ", fitnessValue)
 		#fitnessValue -= Chromosome.getCostof(nextIndice, nextItem, itemsRank[nextIndice], solution)
 		#print ("nI : ", nextItem, itemsRank[nextIndice] , Chromosome.problem.deadlineDemandPeriods[nextItem-1][1])#[itemsRank[nextIndice]])
 
@@ -929,3 +944,5 @@ class AdvMutateNode(object):
 
 	def __repr__(self):
 		return str(self.chromosome) #+ " / " + str(self.tab) + " / " + str(self.path)
+
+	evalSwitchedChrom = classmethod(evalSwitchedChrom)

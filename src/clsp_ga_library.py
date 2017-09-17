@@ -349,11 +349,9 @@ class Instance:
 			nbZero -= len(deadlines)
 
 		if nbZero == 0:
-			self.category = 1
 			self.zerosRow = []
 		else:
 			self.zerosRow = [0] * nbZero
-			self.category = 2
 
 		# 
 

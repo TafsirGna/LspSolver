@@ -35,34 +35,6 @@ class SlaveThreadsManager:
 
 			i += 1
 
-	def improvePop(self, chromosomes):
-
-		popSize = len(chromosomes)
-		nodePerSlave = math.ceil(popSize / SlaveThreadsManager.nbSlavesThread)
-
-		i = 0
-		slaveQueue = []
-		counter = 0
-		for chromosome in chromosomes:
-			slaveQueue.append(chromosome) # TODO
-			i += 1
-			if i == nodePerSlave:
-				(self.listSlaveThreads[counter]).queue = copy.deepcopy(slaveQueue)
-				slaveQueue = []
-				counter += 1
-
-		if slaveQueue != []:
-			(self.listSlaveThreads[counter]).queue = copy.deepcopy(slaveQueue)
-
-		for thread in self.listSlaveThreads:
-			thread.action = 1 # i want to improve the quality of the initial population
-			thread.doneEvent.clear()
-			
-		for thread in self.listSlaveThreads:
-			thread.run()
-		
-		(self.listSlaveThreads[SlaveThreadsManager.nbSlavesThread-1]).doneEvent.wait()
-
 	def initSlaveThread(self, queue):
 		
 		(self.listSlaveThreads[self.currentSlaveThreadId]).action = 0
@@ -103,7 +75,15 @@ class SlaveThread(Thread):
 			#print("slave : ", self.queue)
 			self.mainThread.initSearch(self.queue, "slave")
 			self.queue = []
+	
+		elif self.action == 2:
+			self.mainThread.crossPopulation()
 
+		if self.threadId != 0:
+			self.mateDoneEvent.wait()
+		self.doneEvent.set()
+
+		'''
 		elif self.action == 1 and self.queue != []: # i want to improve the quality of the initial population
 
 			for chromosome in self.queue:
@@ -112,10 +92,4 @@ class SlaveThread(Thread):
 
 			#self.mainThread.population.chromosomes.sort()
 			self.queue = []
-
-		elif self.action == 2:
-			self.mainThread.crossPopulation()
-
-		if self.threadId != 0:
-			self.mateDoneEvent.wait()
-		self.doneEvent.set()
+		'''

@@ -18,16 +18,16 @@ class GeneticAlgorithm:
 	FITNESS_PADDING = 1
 	NumberOfMigrants = 1
 	MigrationRate = 0 # this variable holds the number of generations needed before a migration occurs during the search
-	nbMainThreads = 1
+	nbMainThreads = 2
 	nbSlavesThread = 2
-	NbGenToStop = 10
+	nbTrials = 3
+	pickeRandChromGens = 3
 
 	# Builder
 	def __init__(self, inst):
 
 		self.hashTable = {} #hashTable is a dictionnary
 		self.listMainThreads = [] # i initialize a list that's intended to contain all the main threads of this genetic algorithm program
-		self.moyNbGenerations = 0
 
 		# i impart some parameters to the chromosome class and population class
 		Chromosome.mutationRate = GeneticAlgorithm.mutationRate
@@ -36,14 +36,13 @@ class GeneticAlgorithm:
 
 		# i set some class' properties of Population class
 		ClspThread.FITNESS_PADDING = GeneticAlgorithm.FITNESS_PADDING
-		#Population.ga_memory = self.ga_memory
-		#Population.gaMemoryLocker = threading.Lock()
 		ClspThread.MigrationRate = GeneticAlgorithm.MigrationRate
 		ClspThread.crossOverRate = GeneticAlgorithm.crossOverRate
 
 		ClspThread.NbMaxPopulation = GeneticAlgorithm.NbMaxPopulation
 		ClspThread.listMainThreads = self.listMainThreads
-		ClspThread.NbGenToStop = GeneticAlgorithm.NbGenToStop
+		ClspThread.nbTrials = GeneticAlgorithm.nbTrials
+		ClspThread.pickeRandChromGens = GeneticAlgorithm.pickeRandChromGens
 		SlaveThreadsManager.nbSlavesThread = GeneticAlgorithm.nbSlavesThread
 		ClspThread.NumberOfMigrants = GeneticAlgorithm.NumberOfMigrants
 

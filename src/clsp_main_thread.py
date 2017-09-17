@@ -13,11 +13,12 @@ class ClspThread(Thread):
 
 	listMainThreads = 0
 	NumberOfMigrants = 0
-	NbGenToStop = 0
+	nbTrials = 0
 	crossOverRate = 0
 	MigrationRate = 0
 	NbMaxPopulation = 0
 	FITNESS_PADDING = 0
+	pickeRandChromGens = 0
 
 	def __init__(self, threadId):
 
@@ -43,6 +44,7 @@ class ClspThread(Thread):
 		self.initialChromData = []
 		self.prevChromosomes = []
 		self.prevListFitnessData = []
+		self.popSize = 0
 
 		self.immigrants = []
 		self.slaveThreadsManager = SlaveThreadsManager(self) # i initialize a list that's intended to contain all the population's initialization threads 
@@ -53,11 +55,12 @@ class ClspThread(Thread):
 
 			self.initSearch(self.queue)
 
-			if Chromosome.problem.category == 1:
-				self.getPopImproved()
-			#else:
-			#	(self.chromosomes[0]).advmutate()
-			#print (self.name, " ", "Initial Population : ", self.population)
+			#print('popSize : ', self.popSize)
+
+			#for i in range(1, self.popSize):
+			#	(self.chromosomes[i]).advmutate()
+
+			#self.chromosomes.sort()
 			
 			self.getFitnessData()
 			print (self.name, " ", "Initial Population : ", self.chromosomes)
@@ -91,6 +94,16 @@ class ClspThread(Thread):
 				for chromosome in self.immigrants:
 					self.replace(chromosome)
 				self.listFitnessData = []
+
+				'''
+				c1, c2 = self.mate(self.immigrants[0], self.chromosomes[0])
+				c1.advmutate()
+				c2.advmutate()
+				self.replace(c1)
+				self.replace(c2)
+				'''
+				#(self.chromosomes[randint(0, self.popSize - 1)]).advmutate()
+
 				self.chromosomes.sort()
 				self.getFitnessData()
 			self.immigrants = []
@@ -114,16 +127,15 @@ class ClspThread(Thread):
 
 				#print("LACKING DIVERSITY - ", self.name)
 				chromosome = copy.deepcopy(self.chromosomes[0])
-			
-				# i store this local optima in the genetic algorithm's memory to remind me that it's already been visited before
-				chromosome.advmutate()	
-				
-				if not chromosome.isFeasible():
-					#chromosome.getFeasible()
-					print("OOOOOOOOOOOOOOOOOOOOOOOOOOOO")
+
+				chromosome.advmutate()
+
+				#if not chromosome.isFeasible():
+				#	print("OOOOOOOOOOOOOOOOOOOOOOOOOOOO")
 
 				self.chromosomes = copy.deepcopy(self.initialChromosomes)
 				self.replace(chromosome)
+				#(self.chromosomes[randint(0,len(self.chromosomes)-1)]).advmutate()
 
 				self.listFitnessData = []
 				self.getFitnessData()
@@ -131,7 +143,10 @@ class ClspThread(Thread):
 
 				self.initialChromosomes = copy.deepcopy(self.chromosomes)
 				self.initialChromData = copy.deepcopy(self.listFitnessData)	
-				self.nbIdleGens += 1		
+				self.nbIdleGens += 1	
+
+				#if self.NbGenerations % ClspThread.pickeRandChromGens == 0:
+				#	(self.chromosomes[randint(0,len(self.chromosomes)-1)]).advmutate()	
 
 				# for the first solution found
 				if isinstance(self.result, int):
@@ -140,7 +155,7 @@ class ClspThread(Thread):
 					if chromosome.fitnessValue < self.result.fitnessValue:
 						self.result = copy.deepcopy(chromosome)
 						self.nbIdleGens = 0
-					if self.nbIdleGens == ClspThread.NbGenToStop:
+					if self.nbIdleGens == ClspThread.nbTrials:
 						print (self.name, " ", "Solution : ", chromosome)
 						self.finished = True		
 
@@ -156,43 +171,41 @@ class ClspThread(Thread):
 
 			return
 
-	def getPopImproved(self):
-
-		self.slaveThreadsManager.improvePop(self.chromosomes)
-		self.chromosomes.sort()
-		self.listFitnessData = []
-
 	def exploit(self, chromosome):
 
-		print("log exploit : ", chromosome)
+		nbResults = 1
 		queue = []
 		currentNode = AdvMutateNode(chromosome)
+		successors = []
 
-		#i = 0
+		#print ("in exploit : ",chromosome)
+		
 		while True:
 
-			#i += 1
-			#print("current : ", currentNode.chromosome)
-			children = currentNode.getChildren1()
-			#print("children : ", children)
-			
-			for child in children:
-				if child.chromosome not in self.chromosomes and len(self.chromosomes) < ClspThread.NbMaxPopulation:
-					self.chromosomes.append(child.chromosome)
+			#print("Current node : ", currentNode)
+			child = currentNode.getChild()
+			#print("Child : ", child)
 
-			queue += copy.deepcopy(children)
-			#print("queue : ", queue)
+			if child != []:
+				successors.append(child)
+				queue.append(child)
 
-			if queue == [] or len(self.chromosomes) > ClspThread.NbMaxPopulation :
+			if queue == []:
+				#print ("in exploit : ",currentNode.chromosome)
 				break
 
 			currentNode = queue[len(queue)-1]
 			del queue[len(queue)-1]
 
-			#if i == 7:
-			#	break
+		i = len(successors)-1
+		#print("End exploit 1-----------------------", i)
+		while i >= 0:
+			if (successors[i]).chromosome not in self.chromosomes and self.popSize < ClspThread.NbMaxPopulation:
+				self.chromosomes.append((successors[i]).chromosome)
+				self.popSize += 1
+			i -= 1
 
-		print("len first : ", len(self.chromosomes), ClspThread.NbMaxPopulation)
+		#print("End exploit-----------------------")
 
 	def initSearch(self, queue):
 
@@ -209,15 +222,16 @@ class ClspThread(Thread):
 				chromosome.init1(list(currentNode.solution), currentNode.fitnessValue)
 
 				self.locker.acquire()
-				if len(self.chromosomes) >= ClspThread.NbMaxPopulation:
+				if self.popSize >= ClspThread.NbMaxPopulation:
+					#(self.chromosomes[randint(0, self.popSize - 1)]).advmutate()
 					self.chromosomes.sort()
-					#print("yes1")
 					self.locker.release()
 					break
 
 				if chromosome not in self.chromosomes:
 					self.chromosomes.append(copy.deepcopy(chromosome))
-					#self.exploit(chromosome)
+					self.popSize += 1
+					self.exploit(chromosome)
 				self.locker.release()
 
 			#else:
@@ -266,7 +280,7 @@ class ClspThread(Thread):
 		#print("Nb : ", self.NbPopulation, self.chromosomes)
 		result = ""
 		i = 0
-		while i < len(self.chromosomes):
+		while i < self.popSize:
 
 			c = self.chromosomes[i]
 			result += str(c.solution) + " : " + str(c.fitnessValue) + ","
@@ -282,20 +296,18 @@ class ClspThread(Thread):
 			self.chromosomes.insert(0,copy.deepcopy(chromosome))
 
 			# After inserting a new good chromosome into the population, i remove a bad one
-			del self.chromosomes[len(self.chromosomes)-1]
+			del self.chromosomes[self.popSize-1]
 
 	def getFitnessData(self):
-
-		popSize = len(self.chromosomes)
 		
-		if popSize > 0 and self.listFitnessData == []:
+		if self.popSize > 0 and self.listFitnessData == []:
 
 			sumAllFitnessValues = 0
 			tmpSumFitness = 0 #variable used to quantify the lack of diversity in the population
-			max_fitness = (self.chromosomes[len(self.chromosomes)-1]).fitnessValue
+			max_fitness = (self.chromosomes[self.popSize-1]).fitnessValue
 			
 			i = 0
-			while i < popSize:
+			while i < self.popSize:
 				
 				chromosome = self.chromosomes[i]
 				temp = chromosome.fitnessValue
@@ -314,11 +326,11 @@ class ClspThread(Thread):
 			if tmpSumFitness == 0:
 				self.popLackingDiversity = True
 			
-			self.fitnessMean = math.floor(sumAllFitnessValues / popSize)
+			self.fitnessMean = math.floor(sumAllFitnessValues / self.popSize)
 
 			i = 0
 			percentage = 0
-			while i < popSize:
+			while i < self.popSize:
 				temp = self.listFitnessData[i]
 				del self.listFitnessData[i]
 				if sumAllFitnessValues == 0:
@@ -446,6 +458,7 @@ class ClspThread(Thread):
 			self.locker.acquire()
 
 			if len(self.chromosomes) >= len(self.prevChromosomes):
+				#(self.chromosomes[randint(0,len(self.chromosomes)-1)]).advmutate()
 				self.chromosomes.sort()
 				self.getFitnessData()
 				self.locker.release()	
@@ -469,9 +482,10 @@ class ClspThread(Thread):
 		limit = ClspThread.NbMaxPopulation
 
 		if self.prevChromosomes != []:
-			limit = len(self.prevChromosomes)
+			limit = self.popSize
 		
 		if popSize >= limit:
+			#(self.chromosomes[randint(0,len(self.chromosomes)-1)]).advmutate()
 			self.chromosomes.sort()
 			self.getFitnessData()
 			self.locker.release()
