@@ -80,17 +80,25 @@
 \headcommand {\slideentry {4}{1}{1}{30/30}{Donn\IeC {\'e}es et param\IeC {\`e}tres de test}{0}}
 \headcommand {\beamer@framepages {30}{30}}
 \headcommand {\beamer@subsectionentry {0}{4}{2}{31}{R\IeC {\'e}sultats exp\IeC {\'e}rimentaux des algorithmes g\IeC {\'e}n\IeC {\'e}tiques parall\IeC {\`e}les hi\IeC {\'e}rarchiques fine-grained et coarse-grained}}\headcommand {\beamer@subsectionpages {30}{30}}
-\headcommand {\beamer@subsectionentry {0}{4}{3}{31}{R\IeC {\'e}sultats exp\IeC {\'e}rimentaux des algorithmes g\IeC {\'e}n\IeC {\'e}tiques parall\IeC {\`e}les hi\IeC {\'e}rarchiques master-slave et coarse-grained}}\headcommand {\beamer@subsectionpages {31}{30}}
-\headcommand {\beamer@subsectionentry {0}{4}{4}{31}{Discussion}}\headcommand {\beamer@subsectionpages {31}{30}}
-\headcommand {\sectionentry {5}{Conclusion}{31}{Conclusion}{0}}
-\headcommand {\beamer@sectionpages {30}{30}}
-\headcommand {\beamer@subsectionpages {31}{30}}
-\headcommand {\slideentry {5}{0}{1}{31/31}{}{0}}
+\headcommand {\slideentry {4}{2}{1}{31/31}{R\IeC {\'e}sultats exp\IeC {\'e}rimentaux des algorithmes g\IeC {\'e}n\IeC {\'e}tiques parall\IeC {\`e}les hi\IeC {\'e}rarchiques fine-grained et coarse-grained}{0}}
 \headcommand {\beamer@framepages {31}{31}}
-\headcommand {\slideentry {5}{0}{2}{32/32}{}{0}}
+\headcommand {\slideentry {4}{2}{2}{32/32}{R\IeC {\'e}sultats exp\IeC {\'e}rimentaux des algorithmes g\IeC {\'e}n\IeC {\'e}tiques parall\IeC {\`e}les hi\IeC {\'e}rarchiques fine-grained et coarse-grained}{0}}
 \headcommand {\beamer@framepages {32}{32}}
-\headcommand {\beamer@partpages {1}{32}}
-\headcommand {\beamer@subsectionpages {31}{32}}
-\headcommand {\beamer@sectionpages {31}{32}}
-\headcommand {\beamer@documentpages {32}}
-\headcommand {\def \inserttotalframenumber {32}}
+\headcommand {\beamer@subsectionentry {0}{4}{3}{33}{R\IeC {\'e}sultats exp\IeC {\'e}rimentaux des algorithmes g\IeC {\'e}n\IeC {\'e}tiques parall\IeC {\`e}les hi\IeC {\'e}rarchiques master-slave et coarse-grained}}\headcommand {\beamer@subsectionpages {31}{32}}
+\headcommand {\slideentry {4}{3}{1}{33/33}{R\IeC {\'e}sultats exp\IeC {\'e}rimentaux des algorithmes g\IeC {\'e}n\IeC {\'e}tiques parall\IeC {\`e}les hi\IeC {\'e}rarchiques master-slave et coarse-grained}{0}}
+\headcommand {\beamer@framepages {33}{33}}
+\headcommand {\slideentry {4}{3}{2}{34/34}{R\IeC {\'e}sultats exp\IeC {\'e}rimentaux des algorithmes g\IeC {\'e}n\IeC {\'e}tiques parall\IeC {\`e}les hi\IeC {\'e}rarchiques master-slave et coarse-grained}{0}}
+\headcommand {\beamer@framepages {34}{34}}
+\headcommand {\beamer@subsectionentry {0}{4}{4}{35}{Discussion}}\headcommand {\beamer@subsectionpages {33}{34}}
+\headcommand {\sectionentry {5}{Conclusion}{35}{Conclusion}{0}}
+\headcommand {\beamer@sectionpages {30}{34}}
+\headcommand {\beamer@subsectionpages {35}{34}}
+\headcommand {\slideentry {5}{0}{1}{35/35}{}{0}}
+\headcommand {\beamer@framepages {35}{35}}
+\headcommand {\slideentry {5}{0}{2}{36/36}{}{0}}
+\headcommand {\beamer@framepages {36}{36}}
+\headcommand {\beamer@partpages {1}{36}}
+\headcommand {\beamer@subsectionpages {35}{36}}
+\headcommand {\beamer@sectionpages {35}{36}}
+\headcommand {\beamer@documentpages {36}}
+\headcommand {\def \inserttotalframenumber {36}}

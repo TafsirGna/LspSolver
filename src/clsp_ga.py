@@ -18,8 +18,8 @@ class GeneticAlgorithm:
 	FITNESS_PADDING = 1
 	NumberOfMigrants = 1
 	MigrationRate = 0 # this variable holds the number of generations needed before a migration occurs during the search
-	nbMainThreads = 2
-	nbSlavesThread = 2
+	nbMainThreads = 1
+	nbSlavesThread = 1
 	nbTrials = 3
 	pickeRandChromGens = 3
 
@@ -63,8 +63,10 @@ class GeneticAlgorithm:
 
 		queue = []
 		currentNode = Node()
+		currentNode.initialize()
 		children = currentNode.getChildren()
 
+		#print("children 0 :", children)
 		#print ("start!!")
 		i = 0
 		while len(children) <= 1:
@@ -85,13 +87,14 @@ class GeneticAlgorithm:
 		for i in range(0, nbChildren):
 			(self.listMainThreads[i%GeneticAlgorithm.nbMainThreads]).queue.append(copy.deepcopy(children[i]))
 
+		
 		# i set the flags
 		prevThread = self.listMainThreads[0]
 		if GeneticAlgorithm.nbMainThreads > 1:
 			for i in range(1, GeneticAlgorithm.nbMainThreads):
 				(self.listMainThreads[i]).readyFlag = prevThread.readyEvent
 				prevThread = self.listMainThreads[i]
-		
+
 		# first, i initialize the population upon which the search will be applied
 		for thread in self.listMainThreads:
 			thread.start()
@@ -100,6 +103,7 @@ class GeneticAlgorithm:
 		(self.listMainThreads[len(self.listMainThreads)-1]).readyEvent.wait()
 
 		print("Initialized!!!")
+		
 		
 		readyFlag = 0
 		flagId = -1
@@ -139,13 +143,13 @@ class GeneticAlgorithm:
 			if not ok:
 				break
 
-			#if it == 5:
+			#if it == 1:
 			#	break
+			#print("----------------------------------------  OK")
 
 			it += 1
 
-		self.printResults()
-		
+		self.printResults()		
 	
 	#--------------------
 	# function : printResults
@@ -158,6 +162,7 @@ class GeneticAlgorithm:
 		for thread in self.listMainThreads:
 			if not isinstance(thread.result, int):
 				chromosome = thread.result
+				#print()
 
 		for thread in self.listMainThreads:
 			if not isinstance(thread.result, int) and thread.result.fitnessValue < chromosome.fitnessValue:

@@ -54,13 +54,6 @@ class ClspThread(Thread):
 		if self.action == 1:
 
 			self.initSearch(self.queue)
-
-			#print('popSize : ', self.popSize)
-
-			#for i in range(1, self.popSize):
-			#	(self.chromosomes[i]).advmutate()
-
-			#self.chromosomes.sort()
 			
 			self.getFitnessData()
 			print (self.name, " ", "Initial Population : ", self.chromosomes)
@@ -89,8 +82,10 @@ class ClspThread(Thread):
 		if self.action == 2 and not self.finished:
 
 			# After the initial population has been created, i launch the search process
+			#print ('------------------------- : ', self.chromosomes, " / ", self.listFitnessData)
 			self.locker.acquire()
 			if self.immigrants != []:
+
 				for chromosome in self.immigrants:
 					self.replace(chromosome)
 				self.listFitnessData = []
@@ -117,15 +112,17 @@ class ClspThread(Thread):
 
 			#print (self.name, " ", "Prev Population : ", self.prevChromosomes, " + ", self.prevListFitnessData, )
 			#print (" ")
-
+			#print("WOOOOOO 1 ")
 			self.slaveThreadsManager.crossoverPop()
+			#print("WOOOOOO 2 ")
 
 			#print (self.name, " ", self.NbGenerations,  " ", "Population : ", self.chromosomes, " + ", self.listFitnessData)
 			#print (" ")
 
 			if self.popLackingDiversity:
 
-				#print("LACKING DIVERSITY - ", self.name)
+				#print ('-----------------', self.nbIdleGens)
+				print("LACKING DIVERSITY - ", self.name)
 				chromosome = copy.deepcopy(self.chromosomes[0])
 
 				chromosome.advmutate()
@@ -201,6 +198,7 @@ class ClspThread(Thread):
 		#print("End exploit 1-----------------------", i)
 		while i >= 0:
 			if (successors[i]).chromosome not in self.chromosomes and self.popSize < ClspThread.NbMaxPopulation:
+
 				self.chromosomes.append((successors[i]).chromosome)
 				self.popSize += 1
 			i -= 1
@@ -209,6 +207,7 @@ class ClspThread(Thread):
 
 	def initSearch(self, queue):
 
+		#print("ok")
 		currentNode = copy.deepcopy(queue[len(queue)-1])
 		del queue[len(queue)-1]
 
@@ -217,21 +216,29 @@ class ClspThread(Thread):
 
 			if currentNode.isLeaf():
 
-				# i create a chromosome from the solution, i've just found
-				chromosome = Chromosome()
-				chromosome.init1(list(currentNode.solution), currentNode.fitnessValue)
-
 				self.locker.acquire()
+
+				'''
+				c = Chromosome()
+				c.solution = currentNode.chromosome.solution
+				if c.get_itemsRanks() != currentNode.chromosome.itemsRank:
+					print("- OOOOOOOOOOOOOOOOOOOOOOOOOOOO")
+					print(c.get_itemsRanks(), " / ", currentNode.chromosome.itemsRank , c.solution)
+					break
+				'''
+				
+
 				if self.popSize >= ClspThread.NbMaxPopulation:
 					#(self.chromosomes[randint(0, self.popSize - 1)]).advmutate()
 					self.chromosomes.sort()
 					self.locker.release()
 					break
 
-				if chromosome not in self.chromosomes:
-					self.chromosomes.append(copy.deepcopy(chromosome))
+				if currentNode.chromosome not in self.chromosomes:
+					#currentNode.chromosome.checkItemRank()
+					self.chromosomes.append(copy.deepcopy(currentNode.chromosome))
 					self.popSize += 1
-					self.exploit(chromosome)
+					self.exploit(currentNode.chromosome)
 				self.locker.release()
 
 			#else:
@@ -250,8 +257,6 @@ class ClspThread(Thread):
 			currentNode = copy.deepcopy(queue[len(queue)-1])
 			del queue[len(queue)-1]
 
-	#def advMutate(chromosome):
-	#	pass
 
 	def sendMigrants(self):
 		
@@ -299,7 +304,7 @@ class ClspThread(Thread):
 			del self.chromosomes[self.popSize-1]
 
 	def getFitnessData(self):
-		
+
 		if self.popSize > 0 and self.listFitnessData == []:
 
 			sumAllFitnessValues = 0
@@ -318,11 +323,12 @@ class ClspThread(Thread):
 				value += ClspThread.FITNESS_PADDING
 				self.listFitnessData.append(value)
 				sumAllFitnessValues += value
+				#print(" value : ", value, tmpSumFitness)
 
 				i += 1
 			
 			#print(" Fitness Data 1 : ", self.listFitnessData)
-
+			#print(max_fitness, tmpSumFitness)
 			if tmpSumFitness == 0:
 				self.popLackingDiversity = True
 			
@@ -344,8 +350,6 @@ class ClspThread(Thread):
 			#print("listFitnessData : ", self.listFitnessData)
 			#print("log getfitnessData: ", self.threadId ," / " , self.chromosomes, " / ",self.listFitnessData , " / ", max_fitness)
 
-		#print(" Fitness Data 2 : ", self.listFitnessData)
-
 	#--------------------
 	# function : mate
 	# Class : SlaveThread
@@ -354,6 +358,10 @@ class ClspThread(Thread):
 
 	def mate(self, chromosome1, chromosome2):
 
+		#chromosome1.checkItemRank()
+		#chromosome2.checkItemRank()
+
+		#print("mate 1 : ", chromosome1, chromosome2)
 		solution3 = []
 		solution4 = []
 
@@ -395,12 +403,18 @@ class ClspThread(Thread):
 			#print(" 2 - solution3 : ", solution3, " ranks3 : ", ranks3, " solution4 : ", solution4, " ranks4 : ", ranks4)
 
 			chromosome3 = Chromosome()
-			chromosome3.init2(solution3, ranks3)
-			#chromosome3.advmutate()
+			chromosome3.solution = solution3
+			chromosome3.itemsRank = ranks3
+			#print("chromosome3 1 : ", chromosome3, ranks3)
+			chromosome3.getFeasible()
+			#print("chromosome3 2 : ", chromosome3)
 
 			chromosome4 = Chromosome()
-			chromosome4.init2(solution4, ranks4)
-			#chromosome4.advmutate()
+			chromosome4.solution = solution4
+			chromosome4.itemsRank = ranks4
+			#print("chromosome4 1 : ", chromosome4, ranks4)
+			chromosome4.getFeasible()
+			#print("chromosome4 2 : ", chromosome4)
 
 			#print(" 2 - solution3 : ", chromosome3.solution, " ranks3 : ", ranks3, " solution4 : ", chromosome4.solution, " ranks4 : ", ranks4)
 			
@@ -409,6 +423,7 @@ class ClspThread(Thread):
 			chromosome3 = copy.deepcopy(chromosome1)
 			chromosome4 = copy.deepcopy(chromosome2)
 
+		#print("mate 2 : ", chromosome1, chromosome2)
 		return chromosome3, chromosome4
 
 
@@ -449,6 +464,7 @@ class ClspThread(Thread):
 		self.insert(chromosome3)
 		self.insert(chromosome4)
 
+		#print("chromosomes : ", self.chromosomes)
 		#print ("pop : ", nextPopulation.chromosomes)
 
 	def crossPopulation(self):
@@ -480,9 +496,6 @@ class ClspThread(Thread):
 		popSize = len(self.chromosomes)
 
 		limit = ClspThread.NbMaxPopulation
-
-		if self.prevChromosomes != []:
-			limit = self.popSize
 		
 		if popSize >= limit:
 			#(self.chromosomes[randint(0,len(self.chromosomes)-1)]).advmutate()
@@ -491,14 +504,7 @@ class ClspThread(Thread):
 			self.locker.release()
 			return 
 
-		
-		if self.prevChromosomes != []:
-			chromosome.mutate()
-		else:
-			if chromosome in self.chromosomes:
-				self.locker.release()
-				return
-
+		#chromosome.checkItemRank()
 		self.chromosomes.append(copy.deepcopy(chromosome))
 
 		#print("Yes ", population.chromosomes)
