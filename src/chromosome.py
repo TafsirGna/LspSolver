@@ -18,7 +18,10 @@ class Chromosome(object):
 		self._fitnessValue = 0
 		#self.itemsRankFlag = False
 		self._hashSolution = ""
-		self.manufactItemsPeriods = getManufactPeriodsGrid(Chromosome.problem.nbItems, Chromosome.problem.deadlineDemandPeriods) #Chromosome.problem.manufactItemsPeriods 
+		self.manufactItemsPeriods = [] 
+
+		for i in range(0, Chromosome.problem.nbItems+1):
+			self.manufactItemsPeriods.append([])
 
 	# the following lines have to be removed, they've been added just for test
 	def init1(self, solution, fitnessValue = 0):
@@ -27,7 +30,7 @@ class Chromosome(object):
 		self._get_hashSolution()
 
 		self._fitnessValue = Node.evaluate(self._solution)
-		self.get_itemsRanks()
+		#self.get_itemsRanks()
 
 	def __lt__(self, chromosome):
 		return self._fitnessValue < chromosome.fitnessValue
@@ -55,7 +58,7 @@ class Chromosome(object):
 		self._fitnessValue = new_value
 
 	def __repr__(self):
-		return " {} : {} ".format(self._solution,self.fitnessValue)
+		return " {} : {} / {}".format(self._solution,self.fitnessValue, self.itemsRank)
 
 	def __eq__(self, chromosome):
 		return self._solution == chromosome.solution
@@ -100,38 +103,33 @@ class Chromosome(object):
 
 	def mutate2(self):
 
-		mutated = False
 
-		while mutated is False:
+		randomIndice = randint(0,(Chromosome.problem.nbTimes-1))
 
+		item1 = self._solution[randomIndice]
+
+		# i make sure that the randomIndice variable never corresponds to a zero indice
+		while item1 == 0:
 			randomIndice = randint(0,(Chromosome.problem.nbTimes-1))
-
+			# i get the item corresponding the gene to be flipped
 			item1 = self._solution[randomIndice]
 
-			# i make sure that the randomIndice variable never corresponds to a zero indice
-			while item1 == 0:
-				randomIndice = randint(0,(Chromosome.problem.nbTimes-1))
-				# i get the item corresponding the gene to be flipped
-				item1 = self._solution[randomIndice]
+		#print(" randomIndice : ", randomIndice)
+		itemsRank = self.itemsRank
+		item1DemandPeriod = Chromosome.problem.deadlineDemandPeriods[item1-1][itemsRank[randomIndice]-1]
 
-			#print(" randomIndice : ", randomIndice)
+		i = item1DemandPeriod
 
-			visitedItems = []
+		while i > 0:
 
-			i = randomIndice-1
-			itemsRank = self.itemsRank
-			while i >= 0:
-				if self._solution[i] != item1 and self._solution[i] != 0:
+			if self._solution[i] != item1:
 
-					item2 = self._solution[i]
-					#print(" item2 : ", item2)
+				if self._solution[i] != 0: 
 
-					if item2 not in visitedItems:
+					if Chromosome.problem.deadlineDemandPeriods[self._solution[i]-1][self.itemsRank[i]-1] >= randomIndice and item1DemandPeriod >= i:
 
-						visitedItems.append(item2)
-
+						item2 = self._solution[i]
 						item2DemandPeriod = Chromosome.problem.deadlineDemandPeriods[item2-1][itemsRank[i]-1]
-
 						if item2DemandPeriod >= randomIndice:
 
 							c = Chromosome()
@@ -139,40 +137,21 @@ class Chromosome(object):
 							c.itemsRank = switchGenes(self.itemsRank, randomIndice, i)
 							c.fitnessValue = AdvMutateNode.evalSwitchedChrom(self.solution, self.fitnessValue, self.itemsRank, randomIndice, i)
 							self.manufactItemsPeriods = list(self.manufactItemsPeriods)
-							mutated = True
+							#print("OKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK")
 							break
-				i-=1
 
-			# if the first approach doesn't work ,then i apply another one in order to leave the current chromosome actually mutated
+				else:
+					
+					c = Chromosome()
+					c.solution = switchGenes(self.solution, randomIndice, i)
+					c.itemsRank = switchGenes(self.itemsRank, randomIndice, i)
+					c.fitnessValue = AdvMutateNode.evalSwitchedChrom(self.solution, self.fitnessValue, self.itemsRank, randomIndice, i)
+					self.manufactItemsPeriods = list(self.manufactItemsPeriods)
+					#print("OKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK1")
+					break
 
-			if mutated is False:
 
-				visitedItems = []
-
-				i = randomIndice + 1
-				while i < Chromosome.problem.nbTimes:
-
-					if self._solution[i] != item1 and self._solution[i] != 0:
-
-						item2 = self._solution[i]
-
-						if item2 not in visitedItems:
-
-							item1DemandPeriod = Chromosome.problem.deadlineDemandPeriods[item1-1][itemsRank[randomIndice]-1]
-
-							if item1DemandPeriod >= i:
-								#print(i, randomIndice)
-								solution = switchGenes(self._solution, randomIndice, i)
-								#ir = switchGenes(self._itemsRank, randomIndice, i)
-								c = Chromosome()
-								c.solution = switchGenes(self.solution, randomIndice, i)
-								c.itemsRank = switchGenes(self.itemsRank, randomIndice, i)
-								c.fitnessValue = AdvMutateNode.evalSwitchedChrom(self.solution, self.fitnessValue, self.itemsRank, randomIndice, i)
-								self.manufactItemsPeriods = list(c.manufactItemsPeriods)
-								mutated = True
-								break					
-
-					i += 1
+			i-=1
 		
 
 	#--------------------
@@ -210,8 +189,6 @@ class Chromosome(object):
 				rec.append(Chromosome.problem.deadlineDemandPeriods[self._solution[i]-1][self.itemsRank[i]-1])
 				rec.append(self.itemsRank[i])
 				rec.append(i)
-				#print (i, " : ", self._solution, self.)
-				#rec.append(Chromosome.getCostof(i, self._solution[i], self._itemsRank[i], self._solution))
 				costTab.append(rec)
 
 		#costTab = sorted(costTab, key = getCostTabKey)
@@ -285,6 +262,7 @@ class Chromosome(object):
 		zeroperiods = []
 		copy_solution = list(self._solution)
 		copy_itemRank = list(self.itemsRank)
+		self.manufactItemsPeriods = getManufactPeriodsGrid(Chromosome.problem.nbItems, Chromosome.problem.deadlineDemandPeriods)
 
 		i = 0
 		while i < Chromosome.problem.nbTimes:
@@ -390,13 +368,6 @@ class Chromosome(object):
 				j-=1
 			i+=1
 
-		'''
-		c = Chromosome()
-		c.init1(self.solution)
-		if not self.isFeasible() or self.fitnessValue != c.fitnessValue:
-			print ("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", self.fitnessValue, c.fitnessValue)
-		'''
-
 	def getEnvItemCost(cls, indice, item, rank, solution, secondIndice = -1):
 
 		solution = list(solution) # TODO
@@ -484,6 +455,9 @@ class Node(object):
 		self.tab = []
 		self.branches = []
 
+		#for i in range(0, len(Chromosome.problem.deadlineDemandPeriods)-1):
+		#	self.itemsCountTab.append(len(Chromosome.problem.deadlineDemandPeriods[i]))
+
 	def initialize(self):
 		
 		self.chromosome = Chromosome()
@@ -493,7 +467,6 @@ class Node(object):
 		self.tab.append(copy.deepcopy(Chromosome.problem.zerosRow))
 
 		self.branches = []
-
 
 
 	def __repr__(self):
@@ -527,6 +500,8 @@ class Node(object):
 				child.chromosome.solution.insert(0, branch_row[0][0])
 				child.chromosome.itemsRank = copy.deepcopy(self.chromosome.itemsRank)
 				child.chromosome.itemsRank.insert(0, len(self.tab[branch_row[0][0]-1]))
+				child.chromosome.manufactItemsPeriods = copy.deepcopy(self.chromosome.manufactItemsPeriods)
+				(child.chromosome.manufactItemsPeriods[branch_row[0][0]-1]).insert(0, self.currentPeriod)
 				child.chromosome.fitnessValue = Node.getFitnessValue(self.chromosome.solution, self.chromosome.fitnessValue, branch_row[0][0]-1, len(self.tab[branch_row[0][0]-1]), self.currentPeriod)
 
 				child.currentPeriod = self.currentPeriod - 1
@@ -545,6 +520,8 @@ class Node(object):
 				child.chromosome.solution.insert(0, 0)
 				child.chromosome.itemsRank = copy.deepcopy(self.chromosome.itemsRank)
 				child.chromosome.itemsRank.insert(0, 0)
+				child.chromosome.manufactItemsPeriods = copy.deepcopy(self.chromosome.manufactItemsPeriods)
+				(child.chromosome.manufactItemsPeriods[Chromosome.problem.nbItems]).insert(0, self.currentPeriod)
 				child.chromosome.fitnessValue = self.chromosome.fitnessValue
 
 				child.currentPeriod = self.currentPeriod - 1
@@ -567,6 +544,8 @@ class Node(object):
 				child.chromosome.solution.insert(0, 0)
 				child.chromosome.itemsRank = copy.deepcopy(self.chromosome.itemsRank)
 				child.chromosome.itemsRank.insert(0, 0)
+				child.chromosome.manufactItemsPeriods = copy.deepcopy(self.chromosome.manufactItemsPeriods)
+				(child.chromosome.manufactItemsPeriods[Chromosome.problem.nbItems]).insert(0, self.currentPeriod)
 				child.chromosome.fitnessValue = self.chromosome.fitnessValue
 
 				(child.branches[0]).remove([0,0])
@@ -587,6 +566,8 @@ class Node(object):
 				child.chromosome.solution.insert(0, branch_row[1][0])
 				child.chromosome.itemsRank = copy.deepcopy(self.chromosome.itemsRank)
 				child.chromosome.itemsRank.insert(0, len(self.tab[branch_row[1][0]-1]))
+				child.chromosome.manufactItemsPeriods = copy.deepcopy(self.chromosome.manufactItemsPeriods)
+				(child.chromosome.manufactItemsPeriods[branch_row[1][0]-1]).insert(0, self.currentPeriod)
 				child.chromosome.fitnessValue = Node.getFitnessValue(self.chromosome.solution, self.chromosome.fitnessValue, branch_row[1][0]-1, len(self.tab[branch_row[1][0]-1]), self.currentPeriod)
 
 				for element in child.branches[0]:
@@ -610,6 +591,8 @@ class Node(object):
 			child.chromosome.solution.insert(0, branch_row[0][0])
 			child.chromosome.itemsRank = copy.deepcopy(self.chromosome.itemsRank)
 			child.chromosome.itemsRank.insert(0, len(self.tab[branch_row[0][0]-1]))
+			child.chromosome.manufactItemsPeriods = copy.deepcopy(self.chromosome.manufactItemsPeriods)
+			(child.chromosome.manufactItemsPeriods[branch_row[0][0]-1]).insert(0, self.currentPeriod)
 			child.chromosome.fitnessValue = Node.getFitnessValue(self.chromosome.solution, self.chromosome.fitnessValue, branch_row[0][0]-1, len(self.tab[branch_row[0][0]-1]), self.currentPeriod)
 
 			for element in child.branches[0]:
@@ -654,6 +637,7 @@ class Node(object):
 			tab = copy.deepcopy(self.tab)
 			branches = copy.deepcopy(self.branches)
 			itemsRank = copy.deepcopy(self.chromosome.itemsRank)
+			manufactItemsPeriods = copy.deepcopy(self.chromosome.manufactItemsPeriods)
 			fitnessValue = self.chromosome.fitnessValue
 
 			counterTab = [0] * (Chromosome.problem.nbItems + 1)
@@ -677,10 +661,14 @@ class Node(object):
 								break
 							i += 1
 
+					del manufactItemsPeriods[item-1][0]
+
 				else:
 					counterTab[Chromosome.problem.nbItems] += 1
 					(tab[Chromosome.problem.nbItems]).append(0)
 					(tab[Chromosome.problem.nbItems]).sort()
+
+					del manufactItemsPeriods[Chromosome.problem.nbItems][0]
 
 				del solution[0]
 				del branches[0]
@@ -710,9 +698,14 @@ class Node(object):
 							fitnessValue -= int(Chromosome.problem.chanOverGrid[item-1][solution[i]-1])
 							break
 						i += 1
+
+				del manufactItemsPeriods[item-1][0]
+
 			else:
 				counterTab[Chromosome.problem.nbItems] += 1
 				(tab[Chromosome.problem.nbItems]).append(0)
+
+				del manufactItemsPeriods[Chromosome.problem.nbItems][0]
 
 			del solution[0]
 			del itemsRank[0]
@@ -728,13 +721,16 @@ class Node(object):
 			solution.insert(0, branches[0][0][0])
 			child.chromosome.solution = solution
 			child.chromosome.itemsRank = itemsRank
+			child.chromosome.manufactItemsPeriods = manufactItemsPeriods
 
 			if branches[0][0][0] == 0:
 				child.chromosome.itemsRank.insert(0, 0)
+				(child.chromosome.manufactItemsPeriods[Chromosome.problem.nbItems]).insert(0, currentPeriod)
 				del child.tab[len(child.tab)-1][len(child.tab[len(child.tab)-1])-1]
 				del child.branches[0][0]
 			else:
 				child.chromosome.itemsRank.insert(0, len(tab[branches[0][0][0]-1]))
+				(child.chromosome.manufactItemsPeriods[branches[0][0][0]-1]).insert(0, currentPeriod)
 				del child.tab[child.branches[0][0][0]-1][len(self.tab[child.branches[0][0][0]-1])-1]
 				del child.branches[0][0]
 
@@ -774,7 +770,10 @@ class Node(object):
 				childNode.chromosome.solution.insert(0, i + 1)
 				childNode.chromosome.itemsRank = copy.deepcopy(self.chromosome.itemsRank)
 				childNode.chromosome.itemsRank.insert(0, len(self.tab[i]))
+				childNode.chromosome.manufactItemsPeriods = copy.deepcopy(self.chromosome.manufactItemsPeriods)
+				(childNode.chromosome.manufactItemsPeriods[i]).insert(0, self.currentPeriod)
 				childNode.chromosome.fitnessValue = Node.getFitnessValue(self.chromosome.solution, self.chromosome.fitnessValue, i, len(self.tab[i]), self.currentPeriod)
+
 
 				childNode.currentPeriod = self._currentPeriod - 1
 				del childNode.tab[i][len(self.tab[i])-1]
@@ -793,6 +792,8 @@ class Node(object):
 			childNode.chromosome.solution.insert(0, 0)
 			childNode.chromosome.itemsRank = copy.deepcopy(self.chromosome.itemsRank)
 			childNode.chromosome.itemsRank.insert(0, 0)
+			childNode.chromosome.manufactItemsPeriods = copy.deepcopy(self.chromosome.manufactItemsPeriods)
+			(childNode.chromosome.manufactItemsPeriods[Chromosome.problem.nbItems]).insert(0, self.currentPeriod)
 			childNode.chromosome.fitnessValue = self.chromosome.fitnessValue
 
 			childNode.currentPeriod = self._currentPeriod - 1
@@ -850,6 +851,7 @@ class Node(object):
 
 		return fitnessValue
 	evaluate = classmethod(evaluate)
+
 	'''
 	def evaluate_bis(cls, sol):
 			
@@ -909,10 +911,6 @@ class AdvMutateNode(object):
 
 		self.chromosome = copy.deepcopy(chromosome)
 		#self.path = []
-		#self.tab = chromosome.getProductionPeriodsByItem()
-		#self.currentItem = Chromosome.problem.nbItems 
-		#self.pointer = [0,0,0] #[self.currentItem, len(self.tab[self.currentItem-1])-1, self.tab[self.currentItem-1][len(self.tab[self.currentItem-1])-1][1]]
-		#print(self.pointer)
 
 	def isLeaf(self):
 		if self.currentItem == 0:
@@ -930,16 +928,45 @@ class AdvMutateNode(object):
 
 				j = deadlineItem
 				while j > i:
-					c = Chromosome()
-					c.solution = switchGenes(self.chromosome.solution, i, j)
-					c.itemsRank = switchGenes(self.chromosome.itemsRank, i, j)
-					c.fitnessValue = AdvMutateNode.evalSwitchedChrom(self.chromosome.solution, self.chromosome.fitnessValue, self.chromosome.itemsRank, i, j)
 
-					if c.fitnessValue < self.chromosome.fitnessValue:
+					if self.chromosome.solution[j] != self.chromosome.solution[i]:
 
-						#c.checkItemRank()
+						c = Chromosome()
+						c.solution = switchGenes(self.chromosome.solution, i, j)
+						c.itemsRank = switchGenes(self.chromosome.itemsRank, i, j)
 
-						return AdvMutateNode(c)
+						'''
+						# TODO : To revamp
+						c.manufactItemsPeriods = copy.deepcopy(self.chromosome.manufactItemsPeriods)
+						c.itemsRank = copy.deepcopy(self.chromosome.itemsRank)
+						
+						del c.manufactItemsPeriods[self.chromosome.solution[i]-1][self.chromosome.itemsRank[i]-1]
+						(c.manufactItemsPeriods[self.chromosome.solution[i]-1]).append(j)
+						(c.manufactItemsPeriods[self.chromosome.solution[i]-1]).sort()
+
+						del c.manufactItemsPeriods[self.chromosome.solution[j]-1][self.chromosome.itemsRank[j]-1]
+						(c.manufactItemsPeriods[self.chromosome.solution[j]-1]).append(i)
+						(c.manufactItemsPeriods[self.chromosome.solution[j]-1]).sort()
+
+						indice = 1
+						for period in c.manufactItemsPeriods[self.chromosome.solution[i]-1]:
+							c.itemsRank[period] = indice
+							indice += 1
+
+						if self.chromosome.solution[j] != 0:
+
+							indice = 1
+							for period in c.manufactItemsPeriods[self.chromosome.solution[j]-1]:
+								c.itemsRank[period] = indice
+								indice += 1
+
+						else:
+							c.itemsRank[i] = 0
+						'''
+
+						c.fitnessValue = AdvMutateNode.evalSwitchedChrom(self.chromosome.solution, self.chromosome.fitnessValue, self.chromosome.itemsRank, i, j)
+						if c.fitnessValue < self.chromosome.fitnessValue:
+							return AdvMutateNode(c)
 
 					j -= 1
 

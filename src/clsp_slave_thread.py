@@ -39,11 +39,8 @@ class SlaveThreadsManager:
 		
 		(self.listSlaveThreads[self.currentSlaveThreadId]).action = 0
 		(self.listSlaveThreads[self.currentSlaveThreadId]).queue = queue
-		#print("currentSlaveThreadId ", self.currentSlaveThreadId, self.mainThread.threadId)
 		(self.listSlaveThreads[self.currentSlaveThreadId]).start()
 		self.currentSlaveThreadId += 1
-		
-		#print("Nb Slaves : ", SlaveThreadsManager.nbSlavesThread)
 
 	def crossoverPop(self):
 		for thread in self.listSlaveThreads:

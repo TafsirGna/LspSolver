@@ -18,8 +18,8 @@ class GeneticAlgorithm:
 	FITNESS_PADDING = 1
 	NumberOfMigrants = 1
 	MigrationRate = 0 # this variable holds the number of generations needed before a migration occurs during the search
-	nbMainThreads = 1
-	nbSlavesThread = 1
+	nbMainThreads = 2
+	nbSlavesThread = 2
 	nbTrials = 3
 	pickeRandChromGens = 3
 
@@ -103,7 +103,7 @@ class GeneticAlgorithm:
 		(self.listMainThreads[len(self.listMainThreads)-1]).readyEvent.wait()
 
 		print("Initialized!!!")
-		
+
 		
 		readyFlag = 0
 		flagId = -1
@@ -148,8 +148,8 @@ class GeneticAlgorithm:
 			#print("----------------------------------------  OK")
 
 			it += 1
-
-		self.printResults()		
+		self.printResults()	
+		
 	
 	#--------------------
 	# function : printResults

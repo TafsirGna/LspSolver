@@ -34,18 +34,12 @@ startTime = time.clock()
 
 '''
 c = Chromosome()
-c.solution = [5, 5, 5, 1, 2, 2, 4, 1, 3, 2, 1, 3, 2, 2, 1, 3, 3, 4, 4, 2]
-c.itemsRank = [1, 2, 3, 2, 1, 2, 1, 1, 1, 3, 4, 2, 5, 4, 3, 3, 4, 6, 2, 6]
-c.getFeasible()
-
-print("Ok! c is : ", c)
-
-c = Chromosome()
-c.init1([5, 5, 5, 1, 2, 2, 4, 1, 3, 2, 1, 3, 2, 2, 1, 3, 3, 4, 4, 2])
-
-print("Ok! c is : ", c)
+c.solution = [3, 3, 3, 3, 4, 5, 2, 4, 1, 1, 1, 1, 4, 3, 2, 2, 5, 5, 5, 4]
+c.isFeasible()
+if not c.isFeasible():
+	print('ok')
+print(c #Node.evaluate(c.solution))
 '''
-
 genAlgo.start()
 
 # i store the time when the solving ended

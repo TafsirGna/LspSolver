@@ -54,8 +54,20 @@ class ClspThread(Thread):
 		if self.action == 1:
 
 			self.initSearch(self.queue)
+
+			for i in range(1, self.popSize):
+				#if not (self.chromosomes[i]).isFeasible():
+				#	print("in init 1 : ", (self.chromosomes[i]))
+				(self.chromosomes[i]).mutate2()
+				#if not (self.chromosomes[i]).isFeasible():
+				#	print("in init 2 : ", (self.chromosomes[i]))
+
+			(self.chromosomes[randint(1, self.popSize-1)]).advmutate()
 			
+			self.chromosomes.sort()
+			self.listFitnessData = []
 			self.getFitnessData()
+
 			print (self.name, " ", "Initial Population : ", self.chromosomes)
 			print (self.name, " ", "Population Data: ", self.listFitnessData)
 			self.initialChromosomes = copy.deepcopy(self.chromosomes)
@@ -90,13 +102,6 @@ class ClspThread(Thread):
 					self.replace(chromosome)
 				self.listFitnessData = []
 
-				'''
-				c1, c2 = self.mate(self.immigrants[0], self.chromosomes[0])
-				c1.advmutate()
-				c2.advmutate()
-				self.replace(c1)
-				self.replace(c2)
-				'''
 				#(self.chromosomes[randint(0, self.popSize - 1)]).advmutate()
 
 				self.chromosomes.sort()
@@ -121,18 +126,19 @@ class ClspThread(Thread):
 
 			if self.popLackingDiversity:
 
-				#print ('-----------------', self.nbIdleGens)
 				print("LACKING DIVERSITY - ", self.name)
 				chromosome = copy.deepcopy(self.chromosomes[0])
 
 				chromosome.advmutate()
 
-				#if not chromosome.isFeasible():
-				#	print("OOOOOOOOOOOOOOOOOOOOOOOOOOOO")
-
 				self.chromosomes = copy.deepcopy(self.initialChromosomes)
 				self.replace(chromosome)
-				#(self.chromosomes[randint(0,len(self.chromosomes)-1)]).advmutate()
+
+				for i in range(1, self.popSize):
+					(self.chromosomes[i]).mutate2()
+
+				(self.chromosomes[randint(1, self.popSize-1)]).advmutate()
+				self.chromosomes.sort()
 
 				self.listFitnessData = []
 				self.getFitnessData()
@@ -200,6 +206,8 @@ class ClspThread(Thread):
 			if (successors[i]).chromosome not in self.chromosomes and self.popSize < ClspThread.NbMaxPopulation:
 
 				self.chromosomes.append((successors[i]).chromosome)
+				if (successors[i]).chromosome.fitnessValue != Node.evaluate((successors[i]).chromosome.solution):
+					print("COOOOOOOOOOOOOOOOOOOOL")
 				self.popSize += 1
 			i -= 1
 
@@ -217,28 +225,21 @@ class ClspThread(Thread):
 			if currentNode.isLeaf():
 
 				self.locker.acquire()
-
-				'''
-				c = Chromosome()
-				c.solution = currentNode.chromosome.solution
-				if c.get_itemsRanks() != currentNode.chromosome.itemsRank:
-					print("- OOOOOOOOOOOOOOOOOOOOOOOOOOOO")
-					print(c.get_itemsRanks(), " / ", currentNode.chromosome.itemsRank , c.solution)
-					break
-				'''
 				
 
 				if self.popSize >= ClspThread.NbMaxPopulation:
-					#(self.chromosomes[randint(0, self.popSize - 1)]).advmutate()
-					self.chromosomes.sort()
 					self.locker.release()
 					break
 
 				if currentNode.chromosome not in self.chromosomes:
 					#currentNode.chromosome.checkItemRank()
+
+					if currentNode.chromosome.fitnessValue != Node.evaluate(currentNode.chromosome.solution):
+						print("COOOOOOOOOOOOOOOOOOOOL")
+
 					self.chromosomes.append(copy.deepcopy(currentNode.chromosome))
 					self.popSize += 1
-					self.exploit(currentNode.chromosome)
+					#self.exploit(currentNode.chromosome)
 				self.locker.release()
 
 			#else:
@@ -250,7 +251,7 @@ class ClspThread(Thread):
 			#print("Queue : ", queue)
 		
 			if queue == []:
-				self.chromosomes.sort()
+				#self.chromosomes.sort()
 				#print("yes2")
 				break
 
@@ -406,14 +407,20 @@ class ClspThread(Thread):
 			chromosome3.solution = solution3
 			chromosome3.itemsRank = ranks3
 			#print("chromosome3 1 : ", chromosome3, ranks3)
+			#co = copy.deepcopy(chromosome3)
 			chromosome3.getFeasible()
+			#if not chromosome3.isFeasible():
+			#	print("not feasible : ", co, chromosome3)
 			#print("chromosome3 2 : ", chromosome3)
 
 			chromosome4 = Chromosome()
 			chromosome4.solution = solution4
 			chromosome4.itemsRank = ranks4
 			#print("chromosome4 1 : ", chromosome4, ranks4)
+			#co = copy.deepcopy(chromosome4)
 			chromosome4.getFeasible()
+			#if not chromosome3.isFeasible():
+			#	print("not feasible : ", co, chromosome4)
 			#print("chromosome4 2 : ", chromosome4)
 
 			#print(" 2 - solution3 : ", chromosome3.solution, " ranks3 : ", ranks3, " solution4 : ", chromosome4.solution, " ranks4 : ", ranks4)

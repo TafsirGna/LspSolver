@@ -35,172 +35,71 @@
  % Page de sommaire
  \begin{frame}
  \frametitle{Sommaire}
+ \setcounter{tocdepth}{1}
  \tableofcontents
  \end{frame}
- 
- % Introduction
- \section*{Introduction}
+
+ \section{Introduction}
  \begin{frame}
  \frametitle{Introduction}
- 	\begin{center}
- 		\LARGE{\texttt{Introduction}}
- 	\end{center}
- \end{frame}
+ \framesubtitle{Le dimensionnement de lots}
+ 	\begin{figure}
+   \begin{minipage}[c]{.46\linewidth}
+      \includegraphics[scale=.7]{img/image_intro1.png}
+   \end{minipage} \hfill
+   \begin{minipage}[c]{.46\linewidth}
+      \includegraphics[scale=.6]{img/image_intro2.png}
+   \end{minipage}
+\end{figure}
+ \end{frame} 
+ 
+ \begin{frame}
+ \frametitle{Introduction}
+ \framesubtitle{Les algorithmes génétiques}
+ 	\begin{figure}
+   \begin{minipage}[c]{.46\linewidth}
+      \includegraphics[scale=.7]{img/image_gene1.png}
+   \end{minipage} \hfill
+   \begin{minipage}[c]{.46\linewidth}
+      \includegraphics[scale=.7]{img/image_gene2.png}
+   \end{minipage}
+\end{figure}
+ \end{frame} 
  
  % Etat de l'art
- \section{Etat de l'art}
- \subsection{Le dimensionnement de lots en planification de production}
- \begin{frame}
- \frametitle{Le dimensionnement de lots en planification de production}
- \framesubtitle{Critères de classification}
- 	%Différents critères [] interviennent dans la classification des problèmes de dimensionnement de lots, notamment :
-	\begin{itemize}
-		\item L’échelle de temps;
-		\item Le nombre de niveaux;
-		\item Le nombre de produit;
-		\item Les contraintes de capacité;
-		\item Les demandes;
-		\item Les coûts et temps de lancement ou préparation (setup).
-	\end{itemize}
- \end{frame}
- 
- \begin{frame}
- \frametitle{Le dimensionnement de lots en planification de production}
- \framesubtitle{Classes de problèmes de dimensionnement de lots I}
- 	%Suivant l’échelle en temps, nous distinguons les classes de problèmes de dimensionnement de lots comme suit:
-	\begin{itemize}
-		\item Problèmes de petite taille ou à courtes périodes;
-		\item Problèmes de grande taille ou à longues périodes;
-		\item Problèmes de très grande taille ou à très longues périodes.
-	\end{itemize}
- \end{frame}
- 
- \begin{frame}
- \frametitle{Le dimensionnement de lots en planification de production}
- \framesubtitle{Classes de problèmes de dimensionnement de lots II}
- 	%Nous nous sommes intéressés au cours de notre travail aux problèmes de petite taille ou à courtes périodes au sein desquels nous pouvons distinguer:
-	\begin{itemize}
-		\item Discrete lot-sizing and scheduling problem (DLSP);
-		\item Continuous setup lot-sizing problem (CSLP);
-		\item Proportional lot-sizing and scheduling problem (PLSP);
-		\item General lot-sizing and scheduling problem (GLSP).
-	\end{itemize}
-	%Le "Pigment Sequencing Problem" fait partie de la famille DLSP.
- \end{frame}
- 
- \begin{frame}
- \frametitle{Le dimensionnement de lots en planification de production}
- \framesubtitle{Classes de problèmes de dimensionnement de lots III}
- \begin{center}
-		\begin{figure}[!h]
-			\includegraphics[scale=.3]{img/classification_dimensionnement.png}
-			\caption{Exemple de classification des modèles de dimensionnement de lots []}
-			\label{fig:classification_dimensionnement_lots}
-		\end{figure}
-	\end{center}
- \end{frame}
- 
+ \section{Etat de l'art et formulation du problème}
+    
  \subsection{Le "Pigment Sequencing Problem" (PSP)}
+ 
  \begin{frame}
+ 	\begin{minipage}[c]{.46\linewidth}
+      \Large{\emph{\textbf{Pigment Sequencing Problem (PSP) }}}
+   \end{minipage} \hfill
+   \begin{minipage}[c]{.46\linewidth}
+		\includegraphics[scale=.6]{img/reflexion.png}
+   \end{minipage}
+\end{frame}  
+ 
+ \begin{frame}
+ \transsplitverticalin
  \frametitle{Le "Pigment Sequencing Problem" (PSP)}
  \framesubtitle{Description}
  
  	Objectif:
     \begin{itemize}
-    	\item trouver un plan de production de plusieurs articles à partir d’une
-machine avec des coûts de transition;
-    	\item respectant la capacité de production de la machine ;
-    	\item minimisant les coûts de stockage et de transition.
+    	\item<2-> trouver un plan de production de plusieurs articles à partir d’une
+machine dont la capacité de production est limité à un article par période;
+		\vspace*{.5cm}
+    	\item<3-> minimisant les coûts de stockage et de transition;
+    	\vspace*{.5cm}
+    	\item<4-> les demandes sont normalisées et donc binaires.
     \end{itemize}
- \end{frame}
+ \end{frame} 
  
  \begin{frame}
+ \transboxout
  \frametitle{Le "Pigment Sequencing Problem" (PSP)}
- \framesubtitle{Modèles et formulations}
- 
-    \begin{itemize}
-    	\item Modèles basés sur la programmation en nombres mixtes[] (MIP1, MIP2, MIP3);
-    	\item Modèle basé sur la Programmation par contraintes[];
-    	\item Modèle basé sur le recuit simulé[].
-    \end{itemize}
- 
- \end{frame}
- 
- \subsection{Les algorithmes génétiques}
- \begin{frame}
- \frametitle{Les algorithmes génétiques}
- \framesubtitle{Algorithme génétique standard}
- 
- 	\begin{algorithm}[H]
- 	\caption{Algorithme génétique standard \cite{Goncalves}}
- 	\label{algo:algo_genetique_standard}
- 	%\KwData{this text}
- 	%\KwResult{how to write algorithm with \LaTeX2e }
- 	%initialization\;
- 	Générer la population initiale $P_{i}$ \\
- 	Évaluer la population $P_{i}$ \\
- 	\While{le critère de terminaison n'est pas satisfait}{
- 	 Sélectionner les éléments de $P_{i}$ à copier dans $P_{i+1}$ \\
- 	 Appliquer le croisement aux éléments de $P_{i}$ et les mettre dans $P_{i+1}$ \\
- 	 Appliquer la mutation aux éléments de $P_{i}$ et les mettre dans $P_{i+1}$ \\
- 	 Évaluer la nouvelle population $P_{i+1}$ \\
- 	 $P_{i}$ = $P_{i+1}$
- 	}
-	\end{algorithm}
- \end{frame}
- 
- 
- \begin{frame}
- \frametitle{Les algorithmes génétiques}
- \framesubtitle{Opérations génétiques}
- 
- 	\begin{itemize}
- 		\item la sélection;
- 		\item le croisement;
- 		\item la mutation.
- 	\end{itemize}
- \end{frame}
- 
- \begin{frame}
- \frametitle{Les algorithmes génétiques}
- \framesubtitle{Les algorithmes génétiques parallèles}
- 
- 	\begin{itemize}
- 		\item Les algorithmes génétiques parallèles de type master-slave;
- 		\item Les algorithmes génétiques parallèles coarse-grained;
- 		\item Les algorithmes génétiques parallèles fine-grained.
- 	\end{itemize}
- \end{frame}
- 
- \begin{frame}
- \frametitle{Les algorithmes génétiques}
- \framesubtitle{Hiérarchisation entre les algorithmes génétiques parallèles}
- 
- 	\begin{itemize}
- 		\item Les algorithmes génétiques parallèles et hiérarchiques entre coarse-grained et master-slave;
- 		\item Les algorithmes génétiques parallèles et hiérarchiques entre coarse-grained et fine-grained.
- 	\end{itemize}
- \end{frame}
- 
- % Matériel et Méthodes
- \section{Matériel et Méthodes}
- \subsection{Outils de test}
- \begin{frame}
- \frametitle{Outils de test}
- %\framesubtitle{}
- 
- 	\begin{itemize}
- 		\item Système d'exploitation: Linux Ubuntu 16.04 LTS; 
-		\item Processeur: Intel®  Core \up{\textsc{TM}} i7 CPU L 640 @ 2.13GHz x 4; 
-		\item Mémoire: 3,7 Gio;
-		\item Type du système d'exploitation: 64 bits.
- 	\end{itemize}
- \end{frame}
- 
- \subsection{Modèle et formulation utilisés}
- \begin{frame}[allowframebreaks]
- \frametitle{Modèle et formulation utilisés}
- \framesubtitle{MIP1}
+ \framesubtitle{Modèle mathématique du PSP}
  	\begin{eqnarray}
 		min \sum_{i,j,t} q^{i,j}\chi_{t}^{i,j} + \sum_{i,t} h^{i} s_{t}^{i} \\
 		s_{0}^{i} = 0, \forall i \\
@@ -210,17 +109,115 @@ machine avec des coûts de transition;
 		\chi_{t}^{i,j} = y_{t-1}^{i} + y_{t}^{j} - 1, \forall i,j,t \\
 		x,y,\chi \in \{0,1\}, s \in \mathbb{N}, i \in \{0..NI\}, t \in \{1..NT\}
 	\end{eqnarray}
-		
-		avec les variables de décisions suivantes: \\
-		\begin{itemize}
-			\item[-] $x_{t}^{i}$ : variable binaire de production qui vaut 1 si l’article $i$ est produit à la période $t$ et 0 sinon ;
-			\item[-] $y_{t}^{i}$ : variable binaire de setup qui vaut 1 si la machine est préparée pour la production de l’article $i$ et 0 sinon ;
-			\item[-] $s_{t}^{i}$ : variable entière de stockage qui contient le nombre d’articles $i$ stockés à la période $t$ ; 
-			\item[-] $\chi_{t}^{i,j}$ : variable binaire de transition qui vaut 1 si à la période $t$, on est passé de la production de l’article $i$ à l’article $j$ et 0 sinon.
-		\end{itemize}
+ \end{frame} 
+ 
+ \begin{frame}
+ \transreplace
+ \frametitle{Le "Pigment Sequencing Problem" (PSP)}
+ \framesubtitle{Etat de l'art} 
+ 
+ 	Travaux:
+    \begin{itemize}
+    	\item Pochet et Wolsey et formulations MIP du DLSP;
+    	\item<2->Houndji et al et programmation par contraintes;
+    	\item<3->Ceschia et al. et le recuit simulé;
+    	\item<4-> ...
+    	\item<5-> ...
+    	\item<6-> \LARGE{\textcolor{red}{Tafsir Gna et Algorithmes génétiques.}}
+    \end{itemize}
+ \end{frame} 
+ 
+ \begin{frame}
+ 	\begin{minipage}[c]{.46\linewidth}
+      \Large{\emph{\textbf{Les algorithmes génétiques (AGs)}}}
+   \end{minipage} \hfill
+   \begin{minipage}[c]{.46\linewidth}
+		\includegraphics[scale=.6]{img/reflexion.png}
+   \end{minipage}
+\end{frame}  
+
+
+\begin{frame}
+\frametitle{Les algorithmes génétiques}
+\begin{figure}
+   \begin{minipage}[c]{.46\linewidth}
+      \includegraphics[scale=.5]{img/algo_gene1.png}
+   \end{minipage} \hfill
+   \begin{minipage}[c]{.46\linewidth}
+      \includegraphics[scale=.5]{img/algo_gene2.png}
+   \end{minipage}
+ \end{figure}
+\end{frame} 
+
+\begin{frame}
+\frametitle{Les algorithmes génétiques}
+\framesubtitle{Fonctionnement}
+\begin{figure}
+      \includegraphics[scale=.3]{img/genetic_algo_flowchart.png}
+      \caption{Diagramme d'un algorithme génétique standard}
+	  \label{fig:genetic_algo_flowchart}
+ \end{figure}
+\end{frame} 
+
+ \begin{frame}
+ \transsplitverticalin
+ \frametitle{Les algorithmes génétiques}
+ \framesubtitle{Les algorithmes génétiques parallèles}
+	%\begin{figure}
+	De la gauche vers la droite dans l'ordre : master-slave, coarsed-grained, fine-grained
+	\begin{tabular}{ccc}
+		%\begin{figure}
+		\includegraphics[scale=.3]{img/master_slave_ga.png} 
+		&
+		\includegraphics[scale=.3]{img/fine_grained_fig.png}
+    	&	
+   		\includegraphics[scale=.3]{img/topology_fig.png} 
+   		%\caption{}	
+   		%\end{figure}
+	\end{tabular}
+	%\end{figure}
+	
  \end{frame}
  
+ \begin{frame}
+ \frametitle{Les algorithmes génétiques}
+ \framesubtitle{Hiérarchisation entre les algorithmes génétiques parallèles}
+ 		\begin{figure}
+   		\includegraphics[scale=.15]{img/hierarchical_gene1_fig.png} 
+   		\caption{HCM-PGA}
+   		\end{figure}
+   		\hfill
+   		\begin{figure}
+   		\includegraphics[scale=.15]{img/hierar_fine_grained_fig.png}
+   		\caption{HCM-PGA}
+   		\end{figure}
+ 	
+ \end{frame}
+ 
+ % Matériel et Méthodes
+ \section{Méthodes et Solutions}
+ 
+ \begin{frame}
+ \transsplitverticalin
+ 	\frametitle{Méthodes et solutions}
+ 	\begin{center}
+ 		\LARGE{\texttt{Méthodes et solutions}}
+ 	\end{center}
+ \end{frame}  
+ 
  \subsection{Aspects généraux aux deux méthodes de recherche proposées}
+ 
+ \begin{frame}
+ \frametitle{Aspects généraux aux deux méthodes de recherche proposées}
+ \framesubtitle{Axes d'implémentation}
+ 	\begin{itemize}
+ 		\item Comment représenter t-on nos chromosomes ?
+ 		\item<2-> Comment initialise t-on notre population ?
+ 		\item<3-> Comment sélectionne t-on nos chromosomes parents ?
+ 		\item<4-> Comment croise t-on nos chromosomes parents ?
+ 		\item<5-> ...
+ 	\end{itemize}
+ \end{frame} 
  
  \begin{frame}
  \frametitle{Aspects généraux aux deux méthodes de recherche proposées}
@@ -242,23 +239,9 @@ machine avec des coûts de transition;
  \end{frame}
  
  \begin{frame}
+ \transsplithorizontalout
  \frametitle{Aspects généraux aux deux méthodes de recherche proposées}
- \framesubtitle{Initialisation I}
-	
-	\begin{figure}[!h]
-		\begin{center}
-			\includegraphics[scale=.4]{img/init_algo.png}
-			%\caption{}
-			\label{fig:adopt_gene_repr}
-		\end{center}
- \end{figure}
-	
- \end{frame}
- 
- \begin{frame}
- \frametitle{Aspects généraux aux deux méthodes de recherche proposées}
- \framesubtitle{Initialisation II}
-	
+ \framesubtitle{Initialisation}
 	\begin{figure}[!h]
 		\begin{center}
 			\includegraphics[scale=.5
@@ -270,9 +253,25 @@ machine avec des coûts de transition;
 	
  \end{frame}
  
+  \begin{frame}
+ \frametitle{Aspects généraux aux deux méthodes de recherche proposées}
+ \framesubtitle{Evaluation}
+ 
+ \textbf{Evaluation}
+	\begin{figure}[!h]
+		\begin{center}
+			\includegraphics[scale=.5
+			]{img/eval_fig.png}
+			\caption{Schéma illustratif de la méthode d'évaluation utilisée}
+			%\label{fig:adopt_gene_repr}
+		\end{center}
+ \end{figure}
+	
+ \end{frame} 
+ 
  \begin{frame}
  \frametitle{Aspects généraux aux deux méthodes de recherche proposées}
- \framesubtitle{Opérateurs génétiques I}
+ \framesubtitle{Sélection}
 	
 	\textbf{Sélection}
 	\begin{figure}[!h]
@@ -288,7 +287,7 @@ machine avec des coûts de transition;
  
  \begin{frame}
  \frametitle{Aspects généraux aux deux méthodes de recherche proposées}
- \framesubtitle{Opérateurs génétiques II}
+ \framesubtitle{Croisement}
 	
 	\textbf{Croisement}
 	\begin{figure}[!h]
@@ -304,7 +303,21 @@ machine avec des coûts de transition;
  
  \begin{frame}
  \frametitle{Aspects généraux aux deux méthodes de recherche proposées}
- \framesubtitle{Opérateurs génétiques III}
+ \framesubtitle{Fonction de faisabilité}
+	
+	\textbf{Principe:}
+	\vspace*{.5cm}
+    \begin{itemize}
+    	\item Réduction du surplus de production;
+    	\vspace*{.5cm}
+    	\item<2-> Production d'articles à des périodes données afin de combler une sous-production.
+    \end{itemize}
+	
+ \end{frame} 
+ 
+ \begin{frame}
+ \frametitle{Aspects généraux aux deux méthodes de recherche proposées}
+ \framesubtitle{Mutation}
 	
 	\textbf{Mutation}
 	\begin{figure}[!h]
@@ -320,69 +333,26 @@ machine avec des coûts de transition;
  
  \begin{frame}
  \frametitle{Aspects généraux aux deux méthodes de recherche proposées}
- \framesubtitle{Evaluation}
-	
-	%\textbf{}
-	\begin{figure}[!h]
-		\begin{center}
-			\includegraphics[scale=.4
-			]{img/eval_algo.png}
-			%\caption{Schéma illustratif de la méthode de mutation utilisée}
-			%\label{fig:adopt_gene_repr}
-		\end{center}
- \end{figure}
-	
- \end{frame}
- 
- \begin{frame}
- \frametitle{Aspects généraux aux deux méthodes de recherche proposées}
  \framesubtitle{Terminaison}
 	
 	\textbf{Deux critères de terminaison}
+	\vspace*{.5cm}
 	\begin{itemize}
 		\item Convergence de la population sur une solution;
-		\item Absence de meilleures solutions à partir de celle trouvée.
+		\vspace*{.5cm}
+		\item<2-> Absence de meilleures solutions à partir de celle trouvée.
+		\vspace*{.5cm}
+		\item<3-> Hybridation
 	\end{itemize}
 	
  \end{frame}
- 
- \begin{frame}
- \frametitle{Aspects généraux aux deux méthodes de recherche proposées}
- \framesubtitle{Fonction de faisabilité}
-	
-	\begin{figure}[!h]
-		\begin{center}
-			\includegraphics[scale=.4
-			]{img/faisabilite_algo.png}
-			%\caption{Schéma illustratif de la méthode de mutation utilisée}
-			%\label{fig:adopt_gene_repr}
-		\end{center}
- \end{figure}
-	
- \end{frame}
- 
- 
  
  \subsection{Méthodes de recherche proposées}
  
  \begin{frame}
  \frametitle{Méthodes de recherche proposées}
  \framesubtitle{Algorithmes génétiques parallèles et hiérarchiques coarse-grained et
-master-slave}
-	
-	Problématiques :
-	\begin{itemize}
-		\item Fréquence de migration;
-		\item Choix et nombre de migrants;
-		\item Topologie de connexions;
-		\item Méthode d’intégration des migrants;
-	\end{itemize}
-	
- \end{frame}
- 
- \begin{frame}
- \frametitle{Méthodes de recherche proposées}
- \framesubtitle{Algorithmes génétiques parallèles et hiérarchiques coarse-grained et
+master-slave / Algorithmes génétiques parallèles et hiérarchiques coarse-grained et
 fine-grained}
 	
 	Problématiques :
@@ -393,48 +363,19 @@ fine-grained}
 		\item Méthode d’intégration des migrants;
 	\end{itemize}
 	
- \end{frame}
- 
- \begin{frame}
- \frametitle{Méthodes de recherche proposées}
- \framesubtitle{Autres algorithmes implémentés I}
-	
-	\begin{itemize}
-		\item Hybridation
-		\begin{figure}[!h]
-		\begin{center}
-			\includegraphics[scale=.3
-			]{img/faisabilite_algo.png}
-			%\caption{Schéma illustratif de la méthode de mutation utilisée}
-			%\label{fig:adopt_gene_repr}
-		\end{center}
- \end{figure}
-	\end{itemize}
-	
- \end{frame}
- 
- \begin{frame}
- \frametitle{Méthodes de recherche proposées}
- \framesubtitle{Autres algorithmes implémentés II}
-	
-	\begin{itemize}
-		\item Table de hash
-		\begin{figure}[!h]
-		\begin{center}
-			\includegraphics[scale=.4
-			]{img/hash_table_algo.png}
-			%\caption{Schéma illustratif de la méthode de mutation utilisée}
-			%\label{fig:adopt_gene_repr}
-		\end{center}
- \end{figure}
-	\end{itemize}
-	
- \end{frame}
- 
- 
+ \end{frame} 
  
  % Résultats et discussion
  \section{Résultats et discussion}
+ 
+ \begin{frame}
+ 	\frametitle{Matériel et Méthodes}
+ 	\begin{center}
+ 		\LARGE{\texttt{Résultats et discussion}}
+ 	\end{center}
+ \end{frame}   
+ 
+ 
  \subsection{Données et paramètres de test}
  \begin{frame}
  \frametitle{Résultats et discussion}
@@ -444,8 +385,8 @@ fine-grained}
 			        \item[-] Probabilité de mutation : 5\%;
 			        \item[-] Probabilité de croisement : 80\%;
 			        \item[-] Nombre de migrants : 1 individu;
-		 	        \item[-] Nombre de processus esclaves : 2 processus;
-			        \item[-] Nombre de processus principaux : 2 processus;
+		 	        \item[-] Nombre de processus esclaves : 2 processus (cas du HCM-PGA);
+			        \item[-] Nombre de processus principaux : 2 processus (cas du HFC-PGA);
 			        \item[-] Nombre de générations avant migration : 0 génération (la migration intervient après une convergence).
 				\end{itemize}
  \end{frame}
@@ -459,21 +400,7 @@ fine-grained}
 		\begin{center}
 			\includegraphics[scale=.4
 			]{img/cp_hfc.png}
-			%\caption{Schéma illustratif de la méthode de mutation utilisée}
-			%\label{fig:adopt_gene_repr}
-		\end{center}
- \end{figure}
- \end{frame}
- 
- \begin{frame}
- \frametitle{Résultats expérimentaux des algorithmes génétiques parallèles hiérarchiques fine-grained et coarse-grained}
- \framesubtitle{HFC-PGA et SA}
- \begin{figure}[!h]
-		\begin{center}
-			\includegraphics[scale=.4
-			]{img/sa_hfc.png}
-			%\caption{Schéma illustratif de la méthode de mutation utilisée}
-			%\label{fig:adopt_gene_repr}
+			\caption{Résultats expérimentaux HFC-PGA et CP}
 		\end{center}
  \end{figure}
  \end{frame}
@@ -482,45 +409,41 @@ fine-grained}
  
  \begin{frame}
  \frametitle{Résultats expérimentaux des algorithmes génétiques parallèles hiérarchiques master-slave et coarse-grained}
- \framesubtitle{HCM-PGA et CP}
- \begin{figure}[!h]
-		\begin{center}
-			\includegraphics[scale=.4
-			]{img/cp_hcm.png}
-			%\caption{Schéma illustratif de la méthode de mutation utilisée}
-			%\label{fig:adopt_gene_repr}
-		\end{center}
- \end{figure}
- \end{frame}
- 
- \begin{frame}
- \frametitle{Résultats expérimentaux des algorithmes génétiques parallèles hiérarchiques master-slave et coarse-grained}
  \framesubtitle{HCM-PGA et SA}
  \begin{figure}[!h]
 		\begin{center}
 			\includegraphics[scale=.4
 			]{img/sa_hcm.png}
+			\caption{Résultats expérimentaux HCM-PGA et SA}
+		\end{center}
+ \end{figure}
+ \end{frame}
+ 
+ \begin{frame}
+  \frametitle{Test}
+ 	\begin{center}
+ 		\LARGE{\texttt{Test}}
+ 	\end{center}
+ \end{frame} 
+ 
+ % Conclusion
+ \section{Conclusion et perspectives}
+ \begin{frame}
+  \frametitle{Conclusion et Perspectives}
+ 	\begin{center}
+ 		\LARGE{\texttt{Conclusion et perspectives}}
+ 	\end{center}
+ \end{frame}
+ 
+ \begin{frame}
+ 	\begin{figure}[!h]
+		\begin{center}
+			\includegraphics[scale=.4
+			]{img/merci.png}
 			%\caption{Schéma illustratif de la méthode de mutation utilisée}
 			%\label{fig:adopt_gene_repr}
 		\end{center}
  \end{figure}
- \end{frame}
-
- \subsection{Discussion} 
- 
- % Conclusion
- \section*{Conclusion}
- \begin{frame}
-  \frametitle{Conclusion}
- 	\begin{center}
- 		\LARGE{\texttt{Conclusion}}
- 	\end{center}
- \end{frame}
- 
- \begin{frame}
- 	\begin{center}
- 		\LARGE{\texttt{Merci pour votre attention}}
- 	\end{center}
  \end{frame}
  
 % \begin{frame}{•}
