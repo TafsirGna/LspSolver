@@ -8,12 +8,12 @@
  \usepackage{amssymb}
  \usepackage{graphicx}
  \usepackage{algorithm2e}
- \author{\textbf{Présenté par:} \\ \textit{Tafsir GNA} \\ \textbf{Supervisé par:} \\ \textit{Dr Ing. Vinasétan Ratheil HOUNDJI \\ \& \\ Professeur Mahouton Norbert HOUNKONNOU}}
+ \author{\textbf{Présenté par:} \\ \textit{Tafsir GNA} \\ \textbf{Supervisé par:} \\ \textit{Dr Ing. Vinasétan Ratheil HOUNDJI \& Professeur Mahouton Norbert HOUNKONNOU}}
  \title{Résolution du \emph{Pigment Sequencing Problem} avec les algorithmes génétiques}
  %\setbeamercovered{transparent} 
  %\setbeamertemplate{navigation symbols}{} 
  %\logo{} 
-\institute{Institut de Formation et de Recherche en Informatique (IFRI)} 
+ %\institute{Institut de Formation et de Recherche en Informatique (IFRI)} 
  %\date{} 
  %\subject{} 
  \begin{document}
@@ -81,23 +81,23 @@
 \end{frame}  
  
  \begin{frame}
- \transsplitverticalin
+ %\transsplitverticalin
  \frametitle{Le "Pigment Sequencing Problem" (PSP)}
  \framesubtitle{Description}
  
  	Objectif:
     \begin{itemize}
-    	\item<2-> trouver un plan de production de plusieurs articles à partir d’une
-machine dont la capacité de production est limité à un article par période;
+    	\item trouver un plan de production de plusieurs articles à partir d’une
+machine dont la capacité de production est limité à un article par période.
 		\vspace*{.5cm}
-    	\item<3-> minimisant les coûts de stockage et de transition;
+    	\item minimisant les coûts de stockage et de transition.
     	\vspace*{.5cm}
-    	\item<4-> les demandes sont normalisées et donc binaires.
+    	\item les demandes sont normalisées et donc binaires.
     \end{itemize}
  \end{frame} 
  
  \begin{frame}
- \transboxout
+ %\transboxout
  \frametitle{Le "Pigment Sequencing Problem" (PSP)}
  \framesubtitle{Modèle mathématique du PSP}
  	\begin{eqnarray}
@@ -112,18 +112,17 @@ machine dont la capacité de production est limité à un article par période;
  \end{frame} 
  
  \begin{frame}
- \transreplace
+ %\transreplace
  \frametitle{Le "Pigment Sequencing Problem" (PSP)}
  \framesubtitle{Etat de l'art} 
  
  	Travaux:
     \begin{itemize}
-    	\item Pochet et Wolsey et formulations MIP du DLSP;
-    	\item<2->Houndji et al et programmation par contraintes;
-    	\item<3->Ceschia et al. et le recuit simulé;
-    	\item<4-> ...
-    	\item<5-> ...
-    	\item<6-> \LARGE{\textcolor{red}{Tafsir Gna et Algorithmes génétiques.}}
+    	\item Pochet et Wolsey et formulations MIP du DLSP.
+    	\vspace*{.5cm}
+    	\item Houndji et al et programmation par contraintes.
+    	\vspace*{.5cm}
+    	\item Ceschia et al. et le recuit simulé.
     \end{itemize}
  \end{frame} 
  
@@ -160,7 +159,7 @@ machine dont la capacité de production est limité à un article par période;
 \end{frame} 
 
  \begin{frame}
- \transsplitverticalin
+ %\transsplitverticalin
  \frametitle{Les algorithmes génétiques}
  \framesubtitle{Les algorithmes génétiques parallèles}
 	%\begin{figure}
@@ -198,7 +197,7 @@ machine dont la capacité de production est limité à un article par période;
  \section{Méthodes et Solutions}
  
  \begin{frame}
- \transsplitverticalin
+ %\transsplitverticalin
  	\frametitle{Méthodes et solutions}
  	\begin{center}
  		\LARGE{\texttt{Méthodes et solutions}}
@@ -212,10 +211,9 @@ machine dont la capacité de production est limité à un article par période;
  \framesubtitle{Axes d'implémentation}
  	\begin{itemize}
  		\item Comment représenter t-on nos chromosomes ?
- 		\item<2-> Comment initialise t-on notre population ?
- 		\item<3-> Comment sélectionne t-on nos chromosomes parents ?
- 		\item<4-> Comment croise t-on nos chromosomes parents ?
- 		\item<5-> ...
+ 		\item Comment initialise t-on notre population ?
+ 		\item Comment sélectionne t-on nos chromosomes parents ?
+ 		\item Comment croise t-on nos chromosomes parents ?
  	\end{itemize}
  \end{frame} 
  
@@ -239,7 +237,7 @@ machine dont la capacité de production est limité à un article par période;
  \end{frame}
  
  \begin{frame}
- \transsplithorizontalout
+ %\transsplithorizontalout
  \frametitle{Aspects généraux aux deux méthodes de recherche proposées}
  \framesubtitle{Initialisation}
 	\begin{figure}[!h]
@@ -310,7 +308,7 @@ machine dont la capacité de production est limité à un article par période;
     \begin{itemize}
     	\item Réduction du surplus de production;
     	\vspace*{.5cm}
-    	\item<2-> Production d'articles à des périodes données afin de combler une sous-production.
+    	\item Production d'articles à des périodes données afin de combler une sous-production.
     \end{itemize}
 	
  \end{frame} 
@@ -338,12 +336,12 @@ machine dont la capacité de production est limité à un article par période;
 	\textbf{Deux critères de terminaison}
 	\vspace*{.5cm}
 	\begin{itemize}
-		\item Convergence de la population sur une solution;
+		\item Convergence de la population sur une solution.
 		\vspace*{.5cm}
-		\item<2-> Absence de meilleures solutions à partir de celle trouvée.
-		\vspace*{.5cm}
-		\item<3-> Hybridation
+		\item Absence de meilleures solutions à partir de celle trouvée.
 	\end{itemize}
+	\vspace*{.5cm}
+	\textbf{Hybridation:} Couplage entre méthode de recherche locale et algorithme génétique.
 	
  \end{frame}
  
@@ -357,10 +355,10 @@ fine-grained}
 	
 	Problématiques :
 	\begin{itemize}
-		\item Fréquence de migration;
-		\item Choix et nombre de migrants;
-		\item Topologie de connexions;
-		\item Méthode d’intégration des migrants;
+		\item Fréquence de migration.
+		\item Choix et nombre de migrants.
+		\item Topologie de connexions.
+		\item Méthode d’intégration des migrants.
 	\end{itemize}
 	
  \end{frame} 
@@ -381,12 +379,12 @@ fine-grained}
  \frametitle{Résultats et discussion}
  \framesubtitle{Données et paramètres de test}
  \begin{itemize}
-					\item[-] Taille de la population : 25 individus par processus ;
-			        \item[-] Probabilité de mutation : 5\%;
-			        \item[-] Probabilité de croisement : 80\%;
-			        \item[-] Nombre de migrants : 1 individu;
-		 	        \item[-] Nombre de processus esclaves : 2 processus (cas du HCM-PGA);
-			        \item[-] Nombre de processus principaux : 2 processus (cas du HFC-PGA);
+					\item[-] Taille de la population : 25 individus par processus.
+			        \item[-] Probabilité de mutation : 5\%.
+			        \item[-] Probabilité de croisement : 80\%.
+			        \item[-] Nombre de migrants : 1 individu.
+		 	        \item[-] Nombre de processus esclaves : 2 processus (cas du HCM-PGA).
+			        \item[-] Nombre de processus principaux : 2 processus.
 			        \item[-] Nombre de générations avant migration : 0 génération (la migration intervient après une convergence).
 				\end{itemize}
  \end{frame}
@@ -420,9 +418,9 @@ fine-grained}
  \end{frame}
  
  \begin{frame}
-  \frametitle{Test}
+  \frametitle{Simulation}
  	\begin{center}
- 		\LARGE{\texttt{Test}}
+ 		\LARGE{\texttt{Simulation}}
  	\end{center}
  \end{frame} 
  
@@ -430,9 +428,17 @@ fine-grained}
  \section{Conclusion et perspectives}
  \begin{frame}
   \frametitle{Conclusion et Perspectives}
- 	\begin{center}
- 		\LARGE{\texttt{Conclusion et perspectives}}
- 	\end{center}
+  \textbf{\textsl{Conclusion}}
+ 	\begin{itemize}
+ 		\item Les algorithmes génétiques réussissent à trouver en relativement peu de temps des solutions exactes sinon proches de la solution optimale. 
+ 	\end{itemize}
+ 	
+ 	\textbf{\textsl{Perspectives}}
+ 	\begin{itemize}
+ 		\item Appliquer les deux approches heuristiques HCM-PGA et HFC-PGA à des problèmes plus complexes à plusieurs machines ou plusieurs niveaux.
+ 		\item Mettre au point une fonction de recherche locale beaucoup plus performante.
+ 		\item Penser à des méthodes de croisement produisant de meilleurs individus. 
+ 	\end{itemize}
  \end{frame}
  
  \begin{frame}
