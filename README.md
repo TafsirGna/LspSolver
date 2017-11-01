@@ -1,2 +1,2 @@
-# ClspGeneticAlgorithm
-Using genetic algorithm in solving capacited lot sizing problem
+# LspSolver
+A lot sizing problems solver
