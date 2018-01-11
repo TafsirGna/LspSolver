@@ -1,5 +1,4 @@
 # LspSolver
------------
 
 LspSolver is a lot sizing problems **solver tool**. LspSolver started as a research project in the Computer Science Research and Training Institute (IFRI-UAC), intends to apply **intelligence artificial methods** (like genetic algorithms or artificial neural networks) in solving the lot sizing problems. It is developed with speed and modularity in mind.
 
