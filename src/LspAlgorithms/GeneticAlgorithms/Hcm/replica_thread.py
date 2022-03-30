@@ -1,8 +1,9 @@
 #!/usr/bin/python3.5
 # -*-coding: utf-8 -*
 
-from clsp_ga_library import *
-from chromosome import *
+from multiprocessing import Event
+from threading import *
+from ..chromosome import *
 
 #--------------------
 # Class : SlaveThreadsManager

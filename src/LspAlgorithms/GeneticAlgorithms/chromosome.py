@@ -1,7 +1,9 @@
 #!/usr/bin/python3.5
 # -*-coding: utf-8 -*
 
-from clsp_ga_library import *
+from random import randint
+import copy
+# from ...LspLibrary.lspLibrary import *
 
 class Chromosome(object):
 

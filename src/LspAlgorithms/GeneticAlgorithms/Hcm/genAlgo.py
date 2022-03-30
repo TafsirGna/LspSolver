@@ -1,7 +1,7 @@
 #!/usr/bin/python3.5
 # -*-coding: utf-8 -*
 
-from clsp_main_thread import *
+from .main_thread import *
 
 #--------------------
 # Class : GeneticAlgorithm

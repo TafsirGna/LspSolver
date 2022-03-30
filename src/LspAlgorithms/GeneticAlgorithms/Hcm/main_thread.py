@@ -1,7 +1,9 @@
 #!/usr/bin/python3.5
 # -*-coding: utf-8 -*
 
-from clsp_slave_thread import *
+from LspAlgorithms.GeneticAlgorithms.Hcm.replica_thread import *
+import threading
+
 
 #--------------------
 # Class : ClspThread
