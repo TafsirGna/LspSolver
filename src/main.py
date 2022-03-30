@@ -4,7 +4,7 @@
 # importing modules
 # import sys
 import argparse 
-from LspAlgorithms.GeneticAlgorithms.Hcm.genAlgo import GeneticAlgorithm
+from LspAlgorithms.GeneticAlgorithms.Hcm.Solver import GeneticAlgorithm
 from LspInputData.LspInputDataReader import InputDataReader
 
 # Setting solver's options 
@@ -30,7 +30,7 @@ lspSolver = GeneticAlgorithm(inputDataInstance)
 # i store the time when the solving began
 # startTime = time.clock()
 
-# lspSolver.start()
+lspSolver.solve()
 
 # i store the time when the solving ended
 # endTime = time.clock()

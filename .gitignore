@@ -8,3 +8,4 @@ Research Report/Report.pdf
 *.lot
 Thesis Paper/main.pdf
 *.pyc
+env/

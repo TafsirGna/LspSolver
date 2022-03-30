@@ -68,7 +68,7 @@ class InputDataReader:
                 tab[a][i] = tmp
                 i += 1
 
-        return InputDataInstance(tab[0], tab[1], tab[2], tab[3], tab[4])
+        return InputDataInstance(tab[1], tab[0], tab[2], tab[3], tab[4])
 
 
     def useFormat1(self, file):

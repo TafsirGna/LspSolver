@@ -1,7 +1,7 @@
 #!/usr/bin/python3.5
 # -*-coding: utf-8 -*
 
-from LspAlgorithms.GeneticAlgorithms.Hcm.replica_thread import *
+from LspAlgorithms.GeneticAlgorithms.Hcm.ReplicaThread import *
 import threading
 
 

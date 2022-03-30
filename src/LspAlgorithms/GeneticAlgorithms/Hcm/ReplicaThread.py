@@ -3,7 +3,7 @@
 
 from multiprocessing import Event
 from threading import *
-from ..chromosome import *
+from ..Chromosome import *
 
 #--------------------
 # Class : SlaveThreadsManager

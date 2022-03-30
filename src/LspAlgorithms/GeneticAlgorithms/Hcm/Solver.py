@@ -1,7 +1,9 @@
 #!/usr/bin/python3.5
 # -*-coding: utf-8 -*
 
-from .main_thread import *
+from .MainThread import *
+import math
+from ..Node import Node
 
 #--------------------
 # Class : GeneticAlgorithm
@@ -24,14 +26,14 @@ class GeneticAlgorithm:
 	pickeRandChromGens = 3
 
 	# Builder
-	def __init__(self, inst):
+	def __init__(self, instance):
 
 		self.hashTable = {} #hashTable is a dictionnary
 		self.listMainThreads = [] # i initialize a list that's intended to contain all the main threads of this genetic algorithm program
 
 		# i impart some parameters to the chromosome class and population class
 		Chromosome.mutationRate = GeneticAlgorithm.mutationRate
-		Chromosome.problem = inst
+		Chromosome.problem = instance
 		Chromosome.hashTable = self.hashTable
 
 		# i set some class' properties of Population class
@@ -56,17 +58,15 @@ class GeneticAlgorithm:
 	# purpose : Initializing le population of chromosomes to be processed during the first iteration
 	#--------------------
 
-	def start(self):
+	def solve(self):
 
 		# In order to create this new population, i use the deep first search(DFS) to create some potential good chromosomes
-		#print(Chromosome.problem.deadlineDemandPeriods)
 
 		queue = []
 		currentNode = Node()
 		currentNode.initialize()
 		children = currentNode.getChildren()
 
-		#print("children 0 :", children)
 		#print ("start!!")
 		i = 0
 		while len(children) <= 1:
@@ -105,50 +105,50 @@ class GeneticAlgorithm:
 		print("Initialized!!!")
 
 		
-		readyFlag = 0
-		flagId = -1
-		for mainThread in self.listMainThreads:
-			if not mainThread.finished:
-				thread.readyFlag = readyFlag
-				readyFlag = thread.readyEvent
-				thread.flagId = flagId
-				flagId = thread.threadId
+		# readyFlag = 0
+		# flagId = -1
+		# for mainThread in self.listMainThreads:
+		# 	if not mainThread.finished:
+		# 		thread.readyFlag = readyFlag
+		# 		readyFlag = thread.readyEvent
+		# 		thread.flagId = flagId
+		# 		flagId = thread.threadId
 
-		# then, i launch the search in order to find out the global optima
-		ok = True
-		it = 0
-		while ok:
+		# # then, i launch the search in order to find out the global optima
+		# ok = True
+		# it = 0
+		# while ok:
 
-			#for thread in self.listMainThreads:
-			#	thread.readyEvent.clear()
+		# 	#for thread in self.listMainThreads:
+		# 	#	thread.readyEvent.clear()
 
-			#print(it)
-			for thread in self.listMainThreads:
-				thread.run()
-				#print("Pop : ", thread.population)
+		# 	#print(it)
+		# 	for thread in self.listMainThreads:
+		# 		thread.run()
+		# 		#print("Pop : ", thread.population)
 
-			(self.listMainThreads[len(self.listMainThreads)-1]).readyEvent.wait()
+		# 	(self.listMainThreads[len(self.listMainThreads)-1]).readyEvent.wait()
 
-			#time.sleep(1.5)
+		# 	#time.sleep(1.5)
 
-			# once, the current generation has been produced, i check if i should stop the search and i set the event of each thread
-			readyFlag = 0
-			ok = False
-			for mainThread in self.listMainThreads:
-				if not mainThread.finished:
-					ok = True
-					thread.readyFlag = readyFlag
-					readyFlag = thread.readyEvent
+		# 	# once, the current generation has been produced, i check if i should stop the search and i set the event of each thread
+		# 	readyFlag = 0
+		# 	ok = False
+		# 	for mainThread in self.listMainThreads:
+		# 		if not mainThread.finished:
+		# 			ok = True
+		# 			thread.readyFlag = readyFlag
+		# 			readyFlag = thread.readyEvent
 
-			if not ok:
-				break
+		# 	if not ok:
+		# 		break
 
-			#if it == 1:
-			#	break
-			#print("----------------------------------------  OK")
+		# 	#if it == 1:
+		# 	#	break
+		# 	#print("----------------------------------------  OK")
 
-			it += 1
-		self.printResults()	
+		# 	it += 1
+		# self.printResults()	
 		
 	
 	#--------------------
