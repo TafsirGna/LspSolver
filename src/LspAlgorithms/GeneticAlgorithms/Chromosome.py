@@ -3,26 +3,63 @@
 
 from random import randint
 import copy
+import numpy as np
+
+from LspInputData.LspInputDataInstance import InputDataInstance
 # from ...LspLibrary.lspLibrary import *
 
 class Chromosome(object):
 
-	mutationRate = 0
-	problem = 0
-	hashTable = {}
+	# mutationRate = 0
+	# problem = 0
+	# hashTable = {}
 
 	# Builder 
-	def __init__(self):
+	def __init__(self, dnaArray):
+		"""
+		"""
+
+		self.dnaArray = np.array(dnaArray)
+		self.cost = 0 #self.calculateCost(self.dnaArray, InputDataInstance.instance)
+
+	@classmethod
+	def calculateCost(cls, dnaArray, inputDataInstance):
+		"""
+		"""
+		cost = 0
+		item1, item2 = dnaArray[0], dnaArray[0]
+		nOccurenceItem = np.array([0 for i in range(0, inputDataInstance.instance.nItems)])
+		nOccurenceItem[item2 - 1] += 1
+		cost += inputDataInstance.instance.stockingCostsArray[item2 - 1] * (inputDataInstance.instance.demandsArrayZipped[item2 - 1][nOccurenceItem[item2 - 1] -1] - 0)
+
+		for index in range(1, len(dnaArray)):
+			if dnaArray[index] != 0:
+				item2 = dnaArray[index]
+				# print(dnaArray, index, item1, item2)
+				cost += inputDataInstance.chanOverArray[item1 - 1 , item2 - 1]
+				nOccurenceItem[item2 - 1] += 1
+				cost += inputDataInstance.instance.stockingCostsArray[item2 - 1] * (inputDataInstance.instance.demandsArrayZipped[item2 - 1][nOccurenceItem[item2 - 1] -1] - index)
+
+				item1 = item2
+			else: 
+				continue
+
+		return cost
+
+	def isFeasible():
+		pass
+
+
 
 		# Variables
-		self._solution = [] 
-		self.itemsRank = []
-		self._fitnessValue = 0
-		self._hashSolution = ""
-		self.manufactItemsPeriods = [] 
+		# self._solution = [] 
+		# self.itemsRank = []
+		# self._fitnessValue = 0
+		# self._hashSolution = ""
+		# self.manufactItemsPeriods = [] 
 
-		for i in range(0, Chromosome.problem.nbItems+1):
-			self.manufactItemsPeriods.append([])
+		# for i in range(0, Chromosome.problem.nbItems+1):
+		# 	self.manufactItemsPeriods.append([])
 
 	# the following lines have to be removed, they've been added just for test
 	def init1(self, solution, fitnessValue = 0):
@@ -59,7 +96,7 @@ class Chromosome(object):
 		self._fitnessValue = new_value
 
 	def __repr__(self):
-		return " {} : {} / {}".format(self._solution,self.fitnessValue, self.itemsRank)
+		return " {} : {} ".format(self.dnaArray, self.cost)
 
 	def __eq__(self, chromosome):
 		return self._solution == chromosome.solution

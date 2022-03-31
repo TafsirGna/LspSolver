@@ -5,6 +5,7 @@
 # import sys
 import argparse 
 from LspAlgorithms.GeneticAlgorithms.Hcm.Solver import GeneticAlgorithm
+from LspInputData.LspInputDataInstance import InputDataInstance
 from LspInputData.LspInputDataReader import InputDataReader
 
 # Setting solver's options 
@@ -22,7 +23,7 @@ inputFile = args.file  #sys.argv[1]
 inputDataReader = InputDataReader()
 inputDataInstance = inputDataReader.readInput(inputFile)
 
-print(inputDataInstance)
+# print(InputDataInstance.instance.nPeriods)
 
 # I create an instance of the genetic algorithm to be used
 lspSolver = GeneticAlgorithm(inputDataInstance)

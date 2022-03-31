@@ -74,8 +74,8 @@ class InputDataReader:
     def useFormat1(self, file):
 
         # Input data's initialization 
-        nbItems = 0
-        nbTimes = 0
+        nItems = 0
+        nPeriods = 0
         demandsGrid = []
         holdingGrid = []
         chanOverGrid = []
@@ -86,28 +86,28 @@ class InputDataReader:
             for line in instance:
                 
                 if i == 1:
-                    nbTimes = int(line)
+                    nPeriods = int(line)
 
                 if i == 2:
-                    nbItems = int(line)
+                    nItems = int(line)
 
-                if i >= 5 and i < (5 + nbItems):
+                if i >= 5 and i < (5 + nItems):
                     data = []
                     data = line.split(" ")
                     chanOverGrid.append(data)
 
-                if i == (5 + nbItems + 1):
+                if i == (5 + nItems + 1):
                     holdingGrid = line.split(" ")
 
-                if i >= (5 + nbItems + 3) and i < (5 + nbItems*2 + 3):
+                if i >= (5 + nItems + 3) and i < (5 + nItems*2 + 3):
                     data = []
                     data = line.split(" ")
                     demandsGrid.append(data)
 
                 i += 1
 
-            if nbItems != 0 and nbTimes != 0 and demandsGrid != [] and holdingGrid != [] and chanOverGrid != []:
-                return InputDataInstance(nbItems,nbTimes,demandsGrid,holdingGrid,chanOverGrid)
+            if nItems != 0 and nPeriods != 0 and demandsGrid != [] and holdingGrid != [] and chanOverGrid != []:
+                return InputDataInstance(nItems,nPeriods,demandsGrid,holdingGrid,chanOverGrid)
             return 0
 
     def getReadingFunction(self, file):
@@ -122,4 +122,8 @@ class InputDataReader:
         """
 
         readFile = self.getReadingFunction(file)
-        return readFile(file)
+        inputDataInstance = readFile(file)
+
+        InputDataInstance.instance = inputDataInstance
+        
+        return inputDataInstance

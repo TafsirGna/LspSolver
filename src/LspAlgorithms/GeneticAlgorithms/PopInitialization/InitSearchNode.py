@@ -1,32 +1,152 @@
-from .Chromosome import Chromosome
+from LspInputData.LspInputDataInstance import InputDataInstance
+from ..Chromosome import Chromosome
 import copy
 
-class Node(object):
+class SearchNode(object):
+	"""
+	"""
 
-	def __init__(self):
-
-		# self.chromosome = Chromosome()
-		self._currentPeriod = Chromosome.problem.nbTimes - 1
-		self.tab = []
-		self.branches = []
-
-		#for i in range(0, len(Chromosome.problem.deadlineDemandPeriods)-1):
-		#	self.itemsCountTab.append(len(Chromosome.problem.deadlineDemandPeriods[i]))
-
-	def initialize(self):
+	def __init__(self, chromosome, period) -> None:
+		"""
+		"""
 		
-		self.chromosome = Chromosome()
-		self._currentPeriod = Chromosome.problem.nbTimes - 1
+		self.chromosome = chromosome
+		self.period = period
+		self.itemsToOrder = [0 for i in range(0, InputDataInstance.instance.nItems)]
 
-		self.tab = copy.deepcopy(Chromosome.problem.deadlineDemandPeriods)
-		self.tab.append(copy.deepcopy(Chromosome.problem.zerosRow))
+		# then i append the number of periods where no items are to be ordered
+		self.itemsToOrder.append((InputDataInstance.instance.nPeriods - InputDataInstance.instance.demandsArray.sum()))
 
-		self.branches = []
+	@classmethod
+	def root(cls, inputDataInstance):
+		"""
+		"""
+		
+		chromosome = Chromosome([0 for i in range(0, InputDataInstance.instance.nPeriods)])
+		chromosome.cost = 0
+
+		# Wrapping the chromosome in the search node for population initialization purpose
+		root = cls(chromosome, (inputDataInstance.nPeriods - 1))
+
+		return root
+
+	def children(self):
+		"""
+		"""
+
+		if self.period < 0:
+			return []
+
+		children = []
+		
+		periodDemands = InputDataInstance.instance.demandsArray[:,self.period]
+
+		for index, item in enumerate(periodDemands):
+			if item == 1:
+				self.itemsToOrder[index] += 1
+
+		# print("Parent --> ", self)
+
+		for index, item in enumerate(self.itemsToOrder):
+			dnaArray = None
+			itemsToOrder = None
+			if item > 0:
+				dnaArray = [0 for i in range(0, self.period)] + [0 if index == InputDataInstance.instance.nItems else index + 1] + [self.chromosome.dnaArray[i] for i in range(self.period + 1, InputDataInstance.instance.nPeriods)]
+				itemsToOrder = [i for i in self.itemsToOrder]
+				itemsToOrder[index] -= 1
+
+				# setting node's chomosome period
+				node = SearchNode(Chromosome(dnaArray), self.period - 1)
+
+				node.itemsToOrder = itemsToOrder
+				#Calculating the node's chromosome cost
+				rightItem = node.chromosome.dnaArray[(self.period if self.period < InputDataInstance.instance.nPeriods - 1 else 0)]
+				changeOverCost = 0 #InputDataInstance.instance.chanOverArray[index, rightItem]
+				stockingCost = 0
+				node.chromosome.cost = (self.chromosome.cost + changeOverCost + stockingCost) # adding the changeOver cost and the stocking cost 
+
+				if not(self.period == InputDataInstance.instance.nPeriods - 1 and index == InputDataInstance.instance.nItems):
+					children.append(node)
+
+		# print("--- Children ---")
+		# print(children)
+
+		return children
 
 	def __repr__(self):
-		#return "Chromosome : " + str(self._solution) + ", " + str(self.fitnessValue) +  ", " + str(self._currentPeriod) + ", " + str(self.tab) + " : ranks - " + str(self.itemsRank) +" ;" 
-		return "Chromosome : " + str(self.chromosome.solution) + " / "+ str(self.chromosome.itemsRank)+", " + str(self.chromosome.fitnessValue) +  ", " + str(self._currentPeriod)  + ", " + str(self.tab) + \
-		" / " + str(self.branches) + " ;" 
+		return str(self.chromosome.dnaArray) + " | " + str(self.period) + " | " + str(self.itemsToOrder) + "\n"
+
+		# for i in range(0, Chromosome.problem.nbItems):
+
+		# 	if self.tab[i] != [] and self.tab[i][len(self.tab[i])-1] >= self._currentPeriod:
+
+		# 		# the child will inherit some values from the parent
+		# 		childNode = Node()
+		# 		childNode.tab = copy.deepcopy(self.tab)
+		# 		childNode.branches = copy.deepcopy(self.branches)
+		# 		childNode.branches.insert(0, [])
+
+		# 		# i build the chromosome of the child 
+		# 		childNode.chromosome.solution = copy.deepcopy(self.chromosome.solution)
+		# 		childNode.chromosome.solution.insert(0, i + 1)
+		# 		childNode.chromosome.itemsRank = copy.deepcopy(self.chromosome.itemsRank)
+		# 		childNode.chromosome.itemsRank.insert(0, len(self.tab[i]))
+		# 		childNode.chromosome.manufactItemsPeriods = copy.deepcopy(self.chromosome.manufactItemsPeriods)
+		# 		(childNode.chromosome.manufactItemsPeriods[i]).insert(0, self.currentPeriod)
+		# 		childNode.chromosome.fitnessValue = Node.getFitnessValue(self.chromosome.solution, self.chromosome.fitnessValue, i, len(self.tab[i]), self.currentPeriod)
+
+
+		# 		childNode.currentPeriod = self._currentPeriod - 1
+		# 		del childNode.tab[i][len(self.tab[i])-1]
+		# 		childrenQueue.append(copy.deepcopy(childNode))
+
+		# if self.tab[len(self.tab)-1] != []:
+
+		# 	# the child will inherit some values from the parent
+		# 	childNode = Node()
+		# 	childNode.tab = copy.deepcopy(self.tab)
+		# 	childNode.branches = copy.deepcopy(self.branches)
+		# 	childNode.branches.insert(0, [])
+
+		# 	# i build the chromosome of the child
+		# 	childNode.chromosome.solution = copy.deepcopy(self.chromosome.solution)
+		# 	childNode.chromosome.solution.insert(0, 0)
+		# 	childNode.chromosome.itemsRank = copy.deepcopy(self.chromosome.itemsRank)
+		# 	childNode.chromosome.itemsRank.insert(0, 0)
+		# 	childNode.chromosome.manufactItemsPeriods = copy.deepcopy(self.chromosome.manufactItemsPeriods)
+		# 	(childNode.chromosome.manufactItemsPeriods[Chromosome.problem.nbItems]).insert(0, self.currentPeriod)
+		# 	childNode.chromosome.fitnessValue = self.chromosome.fitnessValue
+
+		# 	childNode.currentPeriod = self._currentPeriod - 1
+		# 	del childNode.tab[len(self.tab)-1][len(childNode.tab[len(self.tab)-1])-1]
+		# 	childrenQueue.append(copy.deepcopy(childNode))
+
+		# if childrenQueue == []:
+
+		# 	childNode = copy.deepcopy(self)
+		# 	childNode.currentPeriod -= 1
+		# 	childrenQueue.append(copy.deepcopy(childNode))
+
+		# childrenQueue.sort()
+		# return list(reversed(childrenQueue))
+
+
+
+
+
+
+
+
+
+	# def initialize(self):
+		
+	# 	self.chromosome = Chromosome()
+	# 	self._currentPeriod = Chromosome.problem.nbTimes - 1
+
+	# 	self.tab = copy.deepcopy(Chromosome.problem.deadlineDemandPeriods)
+	# 	self.tab.append(copy.deepcopy(Chromosome.problem.zerosRow))
+
+	# 	self.branches = []
 
 	def isLeaf(self):
 		
@@ -303,65 +423,6 @@ class Node(object):
 			self = copy.deepcopy(child)
 
 			return self.getChild()
-
-
-	def getChildren(self):
-
-		childrenQueue = []
-
-		for i in range(0, Chromosome.problem.nbItems):
-
-			if self.tab[i] != [] and self.tab[i][len(self.tab[i])-1] >= self._currentPeriod:
-
-				# the child will inherit some values from the parent
-				childNode = Node()
-				childNode.tab = copy.deepcopy(self.tab)
-				childNode.branches = copy.deepcopy(self.branches)
-				childNode.branches.insert(0, [])
-
-				# i build the chromosome of the child 
-				childNode.chromosome.solution = copy.deepcopy(self.chromosome.solution)
-				childNode.chromosome.solution.insert(0, i + 1)
-				childNode.chromosome.itemsRank = copy.deepcopy(self.chromosome.itemsRank)
-				childNode.chromosome.itemsRank.insert(0, len(self.tab[i]))
-				childNode.chromosome.manufactItemsPeriods = copy.deepcopy(self.chromosome.manufactItemsPeriods)
-				(childNode.chromosome.manufactItemsPeriods[i]).insert(0, self.currentPeriod)
-				childNode.chromosome.fitnessValue = Node.getFitnessValue(self.chromosome.solution, self.chromosome.fitnessValue, i, len(self.tab[i]), self.currentPeriod)
-
-
-				childNode.currentPeriod = self._currentPeriod - 1
-				del childNode.tab[i][len(self.tab[i])-1]
-				childrenQueue.append(copy.deepcopy(childNode))
-
-		if self.tab[len(self.tab)-1] != []:
-
-			# the child will inherit some values from the parent
-			childNode = Node()
-			childNode.tab = copy.deepcopy(self.tab)
-			childNode.branches = copy.deepcopy(self.branches)
-			childNode.branches.insert(0, [])
-
-			# i build the chromosome of the child
-			childNode.chromosome.solution = copy.deepcopy(self.chromosome.solution)
-			childNode.chromosome.solution.insert(0, 0)
-			childNode.chromosome.itemsRank = copy.deepcopy(self.chromosome.itemsRank)
-			childNode.chromosome.itemsRank.insert(0, 0)
-			childNode.chromosome.manufactItemsPeriods = copy.deepcopy(self.chromosome.manufactItemsPeriods)
-			(childNode.chromosome.manufactItemsPeriods[Chromosome.problem.nbItems]).insert(0, self.currentPeriod)
-			childNode.chromosome.fitnessValue = self.chromosome.fitnessValue
-
-			childNode.currentPeriod = self._currentPeriod - 1
-			del childNode.tab[len(self.tab)-1][len(childNode.tab[len(self.tab)-1])-1]
-			childrenQueue.append(copy.deepcopy(childNode))
-
-		if childrenQueue == []:
-
-			childNode = copy.deepcopy(self)
-			childNode.currentPeriod -= 1
-			childrenQueue.append(copy.deepcopy(childNode))
-
-		childrenQueue.sort()
-		return list(reversed(childrenQueue))
 
 
 	def getFitnessValue(cls, solution, fitnessValue, item, rank, currentPeriod):

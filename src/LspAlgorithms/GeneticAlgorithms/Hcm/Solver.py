@@ -3,54 +3,57 @@
 
 from .MainThread import *
 import math
-from ..Node import Node
+from ..PopInitialization.PopInitializer import PopInitializer
 
-#--------------------
-# Class : GeneticAlgorithm
-# author : Tafsir GNA
-# purpose : Describing the structure of the kind of genetic algorithm used in the program
-#--------------------
 
 class GeneticAlgorithm:
+	"""
+	"""
 
 	#	Class' variables
-	NbMaxPopulation = 30
-	mutationRate = 0.05
-	crossOverRate = 0.80
-	FITNESS_PADDING = 1
-	NumberOfMigrants = 1
-	MigrationRate = 0 # this variable holds the number of generations needed before a migration occurs during the search
-	nbMainThreads = 2
-	nbSlavesThread = 2
-	nbTrials = 3
-	pickeRandChromGens = 3
+	# NbMaxPopulation = 30
+	# mutationRate = 0.05
+	# crossOverRate = 0.80
+	# FITNESS_PADDING = 1
+	# NumberOfMigrants = 1
+	# MigrationRate = 0 # this variable holds the number of generations needed before a migration occurs during the search
+	# nbMainThreads = 2
+	# nbSlavesThread = 2
+	# nbTrials = 3
+	# pickeRandChromGens = 3
 
 	# Builder
-	def __init__(self, instance):
+	def __init__(self, inputDataInstance):
+		"""
+		"""
 
-		self.hashTable = {} #hashTable is a dictionnary
-		self.listMainThreads = [] # i initialize a list that's intended to contain all the main threads of this genetic algorithm program
+		self.inputDataInstance = inputDataInstance
 
-		# i impart some parameters to the chromosome class and population class
-		Chromosome.mutationRate = GeneticAlgorithm.mutationRate
-		Chromosome.problem = instance
-		Chromosome.hashTable = self.hashTable
+		self.popInitializer = PopInitializer()
 
-		# i set some class' properties of Population class
-		ClspThread.FITNESS_PADDING = GeneticAlgorithm.FITNESS_PADDING
-		ClspThread.MigrationRate = GeneticAlgorithm.MigrationRate
-		ClspThread.crossOverRate = GeneticAlgorithm.crossOverRate
+		# self.hashTable = {} #hashTable is a dictionnary
+		# self.listMainThreads = [] # i initialize a list that's intended to contain all the main threads of this genetic algorithm program
 
-		ClspThread.NbMaxPopulation = GeneticAlgorithm.NbMaxPopulation
-		ClspThread.listMainThreads = self.listMainThreads
-		ClspThread.nbTrials = GeneticAlgorithm.nbTrials
-		ClspThread.pickeRandChromGens = GeneticAlgorithm.pickeRandChromGens
-		SlaveThreadsManager.nbSlavesThread = GeneticAlgorithm.nbSlavesThread
-		ClspThread.NumberOfMigrants = GeneticAlgorithm.NumberOfMigrants
+		# # i impart some parameters to the chromosome class and population class
+		# Chromosome.mutationRate = GeneticAlgorithm.mutationRate
+		# Chromosome.problem = instance
+		# Chromosome.hashTable = self.hashTable
 
-		for i in range(0,GeneticAlgorithm.nbMainThreads):
-			clspThread = ClspThread(i)
-			self.listMainThreads.append(clspThread)
+		# # i set some class' properties of Population class
+		# ClspThread.FITNESS_PADDING = GeneticAlgorithm.FITNESS_PADDING
+		# ClspThread.MigrationRate = GeneticAlgorithm.MigrationRate
+		# ClspThread.crossOverRate = GeneticAlgorithm.crossOverRate
+
+		# ClspThread.NbMaxPopulation = GeneticAlgorithm.NbMaxPopulation
+		# ClspThread.listMainThreads = self.listMainThreads
+		# ClspThread.nbTrials = GeneticAlgorithm.nbTrials
+		# ClspThread.pickeRandChromGens = GeneticAlgorithm.pickeRandChromGens
+		# SlaveThreadsManager.nbSlavesThread = GeneticAlgorithm.nbSlavesThread
+		# ClspThread.NumberOfMigrants = GeneticAlgorithm.NumberOfMigrants
+
+		# for i in range(0,GeneticAlgorithm.nbMainThreads):
+		# 	clspThread = ClspThread(i)
+		# 	self.listMainThreads.append(clspThread)
 
 	#--------------------
 	# function : initPopulation
@@ -59,50 +62,21 @@ class GeneticAlgorithm:
 	#--------------------
 
 	def solve(self):
+		"""
+		"""
+
+		# Making up the initial population
+		self.popInitializer.process(self.inputDataInstance)
 
 		# In order to create this new population, i use the deep first search(DFS) to create some potential good chromosomes
 
-		queue = []
-		currentNode = Node()
-		currentNode.initialize()
-		children = currentNode.getChildren()
 
-		#print ("start!!")
-		i = 0
-		while len(children) <= 1:
-			queue += children
 
-			if queue == []:
-				break
-			currentNode = copy.deepcopy(queue[len(queue)-1])
-			del queue[len(queue)-1]
-			#print("current : ", currentNode)
-			children = currentNode.getChildren()
-			#print("children : ", children)
 
-			i += 1
-		
-		# i make up the queue of each main thread
-		nbChildren = len(children)
-		for i in range(0, nbChildren):
-			(self.listMainThreads[i%GeneticAlgorithm.nbMainThreads]).queue.append(copy.deepcopy(children[i]))
 
-		
-		# i set the flags
-		prevThread = self.listMainThreads[0]
-		if GeneticAlgorithm.nbMainThreads > 1:
-			for i in range(1, GeneticAlgorithm.nbMainThreads):
-				(self.listMainThreads[i]).readyFlag = prevThread.readyEvent
-				prevThread = self.listMainThreads[i]
 
-		# first, i initialize the population upon which the search will be applied
-		for thread in self.listMainThreads:
-			thread.start()
-			thread.join()
 
-		(self.listMainThreads[len(self.listMainThreads)-1]).readyEvent.wait()
 
-		print("Initialized!!!")
 
 		
 		# readyFlag = 0
