@@ -5,8 +5,9 @@
 # import sys
 import argparse 
 from LspAlgorithms.GeneticAlgorithms.Hcm.Solver import GeneticAlgorithm
-from LspInputData.LspInputDataInstance import InputDataInstance
-from LspInputData.LspInputDataReader import InputDataReader
+from LspInputDataReading.LspInputDataReader import InputDataReader
+from LspStatistics.LspRuntimeStatisticsMonitor import LspRuntimeStatisticsMonitor
+from ParameterSearch.ParameterData import ParameterData
 
 # Setting solver's options 
 parser = argparse.ArgumentParser(description = "LspSolver : Lot sizing problems solver tool implementing different AI methods" )
@@ -23,7 +24,11 @@ inputFile = args.file  #sys.argv[1]
 inputDataReader = InputDataReader()
 inputDataInstance = inputDataReader.readInput(inputFile)
 
-# print(InputDataInstance.instance.nPeriods)
+###
+ParameterData.instance = ParameterData()
+
+###
+LspRuntimeStatisticsMonitor.instance = LspRuntimeStatisticsMonitor()
 
 # I create an instance of the genetic algorithm to be used
 lspSolver = GeneticAlgorithm(inputDataInstance)
@@ -33,11 +38,4 @@ lspSolver = GeneticAlgorithm(inputDataInstance)
 
 lspSolver.solve()
 
-# i store the time when the solving ended
-# endTime = time.clock()
-
-# print(" ")
-# print("-------	Statistics	-------")
-# print("time : " + str((endTime - startTime)) + " second(s)")
-
-#---	End
+LspRuntimeStatisticsMonitor.instance.report()

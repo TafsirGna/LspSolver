@@ -1,10 +1,12 @@
 #!/usr/bin/python3.5
 # -*-coding: utf-8 -*
 
-import copy
-
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
-from LspInputData.LspInputDataInstance import InputDataInstance
+from LspInputDataReading.LspInputDataInstance import InputDataInstance
+from LspStatistics.LspRuntimeStatisticsMonitor import LspRuntimeStatisticsMonitor
+import time
+
+from ParameterSearch.ParameterData import ParameterData
 
 from .InitSearchNode import SearchNode
 
@@ -25,9 +27,21 @@ class PopInitializer:
         self.inputDataInstance = inputDataInstance
         self.queue = []
 
+        ###
+        if LspRuntimeStatisticsMonitor.instance:
+            LspRuntimeStatisticsMonitor.instance.popInitClockStart = time.clock()
+        ###
+
         rootNode = self.rootNode()
 
-        return self.search(rootNode)
+        population = self.search(rootNode)
+
+        ###
+        if LspRuntimeStatisticsMonitor.instance:
+            LspRuntimeStatisticsMonitor.instance.popInitClockEnd = time.clock()
+        ###
+
+        return population
 
     def rootNode(self):
         """
@@ -55,6 +69,13 @@ class PopInitializer:
             if len(children) == 0: # leaf node
                 node.chromosome.cost = Chromosome.calculateCost(node.chromosome.dnaArray, InputDataInstance.instance)
                 population.append(node.chromosome)
+
+                ###
+                if ParameterData.instance:
+                    if len(population) >= ParameterData.instance.popSize:
+                        print(population)
+                        return population
+                ###
 
             self.queue += children
 

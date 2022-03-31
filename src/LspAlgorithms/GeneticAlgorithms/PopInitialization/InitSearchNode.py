@@ -1,4 +1,4 @@
-from LspInputData.LspInputDataInstance import InputDataInstance
+from LspInputDataReading.LspInputDataInstance import InputDataInstance
 from ..Chromosome import Chromosome
 import copy
 

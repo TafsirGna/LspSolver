@@ -5,7 +5,7 @@ from random import randint
 import copy
 import numpy as np
 
-from LspInputData.LspInputDataInstance import InputDataInstance
+from LspInputDataReading.LspInputDataInstance import InputDataInstance
 # from ...LspLibrary.lspLibrary import *
 
 class Chromosome(object):
@@ -26,19 +26,20 @@ class Chromosome(object):
 	def calculateCost(cls, dnaArray, inputDataInstance):
 		"""
 		"""
+		# print(dnaArray)
 		cost = 0
 		item1, item2 = dnaArray[0], dnaArray[0]
-		nOccurenceItem = np.array([0 for i in range(0, inputDataInstance.instance.nItems)])
-		nOccurenceItem[item2 - 1] += 1
-		cost += inputDataInstance.instance.stockingCostsArray[item2 - 1] * (inputDataInstance.instance.demandsArrayZipped[item2 - 1][nOccurenceItem[item2 - 1] -1] - 0)
+		nOccurenceItem = np.array([0 for _ in range(0, inputDataInstance.instance.nItems)])
+		if (item2 != 0):
+			nOccurenceItem[item2 - 1] += 1
+			cost += inputDataInstance.instance.stockingCostsArray[item2 - 1] * (inputDataInstance.instance.demandsArrayZipped[item2 - 1][nOccurenceItem[item2 - 1] -1] - 0)
 
 		for index in range(1, len(dnaArray)):
 			if dnaArray[index] != 0:
 				item2 = dnaArray[index]
-				# print(dnaArray, index, item1, item2)
 				cost += inputDataInstance.chanOverArray[item1 - 1 , item2 - 1]
 				nOccurenceItem[item2 - 1] += 1
-				cost += inputDataInstance.instance.stockingCostsArray[item2 - 1] * (inputDataInstance.instance.demandsArrayZipped[item2 - 1][nOccurenceItem[item2 - 1] -1] - index)
+				cost += inputDataInstance.instance.stockingCostsArray[item2 - 1] * (inputDataInstance.instance.demandsArrayZipped[item2 - 1][nOccurenceItem[item2 - 1] - 1] - index)
 
 				item1 = item2
 			else: 
