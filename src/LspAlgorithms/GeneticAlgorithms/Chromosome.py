@@ -47,7 +47,7 @@ class Chromosome(object):
 
 		return cost
 
-	def isFeasible():
+	def feasible():
 		pass
 
 

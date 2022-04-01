@@ -67,7 +67,7 @@ class PopInitializer:
             children = node.children()
 
             if len(children) == 0: # leaf node
-                node.chromosome.cost = Chromosome.calculateCost(node.chromosome.dnaArray, InputDataInstance.instance)
+                # node.chromosome.cost = Chromosome.calculateCost(node.chromosome.dnaArray, InputDataInstance.instance)
                 population.append(node.chromosome)
 
                 ###

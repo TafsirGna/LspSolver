@@ -13,6 +13,8 @@ class SearchNode(object):
 		self.chromosome = chromosome
 		self.period = period
 		self.itemsToOrder = [0 for i in range(0, InputDataInstance.instance.nItems)]
+		self.lastPlacedItem = None
+		self.dnaArrayZipped = [[] for i in range(0, InputDataInstance.instance.nItems)]
 
 		# then i append the number of periods where no items are to be ordered
 		self.itemsToOrder.append((InputDataInstance.instance.nPeriods - InputDataInstance.instance.demandsArray.sum()))
@@ -34,7 +36,7 @@ class SearchNode(object):
 		"""
 		"""
 
-		if self.period < 0:
+		if self.period < 0: # the node is a leaf node
 			return []
 
 		children = []
@@ -48,25 +50,50 @@ class SearchNode(object):
 		# print("Parent --> ", self)
 
 		for index, item in enumerate(self.itemsToOrder):
+
 			dnaArray = None
 			itemsToOrder = None
-			if item > 0:
+
+			if item > 0 and not(self.period == InputDataInstance.instance.nPeriods - 1 and index == InputDataInstance.instance.nItems):
+					
 				dnaArray = [0 for i in range(0, self.period)] + [0 if index == InputDataInstance.instance.nItems else index + 1] + [self.chromosome.dnaArray[i] for i in range(self.period + 1, InputDataInstance.instance.nPeriods)]
+
+				dnaArrayZipped = [[j for j in row] for row in self.dnaArrayZipped]
+
+				#Calculating the node's chromosome cost
+				# first change over costs
+				changeOverCost = 0
+				if self.lastPlacedItem and index < InputDataInstance.instance.nItems :
+					changeOverCost += InputDataInstance.instance.chanOverArray[index, self.lastPlacedItem - 1]
+
+				# next stocking costs and others
+				stockingCost = 0
+				if index < InputDataInstance.instance.nItems:
+
+					# dnaArrayZipped[index].append(self.period)
+					dnaArrayZipped[index].insert(0, self.period)
+					indexItem = (len(InputDataInstance.instance.demandsArrayZipped[index]) - len(self.dnaArrayZipped[index])) - 1
+					stockingCost = (InputDataInstance.instance.demandsArrayZipped[index][indexItem] - self.period) * InputDataInstance.instance.stockingCostsArray[index]
+					# print('-------------', stockingCost)
+
+
+				# setting node's chomosome period
 				itemsToOrder = [i for i in self.itemsToOrder]
 				itemsToOrder[index] -= 1
 
-				# setting node's chomosome period
 				node = SearchNode(Chromosome(dnaArray), self.period - 1)
-
 				node.itemsToOrder = itemsToOrder
-				#Calculating the node's chromosome cost
-				rightItem = node.chromosome.dnaArray[(self.period if self.period < InputDataInstance.instance.nPeriods - 1 else 0)]
-				changeOverCost = 0 #InputDataInstance.instance.chanOverArray[index, rightItem]
-				stockingCost = 0
-				node.chromosome.cost = (self.chromosome.cost + changeOverCost + stockingCost) # adding the changeOver cost and the stocking cost 
 
-				if not(self.period == InputDataInstance.instance.nPeriods - 1 and index == InputDataInstance.instance.nItems):
-					children.append(node)
+				# setting lastPlacedItem property
+				if (index == InputDataInstance.instance.nItems):
+					node.lastPlacedItem = self.lastPlacedItem
+				else:
+					node.lastPlacedItem = index + 1
+
+				node.chromosome.cost = (self.chromosome.cost + changeOverCost + stockingCost) # adding the changeOver cost and the stocking cost 
+				node.dnaArrayZipped = dnaArrayZipped
+
+				children.append(node)
 
 		# print("--- Children ---")
 		# print(children)
@@ -74,7 +101,7 @@ class SearchNode(object):
 		return children
 
 	def __repr__(self):
-		return str(self.chromosome.dnaArray) + " | " + str(self.period) + " | " + str(self.itemsToOrder) + "\n"
+		return str(self.chromosome.dnaArray) + " | " + str(self.period) + " | " + str(self.itemsToOrder) + " | " + str(self.dnaArrayZipped) + "\n"
 
 		# for i in range(0, Chromosome.problem.nbItems):
 
