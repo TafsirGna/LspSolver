@@ -3,24 +3,23 @@
 
 from random import randint
 import copy
+from xmlrpc.client import Boolean
 import numpy as np
+import random
 
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 # from ...LspLibrary.lspLibrary import *
 
 class Chromosome(object):
 
-	# mutationRate = 0
-	# problem = 0
-	# hashTable = {}
-
-	# Builder 
 	def __init__(self, dnaArray):
 		"""
 		"""
 
 		self.dnaArray = np.array(dnaArray)
 		self.cost = 0 #self.calculateCost(self.dnaArray, InputDataInstance.instance)
+		self.dnaArrayZipped = [[] for i in range(0, InputDataInstance.instance.nItems)]
+
 
 	@classmethod
 	def calculateCost(cls, dnaArray, inputDataInstance):
@@ -47,10 +46,101 @@ class Chromosome(object):
 
 		return cost
 
-	def feasible():
-		pass
+	@classmethod
+	def feasible(cls, dnaArray) -> Boolean:
+		"""Checks if a given dnaArray leads to a feasible chromosome
+		"""
+
+		dnaArray = np.array(dnaArray)
+		dnaArrayZipped = [[] for i in range(0, InputDataInstance.instance.nItems)]
+
+		for index, item in enumerate(dnaArray):
+			if (item != 0):
+				dnaArrayZipped[item - 1].append(index)
+
+		for i in range(0, InputDataInstance.instance.nItems):
+			demands = InputDataInstance.instance.demandsArrayZipped[i]
+			prods = dnaArrayZipped[i]
+			for j, value in enumerate(demands):
+				if value < prods[j]:
+					return False
+
+		return True
+
+	def zipDnaArray(self):
+		"""
+		"""
+		self.dnaArrayZipped = [[] for i in range(0, InputDataInstance.instance.nItems)]
+
+		for index, item in enumerate(self.dnaArray):
+			if (item != 0):
+				self.dnaArrayZipped[item - 1].append(index)
 
 
+	def mutate(self, strategy = "minimal"):
+		"""
+		"""
+
+		mutations = []
+
+		if strategy == "maximal":
+			bestDnaArrayCost = 0
+			bestDnaArray = None
+
+		for i1, itemProdIndexes in enumerate(self.dnaArrayZipped):
+
+			j1 = len(itemProdIndexes) - 1
+			while j1 >= 0:
+
+				item1ProdIndex = itemProdIndexes[j1]
+				item1DemandIndex = InputDataInstance.instance.demandsArrayZipped[i1][j1]
+				for i2, indexes in enumerate(self.dnaArrayZipped):
+
+					if i1 == i2:
+						continue
+
+					j2 = len(indexes) - 1
+					while j2 >=0:
+						item2ProdIndex = indexes[j2]
+						item2DemandIndex = InputDataInstance.instance.demandsArrayZipped[i2][j2]
+						# print(InputDataInstance.instance.demandsArrayZipped, '|',self.dnaArrayZipped)
+						# print(item1ProdIndex, item2ProdIndex, '|',i1, j1, '|',i2, j2)
+
+						if (item1ProdIndex <= item2DemandIndex and item2ProdIndex <= item1DemandIndex):
+							dnaArray = [i for i in self.dnaArray]
+							dnaArray[item1ProdIndex], dnaArray[item2ProdIndex] = dnaArray[item2ProdIndex], dnaArray[item1ProdIndex] 
+							# print(dnaArray)
+							if not(dnaArray in mutations):
+								mutations.append(dnaArray)
+
+							if strategy == "minimal":
+								if len(mutations) == 1:
+									self.dnaArray = dnaArray
+									self.zipDnaArray()
+									self.cost = Chromosome.calculateCost(dnaArray, InputDataInstance.instance)
+									return None
+							elif strategy == "maximal":
+								cost = Chromosome.calculateCost(dnaArray, InputDataInstance.instance)
+								if (cost > bestDnaArrayCost):
+									bestDnaArray = dnaArray
+									bestDnaArrayCost = cost
+
+						j2 -= 1
+
+				j1 -= 1
+
+		if strategy == "random":
+			random.shuffle(mutations)
+			dnaArray = mutations[0]
+
+			self.dnaArray = dnaArray
+			self.zipDnaArray()
+			self.cost = Chromosome.calculateCost(dnaArray, InputDataInstance.instance)
+
+		elif strategy == "maximal":
+			self.dnaArray = bestDnaArray
+			self.cost = bestDnaArrayCost
+			self.zipDnaArray()
 
 		# Variables
 		# self._solution = [] 
@@ -199,19 +289,6 @@ class Chromosome(object):
 	# purpose : Applying mutation to a given chromosome and returning the resulting one
 	#--------------------
 
-	def mutate(self):
-
-		#print("M Start : ", self._solution)
-		saved_solution = self._solution
-		saved_fitnessValue = self._fitnessValue
-
-		if (randint(0,100) < (Chromosome.mutationRate*100)): # then the chromsome has been selected for mutation 
-
-			self.mutate2()
-
-		#print("F Start : ", self._solution)
-
-	# TODO Revamp advmutate function as function mutate is
 
 	def getCostTab(self):
 

@@ -2,9 +2,11 @@
 # -*-coding: utf-8 -*
 
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
+from LspAlgorithms.GeneticAlgorithms.PopInitialization.Population import Population
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 from LspStatistics.LspRuntimeStatisticsMonitor import LspRuntimeStatisticsMonitor
 import time
+import random
 
 from ParameterSearch.ParameterData import ParameterData
 
@@ -53,7 +55,7 @@ class PopInitializer:
         """
         """
         
-        population = []
+        chromosomes = []
 
         children = node.children()
 
@@ -68,20 +70,21 @@ class PopInitializer:
 
             if len(children) == 0: # leaf node
                 # node.chromosome.cost = Chromosome.calculateCost(node.chromosome.dnaArray, InputDataInstance.instance)
-                population.append(node.chromosome)
+                chromosomes.append(node.chromosome)
 
                 ###
                 if ParameterData.instance:
-                    if len(population) >= ParameterData.instance.popSize:
-                        print(population)
-                        return population
+                    if len(chromosomes) >= ParameterData.instance.popSize:
+                        print(chromosomes)
+                        return Population(chromosomes)
                 ###
 
+            random.shuffle(children)
             self.queue += children
 
-        print(population)
+        print(chromosomes)
 
-        return population
+        return Population(chromosomes)
 
 		
 		# # i make up the queue of each main thread

@@ -14,7 +14,6 @@ class SearchNode(object):
 		self.period = period
 		self.itemsToOrder = [0 for i in range(0, InputDataInstance.instance.nItems)]
 		self.lastPlacedItem = None
-		self.dnaArrayZipped = [[] for i in range(0, InputDataInstance.instance.nItems)]
 
 		# then i append the number of periods where no items are to be ordered
 		self.itemsToOrder.append((InputDataInstance.instance.nPeriods - InputDataInstance.instance.demandsArray.sum()))
@@ -58,7 +57,7 @@ class SearchNode(object):
 					
 				dnaArray = [0 for i in range(0, self.period)] + [0 if index == InputDataInstance.instance.nItems else index + 1] + [self.chromosome.dnaArray[i] for i in range(self.period + 1, InputDataInstance.instance.nPeriods)]
 
-				dnaArrayZipped = [[j for j in row] for row in self.dnaArrayZipped]
+				dnaArrayZipped = [[j for j in row] for row in self.chromosome.dnaArrayZipped]
 
 				#Calculating the node's chromosome cost
 				# first change over costs
@@ -72,7 +71,7 @@ class SearchNode(object):
 
 					# dnaArrayZipped[index].append(self.period)
 					dnaArrayZipped[index].insert(0, self.period)
-					indexItem = (len(InputDataInstance.instance.demandsArrayZipped[index]) - len(self.dnaArrayZipped[index])) - 1
+					indexItem = (len(InputDataInstance.instance.demandsArrayZipped[index]) - len(self.chromosome.dnaArrayZipped[index])) - 1
 					stockingCost = (InputDataInstance.instance.demandsArrayZipped[index][indexItem] - self.period) * InputDataInstance.instance.stockingCostsArray[index]
 					# print('-------------', stockingCost)
 
@@ -91,7 +90,7 @@ class SearchNode(object):
 					node.lastPlacedItem = index + 1
 
 				node.chromosome.cost = (self.chromosome.cost + changeOverCost + stockingCost) # adding the changeOver cost and the stocking cost 
-				node.dnaArrayZipped = dnaArrayZipped
+				node.chromosome.dnaArrayZipped = dnaArrayZipped
 
 				children.append(node)
 
@@ -101,7 +100,7 @@ class SearchNode(object):
 		return children
 
 	def __repr__(self):
-		return str(self.chromosome.dnaArray) + " | " + str(self.period) + " | " + str(self.itemsToOrder) + " | " + str(self.dnaArrayZipped) + "\n"
+		return str(self.chromosome.dnaArray) + " | " + str(self.period) + " | " + str(self.itemsToOrder) + " | " + str(self.chromosome.dnaArrayZipped) + "\n"
 
 		# for i in range(0, Chromosome.problem.nbItems):
 

@@ -3,7 +3,8 @@
 
 # importing modules
 # import sys
-import argparse 
+import argparse
+from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome 
 from LspAlgorithms.GeneticAlgorithms.Hcm.Solver import GeneticAlgorithm
 from LspInputDataReading.LspInputDataReader import InputDataReader
 from LspStatistics.LspRuntimeStatisticsMonitor import LspRuntimeStatisticsMonitor
@@ -26,6 +27,13 @@ inputDataInstance = inputDataReader.readInput(inputFile)
 
 ###
 ParameterData.instance = ParameterData()
+
+# print(Chromosome.feasible([1, 2, 0, 1, 2]))
+
+# c = Chromosome([2, 1, 0, 1, 2])
+# c.zipDnaArray()
+# c.mutate("maximal")
+# print(c)
 
 ###
 LspRuntimeStatisticsMonitor.instance = LspRuntimeStatisticsMonitor()
