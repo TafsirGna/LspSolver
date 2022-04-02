@@ -10,8 +10,8 @@ class ParameterData:
         """
         """
         self.popSize = 50
-        self.mutationRate = 0
-        self.crossOverRate = 0
+        self.mutationRate = 0.05
+        self.crossOverRate = 0.8
 
     def save(self):
         """

@@ -6,6 +6,7 @@
 import argparse
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome 
 from LspAlgorithms.GeneticAlgorithms.Hcm.Solver import GeneticAlgorithm
+from LspAlgorithms.GeneticAlgorithms.PopInitialization.Population import Population
 from LspInputDataReading.LspInputDataReader import InputDataReader
 from LspStatistics.LspRuntimeStatisticsMonitor import LspRuntimeStatisticsMonitor
 from ParameterSearch.ParameterData import ParameterData
@@ -31,19 +32,18 @@ ParameterData.instance = ParameterData()
 # print(Chromosome.feasible([1, 2, 0, 1, 2]))
 
 # c = Chromosome([2, 1, 0, 1, 2])
-# c.zipDnaArray()
 # c.mutate("maximal")
 # print(c)
+
+# Population.crossOverChromosomes(Chromosome([2, 1, 0, 2, 1]), Chromosome([2, 1, 2, 0, 1]))
 
 ###
 LspRuntimeStatisticsMonitor.instance = LspRuntimeStatisticsMonitor()
 
-# I create an instance of the genetic algorithm to be used
+# # I create an instance of the genetic algorithm to be used
 lspSolver = GeneticAlgorithm(inputDataInstance)
-
-# i store the time when the solving began
-# startTime = time.clock()
 
 lspSolver.solve()
 
+# # Reporting all statistics collected when running the selected algo
 LspRuntimeStatisticsMonitor.instance.report()

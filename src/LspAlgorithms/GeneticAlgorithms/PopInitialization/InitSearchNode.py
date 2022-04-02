@@ -50,12 +50,9 @@ class SearchNode(object):
 
 		for index, item in enumerate(self.itemsToOrder):
 
-			dnaArray = None
 			itemsToOrder = None
 
 			if item > 0 and not(self.period == InputDataInstance.instance.nPeriods - 1 and index == InputDataInstance.instance.nItems):
-					
-				dnaArray = [0 for i in range(0, self.period)] + [0 if index == InputDataInstance.instance.nItems else index + 1] + [self.chromosome.dnaArray[i] for i in range(self.period + 1, InputDataInstance.instance.nPeriods)]
 
 				dnaArrayZipped = [[j for j in row] for row in self.chromosome.dnaArrayZipped]
 
@@ -80,7 +77,7 @@ class SearchNode(object):
 				itemsToOrder = [i for i in self.itemsToOrder]
 				itemsToOrder[index] -= 1
 
-				node = SearchNode(Chromosome(dnaArray), self.period - 1)
+				node = SearchNode(Chromosome(), self.period - 1)
 				node.itemsToOrder = itemsToOrder
 
 				# setting lastPlacedItem property
