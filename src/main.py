@@ -7,6 +7,7 @@ import argparse
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome 
 from LspAlgorithms.GeneticAlgorithms.Hcm.Solver import GeneticAlgorithm
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.Population import Population
+from LspInputDataReading.LspInputDataInstance import InputDataInstance
 from LspInputDataReading.LspInputDataReader import InputDataReader
 from LspStatistics.LspRuntimeStatisticsMonitor import LspRuntimeStatisticsMonitor
 from ParameterSearch.ParameterData import ParameterData
@@ -29,13 +30,13 @@ inputDataInstance = inputDataReader.readInput(inputFile)
 ###
 ParameterData.instance = ParameterData()
 
-# print(Chromosome.feasible([1, 2, 0, 1, 2]))
+# print(Chromosome.feasible([1, 2, 0, 1, 2], InputDataInstance.instance))
 
 # c = Chromosome([2, 1, 0, 1, 2])
 # c.mutate("maximal")
 # print(c)
 
-# Population.crossOverChromosomes(Chromosome([2, 1, 0, 2, 1]), Chromosome([2, 1, 2, 0, 1]))
+Population.crossOverChromosomes(Chromosome([2, 1, 0, 2, 1]), Chromosome([2, 1, 2, 0, 1]))
 
 ###
 LspRuntimeStatisticsMonitor.instance = LspRuntimeStatisticsMonitor()

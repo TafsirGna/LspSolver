@@ -15,7 +15,7 @@ class Chromosome(object):
 	def __init__(self, dnaArray = []):
 		"""
 		"""
-		self.cost = 0	#self.calculateCost(self.dnaArray, InputDataInstance.instance)
+		self.cost = 0
 		self.zipDnaArray(dnaArray)
 
 
@@ -23,20 +23,56 @@ class Chromosome(object):
 	def calculateCost(cls, dnaArray, inputDataInstance):
 		"""
 		"""
-		# print(dnaArray)
+
+		if len(dnaArray) == inputDataInstance.nPeriods:
+			return cls.calculateCostPlainDNA(dnaArray, inputDataInstance)
+		
+		if len(dnaArray) == inputDataInstance.nItems:
+			return cls.calculateCostZippedDNA(dnaArray, inputDataInstance)
+
+		return None
+
+	@classmethod
+	def calculateCostZippedDNA(cls, dnaArrayZipped, inputDataInstance):
+		"""
+		"""
+
+		cost = 0
+		tupleList = []
+
+		for item, itemIndices in enumerate(dnaArrayZipped):
+			for i, index in enumerate(itemIndices):
+				cost += (inputDataInstance.demandsArrayZipped[item][i] - dnaArrayZipped[item][i]) * inputDataInstance.stockingCostsArray[item]
+				pair = (index, item + 1)
+				tupleList.append(pair)
+
+		tupleList.sort(key=lambda pair: pair[0])
+		# print(tupleList)
+		
+		for i in range(1, len(tupleList)):
+			cost += inputDataInstance.chanOverArray[tupleList[i - 1][1] - 1][tupleList[i][1] - 1]
+			# print(cost)
+
+		return cost
+
+	@classmethod
+	def calculateCostPlainDNA(cls, dnaArray, inputDataInstance):
+		"""
+		"""
+
 		cost = 0
 		item1, item2 = dnaArray[0], dnaArray[0]
-		nOccurenceItem = np.array([0 for _ in range(0, inputDataInstance.instance.nItems)])
+		nOccurenceItem = np.array([0 for _ in range(inputDataInstance.nItems)])
 		if (item2 != 0):
 			nOccurenceItem[item2 - 1] += 1
-			cost += inputDataInstance.instance.stockingCostsArray[item2 - 1] * (inputDataInstance.instance.demandsArrayZipped[item2 - 1][nOccurenceItem[item2 - 1] -1] - 0)
+			cost += inputDataInstance.stockingCostsArray[item2 - 1] * (inputDataInstance.demandsArrayZipped[item2 - 1][nOccurenceItem[item2 - 1] -1] - 0)
 
 		for index in range(1, len(dnaArray)):
 			if dnaArray[index] != 0:
 				item2 = dnaArray[index]
 				cost += inputDataInstance.chanOverArray[item1 - 1 , item2 - 1]
 				nOccurenceItem[item2 - 1] += 1
-				cost += inputDataInstance.instance.stockingCostsArray[item2 - 1] * (inputDataInstance.instance.demandsArrayZipped[item2 - 1][nOccurenceItem[item2 - 1] - 1] - index)
+				cost += inputDataInstance.stockingCostsArray[item2 - 1] * (inputDataInstance.demandsArrayZipped[item2 - 1][nOccurenceItem[item2 - 1] - 1] - index)
 
 				item1 = item2
 			else: 
@@ -45,22 +81,39 @@ class Chromosome(object):
 		return cost
 
 	@classmethod
-	def feasible(cls, dnaArray) -> Boolean:
+	def feasible(cls, dnaArray, inputDataInstance) -> Boolean:
 		"""Checks if a given dnaArray leads to a feasible chromosome
 		"""
 
-		dnaArray = np.array(dnaArray)
-		dnaArrayZipped = [[] for _ in range(0, InputDataInstance.instance.nItems)]
+		dnaArrayZipped = None
+		if len(dnaArray) == inputDataInstance.nPeriods:
+			# Alert duplicate
+			dnaArray = np.array(dnaArray)
+			dnaArrayZipped = [[] for _ in range(inputDataInstance.nItems)]
 
-		for index, item in enumerate(dnaArray):
-			if (item != 0):
-				dnaArrayZipped[item - 1].append(index)
+			for index, item in enumerate(dnaArray):
+				if (item != 0):
+					dnaArrayZipped[item - 1].append(index)
+		elif len(dnaArray) == inputDataInstance.nItems:
+			dnaArrayZipped = dnaArray
 
-		for i in range(0, InputDataInstance.instance.nItems):
-			demands = InputDataInstance.instance.demandsArrayZipped[i]
+
+		indices = []
+		for i in range(inputDataInstance.nItems):
+			demands = inputDataInstance.demandsArrayZipped[i]
 			prods = dnaArrayZipped[i]
+
+			if len(demands) != len(prods): # checks that the number of produced item meets the number of demand
+				return False
+
 			for j, value in enumerate(demands):
-				if value < prods[j]:
+				prodIndex = prods[j]
+
+				if prodIndex in indices:
+					return False
+				indices.append(prodIndex)
+
+				if value < prodIndex: # checks that the item is produced before its demand period
 					return False
 
 		return True
@@ -68,7 +121,7 @@ class Chromosome(object):
 	def zipDnaArray(self, dnaArray):
 		"""
 		"""
-		self.dnaArrayZipped = [[] for _ in range(0, InputDataInstance.instance.nItems)]
+		self.dnaArrayZipped = [[] for _ in range(InputDataInstance.instance.nItems)]
 
 		for index, item in enumerate(dnaArray):
 			if (item != 0):
@@ -77,7 +130,7 @@ class Chromosome(object):
 	def unzipDnaArray(self):
 		"""
 		"""
-		dnaArray = [0 for _ in range(0, InputDataInstance.instance.nPeriods)]
+		dnaArray = [0 for _ in range(InputDataInstance.instance.nPeriods)]
 
 		for item, itemIndexes in enumerate(self.dnaArrayZipped):
 			for index in itemIndexes:
@@ -126,10 +179,10 @@ class Chromosome(object):
 							if strategy == "minimal":
 								if len(mutations) == 1:
 									self.dnaArrayZipped = dnaArrayZipped
-									self.cost = 0	#Chromosome.calculateCost(dnaArray, InputDataInstance.instance)
+									self.cost = Chromosome.calculateCost(dnaArrayZipped, InputDataInstance.instance)
 									return None
 							if strategy == "maximal":
-								cost = 0	#Chromosome.calculateCost(dnaArray, InputDataInstance.instance)
+								cost = Chromosome.calculateCost(dnaArrayZipped, InputDataInstance.instance)
 								if (cost < bestCost):
 									bestDnaArrayZipped = dnaArrayZipped
 									bestCost = cost
@@ -140,26 +193,24 @@ class Chromosome(object):
 
 		if strategy == "random":
 			random.shuffle(mutations)
-			bestDnaArrayZipped = mutations[0]
-
-			self.dnaArrayZipped = dnaArrayZipped
-			self.cost = 0 #Chromosome.calculateCost(dnaArray, InputDataInstance.instance)
+			self.dnaArrayZipped = mutations[0]
+			self.cost = Chromosome.calculateCost(self.dnaArrayZipped, InputDataInstance.instance)
 
 		elif strategy == "maximal":
 			self.dnaArrayZipped = bestDnaArrayZipped
 			self.cost = bestCost
 
 
-	def __lt__(self, chromosome):
-		return self._fitnessValue < chromosome.fitnessValue
+	# def __lt__(self, chromosome):
+	# 	return self._fitnessValue < chromosome.fitnessValue
 
 	def __repr__(self):
 		return " {} : {} ".format(self.unzipDnaArray(), self.cost)
 
-	def __eq__(self, chromosome):
-		return self._solution == chromosome.solution
+	# def __eq__(self, chromosome):
+	# 	return self._solution == chromosome.solution
 
-	def __ne__(self, chromosome):
-		return self._solution != chromosome.solution
+	# def __ne__(self, chromosome):
+	# 	return self._solution != chromosome.solution
 
 	

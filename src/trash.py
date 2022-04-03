@@ -46,7 +46,7 @@ def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, 
 from time import sleep
 
 # A List of Items
-items = list(range(0, 57))
+items = list(range(57))
 l = len(items)
 
 # Initial call to print 0% progress

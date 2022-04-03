@@ -55,7 +55,7 @@ class PopInitializer:
         """
         """
         
-        chromosomes = []
+        chromosomes, popCostTotal = [], 0
 
         children = node.children()
 
@@ -69,44 +69,23 @@ class PopInitializer:
             children = node.children()
 
             if len(children) == 0: # leaf node
-                # node.chromosome.cost = Chromosome.calculateCost(node.chromosome.dnaArray, InputDataInstance.instance)
                 chromosomes.append(node.chromosome)
+                popCostTotal += node.chromosome.cost
 
                 ###
                 if ParameterData.instance:
                     if len(chromosomes) >= ParameterData.instance.popSize:
-                        print(chromosomes)
-                        return Population(chromosomes)
+                        population = Population(chromosomes)
+                        population.costTotal = float(popCostTotal)
+                        print(population)
+                        return population
                 ###
 
             random.shuffle(children)
             self.queue += children
 
-        print(chromosomes)
+        population = Population(chromosomes)
+        population.costTotal = float(popCostTotal)
+        print(population)
 
-        return Population(chromosomes)
-
-		
-		# # i make up the queue of each main thread
-		# nbChildren = len(children)
-		# for i in range(0, nbChildren):
-		# 	(self.listMainThreads[i%GeneticAlgorithm.nbMainThreads]).queue.append(copy.deepcopy(children[i]))
-
-		
-		# # i set the flags
-		# prevThread = self.listMainThreads[0]
-		# if GeneticAlgorithm.nbMainThreads > 1:
-		# 	for i in range(1, GeneticAlgorithm.nbMainThreads):
-		# 		(self.listMainThreads[i]).readyFlag = prevThread.readyEvent
-		# 		prevThread = self.listMainThreads[i]
-
-		# # first, i initialize the population upon which the search will be applied
-		# for thread in self.listMainThreads:
-		# 	thread.start()
-		# 	thread.join()
-
-		# (self.listMainThreads[len(self.listMainThreads)-1]).readyEvent.wait()
-
-		# print("Initialized!!!")
-
-        pass
+        return population
