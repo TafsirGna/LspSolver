@@ -1,6 +1,7 @@
 #!/usr/bin/python3.5
 # -*-coding: utf-8 -*
 
+from curses.ascii import CR
 from random import randint
 import copy
 from xmlrpc.client import Boolean
@@ -63,12 +64,12 @@ class Chromosome(object):
 		cost = 0
 		item1, item2 = dnaArray[0], dnaArray[0]
 		nOccurenceItem = np.array([0 for _ in range(inputDataInstance.nItems)])
-		if (item2 != 0):
+		if item2 is not 0:
 			nOccurenceItem[item2 - 1] += 1
 			cost += inputDataInstance.stockingCostsArray[item2 - 1] * (inputDataInstance.demandsArrayZipped[item2 - 1][nOccurenceItem[item2 - 1] -1] - 0)
 
 		for index in range(1, len(dnaArray)):
-			if dnaArray[index] != 0:
+			if dnaArray[index] is not 0:
 				item2 = dnaArray[index]
 				cost += inputDataInstance.chanOverArray[item1 - 1 , item2 - 1]
 				nOccurenceItem[item2 - 1] += 1
@@ -92,7 +93,7 @@ class Chromosome(object):
 			dnaArrayZipped = [[] for _ in range(inputDataInstance.nItems)]
 
 			for index, item in enumerate(dnaArray):
-				if (item != 0):
+				if item is not 0:
 					dnaArrayZipped[item - 1].append(index)
 		elif len(dnaArray) == inputDataInstance.nItems:
 			dnaArrayZipped = dnaArray
@@ -103,13 +104,13 @@ class Chromosome(object):
 			demands = inputDataInstance.demandsArrayZipped[i]
 			prods = dnaArrayZipped[i]
 
-			if len(demands) != len(prods): # checks that the number of produced item meets the number of demand
+			if len(demands) is not len(prods): # checks that the number of produced item meets the number of demand
 				return False
 
 			for j, value in enumerate(demands):
 				prodIndex = prods[j]
 
-				if prodIndex in indices:
+				if prodIndex is None or prodIndex in indices:
 					return False
 				indices.append(prodIndex)
 
@@ -124,17 +125,25 @@ class Chromosome(object):
 		self.dnaArrayZipped = [[] for _ in range(InputDataInstance.instance.nItems)]
 
 		for index, item in enumerate(dnaArray):
-			if (item != 0):
+			if item is not 0:
 				self.dnaArrayZipped[item - 1].append(index)
 
 	def unzipDnaArray(self):
 		"""
 		"""
+		return Chromosome.classUnzipDnaArray(self.dnaArrayZipped)
+
+
+	@classmethod
+	def classUnzipDnaArray(cls, dnaArrayZipped):
+		"""
+		"""
 		dnaArray = [0 for _ in range(InputDataInstance.instance.nPeriods)]
 
-		for item, itemIndexes in enumerate(self.dnaArrayZipped):
-			for index in itemIndexes:
-				dnaArray[index] = item + 1
+		for item, itemIndices in enumerate(dnaArrayZipped):
+			for index in itemIndices:
+				if index is not None:
+					dnaArray[index] = item + 1
 
 		return dnaArray
 

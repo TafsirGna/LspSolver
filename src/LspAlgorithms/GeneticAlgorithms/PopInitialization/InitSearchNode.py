@@ -52,7 +52,7 @@ class SearchNode(object):
 
 			itemsToOrder = None
 
-			if item > 0 and not(self.period == InputDataInstance.instance.nPeriods - 1 and index == InputDataInstance.instance.nItems):
+			if item > 0:
 
 				dnaArrayZipped = [[j for j in row] for row in self.chromosome.dnaArrayZipped]
 

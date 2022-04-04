@@ -55,7 +55,7 @@ class PopInitializer:
         """
         """
         
-        chromosomes, popCostTotal = [], 0
+        chromosomes = []
 
         children = node.children()
 
@@ -70,13 +70,11 @@ class PopInitializer:
 
             if len(children) == 0: # leaf node
                 chromosomes.append(node.chromosome)
-                popCostTotal += node.chromosome.cost
 
                 ###
                 if ParameterData.instance:
                     if len(chromosomes) >= ParameterData.instance.popSize:
                         population = Population(chromosomes)
-                        population.costTotal = float(popCostTotal)
                         print(population)
                         return population
                 ###
@@ -85,7 +83,6 @@ class PopInitializer:
             self.queue += children
 
         population = Population(chromosomes)
-        population.costTotal = float(popCostTotal)
         print(population)
 
         return population

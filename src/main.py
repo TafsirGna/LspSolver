@@ -36,7 +36,7 @@ ParameterData.instance = ParameterData()
 # c.mutate("maximal")
 # print(c)
 
-Population.crossOverChromosomes(Chromosome([2, 1, 0, 2, 1]), Chromosome([2, 1, 2, 0, 1]))
+# Population.crossOverChromosomes(Chromosome([2, 1, 0, 2, 1]), Chromosome([2, 1, 2, 0, 1]))
 
 ###
 LspRuntimeStatisticsMonitor.instance = LspRuntimeStatisticsMonitor()

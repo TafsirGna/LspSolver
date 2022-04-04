@@ -35,15 +35,15 @@ class GeneticAlgorithm:
 		# Making up the initial population
 		population = self.popInitializer.process(self.inputDataInstance)
 
-		i = 0
+		# i = 0
 		while not(self.stopConditionMet(population)):
-			if i == 1:
-				break
+			# if i == 1:
+			# 	break
 
 			population = population.evolve()
 			print(population)
 			
-			i += 1
+			# i += 1
 
 	
 	def stopConditionMet(self, population):
