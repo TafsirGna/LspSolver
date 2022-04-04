@@ -1,6 +1,7 @@
 #!/usr/bin/python3.5
 # -*-coding: utf-8 -*
 
+from ParameterSearch.ParameterData import ParameterData
 from .MainThread import *
 import math
 from ..PopInitialization.PopInitializer import PopInitializer
@@ -26,6 +27,7 @@ class GeneticAlgorithm:
 
 		self.inputDataInstance = inputDataInstance
 		self.popInitializer = PopInitializer()
+		self.elites = []
 
 
 	def solve(self):
@@ -34,6 +36,7 @@ class GeneticAlgorithm:
 
 		# Making up the initial population
 		population = self.popInitializer.process(self.inputDataInstance)
+		self.elites = population.elites
 
 		# i = 0
 		while not(self.stopConditionMet(population)):
@@ -42,6 +45,14 @@ class GeneticAlgorithm:
 
 			population = population.evolve()
 			print(population)
+
+			# making up the new elite group
+			elites = self.elites + population.elites
+			elites.sort(key= lambda chromosome: chromosome.cost)
+			
+			nElites = int(float(len(population.chromosomes)) * ParameterData.instance.elitePercentage)
+			nElites = (1 if nElites < 1 else nElites)
+			self.elites = elites[:nElites]
 			
 			# i += 1
 

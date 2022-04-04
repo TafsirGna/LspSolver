@@ -1,4 +1,6 @@
 from functools import total_ordering
+
+import numpy as np
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
 import random
 
@@ -11,6 +13,7 @@ class Population:
         """
         """
         self.chromosomes = chromosomes
+        self.setElites()
 
 
     def evolve(self):
@@ -21,6 +24,19 @@ class Population:
         population = selectedPopulation
 
         return population
+
+    
+    def setElites(self):
+        """
+        """
+        nElites = int(float(len(self.chromosomes)) * ParameterData.instance.elitePercentage)
+        nElites = ( 1 if nElites < 1 else nElites)
+
+        # self.chromosomes.sorted(key= lambda chromosome: chromosome.cost) 
+        chromosomes = sorted(self.chromosomes, key= (lambda chromosome: chromosome.cost)) # reverse=True
+
+        self.elites = chromosomes[:nElites]
+        self.maxChromosomeCost = (chromosomes[-1]).cost + 1
 
 
     def applyGeneticOperators(self, selection_strategy="roulette_wheel"):
@@ -38,15 +54,11 @@ class Population:
         selectedChromosomes = []
 
         # Calculating fitness value for each chromosome
-        maxChromosomeCost  = 0
-        for chromosome in self.chromosomes:
-            if (chromosome.cost > maxChromosomeCost):
-                maxChromosomeCost = chromosome.cost
-        maxChromosomeCost += 1
+        # maxChromosomeCost = (max(self.chromosomes, key=lambda c: c.cost)).cost + 1
 
         totalFitness = 0
         for chromosome in self.chromosomes:
-            chromosome.fitnessValue = maxChromosomeCost - chromosome.cost
+            chromosome.fitnessValue = self.maxChromosomeCost - chromosome.cost
             # print("888 ---> ", chromosome, chromosome.fitnessValue)
             totalFitness += chromosome.fitnessValue
         self.totalFitness = totalFitness
@@ -54,32 +66,24 @@ class Population:
 
         rouletteProbabilities = []
         
-        partial_sum = float(0)
+
         for chromosome in self.chromosomes:
-            partial_sum += float(chromosome.fitnessValue)/self.totalFitness
-            rouletteProbabilities.append(partial_sum)
+            rouletteProbabilities.append(float(chromosome.fitnessValue)/self.totalFitness)
         print(rouletteProbabilities)
 
         while len(selectedChromosomes) < len(self.chromosomes): # selecting two chromosomes at once
-            randomFloat = random.random()
-            chromosomeC, chromosomeD = None, None
-            for indexA, proba in enumerate(rouletteProbabilities):
-                if randomFloat <= proba:
-                    indexB = int(indexA + (len(self.chromosomes)/2)) % len(self.chromosomes)
-                    # print(indexA, indexB)
-                    chromosomeA, chromosomeB = self.chromosomes[indexA], self.chromosomes[indexB]
 
-                    # print("---", chromosomeA, chromosomeB)
-                    
-                    if (random.random() < ParameterData.instance.crossOverRate):
-                        chromosomeC, chromosomeD = Population.crossOverChromosomes(chromosomeA, chromosomeB)
-                        # print("+++", chromosomeC, chromosomeD)
+            chromosomeA, chromosomeB, chromosomeC, chromosomeD = np.random.choice(self.chromosomes, p=rouletteProbabilities), np.random.choice(self.chromosomes, p=rouletteProbabilities), None, None
+            if (random.random() < ParameterData.instance.crossOverRate):
+                chromosomeC, chromosomeD = Population.crossOverChromosomes(chromosomeA, chromosomeB)
+                # print("+++", chromosomeC, chromosomeD)
 
-                        if (random.random() < ParameterData.instance.mutationRate):
-                            chromosomeC.mutate()
+                if (random.random() < ParameterData.instance.mutationRate):
+                    chromosomeC.mutate()
 
-                        if (random.random() < ParameterData.instance.mutationRate):
-                            chromosomeD.mutate()
+                if (random.random() < ParameterData.instance.mutationRate):
+                    chromosomeD.mutate()
+
 
             if chromosomeC is not None:
                 selectedChromosomes.append(chromosomeC)

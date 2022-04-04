@@ -148,7 +148,7 @@ class Chromosome(object):
 		return dnaArray
 
 
-	def mutate(self, strategy = "minimal"):
+	def mutate(self, strategy = "maximal"):
 		"""
 		"""
 
