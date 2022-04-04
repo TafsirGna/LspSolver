@@ -69,7 +69,6 @@ class Population:
 
         for chromosome in self.chromosomes:
             rouletteProbabilities.append(float(chromosome.fitnessValue)/self.totalFitness)
-        print(rouletteProbabilities)
 
         while len(selectedChromosomes) < len(self.chromosomes): # selecting two chromosomes at once
 
@@ -78,10 +77,10 @@ class Population:
                 chromosomeC, chromosomeD = Population.crossOverChromosomes(chromosomeA, chromosomeB)
                 # print("+++", chromosomeC, chromosomeD)
 
-                if (random.random() < ParameterData.instance.mutationRate):
+                if chromosomeC is not None and (random.random() < ParameterData.instance.mutationRate):
                     chromosomeC.mutate()
 
-                if (random.random() < ParameterData.instance.mutationRate):
+                if chromosomeD is not None and (random.random() < ParameterData.instance.mutationRate):
                     chromosomeD.mutate()
 
 
@@ -129,15 +128,59 @@ class Population:
 
         unzippedDNA = Chromosome.classUnzipDnaArray(dnaArrayZipped)
 
-        # print("=======", dnaArrayZipped, unzippedDNA)
+        # print("=== Before ", dnaArrayZipped, unzippedDNA , ' | ', InputDataInstance.instance.demandsArrayZipped)
+
         for item, itemIndices in enumerate(dnaArrayZipped):
             bottomLimit = 0
             for i, itemIndex in enumerate(itemIndices):
-                if itemIndex == None:
-                    for j, periodValue in enumerate(unzippedDNA[bottomLimit:InputDataInstance.instance.demandsArrayZipped[item][i]]):
+                # print("item : ", item, 'index : ', itemIndex, "None : ", itemIndex is None, "indices : ", itemIndices)
+                if itemIndex is None:
+                    # print("Portion : ", unzippedDNA[bottomLimit:(InputDataInstance.instance.demandsArrayZipped[item][i]+1)])
+
+                    j = (InputDataInstance.instance.demandsArrayZipped[item][i])
+                    while j >= bottomLimit:
+
+                        periodValue = unzippedDNA[j]
+                        # print("periodValue : ", periodValue)
                         if periodValue == 0:
-                            dnaArrayZipped[item][i] = bottomLimit + j
-                bottomLimit = dnaArrayZipped[item][i]
+                            dnaArrayZipped[item][i] = j
+                            unzippedDNA = Chromosome.classUnzipDnaArray(dnaArrayZipped)
+                            # print("result 1 : ", dnaArrayZipped)
+                            break
+                        else:
+                            repaired = False
+                            # print("not a list ", dnaArrayZipped[periodValue - 1], (j))
+                            indexPeriodValue = dnaArrayZipped[periodValue - 1].index(j)
+                            demandPeriod = InputDataInstance.instance.demandsArrayZipped[periodValue - 1][indexPeriodValue]
+                            # print("demande period : ", demandPeriod, "Second portion : ", unzippedDNA[(j + bottomLimit):demandPeriod + 1])
+                            
+                            k = demandPeriod
+                            while k >= (j + bottomLimit):
+
+                                periodVal = unzippedDNA[k]
+                                # print("Second period : ", periodVal)
+                                if periodVal == 0:
+                                    dnaArrayZipped[periodValue - 1][indexPeriodValue] = k
+                                    dnaArrayZipped[item][i] = (j + bottomLimit)
+                                    unzippedDNA = Chromosome.classUnzipDnaArray(dnaArrayZipped)
+                                    # print("result 2 : ", dnaArrayZipped)
+                                    repaired = True
+                                    break
+
+                                k -= 1
+                                
+                            
+                            if repaired:
+                                break
+
+                        j -= 1
+
+                    # if it still none then 
+                    if dnaArrayZipped[item][i] is None:
+                        return None
+                bottomLimit = dnaArrayZipped[item][i] + 1
+        
+        # print("=== After ", dnaArrayZipped, unzippedDNA)
 
         return dnaArrayZipped
 
@@ -148,10 +191,6 @@ class Population:
         """
         dnaArrayZippedC = [[] for _ in range(InputDataInstance.instance.nItems)]
         dnaArrayZippedD = [[] for _ in range(InputDataInstance.instance.nItems)]
-        # cost = 0
-
-        # print(chromosomeA.unzipDnaArray(), chromosomeB.unzipDnaArray())
-        # print(chromosomeA.dnaArrayZipped, chromosomeB.dnaArrayZipped)
 
         indicesC, indicesD  = [], []
         for item in range(InputDataInstance.instance.nItems):
@@ -185,48 +224,15 @@ class Population:
 
         dnaArrayZippedC, dnaArrayZippedD = Population.repairDna(dnaArrayZippedC), Population.repairDna(dnaArrayZippedD)
 
+        chromosomeC, chromosomeD = None, None
+        if dnaArrayZippedC is not None:
+            chromosomeC = Chromosome()
+            chromosomeC.dnaArrayZipped = dnaArrayZippedC
+            chromosomeC.cost = Chromosome.calculateCostZippedDNA(chromosomeC.dnaArrayZipped, InputDataInstance.instance)
 
-        # print("????", dnaArrayZippedC, dnaArrayZippedD)
-
-        chromosomeC, chromosomeD = Chromosome(), Chromosome()
-        chromosomeC.dnaArrayZipped = dnaArrayZippedC
-        chromosomeD.dnaArrayZipped = dnaArrayZippedD
-        
-        chromosomeC.cost = Chromosome.calculateCostZippedDNA(chromosomeC.dnaArrayZipped, InputDataInstance.instance)
-        chromosomeD.cost = Chromosome.calculateCostZippedDNA(chromosomeD.dnaArrayZipped, InputDataInstance.instance)
-
-        if not Chromosome.feasible(chromosomeC.dnaArrayZipped, InputDataInstance.instance):
-            print("oooooooooooooooooooooooooooooooooooooooooooooooooooo", chromosomeC.unzipDnaArray())
-
-        if not Chromosome.feasible(chromosomeD.dnaArrayZipped, InputDataInstance.instance):
-            print("oooooooooooooooooooooooooooooooooooooooooooooooooooo", chromosomeD.unzipDnaArray())
-
-        # print(chromosomeA, chromosomeB)
-        # print(chromosomeC, chromosomeD)
+        if dnaArrayZippedD is not None:
+            chromosomeD = Chromosome()
+            chromosomeD.dnaArrayZipped = dnaArrayZippedD
+            chromosomeD.cost = Chromosome.calculateCostZippedDNA(chromosomeD.dnaArrayZipped, InputDataInstance.instance)
 
         return chromosomeC, chromosomeD
-
-
-
-
-
-
-
-
-
-# dnaArray = [[] for _ in range(InputDataInstance.instance.nPeriods)]
-# dnaArrayZipped = [[] for _ in range(InputDataInstance.instance.nItems)]
-# cost = 0
-
-# period = InputDataInstance.instance.nPeriods - 1
-
-# while period >= 0:
-
-#     randomPick = random.randint(1, 2)
-#     item = (chromosomeA.dnaArray[period] if randomPick == 1 else chromosomeB.dnaArray[period])
-#     dnaArray[period] = item
-
-#     if (item is not 0):
-#         dnaArrayZipped[item - 1].insert(0, period)
-
-#     period -= 1

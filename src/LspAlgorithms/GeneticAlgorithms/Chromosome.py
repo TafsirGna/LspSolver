@@ -1,15 +1,9 @@
 #!/usr/bin/python3.5
 # -*-coding: utf-8 -*
 
-from curses.ascii import CR
-from random import randint
-import copy
-from xmlrpc.client import Boolean
 import numpy as np
 import random
-
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
-# from ...LspLibrary.lspLibrary import *
 
 class Chromosome(object):
 
@@ -41,9 +35,12 @@ class Chromosome(object):
 		cost = 0
 		tupleList = []
 
+		# print(dnaArrayZipped, inputDataInstance.demandsArrayZipped)
+
 		for item, itemIndices in enumerate(dnaArrayZipped):
 			for i, index in enumerate(itemIndices):
-				cost += (inputDataInstance.demandsArrayZipped[item][i] - dnaArrayZipped[item][i]) * inputDataInstance.stockingCostsArray[item]
+				cost += (inputDataInstance.demandsArrayZipped[item][i] - dnaArrayZipped[item][i]) \
+					* inputDataInstance.stockingCostsArray[item]
 				pair = (index, item + 1)
 				tupleList.append(pair)
 
@@ -82,7 +79,7 @@ class Chromosome(object):
 		return cost
 
 	@classmethod
-	def feasible(cls, dnaArray, inputDataInstance) -> Boolean:
+	def feasible(cls, dnaArray, inputDataInstance):
 		"""Checks if a given dnaArray leads to a feasible chromosome
 		"""
 
@@ -146,6 +143,12 @@ class Chromosome(object):
 					dnaArray[index] = item + 1
 
 		return dnaArray
+
+
+	def localSearch(self):
+		"""
+		"""
+		pass
 
 
 	def mutate(self, strategy = "maximal"):
