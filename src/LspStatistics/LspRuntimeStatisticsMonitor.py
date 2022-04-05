@@ -16,7 +16,7 @@ class LspRuntimeStatisticsMonitor:
         pass
 
     def reportPopInit(self):
-        print(str(self.popInitClockEnd - self.popInitClockStart)+ " second(s)")
+        print(f"{self.popInitClockEnd - self.popInitClockStart} second(s)")
 
     def report(self):
         """

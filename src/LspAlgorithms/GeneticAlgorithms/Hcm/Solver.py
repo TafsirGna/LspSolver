@@ -36,6 +36,7 @@ class GeneticAlgorithm:
 
 		# Making up the initial population
 		population = self.popInitializer.process(self.inputDataInstance)
+		population.setElites()
 		self.elites = population.elites
 
 		# i = 0

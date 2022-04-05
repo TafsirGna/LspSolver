@@ -9,7 +9,7 @@ from ParameterSearch.ParameterData import ParameterData
 
 class Population:
 
-    def __init__(self, chromosomes) -> None:
+    def __init__(self, chromosomes = []) -> None:
         """
         """
         self.chromosomes = chromosomes
@@ -29,6 +29,9 @@ class Population:
     def setElites(self):
         """
         """
+        if len(self.chromosomes) is 0:
+            return
+
         nElites = int(float(len(self.chromosomes)) * ParameterData.instance.elitePercentage)
         nElites = ( 1 if nElites < 1 else nElites)
 
@@ -37,6 +40,17 @@ class Population:
 
         self.elites = chromosomes[:nElites]
         self.maxChromosomeCost = (chromosomes[-1]).cost + 1
+
+
+    def add(self, chromosome):
+        """
+        """
+        if ParameterData.instance and len(self.chromosomes) >= ParameterData.instance.popSize:
+            self.setElites()
+            return None
+
+        self.chromosomes.append(chromosome)
+        return chromosome
 
 
     def applyGeneticOperators(self, selection_strategy="roulette_wheel"):

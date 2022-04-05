@@ -11,6 +11,8 @@ from LspInputDataReading.LspInputDataInstance import InputDataInstance
 from LspInputDataReading.LspInputDataReader import InputDataReader
 from LspStatistics.LspRuntimeStatisticsMonitor import LspRuntimeStatisticsMonitor
 from ParameterSearch.ParameterData import ParameterData
+from time import perf_counter
+
 
 # Setting solver's options 
 parser = argparse.ArgumentParser(description = "LspSolver : Lot sizing problems solver tool implementing different AI methods" )
@@ -46,7 +48,17 @@ LspRuntimeStatisticsMonitor.instance = LspRuntimeStatisticsMonitor()
 # # I create an instance of the genetic algorithm to be used
 lspSolver = GeneticAlgorithm(inputDataInstance)
 
+###
+if LspRuntimeStatisticsMonitor.instance:
+    LspRuntimeStatisticsMonitor.instance.popInitClockStart = perf_counter()
+###
+
 lspSolver.solve()
+
+###
+if LspRuntimeStatisticsMonitor.instance:
+    LspRuntimeStatisticsMonitor.instance.popInitClockEnd = perf_counter()
+###
 
 # # Reporting all statistics collected when running the selected algo
 LspRuntimeStatisticsMonitor.instance.report()

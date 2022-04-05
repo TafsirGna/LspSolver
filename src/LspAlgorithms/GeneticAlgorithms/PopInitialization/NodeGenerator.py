@@ -9,8 +9,8 @@ class NodeGenerator:
 
     instance = None
     
-    def __init__(self, rootNode) -> None:
-        self.queue = rootNode.children()
+    def __init__(self, queue) -> None:
+        self.queue = queue
         pass
 
     def generate(self):

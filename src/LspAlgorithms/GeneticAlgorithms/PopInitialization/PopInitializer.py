@@ -1,18 +1,14 @@
 #!/usr/bin/python3.5
 # -*-coding: utf-8 -*
 
-import queue
-from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
+import threading
+
+from numpy import math
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.NodeGenerator import NodeGenerator
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.Population import Population
-from LspInputDataReading.LspInputDataInstance import InputDataInstance
-from LspStatistics.LspRuntimeStatisticsMonitor import LspRuntimeStatisticsMonitor
-import time
-import random
-
 from ParameterSearch.ParameterData import ParameterData
-
 from .InitSearchNode import SearchNode
+from threading import Thread
 
 class PopInitializer:
     """
@@ -22,7 +18,9 @@ class PopInitializer:
         """
         """
         self.strategy = strategy
-        self.nodeGenerator = None
+        self.threads = []
+        self.population = Population()
+        self._lock = threading.Lock()
 
     def process(self, inputDataInstance):
         """
@@ -30,23 +28,21 @@ class PopInitializer:
 
         self.inputDataInstance = inputDataInstance
 
-        ###
-        if LspRuntimeStatisticsMonitor.instance:
-            LspRuntimeStatisticsMonitor.instance.popInitClockStart = time.clock()
-        ###
+        children = self.rootNode().children()
+        step = math.ceil(float(len(children)) / float(ParameterData.instance.popInitThreadsNumber))
 
-        rootNode = self.rootNode()
-        self.nodeGenerator = NodeGenerator(rootNode)
-        NodeGenerator.instance = self.nodeGenerator
 
-        population = self.search(rootNode)
+        nodeGenQueues = [children[i:i+step] for i in range(0, len(children), step)]
 
-        ###
-        if LspRuntimeStatisticsMonitor.instance:
-            LspRuntimeStatisticsMonitor.instance.popInitClockEnd = time.clock()
-        ###
+        for i in range(ParameterData.instance.popInitThreadsNumber):
+            nodeGenerator = NodeGenerator(nodeGenQueues[i])
+            thread_T = Thread(target=self.search, args=(nodeGenerator,))
+            thread_T.start()
+            thread_T.join()
+            self.threads.append(thread_T)
 
-        return population
+        print(self.population.chromosomes)
+        return self.population
 
     def rootNode(self):
         """
@@ -54,17 +50,13 @@ class PopInitializer:
 
         return SearchNode.root(self.inputDataInstance)
 
-    def search(self, node):
+    def search(self, nodeGenerator):
         """
         """
 
-        chromosomes = []
-        for node in self.nodeGenerator.generate(): 
-            chromosomes.append(node.chromosome)
-            if ParameterData.instance and len(chromosomes) >= ParameterData.instance.popSize:
+        for node in nodeGenerator.generate(): 
+            result = None
+            with self._lock:
+                result = self.population.add(node.chromosome)
+            if result is None:
                 break  
-
-        population = Population(chromosomes)
-        print(population)
-
-        return population
