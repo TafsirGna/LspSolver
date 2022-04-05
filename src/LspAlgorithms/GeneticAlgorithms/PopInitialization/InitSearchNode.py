@@ -46,7 +46,7 @@ class SearchNode(object):
 			if item == 1:
 				self.itemsToOrder[index] += 1
 
-		# print("Parent --> ", self)
+		print("Parent --> ", self.chromosome)
 
 		for index, item in enumerate(self.itemsToOrder):
 
@@ -100,5 +100,5 @@ class SearchNode(object):
 		return str(self.chromosome.dnaArray) + " | " + str(self.period) + " | " + str(self.itemsToOrder) + " | " + str(self.chromosome.dnaArrayZipped) + "\n"
 
 
-	def __lt__(self, node):
-		return self.chromosome.fitnessValue < node.chromosome.fitnessValue
+	# def __lt__(self, node):
+	# 	return self.chromosome.fitnessValue < node.chromosome.fitnessValue

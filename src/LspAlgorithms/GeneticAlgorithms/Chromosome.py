@@ -85,16 +85,9 @@ class Chromosome(object):
 
 		dnaArrayZipped = None
 		if len(dnaArray) == inputDataInstance.nPeriods:
-			# Alert duplicate
-			dnaArray = np.array(dnaArray)
-			dnaArrayZipped = [[] for _ in range(inputDataInstance.nItems)]
-
-			for index, item in enumerate(dnaArray):
-				if item is not 0:
-					dnaArrayZipped[item - 1].append(index)
+			dnaArrayZipped = Chromosome.classZipDnaArray(dnaArray)
 		elif len(dnaArray) == inputDataInstance.nItems:
 			dnaArrayZipped = dnaArray
-
 
 		indices = []
 		for i in range(inputDataInstance.nItems):
@@ -119,11 +112,21 @@ class Chromosome(object):
 	def zipDnaArray(self, dnaArray):
 		"""
 		"""
-		self.dnaArrayZipped = [[] for _ in range(InputDataInstance.instance.nItems)]
+		self.dnaArrayZipped = Chromosome.classZipDnaArray(dnaArray)
+
+
+	@classmethod
+	def classZipDnaArray(cls, dnaArray):
+		"""
+		"""
+		dnaArrayZipped = [[] for _ in range(InputDataInstance.instance.nItems)]
 
 		for index, item in enumerate(dnaArray):
 			if item is not 0:
-				self.dnaArrayZipped[item - 1].append(index)
+				dnaArrayZipped[item - 1].append(index)
+			
+		return dnaArrayZipped
+
 
 	def unzipDnaArray(self):
 		"""
@@ -145,10 +148,62 @@ class Chromosome(object):
 		return dnaArray
 
 
-	def localSearch(self):
+	@classmethod
+	def localSearch(cls, dnaArray, inputDataInstance):
 		"""
 		"""
-		pass
+
+		dnaArrayZipped = None
+		if len(dnaArray) == inputDataInstance.nPeriods:
+			dnaArrayZipped = Chromosome.classZipDnaArray(dnaArray)
+		elif len(dnaArray) == inputDataInstance.nItems:
+			dnaArrayZipped = dnaArray
+
+		bestCost = Chromosome.calculateCost(dnaArrayZipped, inputDataInstance)
+		bestDnaArrayZipped = dnaArrayZipped
+
+		# print("fuuuuuuuuuuuuuuuuuuuuuuuck", Chromosome.calculateCost(dnaArrayZipped, inputDataInstance))
+
+		for i1, itemProdIndexes in enumerate(dnaArrayZipped):
+
+			j1 = len(itemProdIndexes) - 1
+			while j1 >= 0:
+
+				item1ProdIndex = itemProdIndexes[j1]
+				item1DemandIndex = InputDataInstance.instance.demandsArrayZipped[i1][j1]
+				for i2, indexes in enumerate(dnaArrayZipped):
+
+					if i1 == i2:
+						continue
+
+					j2 = len(indexes) - 1
+					while j2 >=0:
+						item2ProdIndex = indexes[j2]
+						item2DemandIndex = InputDataInstance.instance.demandsArrayZipped[i2][j2]
+						# print(InputDataInstance.instance.demandsArrayZipped, '|',self.dnaArrayZipped)
+						# print(item1ProdIndex, item2ProdIndex, '|',i1, j1, '|',i2, j2)
+
+						if (item1ProdIndex <= item2DemandIndex and item2ProdIndex <= item1DemandIndex):
+
+							dnaArrayZipped = [[index for index in itemIndexes] for itemIndexes in dnaArrayZipped]
+							dnaArrayZipped[i1][j1], dnaArrayZipped[i2][j2] = dnaArrayZipped[i2][j2], dnaArrayZipped[i1][j1]								
+
+							cost = Chromosome.calculateCost(dnaArrayZipped, InputDataInstance.instance)
+							if (cost < bestCost):
+								bestDnaArrayZipped = dnaArrayZipped
+								bestCost = cost
+
+						j2 -= 1
+
+				j1 -= 1
+
+		if (bestDnaArrayZipped == dnaArrayZipped):
+			chromosome = Chromosome()
+			chromosome.dnaArrayZipped = dnaArrayZipped
+			chromosome.cost = bestCost
+			return chromosome
+
+		return Chromosome.localSearch(bestDnaArrayZipped, inputDataInstance)
 
 
 	def mutate(self, strategy = "maximal"):

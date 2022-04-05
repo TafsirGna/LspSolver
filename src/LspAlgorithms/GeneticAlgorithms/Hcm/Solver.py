@@ -43,6 +43,10 @@ class GeneticAlgorithm:
 			# if i == 1:
 			# 	break
 
+			# index_I = random.randint(0, len(population.chromosomes))
+			# chromosome = population.chromosomes[index_I]
+			# population.chromosomes[index_I] = chromosome.localSearch()
+
 			population = population.evolve()
 			print(population)
 

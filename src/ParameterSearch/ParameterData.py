@@ -13,6 +13,7 @@ class ParameterData:
         self.mutationRate = 0.05
         self.crossOverRate = 0.8
         self.elitePercentage = 0.1
+        self.popInitThreadsNumber = 2
 
     def save(self):
         """

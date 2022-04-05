@@ -32,9 +32,11 @@ ParameterData.instance = ParameterData()
 
 # print(Chromosome.feasible([1, 2, 0, 1, 2], InputDataInstance.instance))
 
-# c = Chromosome([2, 1, 0, 1, 2])
+# c = Chromosome([2, 1, 2, 1, 0])
 # c.mutate("maximal")
 # print(c)
+
+# print(Chromosome.localSearch([2, 1, 2, 1, 0], InputDataInstance.instance))
 
 # Population.crossOverChromosomes(Chromosome([2, 1, 0, 2, 1]), Chromosome([2, 1, 2, 0, 1]))
 
