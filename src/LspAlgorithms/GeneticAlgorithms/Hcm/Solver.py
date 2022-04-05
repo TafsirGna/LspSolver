@@ -44,7 +44,7 @@ class GeneticAlgorithm:
 			# 	break
 
 			population = population.evolve()
-			# print(population)
+			print(population)
 
 			# making up the new elite group
 			elites = self.elites + population.elites
