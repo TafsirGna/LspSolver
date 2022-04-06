@@ -38,7 +38,7 @@ ParameterData.instance = ParameterData()
 # c.mutate("maximal")
 # print(c)
 
-# print(Chromosome.localSearch([2, 1, 1, 2, 0], InputDataInstance.instance))
+# print(Chromosome.localSearch([2, 3, 2, 2, 0, 1, 0, 1], InputDataInstance.instance))
 
 # Population.crossOverChromosomes(Chromosome([2, 1, 0, 2, 1]), Chromosome([2, 1, 2, 0, 1]))
 

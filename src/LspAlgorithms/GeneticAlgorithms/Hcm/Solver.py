@@ -44,10 +44,10 @@ class GeneticAlgorithm:
 			# if self.generationIndex == 1:
 			# 	break
 
-			# index_I = random.randint(0, (len(population.chromosomes) - 1))
-			# chromosome = population.chromosomes[index_I]
+			index_I = random.randint(0, (len(population.chromosomes) - 1))
+			chromosome = population.chromosomes[index_I]
 			# print("////////////////////", chromosome)
-			# population.chromosomes[index_I] = Chromosome.localSearch(chromosome.dnaArrayZipped, InputDataInstance.instance)
+			population.chromosomes[index_I] = Chromosome.localSearch(chromosome.dnaArrayZipped, InputDataInstance.instance)
 
 			population = population.evolve()
 			print(population)

@@ -126,7 +126,10 @@ class Population:
             if not (chromosome.dnaArrayZipped in uniques):
                 uniques.append(chromosome.dnaArrayZipped)
 
-        if (len(uniques) == 1):
+        threshold = int(ParameterData.instance.convergenceThresholdPercentage * len(self.chromosomes))
+        threshold = 1 if threshold < 1 else threshold
+
+        if len(uniques) <= threshold:
             return True
         return False
 

@@ -158,6 +158,7 @@ class Chromosome(object):
 			dnaArrayZipped = Chromosome.classZipDnaArray(dnaArray)
 		elif len(dnaArray) == inputDataInstance.nItems:
 			dnaArrayZipped = dnaArray
+			dnaArray = Chromosome.classUnzipDnaArray(dnaArrayZipped)
 
 		bestCost = Chromosome.calculateCost(dnaArrayZipped, inputDataInstance)
 		bestDnaArrayZipped = dnaArrayZipped
@@ -171,6 +172,19 @@ class Chromosome(object):
 
 				item1ProdIndex = itemProdIndexes[j1]
 				item1DemandIndex = InputDataInstance.instance.demandsArrayZipped[i1][j1]
+				bottomLimit = (0 if j1 == 0 else dnaArrayZipped[i1][j1 - 1])
+				#first approach
+				for period, periodValue in enumerate(dnaArray[bottomLimit:InputDataInstance.instance.demandsArrayZipped[i1][j1] + 1]):
+					if periodValue == 0:
+						dnaArrayZ = [[index for index in itemIndexes] for itemIndexes in dnaArrayZipped]
+						dnaArrayZ[i1][j1] = period + bottomLimit								
+
+						cost = Chromosome.calculateCost(dnaArrayZ, InputDataInstance.instance)
+						if (cost < bestCost):
+							bestDnaArrayZipped = dnaArrayZ
+							bestCost = cost
+
+				# second approach
 				for i2, indexes in enumerate(dnaArrayZipped):
 
 					if i1 == i2:
@@ -190,19 +204,19 @@ class Chromosome(object):
 
 							if (bottomLimit2 < item1ProdIndex and item1ProdIndex < topLimit2) and (bottomLimit1 < item2ProdIndex and item2ProdIndex < topLimit1):
 
-								dnaArrayZipped = [[index for index in itemIndexes] for itemIndexes in dnaArrayZipped]
-								dnaArrayZipped[i1][j1], dnaArrayZipped[i2][j2] = dnaArrayZipped[i2][j2], dnaArrayZipped[i1][j1]								
+								dnaArrayZ = [[index for index in itemIndexes] for itemIndexes in dnaArrayZipped]
+								dnaArrayZ[i1][j1], dnaArrayZ[i2][j2] = dnaArrayZ[i2][j2], dnaArrayZ[i1][j1]								
 
-								cost = Chromosome.calculateCost(dnaArrayZipped, InputDataInstance.instance)
+								cost = Chromosome.calculateCost(dnaArrayZ, InputDataInstance.instance)
 								if (cost < bestCost):
-									bestDnaArrayZipped = dnaArrayZipped
+									bestDnaArrayZipped = dnaArrayZ
 									bestCost = cost
 
 						j2 -= 1
 
 				j1 -= 1
 
-		print(dnaArrayZipped, bestDnaArrayZipped, bestCost, bestDnaArrayZipped == dnaArrayZipped)
+		# print(dnaArrayZipped, bestDnaArrayZipped, bestCost, bestDnaArrayZipped == dnaArrayZipped)
 
 		if (bestDnaArrayZipped == dnaArrayZipped):
 			chromosome = Chromosome()
@@ -230,6 +244,28 @@ class Chromosome(object):
 
 				item1ProdIndex = itemProdIndexes[j1]
 				item1DemandIndex = InputDataInstance.instance.demandsArrayZipped[i1][j1]
+				bottomLimit = (0 if j1 == 0 else self.dnaArrayZipped[i1][j1 - 1])
+				#first approach
+				for period, periodValue in enumerate((self.unzipDnaArray())[bottomLimit:InputDataInstance.instance.demandsArrayZipped[i1][j1] + 1]):
+					if periodValue == 0:
+						dnaArrayZipped = [[index for index in itemIndexes] for itemIndexes in self.dnaArrayZipped]
+						dnaArrayZipped[i1][j1] = period + bottomLimit								
+
+						if not(dnaArrayZipped in mutations):
+							mutations.append(dnaArrayZipped)
+
+						if strategy == "minimal":
+							if len(mutations) == 1:
+								self.dnaArrayZipped = dnaArrayZipped
+								self.cost = Chromosome.calculateCost(dnaArrayZipped, InputDataInstance.instance)
+								return None
+						if strategy == "maximal":
+							cost = Chromosome.calculateCost(dnaArrayZipped, InputDataInstance.instance)
+							if (cost < bestCost):
+								bestDnaArrayZipped = dnaArrayZipped
+								bestCost = cost
+
+				# second approach
 				for i2, indexes in enumerate(self.dnaArrayZipped):
 
 					if i1 == i2:
@@ -251,19 +287,19 @@ class Chromosome(object):
 								dnaArrayZipped = [[index for index in itemIndexes] for itemIndexes in self.dnaArrayZipped]
 								dnaArrayZipped[i1][j1], dnaArrayZipped[i2][j2] = dnaArrayZipped[i2][j2], dnaArrayZipped[i1][j1] 
 
-							if not(dnaArrayZipped in mutations):
-								mutations.append(dnaArrayZipped)
+								if not(dnaArrayZipped in mutations):
+									mutations.append(dnaArrayZipped)
 
-							if strategy == "minimal":
-								if len(mutations) == 1:
-									self.dnaArrayZipped = dnaArrayZipped
-									self.cost = Chromosome.calculateCost(dnaArrayZipped, InputDataInstance.instance)
-									return None
-							if strategy == "maximal":
-								cost = Chromosome.calculateCost(dnaArrayZipped, InputDataInstance.instance)
-								if (cost < bestCost):
-									bestDnaArrayZipped = dnaArrayZipped
-									bestCost = cost
+								if strategy == "minimal":
+									if len(mutations) == 1:
+										self.dnaArrayZipped = dnaArrayZipped
+										self.cost = Chromosome.calculateCost(dnaArrayZipped, InputDataInstance.instance)
+										return None
+								if strategy == "maximal":
+									cost = Chromosome.calculateCost(dnaArrayZipped, InputDataInstance.instance)
+									if (cost < bestCost):
+										bestDnaArrayZipped = dnaArrayZipped
+										bestCost = cost
 
 						j2 -= 1
 
