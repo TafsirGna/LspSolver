@@ -1,9 +1,10 @@
 #!/usr/bin/python3.5
 # -*-coding: utf-8 -*
 
+import random
+from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
+from LspInputDataReading.LspInputDataInstance import InputDataInstance
 from ParameterSearch.ParameterData import ParameterData
-from .MainThread import *
-import math
 from ..PopInitialization.PopInitializer import PopInitializer
 
 
@@ -18,7 +19,6 @@ class GeneticAlgorithm:
 	# nbMainThreads = 2
 	# nbSlavesThread = 2
 	# nbTrials = 3
-	# pickeRandChromGens = 3
 
 	# Builder
 	def __init__(self, inputDataInstance):
@@ -28,6 +28,7 @@ class GeneticAlgorithm:
 		self.inputDataInstance = inputDataInstance
 		self.popInitializer = PopInitializer()
 		self.elites = []
+		self.generationIndex = 0
 
 
 	def solve(self):
@@ -39,14 +40,14 @@ class GeneticAlgorithm:
 		population.setElites()
 		self.elites = population.elites
 
-		# i = 0
 		while not(self.stopConditionMet(population)):
-			# if i == 1:
+			# if self.generationIndex == 1:
 			# 	break
 
-			# index_I = random.randint(0, len(population.chromosomes))
+			# index_I = random.randint(0, (len(population.chromosomes) - 1))
 			# chromosome = population.chromosomes[index_I]
-			# population.chromosomes[index_I] = chromosome.localSearch()
+			# print("////////////////////", chromosome)
+			# population.chromosomes[index_I] = Chromosome.localSearch(chromosome.dnaArrayZipped, InputDataInstance.instance)
 
 			population = population.evolve()
 			print(population)
@@ -59,40 +60,10 @@ class GeneticAlgorithm:
 			nElites = (1 if nElites < 1 else nElites)
 			self.elites = elites[:nElites]
 			
-			# i += 1
+			self.generationIndex += 1
 
 	
 	def stopConditionMet(self, population):
 		"""
 		"""
 		return population.converged()
-
-
-
-
-
-	# def printResults(self):
-
-	# 	#print(self.ga_memory)
-	# 	for thread in self.listMainThreads:
-	# 		if not isinstance(thread.result, int):
-	# 			chromosome = thread.result
-	# 			#print()
-
-	# 	for thread in self.listMainThreads:
-	# 		if not isinstance(thread.result, int) and thread.result.fitnessValue < chromosome.fitnessValue:
-	# 		#if thread.result.fitnessValue < chromosome.fitnessValue:
-	# 			chromosome = thread.result
-	# 		#print(" PRINTING : ", thread.result)
-
-		
-	# 	print("The best solution found so far is : ", chromosome.solution)
-	# 	#print(self.population)
-	# 	print("The fitness of this solution is : ", chromosome.fitnessValue)
-
-	# 	# i print on the screen the number of generations, the program got through before quiting
-	# 	sumNbGenerations = 0
-	# 	for thread in self.listMainThreads:
-	# 		sumNbGenerations += thread.NbGenerations
-
-	# 	print("The average number of generations produced is : ", math.ceil(sumNbGenerations / (GeneticAlgorithm.nbMainThreads)))

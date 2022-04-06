@@ -24,7 +24,7 @@ class NodeGenerator:
 
             children = node.children()
 
-            random.shuffle(children)
+            # random.shuffle(children)
             self.queue += children
 
             if len(children) == 0: # leaf node

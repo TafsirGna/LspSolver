@@ -91,8 +91,7 @@ class SearchNode(object):
 
 				children.append(node)
 
-		# print("--- Children ---")
-		# print(children)
+		children.sort(key=lambda child: child.chromosome.cost, reverse=True)
 
 		return children
 

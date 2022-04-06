@@ -1,4 +1,6 @@
 from functools import total_ordering
+from threading import Thread
+import threading
 
 import numpy as np
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
@@ -14,15 +16,16 @@ class Population:
         """
         self.chromosomes = chromosomes
         self.setElites()
-
+        self.nextPopChromosomes = []
+        self._nextPopLock = threading.Lock()
 
     def evolve(self):
         """
         """
 
-        selectedPopulation = self.applyGeneticOperators()
-        population = selectedPopulation
+        self.applyGeneticOperators()
 
+        population = Population(self.nextPopChromosomes)
         return population
 
     
@@ -53,19 +56,47 @@ class Population:
         return chromosome
 
 
+    def threadTask(self, rouletteProbabilities):
+        """
+        """
+
+        while len(self.nextPopChromosomes) < len(self.chromosomes):
+
+            chromosomeA, chromosomeB, chromosomeC, chromosomeD= np.random.choice(self.chromosomes, p=rouletteProbabilities), np.random.choice(self.chromosomes, p=rouletteProbabilities), None, None
+
+            if (random.random() < ParameterData.instance.crossOverRate):
+                chromosomeC, chromosomeD = Population.crossOverChromosomes(chromosomeA, chromosomeB)
+                # print("+++", chromosomeC, chromosomeD)
+
+                if chromosomeC is not None and (random.random() < ParameterData.instance.mutationRate):
+                    chromosomeC.mutate()
+
+                if chromosomeD is not None and (random.random() < ParameterData.instance.mutationRate):
+                    chromosomeD.mutate()
+
+            if chromosomeC is not None:
+                with self._nextPopLock:
+                    self.nextPopChromosomes.append(chromosomeC)
+                    if len(self.nextPopChromosomes) > len(self.chromosomes):
+                        return
+
+            if chromosomeD is not None:
+                with self._nextPopLock:
+                    self.nextPopChromosomes.append(chromosomeD)
+            
+
+
     def applyGeneticOperators(self, selection_strategy="roulette_wheel"):
         """
         """
         
         if selection_strategy == "roulette_wheel":
-            return self.applyRouletteWheel()
+            self.applyRouletteWheel()
 
 
     def applyRouletteWheel(self):
         """
         """
-
-        selectedChromosomes = []
 
         # Calculating fitness value for each chromosome
         # maxChromosomeCost = (max(self.chromosomes, key=lambda c: c.cost)).cost + 1
@@ -78,38 +109,12 @@ class Population:
         self.totalFitness = totalFitness
         # print("888 ---> ", self.totalFitness)
 
-        rouletteProbabilities = []
-        
+        rouletteProbabilities = [float(chromosome.fitnessValue)/self.totalFitness for chromosome in self.chromosomes]
 
-        for chromosome in self.chromosomes:
-            rouletteProbabilities.append(float(chromosome.fitnessValue)/self.totalFitness)
-
-        while len(selectedChromosomes) < len(self.chromosomes): # selecting two chromosomes at once
-
-            chromosomeA, chromosomeB, chromosomeC, chromosomeD = np.random.choice(self.chromosomes, p=rouletteProbabilities), np.random.choice(self.chromosomes, p=rouletteProbabilities), None, None
-            if (random.random() < ParameterData.instance.crossOverRate):
-                chromosomeC, chromosomeD = Population.crossOverChromosomes(chromosomeA, chromosomeB)
-                # print("+++", chromosomeC, chromosomeD)
-
-                if chromosomeC is not None and (random.random() < ParameterData.instance.mutationRate):
-                    chromosomeC.mutate()
-
-                if chromosomeD is not None and (random.random() < ParameterData.instance.mutationRate):
-                    chromosomeD.mutate()
-
-
-            if chromosomeC is not None:
-                selectedChromosomes.append(chromosomeC)
-                if len(selectedChromosomes) > len(self.chromosomes):
-                    population = Population(selectedChromosomes)
-                    return population
-
-            if chromosomeD is not None:
-                selectedChromosomes.append(chromosomeD)
-        
-        population = Population(selectedChromosomes)
-    
-        return population
+        for i in range(ParameterData.instance.nReplicaThreads):
+            thread_T = Thread(target=self.threadTask, args=(rouletteProbabilities,))
+            thread_T.start()
+            thread_T.join()
 
 
     def converged(self):

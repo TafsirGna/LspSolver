@@ -182,20 +182,27 @@ class Chromosome(object):
 						item2DemandIndex = InputDataInstance.instance.demandsArrayZipped[i2][j2]
 						# print(InputDataInstance.instance.demandsArrayZipped, '|',self.dnaArrayZipped)
 						# print(item1ProdIndex, item2ProdIndex, '|',i1, j1, '|',i2, j2)
+						
+						if item1ProdIndex <= item2DemandIndex and item2ProdIndex <= item1DemandIndex:
 
-						if (item1ProdIndex <= item2DemandIndex and item2ProdIndex <= item1DemandIndex):
+							bottomLimit1 , topLimit1 = (-1 if j1 == 0 else dnaArrayZipped[i1][j1 - 1]), (item1DemandIndex + 1 if j1 == len(itemProdIndexes) - 1 else dnaArrayZipped[i1][j1 + 1])
+							bottomLimit2 , topLimit2 = (-1 if j2 == 0 else dnaArrayZipped[i2][j2 - 1]), (item2DemandIndex + 1 if j2 == len(indexes) - 1 else dnaArrayZipped[i2][j2 + 1])
 
-							dnaArrayZipped = [[index for index in itemIndexes] for itemIndexes in dnaArrayZipped]
-							dnaArrayZipped[i1][j1], dnaArrayZipped[i2][j2] = dnaArrayZipped[i2][j2], dnaArrayZipped[i1][j1]								
+							if (bottomLimit2 < item1ProdIndex and item1ProdIndex < topLimit2) and (bottomLimit1 < item2ProdIndex and item2ProdIndex < topLimit1):
 
-							cost = Chromosome.calculateCost(dnaArrayZipped, InputDataInstance.instance)
-							if (cost < bestCost):
-								bestDnaArrayZipped = dnaArrayZipped
-								bestCost = cost
+								dnaArrayZipped = [[index for index in itemIndexes] for itemIndexes in dnaArrayZipped]
+								dnaArrayZipped[i1][j1], dnaArrayZipped[i2][j2] = dnaArrayZipped[i2][j2], dnaArrayZipped[i1][j1]								
+
+								cost = Chromosome.calculateCost(dnaArrayZipped, InputDataInstance.instance)
+								if (cost < bestCost):
+									bestDnaArrayZipped = dnaArrayZipped
+									bestCost = cost
 
 						j2 -= 1
 
 				j1 -= 1
+
+		print(dnaArrayZipped, bestDnaArrayZipped, bestCost, bestDnaArrayZipped == dnaArrayZipped)
 
 		if (bestDnaArrayZipped == dnaArrayZipped):
 			chromosome = Chromosome()
@@ -237,8 +244,12 @@ class Chromosome(object):
 
 						if (item1ProdIndex <= item2DemandIndex and item2ProdIndex <= item1DemandIndex):
 
-							dnaArrayZipped = [[index for index in itemIndexes] for itemIndexes in self.dnaArrayZipped]
-							dnaArrayZipped[i1][j1], dnaArrayZipped[i2][j2] = dnaArrayZipped[i2][j2], dnaArrayZipped[i1][j1] 
+							bottomLimit1 , topLimit1 = (-1 if j1 == 0 else self.dnaArrayZipped[i1][j1 - 1]), (item1DemandIndex + 1 if j1 == len(itemProdIndexes) - 1 else self.dnaArrayZipped[i1][j1 + 1])
+							bottomLimit2 , topLimit2 = (-1 if j2 == 0 else self.dnaArrayZipped[i2][j2 - 1]), (item2DemandIndex + 1 if j2 == len(indexes) - 1 else self.dnaArrayZipped[i2][j2 + 1])
+
+							if (bottomLimit2 < item1ProdIndex and item1ProdIndex < topLimit2) and (bottomLimit1 < item2ProdIndex and item2ProdIndex < topLimit1):
+								dnaArrayZipped = [[index for index in itemIndexes] for itemIndexes in self.dnaArrayZipped]
+								dnaArrayZipped[i1][j1], dnaArrayZipped[i2][j2] = dnaArrayZipped[i2][j2], dnaArrayZipped[i1][j1] 
 
 							if not(dnaArrayZipped in mutations):
 								mutations.append(dnaArrayZipped)

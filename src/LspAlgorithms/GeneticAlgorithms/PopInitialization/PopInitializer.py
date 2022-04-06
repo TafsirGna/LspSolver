@@ -21,6 +21,7 @@ class PopInitializer:
         self.threads = []
         self.population = Population()
         self._lock = threading.Lock()
+        self.nodeGenerators = []
 
     def process(self, inputDataInstance):
         """
@@ -29,14 +30,15 @@ class PopInitializer:
         self.inputDataInstance = inputDataInstance
 
         children = self.rootNode().children()
-        step = math.ceil(float(len(children)) / float(ParameterData.instance.popInitThreadsNumber))
+        step = math.ceil(float(len(children)) / float(ParameterData.instance.nReplicaThreads))
 
 
         nodeGenQueues = [children[i:i+step] for i in range(0, len(children), step)]
 
-        for i in range(ParameterData.instance.popInitThreadsNumber):
+        for i in range(ParameterData.instance.nReplicaThreads):
             nodeGenerator = NodeGenerator(nodeGenQueues[i])
             thread_T = Thread(target=self.search, args=(nodeGenerator,))
+            self.nodeGenerators.append(nodeGenerator)
             thread_T.start()
             thread_T.join()
             self.threads.append(thread_T)
