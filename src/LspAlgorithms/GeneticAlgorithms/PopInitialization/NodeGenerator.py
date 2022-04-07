@@ -10,8 +10,9 @@ class NodeGenerator:
     instance = None
     
     def __init__(self, queue) -> None:
+        """
+        """
         self.queue = queue
-        pass
 
     def generate(self):
         """
@@ -20,7 +21,7 @@ class NodeGenerator:
         while len(self.queue) > 0:
 
             node = self.queue[-1]
-            self.queue = self.queue[0:- 1]
+            self.queue = self.queue[:- 1]
 
             children = node.children()
 

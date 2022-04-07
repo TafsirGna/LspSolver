@@ -1,11 +1,10 @@
 from functools import total_ordering
-from threading import Thread
+from threading import Thread, local
 import threading
 
 import numpy as np
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
 import random
-
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 from ParameterSearch.ParameterData import ParameterData
 
@@ -15,6 +14,7 @@ class Population:
         """
         """
         self.chromosomes = chromosomes
+        self.elites = []
         self.setElites()
         self.nextPopChromosomes = []
         self._nextPopLock = threading.Lock()
@@ -32,14 +32,14 @@ class Population:
     def setElites(self):
         """
         """
-        if len(self.chromosomes) is 0:
+        if len(self.elites) > 0 or len(self.chromosomes) is 0:
             return
 
         nElites = int(float(len(self.chromosomes)) * ParameterData.instance.elitePercentage)
         nElites = ( 1 if nElites < 1 else nElites)
 
         # self.chromosomes.sorted(key= lambda chromosome: chromosome.cost) 
-        chromosomes = sorted(self.chromosomes, key= (lambda chromosome: chromosome.cost)) # reverse=True
+        chromosomes = sorted(self.chromosomes) # key= (lambda chromosome: chromosome.cost), reverse=False
 
         self.elites = chromosomes[:nElites]
         self.maxChromosomeCost = (chromosomes[-1]).cost + 1
@@ -98,9 +98,6 @@ class Population:
         """
         """
 
-        # Calculating fitness value for each chromosome
-        # maxChromosomeCost = (max(self.chromosomes, key=lambda c: c.cost)).cost + 1
-
         totalFitness = 0
         for chromosome in self.chromosomes:
             chromosome.fitnessValue = self.maxChromosomeCost - chromosome.cost
@@ -117,19 +114,35 @@ class Population:
             thread_T.join()
 
 
+    def preprocess(self):
+        """
+        """
+        pass
+
+
     def converged(self):
         """
         """
         
-        uniques = []
+        uniques, unique_counts, fittest = [], [], self.chromosomes[0]
+
         for chromosome in self.chromosomes:
             if not (chromosome.dnaArrayZipped in uniques):
                 uniques.append(chromosome.dnaArrayZipped)
+                unique_counts.append(0)
+            else:
+                unique_counts[uniques.index(chromosome.dnaArrayZipped)] += 1
 
+            if chromosome.cost < fittest.cost:
+                fittest = chromosome
+
+        localOptimal = uniques[unique_counts.index(max(unique_counts))]
+
+        # Setting the threshold under which a populatioin is set to have converged
         threshold = int(ParameterData.instance.convergenceThresholdPercentage * len(self.chromosomes))
         threshold = 1 if threshold < 1 else threshold
 
-        if len(uniques) <= threshold:
+        if len(uniques) <= threshold and localOptimal == fittest.dnaArrayZipped:
             return True
         return False
 

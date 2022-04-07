@@ -41,6 +41,7 @@ class SearchNode(object):
 		children = []
 		
 		periodDemands = InputDataInstance.instance.demandsArray[:,self.period]
+		# print('pepe ', periodDemands)
 
 		for index, item in enumerate(periodDemands):
 			if item == 1:
@@ -91,7 +92,7 @@ class SearchNode(object):
 
 				children.append(node)
 
-		children.sort(key=lambda child: child.chromosome.cost, reverse=True)
+		children.sort(reverse=True)
 
 		return children
 
@@ -99,5 +100,8 @@ class SearchNode(object):
 		return str(self.chromosome.unzipDnaArray()) + " | " + str(self.period) + " | " + str(self.itemsToOrder) + " | " + str(self.chromosome.dnaArrayZipped) + "\n"
 
 
-	# def __lt__(self, node):
-	# 	return self.chromosome.fitnessValue < node.chromosome.fitnessValue
+	def __lt__(self, node):
+		return self.chromosome.cost < node.chromosome.cost
+
+	def __eq__(self, node):
+		return self.chromosome.dnaArrayZipped < node.chromosome.dnaArrayZipped

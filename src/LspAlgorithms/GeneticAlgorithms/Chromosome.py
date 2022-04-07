@@ -83,29 +83,36 @@ class Chromosome(object):
 		"""Checks if a given dnaArray leads to a feasible chromosome
 		"""
 
+		# transforming the inputs to make them more handleable
 		dnaArrayZipped = None
 		if len(dnaArray) == inputDataInstance.nPeriods:
 			dnaArrayZipped = Chromosome.classZipDnaArray(dnaArray)
 		elif len(dnaArray) == inputDataInstance.nItems:
 			dnaArrayZipped = dnaArray
 
+		# going through the zipped dna array checking : ->
 		indices = []
 		for i in range(inputDataInstance.nItems):
 			demands = inputDataInstance.demandsArrayZipped[i]
 			prods = dnaArrayZipped[i]
 
-			if len(demands) is not len(prods): # checks that the number of produced item meets the number of demand
+			if len(demands) is not len(prods): # -> that the number of produced item meets the number of demand
 				return False
 
-			for j, value in enumerate(demands):
+			for j, demandIndex in enumerate(demands):
 				prodIndex = prods[j]
 
-				if prodIndex is None or prodIndex in indices:
+				if not(prodIndex in range(inputDataInstance.nPeriods)) or prodIndex in indices: # -> that item production index is a very period and there's no duplicate value
 					return False
-				indices.append(prodIndex)
 
-				if value < prodIndex: # checks that the item is produced before its demand period
+				prevProdIndex = (0 if j == 0 else prods[j - 1]) # -> that previous period where the item has bee produced is always less than the current one
+				if (prevProdIndex > prodIndex):
 					return False
+
+				if prodIndex > demandIndex: # checks that the item is produced before its demand period
+					return False
+
+				indices.append(prodIndex)
 
 		return True
 
@@ -227,102 +234,20 @@ class Chromosome(object):
 		return Chromosome.localSearch(bestDnaArrayZipped, inputDataInstance)
 
 
-	def mutate(self, strategy = "maximal"):
+	def mutate(self):
 		"""
 		"""
-
-		mutations = []
-
-		if strategy == "maximal":
-			bestCost = 10 ** 100
-			bestDnaArrayZipped = None
-
-		for i1, itemProdIndexes in enumerate(self.dnaArrayZipped):
-
-			j1 = len(itemProdIndexes) - 1
-			while j1 >= 0:
-
-				item1ProdIndex = itemProdIndexes[j1]
-				item1DemandIndex = InputDataInstance.instance.demandsArrayZipped[i1][j1]
-				bottomLimit = (0 if j1 == 0 else self.dnaArrayZipped[i1][j1 - 1])
-				#first approach
-				for period, periodValue in enumerate((self.unzipDnaArray())[bottomLimit:InputDataInstance.instance.demandsArrayZipped[i1][j1] + 1]):
-					if periodValue == 0:
-						dnaArrayZipped = [[index for index in itemIndexes] for itemIndexes in self.dnaArrayZipped]
-						dnaArrayZipped[i1][j1] = period + bottomLimit								
-
-						if not(dnaArrayZipped in mutations):
-							mutations.append(dnaArrayZipped)
-
-						if strategy == "minimal":
-							if len(mutations) == 1:
-								self.dnaArrayZipped = dnaArrayZipped
-								self.cost = Chromosome.calculateCost(dnaArrayZipped, InputDataInstance.instance)
-								return None
-						if strategy == "maximal":
-							cost = Chromosome.calculateCost(dnaArrayZipped, InputDataInstance.instance)
-							if (cost < bestCost):
-								bestDnaArrayZipped = dnaArrayZipped
-								bestCost = cost
-
-				# second approach
-				for i2, indexes in enumerate(self.dnaArrayZipped):
-
-					if i1 == i2:
-						continue
-
-					j2 = len(indexes) - 1
-					while j2 >=0:
-						item2ProdIndex = indexes[j2]
-						item2DemandIndex = InputDataInstance.instance.demandsArrayZipped[i2][j2]
-						# print(InputDataInstance.instance.demandsArrayZipped, '|',self.dnaArrayZipped)
-						# print(item1ProdIndex, item2ProdIndex, '|',i1, j1, '|',i2, j2)
-
-						if (item1ProdIndex <= item2DemandIndex and item2ProdIndex <= item1DemandIndex):
-
-							bottomLimit1 , topLimit1 = (-1 if j1 == 0 else self.dnaArrayZipped[i1][j1 - 1]), (item1DemandIndex + 1 if j1 == len(itemProdIndexes) - 1 else self.dnaArrayZipped[i1][j1 + 1])
-							bottomLimit2 , topLimit2 = (-1 if j2 == 0 else self.dnaArrayZipped[i2][j2 - 1]), (item2DemandIndex + 1 if j2 == len(indexes) - 1 else self.dnaArrayZipped[i2][j2 + 1])
-
-							if (bottomLimit2 < item1ProdIndex and item1ProdIndex < topLimit2) and (bottomLimit1 < item2ProdIndex and item2ProdIndex < topLimit1):
-								dnaArrayZipped = [[index for index in itemIndexes] for itemIndexes in self.dnaArrayZipped]
-								dnaArrayZipped[i1][j1], dnaArrayZipped[i2][j2] = dnaArrayZipped[i2][j2], dnaArrayZipped[i1][j1] 
-
-								if not(dnaArrayZipped in mutations):
-									mutations.append(dnaArrayZipped)
-
-								if strategy == "minimal":
-									if len(mutations) == 1:
-										self.dnaArrayZipped = dnaArrayZipped
-										self.cost = Chromosome.calculateCost(dnaArrayZipped, InputDataInstance.instance)
-										return None
-								if strategy == "maximal":
-									cost = Chromosome.calculateCost(dnaArrayZipped, InputDataInstance.instance)
-									if (cost < bestCost):
-										bestDnaArrayZipped = dnaArrayZipped
-										bestCost = cost
-
-						j2 -= 1
-
-				j1 -= 1
-
-		if strategy == "random":
-			random.shuffle(mutations)
-			self.dnaArrayZipped = mutations[0]
-			self.cost = Chromosome.calculateCost(self.dnaArrayZipped, InputDataInstance.instance)
-
-		elif strategy == "maximal":
-			self.dnaArrayZipped = bestDnaArrayZipped
-			self.cost = bestCost
+		return Chromosome.localSearch(self.dnaArrayZipped, InputDataInstance.instance)
 
 
-	# def __lt__(self, chromosome):
-	# 	return self._fitnessValue < chromosome.fitnessValue
+	def __lt__(self, chromosome):
+		return self.cost < chromosome.cost
 
 	def __repr__(self):
 		return " {} : {} ".format(self.unzipDnaArray(), self.cost)
 
-	# def __eq__(self, chromosome):
-	# 	return self._solution == chromosome.solution
+	def __eq__(self, chromosome):
+		return self.dnaArrayZipped == chromosome.dnaArrayZipped
 
 	# def __ne__(self, chromosome):
 	# 	return self._solution != chromosome.solution

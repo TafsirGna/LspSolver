@@ -2,6 +2,7 @@
 # -*-coding: utf-8 -*
 
 import random
+from threading import Thread
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 from ParameterSearch.ParameterData import ParameterData
@@ -13,9 +14,6 @@ class GeneticAlgorithm:
 	"""
 
 	#	Class' variables
-	# FITNESS_PADDING = 1
-	# NumberOfMigrants = 1
-	# MigrationRate = 0 # this variable holds the number of generations needed before a migration occurs during the search
 	# nbMainThreads = 2
 	# nbSlavesThread = 2
 	# nbTrials = 3
@@ -26,19 +24,18 @@ class GeneticAlgorithm:
 		"""
 
 		self.inputDataInstance = inputDataInstance
-		self.popInitializer = PopInitializer()
+		self.popInitializer = PopInitializer(self.inputDataInstance)
 		self.elites = []
 		self.generationIndex = 0
 
 
-	def solve(self):
+	def process(self, threadIndex, population):
 		"""
 		"""
 
 		# Making up the initial population
-		population = self.popInitializer.process(self.inputDataInstance)
-		population.setElites()
-		self.elites = population.elites
+		# population.setElites()
+		# self.elites = population.elites
 
 		while not(self.stopConditionMet(population)):
 			# if self.generationIndex == 1:
@@ -46,21 +43,35 @@ class GeneticAlgorithm:
 
 			index_I = random.randint(0, (len(population.chromosomes) - 1))
 			chromosome = population.chromosomes[index_I]
-			# print("////////////////////", chromosome)
 			population.chromosomes[index_I] = Chromosome.localSearch(chromosome.dnaArrayZipped, InputDataInstance.instance)
 
 			population = population.evolve()
 			print(population)
 
 			# making up the new elite group
-			elites = self.elites + population.elites
-			elites.sort(key= lambda chromosome: chromosome.cost)
+			# elites = self.elites + population.elites
+			# elites.sort()
 			
-			nElites = int(float(len(population.chromosomes)) * ParameterData.instance.elitePercentage)
-			nElites = (1 if nElites < 1 else nElites)
-			self.elites = elites[:nElites]
+			# nElites = int(float(len(population.chromosomes)) * ParameterData.instance.elitePercentage)
+			# nElites = (1 if nElites < 1 else nElites)
+			# self.elites = elites[:nElites]
 			
 			self.generationIndex += 1
+
+			
+
+	def solve(self):
+		"""
+		"""
+
+		populations = self.popInitializer.process()
+		
+		threads = []
+		for i in range(ParameterData.instance.nPrimaryThreads):
+			thread_T = Thread(target=self.process, args=(i, populations[i]))
+			thread_T.start()
+			thread_T.join()
+			threads.append(thread_T)
 
 	
 	def stopConditionMet(self, population):
