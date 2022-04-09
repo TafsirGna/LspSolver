@@ -33,11 +33,14 @@ inputDataInstance = inputDataReader.readInput(inputFile)
 ParameterData.instance = ParameterData()
 
 # print(Chromosome.feasible([1, 2, 0, 1, 2], InputDataInstance.instance))
+# [2, 2, 2, 3, 1, 0, 0, 1]
 
 # c = Chromosome([2, 1, 2, 1, 0])
-# c.mutate("maximal")
+# # # [2, 1, 2, 0, 1]
+# c.mutate()
 # print(c)
 
+# print(Chromosome.localSearch([2, 3, 2, 2, 0, 1, 0, 1], InputDataInstance.instance))
 # print(Chromosome.localSearch([2, 3, 2, 2, 0, 1, 0, 1], InputDataInstance.instance))
 
 # Population.crossOverChromosomes(Chromosome([2, 1, 0, 2, 1]), Chromosome([2, 1, 2, 0, 1]))
@@ -48,7 +51,7 @@ LspRuntimeStatisticsMonitor.instance = LspRuntimeStatisticsMonitor()
 # # I create an instance of the genetic algorithm to be used
 lspSolver = GeneticAlgorithm(inputDataInstance)
 
-###
+##
 if LspRuntimeStatisticsMonitor.instance:
     LspRuntimeStatisticsMonitor.instance.popInitClockStart = perf_counter()
 ###

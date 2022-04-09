@@ -16,33 +16,31 @@ class Population:
         self.chromosomes = chromosomes
         self.elites = []
         self.setElites()
-        self.nextPopChromosomes = []
+        self.nextPopulation = Population([])
         self._nextPopLock = threading.Lock()
+        self.maxChromosomeCost = None
 
     def evolve(self):
         """
         """
 
         self.applyGeneticOperators()
-
-        population = Population(self.nextPopChromosomes)
-        return population
+        return self.nextPopulation
 
     
     def setElites(self):
         """
         """
-        if len(self.elites) > 0 or len(self.chromosomes) is 0:
-            return
+        # if len(self.elites) > 0 or len(self.chromosomes) is 0:
+        #     return
 
-        nElites = int(float(len(self.chromosomes)) * ParameterData.instance.elitePercentage)
-        nElites = ( 1 if nElites < 1 else nElites)
+        # nElites = int(float(len(self.chromosomes)) * ParameterData.instance.elitePercentage)
+        # nElites = ( 1 if nElites < 1 else nElites)
 
-        # self.chromosomes.sorted(key= lambda chromosome: chromosome.cost) 
-        chromosomes = sorted(self.chromosomes) # key= (lambda chromosome: chromosome.cost), reverse=False
+        # # self.chromosomes.sorted(key= lambda chromosome: chromosome.cost) 
+        # chromosomes = sorted(self.chromosomes)
 
-        self.elites = chromosomes[:nElites]
-        self.maxChromosomeCost = (chromosomes[-1]).cost + 1
+        # self.elites = chromosomes[:nElites]
 
 
     def add(self, chromosome):
@@ -53,6 +51,14 @@ class Population:
             return None
 
         self.chromosomes.append(chromosome)
+
+        # setting population max cost
+        if self.maxChromosomeCost == None:
+            self.maxChromosomeCost = chromosome.cost
+        else:
+            cost = chromosome.cost + 1
+            if self.maxChromosomeCost < cost:
+                self.maxChromosomeCost = cost
         return chromosome
 
 
@@ -60,7 +66,7 @@ class Population:
         """
         """
 
-        while len(self.nextPopChromosomes) < len(self.chromosomes):
+        while len(self.nextPopulation.chromosomes) < len(self.chromosomes):
 
             chromosomeA, chromosomeB, chromosomeC, chromosomeD= np.random.choice(self.chromosomes, p=rouletteProbabilities), np.random.choice(self.chromosomes, p=rouletteProbabilities), None, None
 
@@ -74,15 +80,15 @@ class Population:
                 if chromosomeD is not None and (random.random() < ParameterData.instance.mutationRate):
                     chromosomeD.mutate()
 
-            if chromosomeC is not None:
+            if chromosomeC != None:
                 with self._nextPopLock:
-                    self.nextPopChromosomes.append(chromosomeC)
+                    self.nextPopulation.add(chromosomeC)
                     if len(self.nextPopChromosomes) > len(self.chromosomes):
                         return
 
-            if chromosomeD is not None:
+            if chromosomeD != None:
                 with self._nextPopLock:
-                    self.nextPopChromosomes.append(chromosomeD)
+                    self.nextPopulation.add(chromosomeD)
             
 
 

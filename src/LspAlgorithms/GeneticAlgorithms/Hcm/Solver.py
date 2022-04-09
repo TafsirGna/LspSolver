@@ -1,10 +1,8 @@
 #!/usr/bin/python3.5
 # -*-coding: utf-8 -*
 
-import random
 from threading import Thread
-from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
-from LspInputDataReading.LspInputDataInstance import InputDataInstance
+import threading
 from ParameterSearch.ParameterData import ParameterData
 from ..PopInitialization.PopInitializer import PopInitializer
 
@@ -13,12 +11,6 @@ class GeneticAlgorithm:
 	"""
 	"""
 
-	#	Class' variables
-	# nbMainThreads = 2
-	# nbSlavesThread = 2
-	# nbTrials = 3
-
-	# Builder
 	def __init__(self, inputDataInstance):
 		"""
 		"""
@@ -27,38 +19,44 @@ class GeneticAlgorithm:
 		self.popInitializer = PopInitializer(self.inputDataInstance)
 		self.elites = []
 		self.generationIndex = 0
+		self.eliteLock = threading.Lock()
+
+
+	def setElites(self, population):
+		"""
+		"""
+		population.setElites()
+
+		nElites = int(float(len(population.chromosomes)) * ParameterData.instance.elitePercentage) if len(self.elites) == 0 else len(self.elites)
+		nElites = (1 if nElites < 1 else nElites)
+
+		# making up the new elite group
+		elites = self.elites + population.elites
+		elites.sort()
+		
+		with self.eliteLock:
+			self.elites = elites[:nElites]
+
+		print("Elites --> ", self.elites)
+
 
 
 	def process(self, threadIndex, population):
 		"""
 		"""
 
-		# Making up the initial population
-		# population.setElites()
-		# self.elites = population.elites
-
 		while not(self.stopConditionMet(population)):
 			# if self.generationIndex == 1:
 			# 	break
 
-			index_I = random.randint(0, (len(population.chromosomes) - 1))
-			chromosome = population.chromosomes[index_I]
-			population.chromosomes[index_I] = Chromosome.localSearch(chromosome.dnaArrayZipped, InputDataInstance.instance)
+			self.setElites(population)
 
 			population = population.evolve()
-			print(population)
-
-			# making up the new elite group
-			# elites = self.elites + population.elites
-			# elites.sort()
-			
-			# nElites = int(float(len(population.chromosomes)) * ParameterData.instance.elitePercentage)
-			# nElites = (1 if nElites < 1 else nElites)
-			# self.elites = elites[:nElites]
+			print("Population --> ", population)
 			
 			self.generationIndex += 1
 
-			
+
 
 	def solve(self):
 		"""
@@ -70,8 +68,12 @@ class GeneticAlgorithm:
 		for i in range(ParameterData.instance.nPrimaryThreads):
 			thread_T = Thread(target=self.process, args=(i, populations[i]))
 			thread_T.start()
-			thread_T.join()
 			threads.append(thread_T)
+
+		[thread_T.join() for thread_T in threads]
+
+		# result = (min(self.elites)).cost
+		# print("Result : ", result)
 
 	
 	def stopConditionMet(self, population):

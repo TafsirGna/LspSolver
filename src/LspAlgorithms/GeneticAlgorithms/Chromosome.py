@@ -1,17 +1,21 @@
 #!/usr/bin/python3.5
 # -*-coding: utf-8 -*
 
+import queue
 import numpy as np
 import random
+from LspAlgorithms.GeneticAlgorithms.MutationSearchNode import MutationSearchNode
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 
 class Chromosome(object):
 
-	def __init__(self, dnaArray = []):
+	def __init__(self):
 		"""
 		"""
 		self.cost = 0
-		self.zipDnaArray(dnaArray)
+		self.dnaArray = None
+		self.startingGene, self.endingGene = None, None
+		# self.zipDnaArray(dnaArray)
 
 
 	@classmethod
@@ -135,42 +139,47 @@ class Chromosome(object):
 		return dnaArrayZipped
 
 
-	def unzipDnaArray(self):
+	def renderDnaArray(self):
 		"""
 		"""
-		return Chromosome.classUnzipDnaArray(self.dnaArrayZipped)
+		return Chromosome.classRenderDnaArray(self.dnaArray)
 
 
 	@classmethod
-	def classUnzipDnaArray(cls, dnaArrayZipped):
+	def classRenderDnaArray(cls, dnaArray):
 		"""
 		"""
-		dnaArray = [0 for _ in range(InputDataInstance.instance.nPeriods)]
+		result = [0 for _ in range(InputDataInstance.instance.nPeriods)]
 
-		for item, itemIndices in enumerate(dnaArrayZipped):
-			for index in itemIndices:
-				if index is not None:
-					dnaArray[index] = item + 1
+		for item, itemIndices in enumerate(dnaArray):
+			for gene in itemIndices:
+				if gene != None:
+					result[gene.period] = item + 1
 
-		return dnaArray
-
+		return result
 
 	@classmethod
-	def localSearch(cls, dnaArray, inputDataInstance):
+	def transformInput(cls, dnaArray, inputDataInstance):
 		"""
 		"""
-
 		dnaArrayZipped = None
 		if len(dnaArray) == inputDataInstance.nPeriods:
 			dnaArrayZipped = Chromosome.classZipDnaArray(dnaArray)
 		elif len(dnaArray) == inputDataInstance.nItems:
 			dnaArrayZipped = dnaArray
-			dnaArray = Chromosome.classUnzipDnaArray(dnaArrayZipped)
+			dnaArray = Chromosome.classRenderDnaArray(dnaArrayZipped)
 
-		bestCost = Chromosome.calculateCost(dnaArrayZipped, inputDataInstance)
-		bestDnaArrayZipped = dnaArrayZipped
+		return dnaArray, dnaArrayZipped
 
-		# print("fuuuuuuuuuuuuuuuuuuuuuuuck", Chromosome.calculateCost(dnaArrayZipped, inputDataInstance))
+
+	@classmethod
+	def searchMutations(cls, dnaArray, inputDataInstance):
+		"""
+		"""
+
+		dnaArray, dnaArrayZipped = Chromosome.transformInput(dnaArray, inputDataInstance)
+
+		mutations = []
 
 		for i1, itemProdIndexes in enumerate(dnaArrayZipped):
 
@@ -179,77 +188,66 @@ class Chromosome(object):
 
 				item1ProdIndex = itemProdIndexes[j1]
 				item1DemandIndex = InputDataInstance.instance.demandsArrayZipped[i1][j1]
-				bottomLimit = (0 if j1 == 0 else dnaArrayZipped[i1][j1 - 1])
+				bottomLimit = (0 if j1 == 0 else dnaArrayZipped[i1][j1 - 1] + 1)
 				#first approach
+
 				for period, periodValue in enumerate(dnaArray[bottomLimit:InputDataInstance.instance.demandsArrayZipped[i1][j1] + 1]):
-					if periodValue == 0:
-						dnaArrayZ = [[index for index in itemIndexes] for itemIndexes in dnaArrayZipped]
-						dnaArrayZ[i1][j1] = period + bottomLimit								
-
-						cost = Chromosome.calculateCost(dnaArrayZ, InputDataInstance.instance)
-						if (cost < bestCost):
-							bestDnaArrayZipped = dnaArrayZ
-							bestCost = cost
-
-				# second approach
-				for i2, indexes in enumerate(dnaArrayZipped):
-
-					if i1 == i2:
-						continue
-
-					j2 = len(indexes) - 1
-					while j2 >=0:
-						item2ProdIndex = indexes[j2]
-						item2DemandIndex = InputDataInstance.instance.demandsArrayZipped[i2][j2]
-						# print(InputDataInstance.instance.demandsArrayZipped, '|',self.dnaArrayZipped)
-						# print(item1ProdIndex, item2ProdIndex, '|',i1, j1, '|',i2, j2)
+					if (periodValue - 1) != i1:
+						mutationItem = None
+						if periodValue == 0:
+							mutationItem = [[i1 + 1, dnaArrayZipped[i1][j1]], [0, period + bottomLimit]]
+						else:
+							item2ProdIndex = period + bottomLimit
+							item2DemandIndex = InputDataInstance.instance.demandsArrayZipped[periodValue - 1][dnaArrayZipped[periodValue - 1].index(item2ProdIndex)]
+							if item2DemandIndex >= item1ProdIndex and item1DemandIndex >= item2ProdIndex:
+								mutationItem = [[i1 + 1, dnaArrayZipped[i1][j1]], [periodValue, dnaArrayZipped[periodValue - 1][dnaArrayZipped[periodValue - 1].index(item2ProdIndex)]]]
 						
-						if item1ProdIndex <= item2DemandIndex and item2ProdIndex <= item1DemandIndex:
-
-							bottomLimit1 , topLimit1 = (-1 if j1 == 0 else dnaArrayZipped[i1][j1 - 1]), (item1DemandIndex + 1 if j1 == len(itemProdIndexes) - 1 else dnaArrayZipped[i1][j1 + 1])
-							bottomLimit2 , topLimit2 = (-1 if j2 == 0 else dnaArrayZipped[i2][j2 - 1]), (item2DemandIndex + 1 if j2 == len(indexes) - 1 else dnaArrayZipped[i2][j2 + 1])
-
-							if (bottomLimit2 < item1ProdIndex and item1ProdIndex < topLimit2) and (bottomLimit1 < item2ProdIndex and item2ProdIndex < topLimit1):
-
-								dnaArrayZ = [[index for index in itemIndexes] for itemIndexes in dnaArrayZipped]
-								dnaArrayZ[i1][j1], dnaArrayZ[i2][j2] = dnaArrayZ[i2][j2], dnaArrayZ[i1][j1]								
-
-								cost = Chromosome.calculateCost(dnaArrayZ, InputDataInstance.instance)
-								if (cost < bestCost):
-									bestDnaArrayZipped = dnaArrayZ
-									bestCost = cost
-
-						j2 -= 1
+						if mutationItem != None and not(mutationItem in mutations) and not([mutationItem[1], mutationItem[0]] in mutations):
+								mutations.append(mutationItem)
 
 				j1 -= 1
 
-		# print(dnaArrayZipped, bestDnaArrayZipped, bestCost, bestDnaArrayZipped == dnaArrayZipped)
+		for mutation in mutations:
+			print("mutation --> ", mutation)
 
-		if (bestDnaArrayZipped == dnaArrayZipped):
-			chromosome = Chromosome()
-			chromosome.dnaArrayZipped = dnaArrayZipped
-			chromosome.cost = bestCost
-			return chromosome
+		return dnaArray, dnaArrayZipped, mutations
 
-		return Chromosome.localSearch(bestDnaArrayZipped, inputDataInstance)
+
+	@classmethod
+	def applyMutations(cls, dnaArrayZipped, mutations):
+		"""
+		"""
+
+		node = MutationSearchNode(dnaArrayZipped, mutations)
+		queue = node.children()
+		while len(queue) > 0:
+			node = queue[-1]
+			queue = queue[:-1]
+			queue += node.children()
+
+
+	@classmethod
+	def localSearch(cls, dnaArray, inputDataInstance):
+		"""
+		"""
+
+		dnaArray, dnaArrayZipped, mutations = Chromosome.searchMutations(dnaArray, inputDataInstance)
+		return Chromosome.applyMutations(dnaArrayZipped, mutations)
 
 
 	def mutate(self):
 		"""
 		"""
-		return Chromosome.localSearch(self.dnaArrayZipped, InputDataInstance.instance)
+		chromosome = Chromosome.localSearch(self.dnaArrayZipped, InputDataInstance.instance)
+		self.dnaArrayZipped = chromosome.dnaArrayZipped
+		self.cost = chromosome.cost
 
 
 	def __lt__(self, chromosome):
 		return self.cost < chromosome.cost
 
 	def __repr__(self):
-		return " {} : {} ".format(self.unzipDnaArray(), self.cost)
+		return " {} : {} ".format(self.renderDnaArray(), self.cost)
 
 	def __eq__(self, chromosome):
-		return self.dnaArrayZipped == chromosome.dnaArrayZipped
-
-	# def __ne__(self, chromosome):
-	# 	return self._solution != chromosome.solution
-
-	
+		return self.dnaArrayZipped == chromosome.dnaArrayZipped	
