@@ -16,7 +16,7 @@ class Population:
         self.chromosomes = chromosomes
         self.elites = []
         self.setElites()
-        self.nextPopulation = Population([])
+        self.nextPopulation = None
         self._nextPopLock = threading.Lock()
         self.maxChromosomeCost = None
 
@@ -24,6 +24,7 @@ class Population:
         """
         """
 
+        self.nextPopulation = Population([])
         self.applyGeneticOperators()
         return self.nextPopulation
 
@@ -68,27 +69,20 @@ class Population:
 
         while len(self.nextPopulation.chromosomes) < len(self.chromosomes):
 
-            chromosomeA, chromosomeB, chromosomeC, chromosomeD= np.random.choice(self.chromosomes, p=rouletteProbabilities), np.random.choice(self.chromosomes, p=rouletteProbabilities), None, None
+            chromosomeA, chromosomeB, chromosome = np.random.choice(self.chromosomes, p=rouletteProbabilities), np.random.choice(self.chromosomes, p=rouletteProbabilities), None
 
             if (random.random() < ParameterData.instance.crossOverRate):
-                chromosomeC, chromosomeD = Population.crossOverChromosomes(chromosomeA, chromosomeB)
-                # print("+++", chromosomeC, chromosomeD)
+                chromosome = Population.crossOverChromosomes(chromosomeA, chromosomeB)
+                # print("+++", chromosome)
 
-                if chromosomeC is not None and (random.random() < ParameterData.instance.mutationRate):
-                    chromosomeC.mutate()
+                if chromosome != None and (random.random() < ParameterData.instance.mutationRate):
+                    chromosome.mutate()
 
-                if chromosomeD is not None and (random.random() < ParameterData.instance.mutationRate):
-                    chromosomeD.mutate()
-
-            if chromosomeC != None:
+            if chromosome is not None:
                 with self._nextPopLock:
-                    self.nextPopulation.add(chromosomeC)
-                    if len(self.nextPopChromosomes) > len(self.chromosomes):
+                    self.nextPopulation.add(chromosome)
+                    if len(self.nextPopulation.chromosomes) > len(self.chromosomes):
                         return
-
-            if chromosomeD != None:
-                with self._nextPopLock:
-                    self.nextPopulation.add(chromosomeD)
             
 
 
@@ -129,15 +123,15 @@ class Population:
     def converged(self):
         """
         """
-        
+        print("7777777777777777777", len(self.chromosomes))
         uniques, unique_counts, fittest = [], [], self.chromosomes[0]
 
         for chromosome in self.chromosomes:
-            if not (chromosome.dnaArrayZipped in uniques):
-                uniques.append(chromosome.dnaArrayZipped)
+            if not (chromosome.dnaArray in uniques):
+                uniques.append(chromosome.dnaArray)
                 unique_counts.append(0)
             else:
-                unique_counts[uniques.index(chromosome.dnaArrayZipped)] += 1
+                unique_counts[uniques.index(chromosome.dnaArray)] += 1
 
             if chromosome.cost < fittest.cost:
                 fittest = chromosome
@@ -148,7 +142,7 @@ class Population:
         threshold = int(ParameterData.instance.convergenceThresholdPercentage * len(self.chromosomes))
         threshold = 1 if threshold < 1 else threshold
 
-        if len(uniques) <= threshold and localOptimal == fittest.dnaArrayZipped:
+        if len(uniques) <= threshold and localOptimal == fittest.dnaArray:
             return True
         return False
 
@@ -163,9 +157,6 @@ class Population:
     def repairDna(cls, dnaArrayZipped):
         """
         """
-
-        if Chromosome.feasible(dnaArrayZipped, InputDataInstance.instance):
-            return dnaArrayZipped
 
         unzippedDNA = Chromosome.classUnzipDnaArray(dnaArrayZipped)
 
@@ -228,52 +219,48 @@ class Population:
 
     @classmethod
     def crossOverChromosomes(cls, chromosomeA, chromosomeB) -> Chromosome:
-        """Uniform crossover
         """
-        dnaArrayZippedC = [[] for _ in range(InputDataInstance.instance.nItems)]
-        dnaArrayZippedD = [[] for _ in range(InputDataInstance.instance.nItems)]
+        """
 
-        indicesC, indicesD  = [], []
-        for item in range(InputDataInstance.instance.nItems):
-            i = len(InputDataInstance.instance.demandsArrayZipped[item]) - 1
-            while i >= 0:
-                
-                itemIndexC, itemIndexD = None, None
-                if random.randint(1, 2) == 1:
-                    itemIndexC = chromosomeA.dnaArrayZipped[item][i]
-                    itemIndexD = chromosomeB.dnaArrayZipped[item][i]
-                else: 
-                    itemIndexD = chromosomeA.dnaArrayZipped[item][i]
-                    itemIndexC = chromosomeB.dnaArrayZipped[item][i]
-                
-                # making sure there's not the same item index twice in the chromosome dna representation
-                if not(itemIndexC in indicesC): 
-                    dnaArrayZippedC[item].insert(0, itemIndexC)
-                    indicesC.append(itemIndexC)
-                    indicesC.sort()
-                else:
-                    dnaArrayZippedC[item].insert(0, None)
+        dnaArray = [[ None for _ in row ] for row in InputDataInstance.instance.demandsArrayZipped]
+        chromosomeA, chromosomeB = (chromosomeA, chromosomeB) if chromosomeA < chromosomeB else (chromosomeB, chromosomeA)
 
-                if not(itemIndexD in indicesD): 
-                    dnaArrayZippedD[item].insert(0, itemIndexD)
-                    indicesD.append(itemIndexD)
-                    indicesD.sort()
-                else:
-                    dnaArrayZippedD[item].insert(0,None)
+        genesList = sorted([gene for itemProdGenes in chromosomeA.dnaArray for gene in itemProdGenes], key= lambda gene: gene.cost)
 
-                i -= 1
+        visitedPeriods = []
+        for geneA in genesList:
+            geneB = chromosomeB.dnaArray[geneA.item][geneA.position]
+            geneA, geneB = (geneA, geneB) if geneA.stockingCost <= geneB.stockingCost else (geneB, geneA)
+            if dnaArray[geneA.item][geneA.position] == None:
+                if not(geneA.period in visitedPeriods):
+                    dnaArray[geneA.item][geneA.position] = geneA
+                    visitedPeriods.append(geneA.period)
+                elif not(geneB.period in visitedPeriods):
+                    dnaArray[geneB.item][geneB.position] = geneB
+                    visitedPeriods.append(geneB.period)
+        
+        # print(dnaArray, '       ', Chromosome.classRenderDnaArray(dnaArray), Chromosome.feasible(dnaArray, InputDataInstance.instance))
+        repairedDnaArray = dnaArray
+        if not Chromosome.feasible(dnaArray, InputDataInstance.instance):
+            print("Boooooooooooooooooooooooooooooo", Chromosome.classRenderDnaArray(chromosomeA.dnaArray), Chromosome.classRenderDnaArray(chromosomeB.dnaArray), dnaArray)
+            repairedDnaArray = Population.repairDna(dnaArray)
 
-        dnaArrayZippedC, dnaArrayZippedD = Population.repairDna(dnaArrayZippedC), Population.repairDna(dnaArrayZippedD)
+        genesList = sorted([gene for itemProdGenes in repairedDnaArray for gene in itemProdGenes], key= lambda gene: gene.period)
 
-        chromosomeC, chromosomeD = None, None
-        if dnaArrayZippedC is not None:
-            chromosomeC = Chromosome()
-            chromosomeC.dnaArrayZipped = dnaArrayZippedC
-            chromosomeC.cost = Chromosome.calculateCostZippedDNA(chromosomeC.dnaArrayZipped, InputDataInstance.instance)
+        prevGene = None
+        cost = 0
+        for index, gene in enumerate(genesList):
+            gene.changeOverCost = 0 if index == 0 else InputDataInstance.instance.changeOverCostsArray[prevGene.item][gene.item]
+            gene.cost = gene.stockingCost + gene.changeOverCost            
+            prevGene = gene
+            cost += gene.cost
 
-        if dnaArrayZippedD is not None:
-            chromosomeD = Chromosome()
-            chromosomeD.dnaArrayZipped = dnaArrayZippedD
-            chromosomeD.cost = Chromosome.calculateCostZippedDNA(chromosomeD.dnaArrayZipped, InputDataInstance.instance)
+        chromosome = None
+        if repairedDnaArray != None:
+            chromosome = Chromosome()
+            chromosome.dnaArray = repairedDnaArray
+            chromosome.cost = cost
 
-        return chromosomeC, chromosomeD
+        # print(chromosome)
+
+        return chromosome

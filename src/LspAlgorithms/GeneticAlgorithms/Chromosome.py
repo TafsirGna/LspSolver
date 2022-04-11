@@ -4,6 +4,7 @@
 import queue
 import numpy as np
 import random
+from LspAlgorithms.GeneticAlgorithms.Gene import Gene
 from LspAlgorithms.GeneticAlgorithms.MutationSearchNode import MutationSearchNode
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 
@@ -87,36 +88,29 @@ class Chromosome(object):
 		"""Checks if a given dnaArray leads to a feasible chromosome
 		"""
 
-		# transforming the inputs to make them more handleable
-		dnaArrayZipped = None
-		if len(dnaArray) == inputDataInstance.nPeriods:
-			dnaArrayZipped = Chromosome.classZipDnaArray(dnaArray)
-		elif len(dnaArray) == inputDataInstance.nItems:
-			dnaArrayZipped = dnaArray
-
 		# going through the zipped dna array checking : ->
-		indices = []
-		for i in range(inputDataInstance.nItems):
-			demands = inputDataInstance.demandsArrayZipped[i]
-			prods = dnaArrayZipped[i]
+		# indices = []
+		for item in range(inputDataInstance.nItems):
+			demands = inputDataInstance.demandsArrayZipped[item]
+			prods = dnaArray[item]
 
-			if len(demands) is not len(prods): # -> that the number of produced item meets the number of demand
+			if len(demands) != len(prods): # -> that the number of produced item meets the number of demand
 				return False
 
 			for j, demandIndex in enumerate(demands):
-				prodIndex = prods[j]
+				gene = prods[j]
 
-				if not(prodIndex in range(inputDataInstance.nPeriods)) or prodIndex in indices: # -> that item production index is a very period and there's no duplicate value
+				if gene == None: # -> that item production index is a very period and there's no duplicate value
 					return False
 
-				prevProdIndex = (0 if j == 0 else prods[j - 1]) # -> that previous period where the item has bee produced is always less than the current one
-				if (prevProdIndex > prodIndex):
+				prevProdIndex = (0 if j == 0 else (prods[j - 1]).period) # -> that previous period where the item has bee produced is always less than the current one
+				if (prevProdIndex > gene.period):
 					return False
 
-				if prodIndex > demandIndex: # checks that the item is produced before its demand period
+				if gene.period > demandIndex: # checks that the item is produced before its demand period
 					return False
 
-				indices.append(prodIndex)
+				# indices.append(prodIndex)
 
 		return True
 
@@ -124,19 +118,6 @@ class Chromosome(object):
 		"""
 		"""
 		self.dnaArrayZipped = Chromosome.classZipDnaArray(dnaArray)
-
-
-	@classmethod
-	def classZipDnaArray(cls, dnaArray):
-		"""
-		"""
-		dnaArrayZipped = [[] for _ in range(InputDataInstance.instance.nItems)]
-
-		for index, item in enumerate(dnaArray):
-			if item is not 0:
-				dnaArrayZipped[item - 1].append(index)
-			
-		return dnaArrayZipped
 
 
 	def renderDnaArray(self):
@@ -159,17 +140,26 @@ class Chromosome(object):
 		return result
 
 	@classmethod
-	def transformInput(cls, dnaArray, inputDataInstance):
+	def convertRawDNA(cls, rawDnaArray):
 		"""
 		"""
-		dnaArrayZipped = None
-		if len(dnaArray) == inputDataInstance.nPeriods:
-			dnaArrayZipped = Chromosome.classZipDnaArray(dnaArray)
-		elif len(dnaArray) == inputDataInstance.nItems:
-			dnaArrayZipped = dnaArray
-			dnaArray = Chromosome.classRenderDnaArray(dnaArrayZipped)
+		dnaArray = [[] for _ in range(InputDataInstance.instance.nItems)]
 
-		return dnaArray, dnaArrayZipped
+		prevGene = None
+		producedItemsCount = [0 for _ in range(InputDataInstance.instance.nItems)]
+		for index, item in enumerate(rawDnaArray):
+			if item != 0:
+				position = producedItemsCount[item - 1]
+				refinedItem = item - 1
+
+				gene = Gene(refinedItem, index, position, prevGene)
+				gene.calculateCost()
+				dnaArray[refinedItem].append(gene)
+				prevGene = refinedItem, position
+				producedItemsCount[refinedItem] += 1
+			
+		# print(dnaArray)
+		return dnaArray
 
 
 	@classmethod
@@ -177,30 +167,28 @@ class Chromosome(object):
 		"""
 		"""
 
-		dnaArray, dnaArrayZipped = Chromosome.transformInput(dnaArray, inputDataInstance)
-
 		mutations = []
 
-		for i1, itemProdIndexes in enumerate(dnaArrayZipped):
+		for i1, itemProdGenes in enumerate(dnaArray):
 
-			j1 = len(itemProdIndexes) - 1
+			j1 = len(itemProdGenes) - 1
 			while j1 >= 0:
 
-				item1ProdIndex = itemProdIndexes[j1]
+				item1ProdGene = itemProdGenes[j1]
 				item1DemandIndex = InputDataInstance.instance.demandsArrayZipped[i1][j1]
-				bottomLimit = (0 if j1 == 0 else dnaArrayZipped[i1][j1 - 1] + 1)
+				bottomLimit = (0 if j1 == 0 else (dnaArray[i1][j1 - 1]).period + 1)
 				#first approach
 
 				for period, periodValue in enumerate(dnaArray[bottomLimit:InputDataInstance.instance.demandsArrayZipped[i1][j1] + 1]):
 					if (periodValue - 1) != i1:
 						mutationItem = None
 						if periodValue == 0:
-							mutationItem = [[i1 + 1, dnaArrayZipped[i1][j1]], [0, period + bottomLimit]]
+							mutationItem = [[i1 + 1, dnaArray[i1][j1]], [0, period + bottomLimit]]
 						else:
 							item2ProdIndex = period + bottomLimit
-							item2DemandIndex = InputDataInstance.instance.demandsArrayZipped[periodValue - 1][dnaArrayZipped[periodValue - 1].index(item2ProdIndex)]
+							item2DemandIndex = InputDataInstance.instance.demandsArrayZipped[periodValue - 1][dnaArray[periodValue - 1].index(item2ProdIndex)]
 							if item2DemandIndex >= item1ProdIndex and item1DemandIndex >= item2ProdIndex:
-								mutationItem = [[i1 + 1, dnaArrayZipped[i1][j1]], [periodValue, dnaArrayZipped[periodValue - 1][dnaArrayZipped[periodValue - 1].index(item2ProdIndex)]]]
+								mutationItem = [[i1 + 1, dnaArray[i1][j1]], [periodValue, dnaArray[periodValue - 1][dnaArray[periodValue - 1].index(item2ProdIndex)]]]
 						
 						if mutationItem != None and not(mutationItem in mutations) and not([mutationItem[1], mutationItem[0]] in mutations):
 								mutations.append(mutationItem)
@@ -210,7 +198,7 @@ class Chromosome(object):
 		for mutation in mutations:
 			print("mutation --> ", mutation)
 
-		return dnaArray, dnaArrayZipped, mutations
+		return dnaArray, mutations
 
 
 	@classmethod
@@ -231,15 +219,15 @@ class Chromosome(object):
 		"""
 		"""
 
-		dnaArray, dnaArrayZipped, mutations = Chromosome.searchMutations(dnaArray, inputDataInstance)
-		return Chromosome.applyMutations(dnaArrayZipped, mutations)
+		dnaArray, mutations = Chromosome.searchMutations(dnaArray, inputDataInstance)
+		return Chromosome.applyMutations(dnaArray, mutations)
 
 
 	def mutate(self):
 		"""
 		"""
-		chromosome = Chromosome.localSearch(self.dnaArrayZipped, InputDataInstance.instance)
-		self.dnaArrayZipped = chromosome.dnaArrayZipped
+		chromosome = Chromosome.localSearch(self.dnaArray, InputDataInstance.instance)
+		self.dnaArray = chromosome.dnaArray
 		self.cost = chromosome.cost
 
 
@@ -247,7 +235,7 @@ class Chromosome(object):
 		return self.cost < chromosome.cost
 
 	def __repr__(self):
-		return " {} : {} ".format(self.renderDnaArray(), self.cost)
+		return " {} : {}".format(self.renderDnaArray(), self.cost)
 
 	def __eq__(self, chromosome):
-		return self.dnaArrayZipped == chromosome.dnaArrayZipped	
+		return self.dnaArray == chromosome.dnaArray	

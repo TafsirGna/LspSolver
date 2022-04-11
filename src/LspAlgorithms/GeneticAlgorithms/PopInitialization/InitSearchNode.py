@@ -40,6 +40,8 @@ class SearchNode(object):
 		children = []
 
 		if self.period < 0: # the node is a leaf node
+			# print("Leaf --> ", Chromosome.classRenderDnaArray(self.chromosome.dnaArray), '---', self.chromosome.dnaArray, self.chromosome.cost)
+			# print("---------------------------------------------------------------------------------")
 			return children
 		
 		periodDemands = InputDataInstance.instance.demandsArray[:,self.period]
@@ -49,7 +51,7 @@ class SearchNode(object):
 			if value == 1:
 				self.itemsToOrder[item] += 1
 
-		# print("Parent --> ", self.chromosome)
+		# print("Parent --> ", Chromosome.classRenderDnaArray(self.chromosome.dnaArray), '            ', self.chromosome.dnaArray, self.chromosome.cost)
 
 		for item, itemCount in enumerate(self.itemsToOrder):
 
@@ -60,8 +62,9 @@ class SearchNode(object):
 				node = SearchNode(Chromosome(), self.period - 1)
 				node.lastPlacedItem = self.lastPlacedItem # if we guess a priori that nothing has been produced for this period
 
-				dnaArray = [[gene for gene in row] for row in self.chromosome.dnaArray]
+				dnaArray = [[copy.deepcopy(gene) for gene in row] for row in self.chromosome.dnaArray]
 				cost = 0
+				# print("ok Start --- ", dnaArray)
 
 				if (item < InputDataInstance.instance.nItems):
 
@@ -69,13 +72,15 @@ class SearchNode(object):
 					gene = Gene(item, self.period, itemProdPosition)
 					gene.calculateCost()
 					cost += gene.cost
+					# print("ok --- ", item, self.period, itemProdPosition, gene.cost)
 					dnaArray[item].insert(0, gene)
 
 					node.lastPlacedItem = gene.item
 
 					if self.lastPlacedItem != None:
 						changeOverCost = InputDataInstance.instance.changeOverCostsArray[item][self.lastPlacedItem]
-						(dnaArray[self.lastPlacedItem][0]).prevGene = gene
+						(dnaArray[self.lastPlacedItem][0]).prevGene = item, itemProdPosition
+						(dnaArray[self.lastPlacedItem][0]).changeOverCost = changeOverCost
 						(dnaArray[self.lastPlacedItem][0]).cost += changeOverCost
 						cost += changeOverCost
 
@@ -87,6 +92,8 @@ class SearchNode(object):
 				
 				node.chromosome.dnaArray = dnaArray
 				node.chromosome.cost = (self.chromosome.cost + cost) 
+
+				# print("ok End --- ", dnaArray)
 
 				children.append(node)
 
