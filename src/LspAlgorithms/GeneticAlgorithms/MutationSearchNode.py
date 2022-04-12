@@ -1,23 +1,22 @@
-
-# from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
-
+from . import Chromosome
 
 class MutationSearchNode:
     """
     """
     pass
 
-    # def __init__(self, dnaArrayZipped, mutations) -> None:
-    #     """
-    #     """
-    #     chromosome = Chromosome()
-    #     self.chromosome = chromosome
-    #     self.chromosome.dnaArrayZipped = dnaArrayZipped
-    #     self.mutations = mutations
+    def __init__(self, dnaArray, mutations) -> None:
+        """
+        """
+        chromosome = Chromosome
+        self.chromosome = chromosome
+        self.chromosome.dnaArrayZipped = dnaArray
+        self.mutations = mutations
 
 
-    # def children(self):
-    #     """
-    #     """
-    #     pass
+    def children(self):
+        """
+        """
+        children = []
+        return children
 

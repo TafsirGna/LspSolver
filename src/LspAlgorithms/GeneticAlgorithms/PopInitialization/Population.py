@@ -75,7 +75,7 @@ class Population:
                 chromosome = Population.crossOverChromosomes(chromosomeA, chromosomeB)
                 # print("+++", chromosome)
 
-                if chromosome != None and (random.random() < ParameterData.instance.mutationRate):
+                if chromosome is not None and (random.random() < ParameterData.instance.mutationRate):
                     chromosome.mutate()
 
             if chromosome is not None:
@@ -123,7 +123,6 @@ class Population:
     def converged(self):
         """
         """
-        print("7777777777777777777", len(self.chromosomes))
         uniques, unique_counts, fittest = [], [], self.chromosomes[0]
 
         for chromosome in self.chromosomes:
@@ -251,7 +250,8 @@ class Population:
         cost = 0
         for index, gene in enumerate(genesList):
             gene.changeOverCost = 0 if index == 0 else InputDataInstance.instance.changeOverCostsArray[prevGene.item][gene.item]
-            gene.cost = gene.stockingCost + gene.changeOverCost            
+            gene.cost = gene.stockingCost + gene.changeOverCost    
+            gene.prevGene = (prevGene.item, prevGene.position) if prevGene != None else (None, None)        
             prevGene = gene
             cost += gene.cost
 

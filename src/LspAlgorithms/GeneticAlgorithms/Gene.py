@@ -11,21 +11,37 @@ class Gene:
         self.period = period
         self.cost = 0
         self.position = position
-        self.prevGene, self.nextGene = prevGene, None
+        self.prevGene = prevGene
 
+        # self.changeOverCost = None
+        # self.stockingCost = None
+        # self.calculateCost()
     
     def calculateCost(self):
         """
         """
         self.cost = 0
         # Stocking cost
-        self.stockingCost = (InputDataInstance.instance.demandsArrayZipped[self.item][self.position] - self.period) * InputDataInstance.instance.stockingCostsArray[self.item]
+        self.calculateStockingCost()
         self.cost += self.stockingCost
 
         # Change over cost
+        self.calculateChangeOverCost()
+        self.cost += self.changeOverCost
+
+    def calculateStockingCost(self):
+        """
+        """
+        self.stockingCost = (InputDataInstance.instance.demandsArrayZipped[self.item][self.position] - self.period) * InputDataInstance.instance.stockingCostsArray[self.item]
+
+
+    def calculateChangeOverCost(self):
+        """
+        """
+        self.changeOverCost = 0
         if (self.prevGene != None):
             self.changeOverCost = InputDataInstance.instance.changeOverCostsArray[self.prevGene[0]][self.item]
-            self.cost += self.changeOverCost
+
 
 
     # def __lt__(self, gene):
@@ -37,7 +53,7 @@ class Gene:
     def __repr__(self):
         """
         """
-        return "{}|{}|{}|{}".format(self.item, self.position, self.period, self.cost)
+        return "it:{}|pos:{}|peri:{}|cos:{}|prev:({}, {})".format(self.item, self.position, self.period, self.cost, self.prevGene[0] if self.prevGene != None else None, self.prevGene[1] if self.prevGene != None else None)
 
 
 

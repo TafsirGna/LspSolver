@@ -35,11 +35,12 @@ ParameterData.instance = ParameterData()
 # print(Chromosome.feasible([1, 2, 0, 1, 2], InputDataInstance.instance))
 # [2, 2, 2, 3, 1, 0, 0, 1]
 
-c = Chromosome()
-c.dnaArray = Chromosome.convertRawDNA([2, 1, 2, 1, 0])
-# # [2, 1, 2, 0, 1]
-c.mutate()
-print(c)
+# c = Chromosome()
+# c.dnaArray = Chromosome.convertRawDNA([2, 1, 2, 1, 0])
+# c.calculateCost()
+# # # [2, 1, 2, 0, 1]
+# c.mutate()
+# print(c)
 
 # print(Chromosome.localSearch([2, 3, 2, 2, 0, 1, 0, 1], InputDataInstance.instance))
 # print(Chromosome.localSearch([2, 3, 2, 2, 0, 1, 0, 1], InputDataInstance.instance))
@@ -47,7 +48,8 @@ print(c)
 # dnaA, dnaB = Chromosome.convertRawDNA([2, 1, 0, 2, 1]), Chromosome.convertRawDNA([2, 1, 2, 0, 1])
 # cA, cB = Chromosome(), Chromosome()
 # cA.dnaArray, cB.dnaArray  = dnaA, dnaB
-# Population.crossOverChromosomes(cA, cB)
+# print(cA, "\n", cB, "\n -----------------------------")
+# print(Population.crossOverChromosomes(cA, cB))
 
 ###
 LspRuntimeStatisticsMonitor.instance = LspRuntimeStatisticsMonitor()
@@ -55,17 +57,17 @@ LspRuntimeStatisticsMonitor.instance = LspRuntimeStatisticsMonitor()
 # # I create an instance of the genetic algorithm to be used
 lspSolver = GeneticAlgorithm(inputDataInstance)
 
-# ##
-# if LspRuntimeStatisticsMonitor.instance:
-#     LspRuntimeStatisticsMonitor.instance.popInitClockStart = perf_counter()
-# ###
+##
+if LspRuntimeStatisticsMonitor.instance:
+    LspRuntimeStatisticsMonitor.instance.popInitClockStart = perf_counter()
+###
 
-# lspSolver.solve()
+lspSolver.solve()
 
-# ###
-# if LspRuntimeStatisticsMonitor.instance:
-#     LspRuntimeStatisticsMonitor.instance.popInitClockEnd = perf_counter()
-# ###
+###
+if LspRuntimeStatisticsMonitor.instance:
+    LspRuntimeStatisticsMonitor.instance.popInitClockEnd = perf_counter()
+###
 
-# # # Reporting all statistics collected when running the selected algo
-# LspRuntimeStatisticsMonitor.instance.report()
+# # Reporting all statistics collected when running the selected algo
+LspRuntimeStatisticsMonitor.instance.report()
