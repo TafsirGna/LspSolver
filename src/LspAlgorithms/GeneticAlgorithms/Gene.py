@@ -13,21 +13,15 @@ class Gene:
         self.position = position
         self.prevGene = prevGene
 
-        # self.changeOverCost = None
-        # self.stockingCost = None
+        self.changeOverCost = 0
+        self.stockingCost = 0
         # self.calculateCost()
     
     def calculateCost(self):
         """
         """
-        self.cost = 0
-        # Stocking cost
-        self.calculateStockingCost()
-        self.cost += self.stockingCost
 
-        # Change over cost
-        self.calculateChangeOverCost()
-        self.cost += self.changeOverCost
+        self.cost = self.changeOverCost + self.stockingCost
 
     def calculateStockingCost(self):
         """
@@ -53,7 +47,8 @@ class Gene:
     def __repr__(self):
         """
         """
-        return "it:{}|pos:{}|peri:{}|cos:{}|prev:({}, {})".format(self.item, self.position, self.period, self.cost, self.prevGene[0] if self.prevGene != None else None, self.prevGene[1] if self.prevGene != None else None)
+        # return "it:{}|pos:{}|peri:{}|cos:{}|prev:({}, {})".format(self.item, self.position, self.period, self.cost, self.prevGene[0] if self.prevGene != None else None, self.prevGene[1] if self.prevGene != None else None)
+        return "{} ({}, {})".format(self.period, self.prevGene[0] if self.prevGene != None else None, self.prevGene[1] if self.prevGene != None else None)
 
 
 

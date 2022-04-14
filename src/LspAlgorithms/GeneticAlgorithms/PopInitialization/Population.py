@@ -1,3 +1,4 @@
+import enum
 from functools import total_ordering
 from threading import Thread, local
 import threading
@@ -5,6 +6,7 @@ import threading
 import numpy as np
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
 import random
+from LspAlgorithms.GeneticAlgorithms.Gene import Gene
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 from ParameterSearch.ParameterData import ParameterData
 
@@ -32,16 +34,16 @@ class Population:
     def setElites(self):
         """
         """
-        # if len(self.elites) > 0 or len(self.chromosomes) is 0:
-        #     return
+        if len(self.elites) > 0 or len(self.chromosomes) is 0:
+            return
 
-        # nElites = int(float(len(self.chromosomes)) * ParameterData.instance.elitePercentage)
-        # nElites = ( 1 if nElites < 1 else nElites)
+        nElites = int(float(len(self.chromosomes)) * ParameterData.instance.elitePercentage)
+        nElites = ( 1 if nElites < 1 else nElites)
 
-        # # self.chromosomes.sorted(key= lambda chromosome: chromosome.cost) 
-        # chromosomes = sorted(self.chromosomes)
+        # self.chromosomes.sorted(key= lambda chromosome: chromosome.cost) 
+        chromosomes = sorted(self.chromosomes)
 
-        # self.elites = chromosomes[:nElites]
+        self.elites = chromosomes[:nElites]
 
 
     def add(self, chromosome):
@@ -153,67 +155,85 @@ class Population:
 
 
     @classmethod
-    def repairDna(cls, dnaArrayZipped):
+    def fillNullPeriods(cls, dnaArray):
         """
         """
 
-        unzippedDNA = Chromosome.classUnzipDnaArray(dnaArrayZipped)
+        unzippedDNA = Chromosome.classRenderDnaArray(dnaArray)
 
-        # print("=== Before ", dnaArrayZipped, unzippedDNA , ' | ', InputDataInstance.instance.demandsArrayZipped)
+        print("=== Before ", dnaArray, unzippedDNA , ' | ', InputDataInstance.instance.demandsArrayZipped)
 
-        for item, itemIndices in enumerate(dnaArrayZipped):
+        for item, itemGenes in enumerate(dnaArray):
             bottomLimit = 0
-            for i, itemIndex in enumerate(itemIndices):
-                # print("item : ", item, 'index : ', itemIndex, "None : ", itemIndex is None, "indices : ", itemIndices)
-                if itemIndex is None:
-                    # print("Portion : ", unzippedDNA[bottomLimit:(InputDataInstance.instance.demandsArrayZipped[item][i]+1)])
+            for i, itemGene in enumerate(itemGenes):
+                print("item : ", item, 'index : ', itemGene, "None : ", itemGene is None, "indices : ", itemGenes)
+                if itemGene is None:
 
-                    j = (InputDataInstance.instance.demandsArrayZipped[item][i])
+                    itemDemandPeriod = InputDataInstance.instance.demandsArrayZipped[item][i]
+                    itemNextIndex = (itemGenes[i + 1]).period if i < len(itemGenes) - 1 else  InputDataInstance.instance.demandsArrayZipped[item][i] + 1
+                    topLimit = max([itemDemandPeriod + 1, itemNextIndex])
+
+                    print("Portion : ", bottomLimit, topLimit, unzippedDNA[bottomLimit:topLimit])
+
+                    j = topLimit - 1
                     while j >= bottomLimit:
 
                         periodValue = unzippedDNA[j]
-                        # print("periodValue : ", periodValue)
+                        print("periodValue : ", periodValue)
                         if periodValue == 0:
-                            dnaArrayZipped[item][i] = j
-                            unzippedDNA = Chromosome.classUnzipDnaArray(dnaArrayZipped)
-                            # print("result 1 : ", dnaArrayZipped)
+                            gene = Gene(item, j, i)
+                            gene.calculateStockingCost()
+                            gene.calculateCost()
+                            (dnaArray[item][i]) = gene
+                            unzippedDNA = Chromosome.classRenderDnaArray(dnaArray)
+                            print("result 1 : ", dnaArray)
                             break
-                        else:
-                            repaired = False
-                            # print("not a list ", dnaArrayZipped[periodValue - 1], (j))
-                            indexPeriodValue = dnaArrayZipped[periodValue - 1].index(j)
-                            demandPeriod = InputDataInstance.instance.demandsArrayZipped[periodValue - 1][indexPeriodValue]
-                            # print("demande period : ", demandPeriod, "Second portion : ", unzippedDNA[(j + bottomLimit):demandPeriod + 1])
-                            
-                            k = demandPeriod
-                            while k >= (j + bottomLimit):
-
-                                periodVal = unzippedDNA[k]
-                                # print("Second period : ", periodVal)
-                                if periodVal == 0:
-                                    dnaArrayZipped[periodValue - 1][indexPeriodValue] = k
-                                    dnaArrayZipped[item][i] = (j + bottomLimit)
-                                    unzippedDNA = Chromosome.classUnzipDnaArray(dnaArrayZipped)
-                                    # print("result 2 : ", dnaArrayZipped)
-                                    repaired = True
-                                    break
-
-                                k -= 1
-                                
-                            
-                            if repaired:
-                                break
 
                         j -= 1
 
                     # if it still none then 
-                    if dnaArrayZipped[item][i] is None:
+                    if dnaArray[item][i] is None:
+                        print("still none")
                         return None
-                bottomLimit = dnaArrayZipped[item][i] + 1
+                bottomLimit = (dnaArray[item][i]).period + 1
         
-        # print("=== After ", dnaArrayZipped, unzippedDNA)
+        # print("=== After ", dnaArray, unzippedDNA, Chromosome.feasible(dnaArray, InputDataInstance.instance))
 
-        return dnaArrayZipped
+        return dnaArray
+
+    @classmethod
+    def repairDna(cls, dnaArray):
+        """
+        """
+
+        dnaArray = Population.fillNullPeriods(dnaArray)
+
+        if dnaArray == None:
+            return None, 0
+
+        dnaArray, cost = Population.arrangeDna(dnaArray)
+
+        # print("=== After ", dnaArray, Chromosome.classRenderDnaArray(dnaArray), cost)
+        # print("=== After ", dnaArray, Chromosome.classRenderDnaArray(dnaArray), cost, Chromosome.calculateCostPlainDNA(Chromosome.classRenderDnaArray(dnaArray), InputDataInstance.instance), "price*", cost == Chromosome.calculateCostPlainDNA(Chromosome.classRenderDnaArray(dnaArray), InputDataInstance.instance))
+        return dnaArray, cost
+
+    @classmethod
+    def arrangeDna(cls, dnaArray):
+        """
+        """
+        genesList = sorted([gene for itemProdGenes in dnaArray for gene in itemProdGenes], key= lambda gene: gene.period)
+
+        prevGene = None
+        cost = 0
+        for gene in genesList:
+            gene.prevGene = (prevGene.item, prevGene.position) if prevGene != None else None 
+            gene.calculateChangeOverCost()
+            # gene.calculateStockingCost()
+            gene.calculateCost()          
+            prevGene = gene
+            cost += gene.cost
+
+        return dnaArray, cost
 
 
     @classmethod
@@ -222,45 +242,51 @@ class Population:
         """
 
         dnaArray = [[ None for _ in row ] for row in InputDataInstance.instance.demandsArrayZipped]
-        chromosomeA, chromosomeB = (chromosomeA, chromosomeB) if chromosomeA < chromosomeB else (chromosomeB, chromosomeA)
-
-        genesList = sorted([gene for itemProdGenes in chromosomeA.dnaArray for gene in itemProdGenes], key= lambda gene: gene.cost)
+        
+        # chromosomeA, chromosomeB = (chromosomeA, chromosomeB) if chromosomeA < chromosomeB else (chromosomeB, chromosomeA)
+        # genesList = sorted([gene for itemProdGenes in chromosomeA.dnaArray for gene in itemProdGenes], key= lambda gene: gene.cost)
 
         visitedPeriods = []
-        for geneA in genesList:
-            geneB = chromosomeB.dnaArray[geneA.item][geneA.position]
-            geneA, geneB = (geneA, geneB) if geneA.stockingCost <= geneB.stockingCost else (geneB, geneA)
-            if dnaArray[geneA.item][geneA.position] == None:
-                if not(geneA.period in visitedPeriods):
-                    dnaArray[geneA.item][geneA.position] = geneA
-                    visitedPeriods.append(geneA.period)
-                elif not(geneB.period in visitedPeriods):
-                    dnaArray[geneB.item][geneB.position] = geneB
-                    visitedPeriods.append(geneB.period)
-        
+        # for geneA in genesList:
+        #     geneB = chromosomeB.dnaArray[geneA.item][geneA.position]
+        #     geneA, geneB = (geneA, geneB) if geneA.stockingCost <= geneB.stockingCost else (geneB, geneA)
+        #     if dnaArray[geneA.item][geneA.position] == None:
+        #         if not(geneA.period in visitedPeriods):
+        #             dnaArray[geneA.item][geneA.position] = geneA
+        #             visitedPeriods.append(geneA.period)
+        #         elif not(geneB.period in visitedPeriods):
+        #             dnaArray[geneB.item][geneB.position] = geneB
+        #             visitedPeriods.append(geneB.period)
+
+        for item, itemGenes in enumerate(chromosomeA.dnaArray):
+            bottomLimit, topLimit = -1, InputDataInstance.instance.demandsArrayZipped[item][0]
+            for position, geneA in enumerate(itemGenes):
+                geneB = chromosomeB.dnaArray[item][position]
+                geneA, geneB = (geneA, geneB) if geneA.stockingCost <= geneB.stockingCost else (geneB, geneA)
+                if dnaArray[item][position] == None:
+                    if not(geneA.period in visitedPeriods) and (bottomLimit < geneA.period and geneA.period <= topLimit):
+                        dnaArray[geneA.item][geneA.position] = geneA
+                        visitedPeriods.append(geneA.period)
+                    elif not(geneB.period in visitedPeriods) and (bottomLimit < geneB.period and geneB.period <= topLimit):
+                        dnaArray[geneB.item][geneB.position] = geneB
+                        visitedPeriods.append(geneB.period)
+                bottomLimit = (dnaArray[item][position]).period if (dnaArray[item][position]) is not None else bottomLimit
+                topLimit = InputDataInstance.instance.demandsArrayZipped[item][position + 1] if position < len(itemGenes) - 1 else 0
+
         # print(dnaArray, '       ', Chromosome.classRenderDnaArray(dnaArray), Chromosome.feasible(dnaArray, InputDataInstance.instance))
-        repairedDnaArray = dnaArray
+        cost = 0
         if not Chromosome.feasible(dnaArray, InputDataInstance.instance):
             print("Boooooooooooooooooooooooooooooo", Chromosome.classRenderDnaArray(chromosomeA.dnaArray), Chromosome.classRenderDnaArray(chromosomeB.dnaArray), dnaArray)
-            repairedDnaArray = Population.repairDna(dnaArray)
-
-        genesList = sorted([gene for itemProdGenes in repairedDnaArray for gene in itemProdGenes], key= lambda gene: gene.period)
-
-        prevGene = None
-        cost = 0
-        for index, gene in enumerate(genesList):
-            gene.changeOverCost = 0 if index == 0 else InputDataInstance.instance.changeOverCostsArray[prevGene.item][gene.item]
-            gene.cost = gene.stockingCost + gene.changeOverCost    
-            gene.prevGene = (prevGene.item, prevGene.position) if prevGene != None else (None, None)        
-            prevGene = gene
-            cost += gene.cost
+            dnaArray, cost = Population.repairDna(dnaArray)
+        else:
+            dnaArray, cost = Population.arrangeDna(dnaArray)
 
         chromosome = None
-        if repairedDnaArray != None:
+        if dnaArray != None:
             chromosome = Chromosome()
-            chromosome.dnaArray = repairedDnaArray
+            chromosome.dnaArray = dnaArray
             chromosome.cost = cost
 
-        # print(chromosome)
+        # print("----------------", chromosome)
 
         return chromosome

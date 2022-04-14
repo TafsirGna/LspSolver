@@ -46,6 +46,7 @@ ParameterData.instance = ParameterData()
 # print(Chromosome.localSearch([2, 3, 2, 2, 0, 1, 0, 1], InputDataInstance.instance))
 
 # dnaA, dnaB = Chromosome.convertRawDNA([2, 1, 0, 2, 1]), Chromosome.convertRawDNA([2, 1, 2, 0, 1])
+# dnaA, dnaB = Chromosome.convertRawDNA([1, 2, 2, 1, 3, 2, 0, 0]), Chromosome.convertRawDNA([2, 2, 3, 1, 1, 2, 0, 0] )
 # cA, cB = Chromosome(), Chromosome()
 # cA.dnaArray, cB.dnaArray  = dnaA, dnaB
 # print(cA, "\n", cB, "\n -----------------------------")

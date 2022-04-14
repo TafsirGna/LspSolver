@@ -70,6 +70,7 @@ class SearchNode(object):
 
 					itemProdPosition = (len(InputDataInstance.instance.demandsArrayZipped[item]) - len(dnaArray[item])) - 1
 					gene = Gene(item, self.period, itemProdPosition)
+					gene.calculateStockingCost()
 					gene.calculateCost()
 					cost += gene.cost
 					# print("ok --- ", item, self.period, itemProdPosition, gene.cost)
@@ -78,11 +79,12 @@ class SearchNode(object):
 					node.lastPlacedItem = gene.item
 
 					if self.lastPlacedItem != None:
-						changeOverCost = InputDataInstance.instance.changeOverCostsArray[item][self.lastPlacedItem]
-						(dnaArray[self.lastPlacedItem][0]).prevGene = item, itemProdPosition
-						(dnaArray[self.lastPlacedItem][0]).changeOverCost = changeOverCost
-						(dnaArray[self.lastPlacedItem][0]).cost += changeOverCost
-						cost += changeOverCost
+						# changeOverCost = InputDataInstance.instance.changeOverCostsArray[item][self.lastPlacedItem]
+						lastPlacedGene = (dnaArray[self.lastPlacedItem][0])
+						lastPlacedGene.prevGene = item, itemProdPosition
+						lastPlacedGene.calculateChangeOverCost()
+						lastPlacedGene.calculateCost()
+						cost += lastPlacedGene.changeOverCost
 
 				# setting node's chomosome period
 				itemsToOrder = [i for i in self.itemsToOrder]

@@ -20,7 +20,6 @@ class InputDataInstance:
 
 		# [index for index, item in enumerate(periodDemands) if periodDemands[item] == 1]
 		self.demandsArrayZipped = [[j for j,val in enumerate(row) if val == 1] for row in self.demandsArray]
-		# print("DOOOOOOOOOOPE --> ", self.demandsArrayZipped)
 
 	def __repr__(self):
 		return "Number of Items is : {} \n".format(self.nItems) + \

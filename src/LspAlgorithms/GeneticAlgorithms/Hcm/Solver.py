@@ -44,9 +44,10 @@ class GeneticAlgorithm:
 	def process(self, threadIndex, population):
 		"""
 		"""
+		generationIndex = 0
 
 		while not(self.stopConditionMet(population)):
-			# if self.generationIndex == 1:
+			# if generationIndex == 1:
 			# 	break
 
 			self.setElites(population)
@@ -54,7 +55,7 @@ class GeneticAlgorithm:
 			population = population.evolve()
 			print("Population --> ", population)
 			
-			self.generationIndex += 1
+			generationIndex += 1
 
 
 
@@ -72,8 +73,8 @@ class GeneticAlgorithm:
 
 		[thread_T.join() for thread_T in threads]
 
-		# result = (min(self.elites)).cost
-		# print("Result : ", result)
+		result = (min(self.elites)).cost
+		print("Result : ", result)
 
 	
 	def stopConditionMet(self, population):

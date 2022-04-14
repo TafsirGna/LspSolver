@@ -7,7 +7,6 @@ import queue
 import numpy as np
 import random
 from LspAlgorithms.GeneticAlgorithms.Gene import Gene
-from LspAlgorithms.GeneticAlgorithms.MutationSearchNode import MutationSearchNode
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 
 class Chromosome(object):
@@ -47,30 +46,30 @@ class Chromosome(object):
 
 		return cost
 
-	@classmethod
-	def calculateCostPlainDNA(cls, dnaArray, inputDataInstance):
-		"""
-		"""
+	# @classmethod
+	# def calculateCostPlainDNA(cls, dnaArray, inputDataInstance):
+	# 	"""
+	# 	"""
 
-		cost = 0
-		item1, item2 = dnaArray[0], dnaArray[0]
-		nOccurenceItem = np.array([0 for _ in range(inputDataInstance.nItems)])
-		if item2 is not 0:
-			nOccurenceItem[item2 - 1] += 1
-			cost += inputDataInstance.stockingCostsArray[item2 - 1] * (inputDataInstance.demandsArrayZipped[item2 - 1][nOccurenceItem[item2 - 1] -1] - 0)
+	# 	cost = 0
+	# 	item1, item2 = dnaArray[0], dnaArray[0]
+	# 	nOccurenceItem = np.array([0 for _ in range(inputDataInstance.nItems)])
+	# 	if item2 is not 0:
+	# 		nOccurenceItem[item2 - 1] += 1
+	# 		cost += inputDataInstance.stockingCostsArray[item2 - 1] * (inputDataInstance.demandsArrayZipped[item2 - 1][nOccurenceItem[item2 - 1] -1] - 0)
 
-		for index in range(1, len(dnaArray)):
-			if dnaArray[index] is not 0:
-				item2 = dnaArray[index]
-				cost += inputDataInstance.chanOverArray[item1 - 1 , item2 - 1]
-				nOccurenceItem[item2 - 1] += 1
-				cost += inputDataInstance.stockingCostsArray[item2 - 1] * (inputDataInstance.demandsArrayZipped[item2 - 1][nOccurenceItem[item2 - 1] - 1] - index)
+	# 	for index in range(1, len(dnaArray)):
+	# 		if dnaArray[index] != 0:
+	# 			item2 = dnaArray[index]
+	# 			cost += inputDataInstance.changeOverCostsArray[item1 - 1 , item2 - 1]
+	# 			nOccurenceItem[item2 - 1] += 1
+	# 			cost += inputDataInstance.stockingCostsArray[item2 - 1] * (inputDataInstance.demandsArrayZipped[item2 - 1][nOccurenceItem[item2 - 1] - 1] - index)
 
-				item1 = item2
-			else: 
-				continue
+	# 			item1 = item2
+	# 		else: 
+	# 			continue
 
-		return cost
+	# 	return cost
 
 	@classmethod
 	def feasible(cls, dnaArray, inputDataInstance):
@@ -282,6 +281,7 @@ class Chromosome(object):
 	def __repr__(self):
 		# return " {} : {} --- {}".format(self.renderDnaArray(), self.cost, self.dnaArray)
 		return " {} : {}".format(self.renderDnaArray(), self.cost)
+		# return " {} : {} | {} - {} /".format(self.renderDnaArray(), self.cost, Chromosome.calculateCostPlainDNA(Chromosome.classRenderDnaArray(self.dnaArray), InputDataInstance.instance), Chromosome.feasible(self.dnaArray, InputDataInstance.instance))
 
 	def __eq__(self, chromosome):
 		return self.dnaArray == chromosome.dnaArray	
