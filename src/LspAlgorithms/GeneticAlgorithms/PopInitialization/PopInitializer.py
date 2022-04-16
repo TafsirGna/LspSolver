@@ -85,5 +85,6 @@ class PopInitializer:
             if result is None:
                 break  
 
+        population.popSize = len(population.chromosomes)
         population.setElites()
         self.populations.append(population)

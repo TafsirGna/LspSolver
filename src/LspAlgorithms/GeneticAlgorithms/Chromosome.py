@@ -3,7 +3,9 @@
 
 import copy
 import enum
+from operator import itruediv
 import queue
+from turtle import position
 import numpy as np
 import random
 from LspAlgorithms.GeneticAlgorithms.Gene import Gene
@@ -33,6 +35,18 @@ class Chromosome(object):
 		self.cost = Chromosome.classCalculateCost(self.dnaArray)
 
 
+	def geneAtPeriod(self, period):
+		"""
+		"""
+
+		for itemGenes in self.dnaArray:
+			for gene in itemGenes:
+				if gene.period == period:
+					return gene
+
+		return None
+		
+
 	@classmethod
 	def classCalculateCost(cls, dnaArray):
 		"""
@@ -42,6 +56,10 @@ class Chromosome(object):
 		
 		for itemGenes in dnaArray:
 			for gene in itemGenes:
+				if gene.cost == 0:
+					gene.calculateStockingCost()
+					gene.calculateChangeOverCost()
+					gene.calculateCost()
 				cost += gene.cost
 
 		return cost
@@ -88,7 +106,7 @@ class Chromosome(object):
 			for j, demandIndex in enumerate(demands):
 				gene = prods[j]
 
-				if gene == None: # -> that item production index is a very period and there's no duplicate value
+				if gene is None: # -> that item production index is a very period and there's no duplicate value
 					return False
 
 				prevProdIndex = (0 if j == 0 else (prods[j - 1]).period) # -> that previous period where the item has bee produced is always less than the current one
@@ -122,7 +140,7 @@ class Chromosome(object):
 
 		for item, itemIndices in enumerate(dnaArray):
 			for gene in itemIndices:
-				if gene != None:
+				if gene is not None:
 					result[gene.period] = item + 1
 
 		return result
@@ -135,19 +153,82 @@ class Chromosome(object):
 
 		prevGene = None
 		producedItemsCount = [0 for _ in range(InputDataInstance.instance.nItems)]
-		for index, item in enumerate(rawDnaArray):
-			if item != 0:
-				position = producedItemsCount[item - 1]
-				refinedItem = item - 1
+		for period, periodValue in enumerate(rawDnaArray):
+			if periodValue != 0:
+				item = periodValue - 1
+				position = producedItemsCount[item]
 
-				gene = Gene(refinedItem, index, position, prevGene)
+				gene = Gene(item, period, position, prevGene)
 				gene.calculateCost()
-				dnaArray[refinedItem].append(gene)
-				prevGene = refinedItem, position
-				producedItemsCount[refinedItem] += 1
+				dnaArray[item].append(gene)
+				prevGene = item, position
+				producedItemsCount[item] += 1
 			
 		# print(dnaArray)
 		return dnaArray
+
+	@classmethod
+	def genePossibleMutations(cls, gene1, dnaArray, strategy = "all"): # strategy can be "all" or "null" only for mutations related to null periods
+		"""
+		"""
+		mutations = []
+
+		gene1LowerLimit = 0 if gene1.position == 0 else (dnaArray[gene1.item][gene1.position - 1]).period + 1
+		gene1UpperLimit = InputDataInstance.instance.demandsArrayZipped[gene1.item][gene1.position] + 1 if gene1.position == len(InputDataInstance.instance.demandsArrayZipped[gene1.item]) - 1 else (dnaArray[gene1.item][gene1.position + 1]).period
+
+		for index, periodValue in enumerate(Chromosome.sliceDna(dnaArray, gene1LowerLimit, gene1UpperLimit)):
+			period = index + gene1LowerLimit
+			if periodValue == 0:
+				mutation = Chromosome.evaluateMutation(dnaArray, gene1.item, gene1.position, -1, period)
+				mutations.append(mutation)
+			else:
+				if strategy == "all":
+					item2 = periodValue - 1
+					if item2 != gene1.item:
+						gene2 = [gene for gene in dnaArray[item2] if gene.period == period]
+						gene2 = gene2[0]
+
+						gene2LowerLimit = 0 if gene2.position == 0 else (dnaArray[gene2.item][gene2.position - 1]).period + 1
+						gene2UpperLimit = InputDataInstance.instance.demandsArrayZipped[gene2.item][gene2.position] + 1 if gene2.position == len(InputDataInstance.instance.demandsArrayZipped[gene2.item]) - 1 else (dnaArray[gene2.item][gene2.position + 1]).period
+						
+						if (gene2LowerLimit <= gene1.period and gene1.period < gene2UpperLimit) and (gene1LowerLimit <= gene2.period and gene2.period < gene1UpperLimit):
+							mutation = Chromosome.evaluateMutation(dnaArray, gene1.item, gene1.position, gene2.item, gene2.position)
+							mutations.append(mutation)
+
+		return mutations
+
+
+	@classmethod
+	def evaluateMutation(cls, dnaArray, item1, position1, item2, position2):
+		"""
+		"""
+
+		dnaArray = [[copy.deepcopy(gene) for gene in itemGenes] for itemGenes in dnaArray]
+
+		gene1 = dnaArray[item1][position1] 
+
+		if item2 == -1:
+			gene1.period = position2
+			gene1.calculateStockingCost()
+		else:
+			gene2 = dnaArray[item2][position2] 
+			gene1.period, gene2.period = gene2.period, gene1.period
+			gene1.calculateStockingCost()
+			gene2.calculateStockingCost()
+
+		genesList = sorted([gene for itemProdGenes in dnaArray for gene in itemProdGenes], key= lambda gene: gene.period)
+
+		prevGene = None
+		cost = 0
+		for gene in genesList:
+			if ((gene.item, gene.position) in [(item1, position1), (item2, position2)]):
+				gene.prevGene = (prevGene.item, prevGene.position) if prevGene is not None else None 
+				gene.calculateChangeOverCost()             
+				gene.calculateCost()
+			cost += gene.cost
+			prevGene = gene
+
+		return dnaArray, cost
 
 
 	@classmethod
@@ -156,39 +237,12 @@ class Chromosome(object):
 		"""
 
 		mutations = []
-		renderedDnaArray = Chromosome.classRenderDnaArray(dnaArray)
 
-		for i1, itemProdGenes in enumerate(dnaArray):
+		genesList = sorted([gene for itemProdGenes in dnaArray for gene in itemProdGenes], key= lambda gene: gene.cost, reverse=True)
 
-			j1 = len(itemProdGenes) - 1
-			while j1 >= 0:
-
-				item1ProdGene = itemProdGenes[j1]
-				item1DemandIndex = InputDataInstance.instance.demandsArrayZipped[i1][j1]
-				bottomLimit = (0 if j1 == 0 else (dnaArray[i1][j1 - 1]).period + 1)
-				#first approach
-
-				for period, periodValue in enumerate(renderedDnaArray[bottomLimit:InputDataInstance.instance.demandsArrayZipped[i1][j1] + 1]):
-					if (periodValue - 1) != i1:
-						mutationItem = None
-						if periodValue == 0:
-							# mutationItem = [[i1, (dnaArray[i1][j1]).period], [-1, period + bottomLimit]]
-							mutationItem = [[i1, j1], [-1, period + bottomLimit]]
-						else:
-							item2ProdIndex = period + bottomLimit
-							item2ProdPosition = ([i for i, gene in enumerate(dnaArray[periodValue - 1]) if gene.period == item2ProdIndex])[0]
-							item2DemandIndex = InputDataInstance.instance.demandsArrayZipped[periodValue - 1][item2ProdPosition]
-							if item2DemandIndex >= item1ProdGene.period and item1DemandIndex >= item2ProdIndex:
-								# mutationItem = [[i1, (dnaArray[i1][j1]).period], [periodValue - 1, (dnaArray[periodValue - 1][item2ProdPosition]).period]]
-								mutationItem = [[i1, j1], [periodValue - 1, item2ProdPosition]]
-						
-						if mutationItem != None and not(mutationItem in mutations) and not([mutationItem[1], mutationItem[0]] in mutations):
-							mutations.append(mutationItem)
-
-				j1 -= 1
-
-		# print("mutations --> ", mutations)
-
+		for gene in genesList:
+			mutations += Chromosome.genePossibleMutations(gene, dnaArray)
+		
 		return mutations
 
 
@@ -197,56 +251,57 @@ class Chromosome(object):
 		"""
 		"""
 
-		fittestDnaArray = [None, 0, None]
-		for mutation in mutations:
+		if len(mutations) == 0:
+			return None
 
-			dnaArray = [[copy.deepcopy(gene) for gene in itemGenes] for itemGenes in chromosome.dnaArray]
-			# print("Mutation ---> ", mutation)
-			if mutation[1][0] == -1:
-				(dnaArray[mutation[0][0]][mutation[0][1]]).period = mutation[1][1]
-			else:
-				(dnaArray[mutation[0][0]][mutation[0][1]]).period, (dnaArray[mutation[1][0]][mutation[1][1]]).period = (dnaArray[mutation[1][0]][mutation[1][1]]).period, (dnaArray[mutation[0][0]][mutation[0][1]]).period
+		mutation = min(mutations, key=lambda pair:pair[1])
 
-			genesList = sorted([gene for itemProdGenes in dnaArray for gene in itemProdGenes], key= lambda gene: gene.period)
+		if (mutation[1] >= chromosome.cost):
+			return None
 
-			prevGene = None
-			cost = 0
-			for index, gene in enumerate(genesList):
-				if ([gene.item, gene.position] in mutation):
-					gene.prevGene = (prevGene.item, prevGene.position) if prevGene != None else None              
-					gene.calculateCost()
-				cost += gene.cost
-				prevGene = gene
+		result = Chromosome()
+		result.dnaArray = mutation[0]
+		result.cost = mutation[1]
 
-			# print("DnaArray ---> ", dnaArray, cost)
+		return result
 
-			if cost < chromosome.cost:
-				fittestDnaArray[0] = dnaArray
-				fittestDnaArray[1] = cost
-				fittestDnaArray[2] = mutation
-
-		if fittestDnaArray[0] != None:
-
-			result = Chromosome()
-			result.dnaArray = fittestDnaArray[0]
-			result.cost = fittestDnaArray[1]
-			return result
-
-		return None
-
-
-	def sliceDna(self, startingPeriod, endingPeriod):
+	@classmethod
+	def arrangeDna(cls, dnaArray):
 		"""
 		"""
-		genesList = sorted([gene for itemProdGenes in self.dnaArray for gene in itemProdGenes], key= lambda gene: gene.period)
+
+		genesList = sorted([gene for itemProdGenes in dnaArray for gene in itemProdGenes], key= lambda gene: gene.period)
+
+		prevGene = None
+		cost = 0
+		for gene in genesList:
+			gene.prevGene = (prevGene.item, prevGene.position) if prevGene != None else None 
+			gene.calculateChangeOverCost()
+			gene.calculateCost()          
+			prevGene = gene
+			cost += gene.cost
+			
+		return dnaArray, cost
+
+
+	@classmethod
+	def sliceDna(cls, dnaArray, startingPeriod, endingPeriod):
+		"""
+		"""
+
+		genesList = sorted([gene for itemProdGenes in dnaArray for gene in itemProdGenes], key= lambda gene: gene.period)
+		# print([gene.item + 1 for gene in genesList])
 		slice = []
+		cursor = startingPeriod
 		for index, gene1 in enumerate(genesList):
 			if startingPeriod <= gene1.period:
 				for gene2 in genesList[index:]:
-					if (endingPeriod > gene2.period):
-						slice.append(gene2)
-					else:
-						break
+					if gene2 is not None:
+						if (endingPeriod > gene2.period):
+								slice += [0 for _ in range(gene2.period - cursor)] + [gene2.item + 1]
+								cursor = gene2.period + 1
+						else:
+							break
 				break
 
 		return slice
@@ -258,11 +313,17 @@ class Chromosome(object):
 		"""
 
 		mutations = Chromosome.searchMutations(chromosome.dnaArray)
+
+		[print(mutation) for mutation in mutations]
+
 		betterChromosome = Chromosome.bestMutation(chromosome, mutations)
+		# print("----------------------------------------------------")
 		while betterChromosome is not None:
 			chromosome = betterChromosome
 			mutations = Chromosome.searchMutations(chromosome.dnaArray)
 			betterChromosome = Chromosome.bestMutation(chromosome, mutations)
+			print("----------------------------------------------------")
+			[print(mutation) for mutation in mutations]
 
 		return chromosome
 
@@ -270,6 +331,7 @@ class Chromosome(object):
 	def mutate(self):
 		"""
 		"""
+
 		chromosome = Chromosome.localSearch(self)
 		self.dnaArray = chromosome.dnaArray
 		self.cost = chromosome.cost

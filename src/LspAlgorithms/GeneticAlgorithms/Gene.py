@@ -43,12 +43,16 @@ class Gene:
     #     """
     #     return self.cost < gene.cost
 
-
+    def __eq__(self, gene):
+        """
+        """
+        return self.item == gene.item and self.position == gene.position and self.period == gene.period and self.prevGene == gene.prevGene
+        
     def __repr__(self):
         """
         """
         # return "it:{}|pos:{}|peri:{}|cos:{}|prev:({}, {})".format(self.item, self.position, self.period, self.cost, self.prevGene[0] if self.prevGene != None else None, self.prevGene[1] if self.prevGene != None else None)
-        return "{} ({}, {})".format(self.period, self.prevGene[0] if self.prevGene != None else None, self.prevGene[1] if self.prevGene != None else None)
+        return "{} ({}, {}) ${}".format(self.period, self.prevGene[0] if self.prevGene != None else None, self.prevGene[1] if self.prevGene != None else None, self.cost)
 
 
 

@@ -36,8 +36,12 @@ ParameterData.instance = ParameterData()
 # [2, 2, 2, 3, 1, 0, 0, 1]
 
 # c = Chromosome()
-# c.dnaArray = Chromosome.convertRawDNA([2, 1, 2, 1, 0])
+# # c.dnaArray = Chromosome.convertRawDNA([2, 1, 2, 1, 0])
+# c.dnaArray = Chromosome.convertRawDNA([2, 1, 2, 0, 2, 1, 3, 0])
+# # print(Chromosome.sliceDna(c.dnaArray, 2 , 7))
+# # [3, 2, 2, 2, 1, 1, 0, 0]
 # c.calculateCost()
+# print("cost ((((((((", c.cost)
 # # # [2, 1, 2, 0, 1]
 # c.mutate()
 # print(c)
@@ -46,9 +50,10 @@ ParameterData.instance = ParameterData()
 # print(Chromosome.localSearch([2, 3, 2, 2, 0, 1, 0, 1], InputDataInstance.instance))
 
 # dnaA, dnaB = Chromosome.convertRawDNA([2, 1, 0, 2, 1]), Chromosome.convertRawDNA([2, 1, 2, 0, 1])
-# dnaA, dnaB = Chromosome.convertRawDNA([1, 2, 2, 1, 3, 2, 0, 0]), Chromosome.convertRawDNA([2, 2, 3, 1, 1, 2, 0, 0] )
+# # dnaA, dnaB = Chromosome.convertRawDNA([1, 2, 2, 1, 3, 2, 0, 0]), Chromosome.convertRawDNA([2, 2, 3, 1, 1, 2, 0, 0] )
 # cA, cB = Chromosome(), Chromosome()
 # cA.dnaArray, cB.dnaArray  = dnaA, dnaB
+# cA.calculateCost(), cB.calculateCost()
 # print(cA, "\n", cB, "\n -----------------------------")
 # print(Population.crossOverChromosomes(cA, cB))
 

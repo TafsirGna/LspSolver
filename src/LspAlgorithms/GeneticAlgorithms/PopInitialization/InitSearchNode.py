@@ -79,7 +79,6 @@ class SearchNode(object):
 					node.lastPlacedItem = gene.item
 
 					if self.lastPlacedItem != None:
-						# changeOverCost = InputDataInstance.instance.changeOverCostsArray[item][self.lastPlacedItem]
 						lastPlacedGene = (dnaArray[self.lastPlacedItem][0])
 						lastPlacedGene.prevGene = item, itemProdPosition
 						lastPlacedGene.calculateChangeOverCost()

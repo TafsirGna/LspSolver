@@ -6,13 +6,14 @@ import threading
 import numpy as np
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
 import random
+from LspAlgorithms.GeneticAlgorithms.CrossOverOperator import CrossOverOperator
 from LspAlgorithms.GeneticAlgorithms.Gene import Gene
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 from ParameterSearch.ParameterData import ParameterData
 
 class Population:
 
-    def __init__(self, chromosomes = []) -> None:
+    def __init__(self, chromosomes = [], popSize = None) -> None:
         """
         """
         self.chromosomes = chromosomes
@@ -22,11 +23,13 @@ class Population:
         self._nextPopLock = threading.Lock()
         self.maxChromosomeCost = None
 
+        self.popSize = popSize if popSize != None else ParameterData.instance.popSize
+
     def evolve(self):
         """
         """
 
-        self.nextPopulation = Population([])
+        self.nextPopulation = Population([], self.popSize)
         self.applyGeneticOperators()
         return self.nextPopulation
 
@@ -49,7 +52,8 @@ class Population:
     def add(self, chromosome):
         """
         """
-        if ParameterData.instance and len(self.chromosomes) >= ParameterData.instance.popSize:
+
+        if len(self.chromosomes) >= self.popSize:
             self.setElites()
             return None
 
@@ -62,6 +66,7 @@ class Population:
             cost = chromosome.cost + 1
             if self.maxChromosomeCost < cost:
                 self.maxChromosomeCost = cost
+
         return chromosome
 
 
@@ -69,7 +74,7 @@ class Population:
         """
         """
 
-        while len(self.nextPopulation.chromosomes) < len(self.chromosomes):
+        while len(self.nextPopulation.chromosomes) < self.popSize:
 
             chromosomeA, chromosomeB, chromosome = np.random.choice(self.chromosomes, p=rouletteProbabilities), np.random.choice(self.chromosomes, p=rouletteProbabilities), None
 
@@ -82,8 +87,7 @@ class Population:
 
             if chromosome is not None:
                 with self._nextPopLock:
-                    self.nextPopulation.add(chromosome)
-                    if len(self.nextPopulation.chromosomes) > len(self.chromosomes):
+                    if self.nextPopulation.add(chromosome) is None:
                         return
             
 
@@ -100,26 +104,30 @@ class Population:
         """
         """
 
+        rouletteProbabilities = self.prepSelection()
+        print("roulette ", rouletteProbabilities)
+        threads = []
+
+        for i in range(ParameterData.instance.nReplicaThreads):
+            thread_T = Thread(target=self.threadTask, args=(rouletteProbabilities,))
+            thread_T.start()
+            threads.append(thread_T)
+            
+        [thread_T.join() for thread_T in threads]
+
+
+    def prepSelection(self):
+        """
+        """
         totalFitness = 0
         for chromosome in self.chromosomes:
             chromosome.fitnessValue = self.maxChromosomeCost - chromosome.cost
             # print("888 ---> ", chromosome, chromosome.fitnessValue)
             totalFitness += chromosome.fitnessValue
-        self.totalFitness = totalFitness
-        # print("888 ---> ", self.totalFitness)
+        totalFitness = totalFitness
+        # print("888 ---> ", totalFitness)
 
-        rouletteProbabilities = [float(chromosome.fitnessValue)/self.totalFitness for chromosome in self.chromosomes]
-
-        for i in range(ParameterData.instance.nReplicaThreads):
-            thread_T = Thread(target=self.threadTask, args=(rouletteProbabilities,))
-            thread_T.start()
-            thread_T.join()
-
-
-    def preprocess(self):
-        """
-        """
-        pass
+        return [float(chromosome.fitnessValue)/totalFitness for chromosome in self.chromosomes]
 
 
     def converged(self):
@@ -143,7 +151,9 @@ class Population:
         threshold = int(ParameterData.instance.convergenceThresholdPercentage * len(self.chromosomes))
         threshold = 1 if threshold < 1 else threshold
 
+        print('convergeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeed', len(uniques), self.chromosomes)
         if len(uniques) <= threshold and localOptimal == fittest.dnaArray:
+            # print('convergeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeed')
             return True
         return False
 
@@ -159,81 +169,62 @@ class Population:
         """
         """
 
-        unzippedDNA = Chromosome.classRenderDnaArray(dnaArray)
+        plainDNA = Chromosome.classRenderDnaArray(dnaArray)
 
-        print("=== Before ", dnaArray, unzippedDNA , ' | ', InputDataInstance.instance.demandsArrayZipped)
+        print("=== Before ", dnaArray, plainDNA , ' | ', InputDataInstance.instance.demandsArrayZipped)
 
         for item, itemGenes in enumerate(dnaArray):
-            bottomLimit = 0
-            for i, itemGene in enumerate(itemGenes):
+            for position, itemGene in enumerate(itemGenes):
                 print("item : ", item, 'index : ', itemGene, "None : ", itemGene is None, "indices : ", itemGenes)
+
                 if itemGene is None:
 
-                    itemDemandPeriod = InputDataInstance.instance.demandsArrayZipped[item][i]
-                    itemNextIndex = (itemGenes[i + 1]).period if i < len(itemGenes) - 1 else  InputDataInstance.instance.demandsArrayZipped[item][i] + 1
-                    topLimit = max([itemDemandPeriod + 1, itemNextIndex])
+                    lowerLimit = 0 if position == 0 else (dnaArray[item][position - 1]).period + 1
+                    upperLimit = InputDataInstance.instance.demandsArrayZipped[item][position] + 1 if position == len(InputDataInstance.instance.demandsArrayZipped[item]) - 1 else (dnaArray[item][position + 1]).period
 
-                    print("Portion : ", bottomLimit, topLimit, unzippedDNA[bottomLimit:topLimit])
+                    print("Portion : ", lowerLimit, upperLimit, plainDNA[lowerLimit:upperLimit])
 
-                    j = topLimit - 1
-                    while j >= bottomLimit:
+                    j = upperLimit - 1
+                    filled = False
+                    while j >= lowerLimit:
 
-                        periodValue = unzippedDNA[j]
+                        periodValue = plainDNA[j]
                         print("periodValue : ", periodValue)
                         if periodValue == 0:
-                            gene = Gene(item, j, i)
+                            gene = Gene(item, j, position)
                             gene.calculateStockingCost()
-                            gene.calculateCost()
-                            (dnaArray[item][i]) = gene
-                            unzippedDNA = Chromosome.classRenderDnaArray(dnaArray)
+                            (dnaArray[item][position]) = gene
+                            plainDNA = Chromosome.classRenderDnaArray(dnaArray)
                             print("result 1 : ", dnaArray)
+                            filled = True
                             break
 
                         j -= 1
 
                     # if it still none then 
-                    if dnaArray[item][i] is None:
+                    if filled:
                         print("still none")
                         return None
-                bottomLimit = (dnaArray[item][i]).period + 1
         
-        # print("=== After ", dnaArray, unzippedDNA, Chromosome.feasible(dnaArray, InputDataInstance.instance))
+        # print("=== After ", dnaArray, plainDNA, Chromosome.feasible(dnaArray, InputDataInstance.instance))
 
         return dnaArray
 
-    @classmethod
-    def repairDna(cls, dnaArray):
-        """
-        """
+    # @classmethod
+    # def repairDna(cls, dnaArray):
+    #     """
+    #     """
 
-        dnaArray = Population.fillNullPeriods(dnaArray)
+    #     dnaArray = Population.fillNullPeriods(dnaArray)
 
-        if dnaArray == None:
-            return None, 0
+    #     if dnaArray == None:
+    #         return None, 0
 
-        dnaArray, cost = Population.arrangeDna(dnaArray)
+    #     dnaArray, cost = Chromosome.arrangeDna(dnaArray)
 
-        # print("=== After ", dnaArray, Chromosome.classRenderDnaArray(dnaArray), cost)
-        # print("=== After ", dnaArray, Chromosome.classRenderDnaArray(dnaArray), cost, Chromosome.calculateCostPlainDNA(Chromosome.classRenderDnaArray(dnaArray), InputDataInstance.instance), "price*", cost == Chromosome.calculateCostPlainDNA(Chromosome.classRenderDnaArray(dnaArray), InputDataInstance.instance))
-        return dnaArray, cost
-
-    @classmethod
-    def arrangeDna(cls, dnaArray):
-        """
-        """
-        genesList = sorted([gene for itemProdGenes in dnaArray for gene in itemProdGenes], key= lambda gene: gene.period)
-
-        prevGene = None
-        cost = 0
-        for gene in genesList:
-            gene.prevGene = (prevGene.item, prevGene.position) if prevGene != None else None 
-            gene.calculateChangeOverCost()
-            # gene.calculateStockingCost()
-            gene.calculateCost()          
-            prevGene = gene
-            cost += gene.cost
-
-        return dnaArray, cost
+    #     # print("=== After ", dnaArray, Chromosome.classRenderDnaArray(dnaArray), cost)
+    #     # print("=== After ", dnaArray, Chromosome.classRenderDnaArray(dnaArray), cost, Chromosome.calculateCostPlainDNA(Chromosome.classRenderDnaArray(dnaArray), InputDataInstance.instance), "price*", cost == Chromosome.calculateCostPlainDNA(Chromosome.classRenderDnaArray(dnaArray), InputDataInstance.instance))
+    #     return dnaArray, cost
 
 
     @classmethod
@@ -258,35 +249,29 @@ class Population:
         #             dnaArray[geneB.item][geneB.position] = geneB
         #             visitedPeriods.append(geneB.period)
 
-        for item, itemGenes in enumerate(chromosomeA.dnaArray):
-            bottomLimit, topLimit = -1, InputDataInstance.instance.demandsArrayZipped[item][0]
-            for position, geneA in enumerate(itemGenes):
-                geneB = chromosomeB.dnaArray[item][position]
-                geneA, geneB = (geneA, geneB) if geneA.stockingCost <= geneB.stockingCost else (geneB, geneA)
-                if dnaArray[item][position] == None:
-                    if not(geneA.period in visitedPeriods) and (bottomLimit < geneA.period and geneA.period <= topLimit):
-                        dnaArray[geneA.item][geneA.position] = geneA
-                        visitedPeriods.append(geneA.period)
-                    elif not(geneB.period in visitedPeriods) and (bottomLimit < geneB.period and geneB.period <= topLimit):
-                        dnaArray[geneB.item][geneB.position] = geneB
-                        visitedPeriods.append(geneB.period)
-                bottomLimit = (dnaArray[item][position]).period if (dnaArray[item][position]) is not None else bottomLimit
-                topLimit = InputDataInstance.instance.demandsArrayZipped[item][position + 1] if position < len(itemGenes) - 1 else 0
 
-        # print(dnaArray, '       ', Chromosome.classRenderDnaArray(dnaArray), Chromosome.feasible(dnaArray, InputDataInstance.instance))
-        cost = 0
-        if not Chromosome.feasible(dnaArray, InputDataInstance.instance):
-            print("Boooooooooooooooooooooooooooooo", Chromosome.classRenderDnaArray(chromosomeA.dnaArray), Chromosome.classRenderDnaArray(chromosomeB.dnaArray), dnaArray)
-            dnaArray, cost = Population.repairDna(dnaArray)
-        else:
-            dnaArray, cost = Population.arrangeDna(dnaArray)
 
-        chromosome = None
-        if dnaArray != None:
-            chromosome = Chromosome()
-            chromosome.dnaArray = dnaArray
-            chromosome.cost = cost
 
-        # print("----------------", chromosome)
+
+
+
+        # for item, itemGenes in enumerate(chromosomeA.dnaArray):
+        #     bottomLimit, topLimit = -1, InputDataInstance.instance.demandsArrayZipped[item][0]
+        #     for position, geneA in enumerate(itemGenes):
+        #         geneB = chromosomeB.dnaArray[item][position]
+        #         geneA, geneB = (geneA, geneB) if geneA.stockingCost <= geneB.stockingCost else (geneB, geneA)
+        #         if dnaArray[item][position] == None:
+        #             if not(geneA.period in visitedPeriods) and (bottomLimit < geneA.period and geneA.period <= topLimit):
+        #                 dnaArray[geneA.item][geneA.position] = geneA
+        #                 visitedPeriods.append(geneA.period)
+        #             elif not(geneB.period in visitedPeriods) and (bottomLimit < geneB.period and geneB.period <= topLimit):
+        #                 dnaArray[geneB.item][geneB.position] = geneB
+        #                 visitedPeriods.append(geneB.period)
+        #         bottomLimit = (dnaArray[item][position]).period if (dnaArray[item][position]) is not None else bottomLimit
+        #         topLimit = InputDataInstance.instance.demandsArrayZipped[item][position + 1] if position < len(itemGenes) - 1 else 0
+
+
+        crossOverOperator = CrossOverOperator([chromosomeA, chromosomeB])
+        chromosome = crossOverOperator.process()
 
         return chromosome
