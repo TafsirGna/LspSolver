@@ -1,11 +1,11 @@
 #!/usr/bin/python3.5
 # -*-coding: utf-8 -*
 
-# importing modules
 # import sys
 import argparse
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome 
 from LspAlgorithms.GeneticAlgorithms.Hcm.Solver import GeneticAlgorithm
+from LspAlgorithms.GeneticAlgorithms.MutationOperator import MutationOperator
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.Population import Population
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 from LspInputDataReading.LspInputDataReader import InputDataReader
@@ -43,8 +43,8 @@ ParameterData.instance = ParameterData()
 # c.calculateCost()
 # print("cost ((((((((", c.cost)
 # # # [2, 1, 2, 0, 1]
-# c.mutate()
-# print(c)
+# mutationOperator = MutationOperator(c)
+# print(mutationOperator.process())
 
 # print(Chromosome.localSearch([2, 3, 2, 2, 0, 1, 0, 1], InputDataInstance.instance))
 # print(Chromosome.localSearch([2, 3, 2, 2, 0, 1, 0, 1], InputDataInstance.instance))
