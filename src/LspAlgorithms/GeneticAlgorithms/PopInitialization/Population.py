@@ -20,10 +20,11 @@ class Population:
         """
         self.chromosomes = chromosomes
         self.elites = []
-        self.setElites()
+        # self.setElites()
         self.nextPopulation = None
         self._nextPopLock = threading.Lock()
         self.maxChromosomeCost = None
+        self.uniques = []
 
         self.popSize = popSize if popSize != None else ParameterData.instance.popSize
 
@@ -56,10 +57,13 @@ class Population:
         """
 
         if len(self.chromosomes) >= self.popSize:
-            self.setElites()
+            # self.setElites()
             return None
 
         self.chromosomes.append(chromosome)
+
+        if not(chromosome.stringIdentifier in self.uniques):
+            self.uniques.append(chromosome.stringIdentifier)
 
         # setting population max cost
         if self.maxChromosomeCost == None:
@@ -112,34 +116,6 @@ class Population:
             threads.append(thread_T)
             
         [thread_T.join() for thread_T in threads]
-
-
-    def converged(self):
-        """
-        """
-        uniques, unique_counts, fittest = [], [], self.chromosomes[0]
-
-        for chromosome in self.chromosomes:
-            if not (chromosome.dnaArray in uniques):
-                uniques.append(chromosome.dnaArray)
-                unique_counts.append(0)
-            else:
-                unique_counts[uniques.index(chromosome.dnaArray)] += 1
-
-            if chromosome.cost < fittest.cost:
-                fittest = chromosome
-
-        localOptimal = uniques[unique_counts.index(max(unique_counts))]
-
-        # Setting the threshold under which a populatioin is set to have converged
-        threshold = int(ParameterData.instance.convergenceThresholdPercentage * len(self.chromosomes))
-        threshold = 1 if threshold < 1 else threshold
-
-        print('convergeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeed', len(uniques), self.chromosomes)
-        if len(uniques) <= threshold and localOptimal == fittest.dnaArray:
-            # print('convergeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeed')
-            return True
-        return False
 
 
     def __repr__(self):

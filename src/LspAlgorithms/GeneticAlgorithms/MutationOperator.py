@@ -1,5 +1,6 @@
 import copy
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
+from ParameterSearch.ParameterData import ParameterData
 from .Chromosome import Chromosome
 
 
@@ -20,7 +21,7 @@ class MutationOperator:
         
         mutations = self.searchMutations(self.chromosome.dnaArray)
 
-        [print(mutation) for mutation in mutations]
+        # [print(mutation) for mutation in mutations]
 
         betterChromosome = self.bestMutation(self.chromosome, mutations)
 		# print("----------------------------------------------------")
@@ -29,7 +30,7 @@ class MutationOperator:
             mutations = self.searchMutations(self.chromosome.dnaArray)
             betterChromosome = self.bestMutation(self.chromosome, mutations)
             print("----------------------------------------------------")
-            [print(mutation) for mutation in mutations]
+            # [print(mutation) for mutation in mutations]
 
         return self.chromosome
 
@@ -55,14 +56,15 @@ class MutationOperator:
         if len(mutations) == 0:
             return None
 
-        mutation = min(mutations, key=lambda pair:pair[1])
+        mutation = min(mutations, key=lambda pair:pair[2])
 
-        if (mutation[1] >= chromosome.cost):
+        if (mutation[2] >= chromosome.cost):
             return None
 
         result = Chromosome()
         result.dnaArray = mutation[0]
-        result.cost = mutation[1]
+        result.stringIdentifier = mutation[1]
+        result.cost = mutation[2]
 
         return result
 
@@ -117,6 +119,7 @@ class MutationOperator:
         genesList = sorted([gene for itemProdGenes in dnaArray for gene in itemProdGenes], key= lambda gene: gene.period)
 
         prevGene = None
+        stringIdentifier = "0" * InputDataInstance.instance.nPeriods
         cost = 0
         for gene in genesList:
             if ((gene.item, gene.position) in [(item1, position1), (item2, position2)]):
@@ -125,5 +128,6 @@ class MutationOperator:
                 gene.calculateCost()
             cost += gene.cost
             prevGene = gene
+            stringIdentifier[gene.period] = str((gene.item + 1))
 
-        return dnaArray, cost
+        return dnaArray, stringIdentifier, cost

@@ -3,6 +3,7 @@
 
 from threading import Thread
 import threading
+from LspAlgorithms.GeneticAlgorithms.GATerminator import GATerminator
 from ParameterSearch.ParameterData import ParameterData
 from ..PopInitialization.PopInitializer import PopInitializer
 
@@ -45,12 +46,13 @@ class GeneticAlgorithm:
 		"""
 		"""
 		generationIndex = 0
+		gaTerminator = GATerminator()
 
-		while not(self.stopConditionMet(population)):
+		while not gaTerminator.toTerminate(population):
 			# if generationIndex == 1:
 			# 	break
 
-			self.setElites(population)
+			# self.setElites(population)
 
 			population = population.evolve()
 			print("Population --> ", population)
@@ -73,11 +75,5 @@ class GeneticAlgorithm:
 
 		[thread_T.join() for thread_T in threads]
 
-		result = (min(self.elites)).cost
-		print("Result : ", result)
-
-	
-	def stopConditionMet(self, population):
-		"""
-		"""
-		return population.converged()
+		# result = (min(self.elites)).cost
+		# print("Result : ", result)

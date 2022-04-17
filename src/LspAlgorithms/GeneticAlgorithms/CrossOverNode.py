@@ -36,7 +36,7 @@ class CrossOverNode:
         if self.period < 0: 
             return children
 
-        print("item to order 1 °°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°", self.itemsToOrder)
+        # print("item to order 1 °°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°", self.itemsToOrder)
 
         for index, chromosome in enumerate(self.parentChromosomes):
             gene = chromosome.geneAtPeriod(self.period)
@@ -50,7 +50,7 @@ class CrossOverNode:
                 if max2 == max1 + 1:
                     self.itemsToOrder[InputDataInstance.instance.nItems][0] += 1
 
-        print("item to order 2 °°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°", self.itemsToOrder)
+        # print("item to order 2 °°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°", self.itemsToOrder)
 
 
         for item in range(InputDataInstance.instance.nItems):
@@ -93,6 +93,7 @@ class CrossOverNode:
                     
                     node.chromosome.dnaArray = dnaArray
                     node.chromosome.cost = (self.chromosome.cost + cost) 
+                    node.chromosome.stringIdentifier = str(item + 1) + self.chromosome.stringIdentifier
 
                     print("childreeeeeeeeeeeeeeeeen ", node.chromosome, node.itemsToOrder)
 
@@ -111,6 +112,7 @@ class CrossOverNode:
             itemsToOrder = copy.deepcopy(self.itemsToOrder)
             itemsToOrder[InputDataInstance.instance.nItems][0] -= 1
             node.itemsToOrder = itemsToOrder
+            node.chromosome.stringIdentifier = "0" + self.chromosome.stringIdentifier
             
             children.append(node)
 
@@ -127,4 +129,4 @@ class CrossOverNode:
         return self.chromosome.cost < node.chromosome.cost
 
     def __eq__(self, node):
-        return self.chromosome.dnaArray == node.chromosome.dnaArray
+        return self.chromosome.stringIdentifier == node.chromosome.stringIdentifier

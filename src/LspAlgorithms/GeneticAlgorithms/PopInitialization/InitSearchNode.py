@@ -92,6 +92,8 @@ class SearchNode(object):
 				node.itemsToOrder = itemsToOrder
 				
 				node.chromosome.dnaArray = dnaArray
+				node.chromosome.stringIdentifier = str(item + 1 if item < InputDataInstance.instance.nItems else 0) + self.chromosome.stringIdentifier
+				# print(node.chromosome.stringIdentifier)
 				node.chromosome.cost = (self.chromosome.cost + cost) 
 
 				# print("ok End --- ", dnaArray)
@@ -110,4 +112,4 @@ class SearchNode(object):
 		return self.chromosome.cost < node.chromosome.cost
 
 	def __eq__(self, node):
-		return self.chromosome.dnaArray == node.chromosome.dnaArray
+		return self.chromosome.stringIdentifier == node.chromosome.stringIdentifier

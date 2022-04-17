@@ -77,6 +77,7 @@ class PopInitializer:
         """
 
         population = Population([])
+        population.uniques = []
 
         for node in nodeGenerator.generate(): 
             result = None
@@ -86,5 +87,5 @@ class PopInitializer:
                 break  
 
         population.popSize = len(population.chromosomes)
-        population.setElites()
+        # population.setElites()
         self.populations.append(population)

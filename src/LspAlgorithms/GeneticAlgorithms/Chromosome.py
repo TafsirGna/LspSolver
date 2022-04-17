@@ -17,6 +17,7 @@ class Chromosome(object):
 		self.dnaArray = None
 		self.startingGene, self.endingGene = None, None
 		# self.zipDnaArray(dnaArray)
+		self.stringIdentifier = ""
 
 
 	def calculateCost(self):
@@ -212,8 +213,8 @@ class Chromosome(object):
 
 	def __repr__(self):
 		# return " {} : {} --- {}".format(self.renderDnaArray(), self.cost, self.dnaArray)
-		return " {} : {}".format(self.renderDnaArray(), self.cost)
+		return " {} : {}".format(self.stringIdentifier, self.cost)
 		# return " {} : {} | {} - {} /".format(self.renderDnaArray(), self.cost, Chromosome.calculateCostPlainDNA(Chromosome.classRenderDnaArray(self.dnaArray), InputDataInstance.instance), Chromosome.feasible(self.dnaArray, InputDataInstance.instance))
 
 	def __eq__(self, chromosome):
-		return self.dnaArray == chromosome.dnaArray	
+		return self.stringIdentifier == chromosome.stringIdentifier
