@@ -3,7 +3,8 @@
 
 # import sys
 import argparse
-from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome 
+from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
+from LspAlgorithms.GeneticAlgorithms.CrossOverOperator import CrossOverOperator 
 from LspAlgorithms.GeneticAlgorithms.Hcm.Solver import GeneticAlgorithm
 from LspAlgorithms.GeneticAlgorithms.MutationOperator import MutationOperator
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.Population import Population
@@ -49,13 +50,17 @@ ParameterData.instance = ParameterData()
 # print(Chromosome.localSearch([2, 3, 2, 2, 0, 1, 0, 1], InputDataInstance.instance))
 # print(Chromosome.localSearch([2, 3, 2, 2, 0, 1, 0, 1], InputDataInstance.instance))
 
-# dnaA, dnaB = Chromosome.convertRawDNA([2, 1, 0, 2, 1]), Chromosome.convertRawDNA([2, 1, 2, 0, 1])
-# # dnaA, dnaB = Chromosome.convertRawDNA([1, 2, 2, 1, 3, 2, 0, 0]), Chromosome.convertRawDNA([2, 2, 3, 1, 1, 2, 0, 0] )
+# # dnaA, dnaB = Chromosome.convertRawDNA([2, 1, 0, 2, 1]), Chromosome.convertRawDNA([2, 1, 2, 0, 1])
+# dnaA, dnaB = Chromosome.convertRawDNA([1, 2, 2, 2, 1, 3, 0, 0]), Chromosome.convertRawDNA([2, 2, 2, 3, 1, 1, 0, 0])
 # cA, cB = Chromosome(), Chromosome()
-# cA.dnaArray, cB.dnaArray  = dnaA, dnaB
+# cAInfos = Chromosome.evaluateDnaArray(dnaA)
+# cBInfos = Chromosome.evaluateDnaArray(dnaB)
+# cA.dnaArray, cA.stringIdentifier = cAInfos[0], cAInfos[1]
+# cB.dnaArray, cB.stringIdentifier = cBInfos[0], cBInfos[1]
 # cA.calculateCost(), cB.calculateCost()
 # print(cA, "\n", cB, "\n -----------------------------")
-# print(Population.crossOverChromosomes(cA, cB))
+# crossOverOperator = CrossOverOperator([cA, cB])
+# print(crossOverOperator.process())
 
 ###
 LspRuntimeStatisticsMonitor.instance = LspRuntimeStatisticsMonitor()

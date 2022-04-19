@@ -1,4 +1,5 @@
 import copy
+from LspAlgorithms.GeneticAlgorithms.Gene import Gene
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 from ParameterSearch.ParameterData import ParameterData
 from .Chromosome import Chromosome
@@ -29,7 +30,7 @@ class MutationOperator:
             self.chromosome = betterChromosome
             mutations = self.searchMutations(self.chromosome.dnaArray)
             betterChromosome = self.bestMutation(self.chromosome, mutations)
-            print("----------------------------------------------------")
+            # print("----------------------------------------------------")
             # [print(mutation) for mutation in mutations]
 
         return self.chromosome
@@ -44,7 +45,9 @@ class MutationOperator:
         genesList = sorted([gene for itemProdGenes in dnaArray for gene in itemProdGenes], key= lambda gene: gene.cost, reverse=True)
 
         for gene in genesList:
-            mutations += self.genePossibleMutations(gene, dnaArray)
+            geneMutations = self.genePossibleMutations(gene, dnaArray)
+            mutations += geneMutations
+            # print(gene.item, gene.position, gene.period, geneMutations, '\n')
         
         return mutations
 
@@ -68,24 +71,30 @@ class MutationOperator:
 
         return result
 
+    @classmethod
+    def genePossibleMutations(cls, gene1, dnaArray, evaluate = True, strategy = "all"): # strategy can be "all" or "null" only for mutations related to null periods
+        """
+        """
 
-    def genePossibleMutations(self, gene1, dnaArray, strategy = "all"): # strategy can be "all" or "null" only for mutations related to null periods
-        """
-        """
         mutations = []
 
         gene1LowerLimit = 0 if gene1.position == 0 else (dnaArray[gene1.item][gene1.position - 1]).period + 1
-        gene1UpperLimit = InputDataInstance.instance.demandsArrayZipped[gene1.item][gene1.position] + 1 if gene1.position == len(InputDataInstance.instance.demandsArrayZipped[gene1.item]) - 1 else (dnaArray[gene1.item][gene1.position + 1]).period
+        gene1UpperLimit = InputDataInstance.instance.demandsArrayZipped[gene1.item][gene1.position] + 1 if gene1.position == len(InputDataInstance.instance.demandsArrayZipped[gene1.item]) - 1 else ((dnaArray[gene1.item][gene1.position + 1]).period if (dnaArray[gene1.item][gene1.position + 1]) is not None else InputDataInstance.instance.demandsArrayZipped[gene1.item][gene1.position] + 1)
 
+        # print("Kill ", dnaArray, gene1.item, gene1.position, Chromosome.classRenderDnaArray(dnaArray))
         for index, periodValue in enumerate(Chromosome.sliceDna(dnaArray, gene1LowerLimit, gene1UpperLimit)):
+            # print("Slice ", Chromosome.sliceDna(dnaArray, gene1LowerLimit, gene1UpperLimit))
             period = index + gene1LowerLimit
             if periodValue == 0:
-                mutation = self.evaluateMutation(dnaArray, gene1.item, gene1.position, -1, period)
+                mutatedDnaArray = cls.formMutatedDnaArray(dnaArray, gene1.item, gene1.position, -1, period)
+                focus = [(gene1.item, gene1.position), ( -1, period)]
+                mutation = Chromosome.evaluateDnaArray(mutatedDnaArray, focus) if evaluate else [mutatedDnaArray, focus]
                 mutations.append(mutation)
             else:
                 if strategy == "all":
                     item2 = periodValue - 1
                     if item2 != gene1.item:
+                        # print(dnaArray[item2], item2, period)
                         gene2 = [gene for gene in dnaArray[item2] if gene.period == period]
                         gene2 = gene2[0]
 
@@ -93,13 +102,14 @@ class MutationOperator:
                         gene2UpperLimit = InputDataInstance.instance.demandsArrayZipped[gene2.item][gene2.position] + 1 if gene2.position == len(InputDataInstance.instance.demandsArrayZipped[gene2.item]) - 1 else (dnaArray[gene2.item][gene2.position + 1]).period
                         
                         if (gene2LowerLimit <= gene1.period and gene1.period < gene2UpperLimit) and (gene1LowerLimit <= gene2.period and gene2.period < gene1UpperLimit):
-                            mutation = self.evaluateMutation(dnaArray, gene1.item, gene1.position, gene2.item, gene2.position)
+                            mutatedDnaArray = cls.formMutatedDnaArray(dnaArray, gene1.item, gene1.position, gene2.item, gene2.position)
+                            mutation = Chromosome.evaluateDnaArray(mutatedDnaArray, [(gene1.item, gene1.position), (gene2.item, gene2.position)]) if evaluate else mutatedDnaArray
                             mutations.append(mutation)
 
         return mutations
 
-
-    def evaluateMutation(self, dnaArray, item1, position1, item2, position2):
+    @classmethod
+    def formMutatedDnaArray(cls, dnaArray, item1, position1, item2, position2):
         """
         """
 
@@ -108,26 +118,15 @@ class MutationOperator:
         gene1 = dnaArray[item1][position1] 
 
         if item2 == -1:
-            gene1.period = position2
-            gene1.calculateStockingCost()
+            if gene1 is None:
+                dnaArray[item1][position1] = Gene(item1, position2, position1)
+            else:
+                (dnaArray[item1][position1]).period = position2
+            dnaArray[item1][position1].calculateStockingCost()
         else:
             gene2 = dnaArray[item2][position2] 
             gene1.period, gene2.period = gene2.period, gene1.period
             gene1.calculateStockingCost()
             gene2.calculateStockingCost()
 
-        genesList = sorted([gene for itemProdGenes in dnaArray for gene in itemProdGenes], key= lambda gene: gene.period)
-
-        prevGene = None
-        stringIdentifier = "0" * InputDataInstance.instance.nPeriods
-        cost = 0
-        for gene in genesList:
-            if ((gene.item, gene.position) in [(item1, position1), (item2, position2)]):
-                gene.prevGene = (prevGene.item, prevGene.position) if prevGene is not None else None 
-                gene.calculateChangeOverCost()             
-                gene.calculateCost()
-            cost += gene.cost
-            prevGene = gene
-            stringIdentifier[gene.period] = str((gene.item + 1))
-
-        return dnaArray, stringIdentifier, cost
+        return dnaArray

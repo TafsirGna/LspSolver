@@ -44,12 +44,11 @@ class SearchNode(object):
 			# print("---------------------------------------------------------------------------------")
 			return children
 		
-		periodDemands = InputDataInstance.instance.demandsArray[:,self.period]
+		periodDemands = InputDataInstance.instance.itemDemandsPerPeriod[self.period]
 		# print('pepe ', periodDemands)
 
-		for item, value in enumerate(periodDemands):
-			if value == 1:
-				self.itemsToOrder[item] += 1
+		for item in periodDemands:
+			self.itemsToOrder[item] += 1
 
 		# print("Parent --> ", Chromosome.classRenderDnaArray(self.chromosome.dnaArray), '            ', self.chromosome.dnaArray, self.chromosome.cost)
 

@@ -25,8 +25,6 @@ class CrossOverOperator:
         """
         """
 
-        chromosome = max(self.parentChromosomes)
-
         node = self.rootNode()
         queue = node.children()
 
@@ -35,12 +33,15 @@ class CrossOverOperator:
             queue = queue[:-1]
 
             children = node.children()
-            if len(children) == 0 and node.period < 0:
-                if node.chromosome.cost < chromosome.cost:
-                    print("fuckkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk", node.chromosome)
-                    chromosome = node.chromosome
-                # return node.chromosome
+            # if len(children) == 0 and node.period < 0:
+            if len(children) == 0 and node.pointer == (None, None):
+                chromosome = node.chromosome
+                dnaArray, stringIdentifier, cost = Chromosome.evaluateDnaArray(chromosome.dnaArray)
+                chromosome.dnaArray = dnaArray
+                chromosome.cost = cost
+                chromosome.stringIdentifier = stringIdentifier
+                return chromosome
 
             queue += children
 
-        return chromosome
+        return None

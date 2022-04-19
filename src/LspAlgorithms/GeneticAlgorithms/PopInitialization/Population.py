@@ -62,7 +62,7 @@ class Population:
 
         self.chromosomes.append(chromosome)
 
-        if not(chromosome.stringIdentifier in self.uniques):
+        if chromosome.stringIdentifier not in self.uniques:
             self.uniques.append(chromosome.stringIdentifier)
 
         # setting population max cost
@@ -88,7 +88,7 @@ class Population:
             if (random.random() < ParameterData.instance.crossOverRate):
                 crossOverOperator = CrossOverOperator([chromosomeA, chromosomeB])
                 chromosome = crossOverOperator.process()
-                # print("+++", chromosome)
+                # print("+++", chromosomeA, chromosomeB, chromosome)
 
                 if chromosome is not None and (random.random() < ParameterData.instance.mutationRate):
                     # Proceding to mutate the chromosome
@@ -122,53 +122,3 @@ class Population:
         """
         """
         return "Population : {} : \nCost Total :{} ".format(self.chromosomes, 0)
-
-
-
-    # @classmethod
-    # def crossOverChromosomes(cls, chromosomeA, chromosomeB) -> Chromosome:
-    #     """
-    #     """
-
-    #     dnaArray = [[ None for _ in row ] for row in InputDataInstance.instance.demandsArrayZipped]
-        
-    #     # chromosomeA, chromosomeB = (chromosomeA, chromosomeB) if chromosomeA < chromosomeB else (chromosomeB, chromosomeA)
-    #     # genesList = sorted([gene for itemProdGenes in chromosomeA.dnaArray for gene in itemProdGenes], key= lambda gene: gene.cost)
-
-    #     visitedPeriods = []
-    #     # for geneA in genesList:
-    #     #     geneB = chromosomeB.dnaArray[geneA.item][geneA.position]
-    #     #     geneA, geneB = (geneA, geneB) if geneA.stockingCost <= geneB.stockingCost else (geneB, geneA)
-    #     #     if dnaArray[geneA.item][geneA.position] == None:
-    #     #         if not(geneA.period in visitedPeriods):
-    #     #             dnaArray[geneA.item][geneA.position] = geneA
-    #     #             visitedPeriods.append(geneA.period)
-    #     #         elif not(geneB.period in visitedPeriods):
-    #     #             dnaArray[geneB.item][geneB.position] = geneB
-    #     #             visitedPeriods.append(geneB.period)
-
-
-
-
-
-
-
-    #     # for item, itemGenes in enumerate(chromosomeA.dnaArray):
-    #     #     bottomLimit, topLimit = -1, InputDataInstance.instance.demandsArrayZipped[item][0]
-    #     #     for position, geneA in enumerate(itemGenes):
-    #     #         geneB = chromosomeB.dnaArray[item][position]
-    #     #         geneA, geneB = (geneA, geneB) if geneA.stockingCost <= geneB.stockingCost else (geneB, geneA)
-    #     #         if dnaArray[item][position] == None:
-    #     #             if not(geneA.period in visitedPeriods) and (bottomLimit < geneA.period and geneA.period <= topLimit):
-    #     #                 dnaArray[geneA.item][geneA.position] = geneA
-    #     #                 visitedPeriods.append(geneA.period)
-    #     #             elif not(geneB.period in visitedPeriods) and (bottomLimit < geneB.period and geneB.period <= topLimit):
-    #     #                 dnaArray[geneB.item][geneB.position] = geneB
-    #     #                 visitedPeriods.append(geneB.period)
-    #     #         bottomLimit = (dnaArray[item][position]).period if (dnaArray[item][position]) is not None else bottomLimit
-    #     #         topLimit = InputDataInstance.instance.demandsArrayZipped[item][position + 1] if position < len(itemGenes) - 1 else 0
-
-
-        
-
-    #     return chromosome

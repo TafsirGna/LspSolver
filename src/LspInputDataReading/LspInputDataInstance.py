@@ -1,3 +1,4 @@
+from collections import defaultdict
 import numpy as np
 from scipy import sparse
 
@@ -18,8 +19,22 @@ class InputDataInstance:
 		self.stockingCostsArray = np.array(stockingCostsArray)
 		self.changeOverCostsArray = np.array(changeOverCostsArray)
 
-		# [index for index, item in enumerate(periodDemands) if periodDemands[item] == 1]
-		self.demandsArrayZipped = [[j for j,val in enumerate(row) if val == 1] for row in self.demandsArray]
+		# self.demandsArrayZipped = [[j for j,val in enumerate(row) if val == 1] for row in self.demandsArray]
+		self.demandsArrayZipped = [[]]
+		self.itemDemandsPerPeriod = defaultdict(lambda: [])
+		refItem = 0
+		for item, row in enumerate(self.demandsArray):
+			for period, demand in enumerate(row):
+				if demand == 1:
+					if refItem == item:
+						self.demandsArrayZipped[-1].append(period)
+					else:
+						self.demandsArrayZipped.append([period])
+						refItem = item
+					self.itemDemandsPerPeriod[period].append(item) 
+
+
+		# print("Demands ", self.demandsArrayZipped)
 
 	def __repr__(self):
 		return "Number of Items is : {} \n".format(self.nItems) + \

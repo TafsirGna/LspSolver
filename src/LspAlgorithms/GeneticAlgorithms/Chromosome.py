@@ -14,21 +14,13 @@ class Chromosome(object):
 		"""
 		"""
 		self.cost = 0
-		self.dnaArray = None
-		self.startingGene, self.endingGene = None, None
-		# self.zipDnaArray(dnaArray)
+		self.dnaArray = [[None for _ in indices] for indices in InputDataInstance.instance.demandsArrayZipped]
 		self.stringIdentifier = ""
 
 
 	def calculateCost(self):
 		"""
 		"""
-
-		# if len(dnaArray) == inputDataInstance.nPeriods:
-		# 	return cls.calculateCostPlainDNA(dnaArray, inputDataInstance)
-		
-		# if len(dnaArray) == inputDataInstance.nItems:
-		# 	return cls.calculateCostZippedDNA(dnaArray, inputDataInstance)
 
 		self.cost = Chromosome.classCalculateCost(self.dnaArray)
 
@@ -54,38 +46,14 @@ class Chromosome(object):
 		
 		for itemGenes in dnaArray:
 			for gene in itemGenes:
-				if gene.cost == 0:
-					gene.calculateStockingCost()
-					gene.calculateChangeOverCost()
-					gene.calculateCost()
+				# if gene.cost == 0:
+				gene.calculateStockingCost()
+				gene.calculateChangeOverCost()
+				gene.calculateCost()
 				cost += gene.cost
 
 		return cost
-
-	# @classmethod
-	# def calculateCostPlainDNA(cls, dnaArray, inputDataInstance):
-	# 	"""
-	# 	"""
-
-	# 	cost = 0
-	# 	item1, item2 = dnaArray[0], dnaArray[0]
-	# 	nOccurenceItem = np.array([0 for _ in range(inputDataInstance.nItems)])
-	# 	if item2 is not 0:
-	# 		nOccurenceItem[item2 - 1] += 1
-	# 		cost += inputDataInstance.stockingCostsArray[item2 - 1] * (inputDataInstance.demandsArrayZipped[item2 - 1][nOccurenceItem[item2 - 1] -1] - 0)
-
-	# 	for index in range(1, len(dnaArray)):
-	# 		if dnaArray[index] != 0:
-	# 			item2 = dnaArray[index]
-	# 			cost += inputDataInstance.changeOverCostsArray[item1 - 1 , item2 - 1]
-	# 			nOccurenceItem[item2 - 1] += 1
-	# 			cost += inputDataInstance.stockingCostsArray[item2 - 1] * (inputDataInstance.demandsArrayZipped[item2 - 1][nOccurenceItem[item2 - 1] - 1] - index)
-
-	# 			item1 = item2
-	# 		else: 
-	# 			continue
-
-	# 	return cost
+		
 
 	@classmethod
 	def feasible(cls, dnaArray, inputDataInstance):
@@ -118,30 +86,6 @@ class Chromosome(object):
 
 		return True
 
-	def zipDnaArray(self, dnaArray):
-		"""
-		"""
-		self.dnaArrayZipped = Chromosome.classZipDnaArray(dnaArray)
-
-
-	def renderDnaArray(self):
-		"""
-		"""
-		return Chromosome.classRenderDnaArray(self.dnaArray)
-
-
-	@classmethod
-	def classRenderDnaArray(cls, dnaArray):
-		"""
-		"""
-		result = [0 for _ in range(InputDataInstance.instance.nPeriods)]
-
-		for item, itemIndices in enumerate(dnaArray):
-			for gene in itemIndices:
-				if gene is not None:
-					result[gene.period] = item + 1
-
-		return result
 
 	@classmethod
 	def convertRawDNA(cls, rawDnaArray):
@@ -167,22 +111,31 @@ class Chromosome(object):
 
 
 	@classmethod
-	def arrangeDna(cls, dnaArray):
+	def evaluateDnaArray(cls, dnaArray, focus = []):
 		"""
 		"""
 
 		genesList = sorted([gene for itemProdGenes in dnaArray for gene in itemProdGenes], key= lambda gene: gene.period)
+		# genesList = sorted([gene for itemProdGenes in dnaArray for gene in itemProdGenes if gene is not None], key= lambda gene: gene.period)
 
 		prevGene = None
+		stringIdentifier = "0" * InputDataInstance.instance.nPeriods
 		cost = 0
 		for gene in genesList:
-			gene.prevGene = (prevGene.item, prevGene.position) if prevGene != None else None 
-			gene.calculateChangeOverCost()
-			gene.calculateCost()          
-			prevGene = gene
-			cost += gene.cost
+			compute = True
 			
-		return dnaArray, cost
+			if len(focus) > 0 and not ((gene.item, gene.position) in focus):
+				compute = False
+
+			if compute:
+				gene.prevGene = (prevGene.item, prevGene.position) if prevGene is not None else None 
+				gene.calculateChangeOverCost()             
+				gene.calculateCost()
+			cost += gene.cost
+			prevGene = gene
+			stringIdentifier = stringIdentifier[:gene.period] + str(gene.item + 1) + stringIdentifier[gene.period + 1:]
+
+		return dnaArray, stringIdentifier, cost
 
 
 	@classmethod
@@ -190,7 +143,7 @@ class Chromosome(object):
 		"""
 		"""
 
-		genesList = sorted([gene for itemProdGenes in dnaArray for gene in itemProdGenes], key= lambda gene: gene.period)
+		genesList = sorted([gene for itemProdGenes in dnaArray for gene in itemProdGenes if gene is not None], key= lambda gene: gene.period)
 		# print([gene.item + 1 for gene in genesList])
 		slice = []
 		cursor = startingPeriod
@@ -208,13 +161,27 @@ class Chromosome(object):
 		return slice
 
 
+	@classmethod
+	def classRenderDnaArray(cls, dnaArray):
+		"""
+		"""
+		result = [0 for _ in range(InputDataInstance.instance.nPeriods)]
+
+		for item, itemIndices in enumerate(dnaArray):
+			for gene in itemIndices:
+				if gene is not None:
+					result[gene.period] = item + 1
+
+		return result
+
+
 	def __lt__(self, chromosome):
 		return self.cost < chromosome.cost
 
 	def __repr__(self):
-		# return " {} : {} --- {}".format(self.renderDnaArray(), self.cost, self.dnaArray)
-		return " {} : {}".format(self.stringIdentifier, self.cost)
-		# return " {} : {} | {} - {} /".format(self.renderDnaArray(), self.cost, Chromosome.calculateCostPlainDNA(Chromosome.classRenderDnaArray(self.dnaArray), InputDataInstance.instance), Chromosome.feasible(self.dnaArray, InputDataInstance.instance))
+		return "{} : {}".format(Chromosome.classRenderDnaArray(self.dnaArray), self.cost)
+		return "{} : {}".format(self.stringIdentifier, self.cost)
+		# return "{} : {} | {} - {} /".format(self.renderDnaArray(), self.cost, Chromosome.calculateCostPlainDNA(Chromosome.classRenderDnaArray(self.dnaArray), InputDataInstance.instance), Chromosome.feasible(self.dnaArray, InputDataInstance.instance))
 
 	def __eq__(self, chromosome):
 		return self.stringIdentifier == chromosome.stringIdentifier
