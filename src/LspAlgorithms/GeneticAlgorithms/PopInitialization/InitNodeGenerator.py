@@ -1,11 +1,7 @@
-
-
+import queue
 import random
-from LspAlgorithms.GeneticAlgorithms.PopInitialization.Population import Population
-from ParameterSearch.ParameterData import ParameterData
 
-
-class NodeGenerator:
+class InitNodeGenerator:
 
     instance = None
     
@@ -17,17 +13,17 @@ class NodeGenerator:
     def generate(self):
         """
         """
-
+        
         while len(self.queue) > 0:
 
             node = self.queue[-1]
             self.queue = self.queue[:- 1]
 
             children = node.children()
+            if len(children) == 0: # leaf node
+                return node
 
-            # random.shuffle(children)
             self.queue += children
 
-            if len(children) == 0: # leaf node
-                yield node
+        return None
     

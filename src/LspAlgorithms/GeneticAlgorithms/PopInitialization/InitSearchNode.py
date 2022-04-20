@@ -104,7 +104,7 @@ class SearchNode(object):
 		return children
 
 	def __repr__(self):
-		return str(self.chromosome.unzipDnaArray()) + " | " + str(self.period) + " | " + str(self.itemsToOrder) + " | " + str(self.chromosome.dnaArray) + "\n"
+		return str(self.chromosome.stringIdentifier) + " | " + str(self.period) + " | " + str(self.itemsToOrder) + " | " + str(self.chromosome.dnaArray) + "\n"
 
 
 	def __lt__(self, node):

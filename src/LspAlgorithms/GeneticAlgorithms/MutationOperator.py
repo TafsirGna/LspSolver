@@ -1,4 +1,5 @@
 import copy
+import random
 from LspAlgorithms.GeneticAlgorithms.Gene import Gene
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 from ParameterSearch.ParameterData import ParameterData
@@ -14,55 +15,56 @@ class MutationOperator:
         """
 
         self.chromosome = chromosome
+        self.genes = [gene for itemProdGenes in self.chromosome.dnaArray for gene in itemProdGenes]
 
 
     def process(self):
         """
         """
         
-        mutations = self.searchMutations(self.chromosome.dnaArray)
+        mutations = self.searchMutations()
+        chromosome = self.selectOneMutation(mutations)
+        if chromosome is not None:
+            self.chromosome = chromosome
 
-        # [print(mutation) for mutation in mutations]
-
-        betterChromosome = self.bestMutation(self.chromosome, mutations)
 		# print("----------------------------------------------------")
-        while betterChromosome is not None:
-            self.chromosome = betterChromosome
-            mutations = self.searchMutations(self.chromosome.dnaArray)
-            betterChromosome = self.bestMutation(self.chromosome, mutations)
-            # print("----------------------------------------------------")
-            # [print(mutation) for mutation in mutations]
+        # while betterChromosome is not None:
+        #     self.chromosome = betterChromosome
+        #     mutations = self.searchMutations(self.chromosome.dnaArray)
+        #     betterChromosome = self.bestMutation(self.chromosome, mutations)
+        #     # print("----------------------------------------------------")
+        #     # [print(mutation) for mutation in mutations]
 
         return self.chromosome
 
 
-    def searchMutations(self, dnaArray):
+    def searchMutations(self):
         """
         """
 
         mutations = []
+        # genesList = sorted([gene for itemProdGenes in dnaArray for gene in itemProdGenes], key= lambda gene: gene.cost, reverse=True)
 
-        genesList = sorted([gene for itemProdGenes in dnaArray for gene in itemProdGenes], key= lambda gene: gene.cost, reverse=True)
-
-        for gene in genesList:
-            geneMutations = self.genePossibleMutations(gene, dnaArray)
-            mutations += geneMutations
+        # for gene in genesList:
+        while len(mutations) == 0 and len(self.genes) > 0:
+            gene = random.choice(self.genes)
+            mutations = self.genePossibleMutations(gene, self.chromosome.dnaArray)
+            self.genes.remove(gene)
+            # mutations += geneMutations
             # print(gene.item, gene.position, gene.period, geneMutations, '\n')
         
         return mutations
 
 
-    def bestMutation(self, chromosome, mutations):
+    def selectOneMutation(self, mutations):
         """
         """
 
         if len(mutations) == 0:
             return None
 
-        mutation = min(mutations, key=lambda pair:pair[2])
-
-        if (mutation[2] >= chromosome.cost):
-            return None
+        # mutation = min(mutations, key=lambda pair:pair[2])
+        mutation = random.choice(mutations)
 
         result = Chromosome()
         result.dnaArray = mutation[0]

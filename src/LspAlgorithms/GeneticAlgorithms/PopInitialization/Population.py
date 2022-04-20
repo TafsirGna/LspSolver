@@ -23,7 +23,8 @@ class Population:
         # self.setElites()
         self.nextPopulation = None
         self._nextPopLock = threading.Lock()
-        self.maxChromosomeCost = None
+        self.selectionOperatorLock = threading.Lock()
+        self.maxCostChromosome, self.minCostChromosome = None, None
         self.uniques = []
 
         self.popSize = popSize if popSize != None else ParameterData.instance.popSize
@@ -62,16 +63,15 @@ class Population:
 
         self.chromosomes.append(chromosome)
 
-        if chromosome.stringIdentifier not in self.uniques:
-            self.uniques.append(chromosome.stringIdentifier)
+        if chromosome not in self.uniques:
+            self.uniques.append(chromosome)
 
         # setting population max cost
-        if self.maxChromosomeCost == None:
-            self.maxChromosomeCost = chromosome.cost
+        if self.maxCostChromosome is None:
+            self.maxCostChromosome = chromosome
         else:
-            cost = chromosome.cost + 1
-            if self.maxChromosomeCost < cost:
-                self.maxChromosomeCost = cost
+            if self.maxCostChromosome.cost < chromosome.cost + 1:
+                self.maxCostChromosome = chromosome
 
         return chromosome
 
@@ -82,10 +82,12 @@ class Population:
 
         while len(self.nextPopulation.chromosomes) < self.popSize:
 
-            chromosomeA, chromosomeB = selectionOperator.select()
             chromosome = None
-
             if (random.random() < ParameterData.instance.crossOverRate):
+
+                with self.selectionOperatorLock:
+                    chromosomeA, chromosomeB = selectionOperator.select()
+
                 crossOverOperator = CrossOverOperator([chromosomeA, chromosomeB])
                 chromosome = crossOverOperator.process()
                 # print("+++", chromosomeA, chromosomeB, chromosome)
@@ -106,7 +108,7 @@ class Population:
         """
         """
 
-        selectionOperator = SelectionOperator(self.chromosomes, self.maxChromosomeCost)
+        selectionOperator = SelectionOperator(self)
 
         threads = []
 
