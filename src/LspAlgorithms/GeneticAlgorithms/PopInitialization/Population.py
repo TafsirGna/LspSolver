@@ -1,16 +1,11 @@
-import enum
 from functools import total_ordering
-from threading import Thread, local
+from threading import Thread
 import threading
-
-import numpy as np
-from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
 import random
 from LspAlgorithms.GeneticAlgorithms.CrossOverOperator import CrossOverOperator
 from LspAlgorithms.GeneticAlgorithms.Gene import Gene
 from LspAlgorithms.GeneticAlgorithms.MutationOperator import MutationOperator
 from LspAlgorithms.GeneticAlgorithms.SelectionOperator import SelectionOperator
-from LspInputDataReading.LspInputDataInstance import InputDataInstance
 from ParameterSearch.ParameterData import ParameterData
 
 class Population:
@@ -70,8 +65,15 @@ class Population:
         if self.maxCostChromosome is None:
             self.maxCostChromosome = chromosome
         else:
-            if self.maxCostChromosome.cost < chromosome.cost + 1:
+            if self.maxCostChromosome.cost < chromosome.cost:
                 self.maxCostChromosome = chromosome
+
+        # setting population min cost
+        if self.minCostChromosome is None:
+            self.minCostChromosome = chromosome
+        else:
+            if self.minCostChromosome.cost > chromosome.cost:
+                self.minCostChromosome = chromosome
 
         return chromosome
 
@@ -118,6 +120,20 @@ class Population:
             threads.append(thread_T)
             
         [thread_T.join() for thread_T in threads]
+
+
+    def localSeachOneIndividu(self):
+        """ Selection randomly one chromosome upon which an advanced mutation function is performed
+        """
+
+        index = random.randrange(0, self.popSize - 1)
+        # chromosome = random.choice(self.uniques)
+        chromosome = self.chromosomes[index]
+
+        mutationOperator = MutationOperator(chromosome)
+        self.chromosomes[index] = mutationOperator.process(strategy="advanced")
+
+        return
 
 
     def __repr__(self):

@@ -3,7 +3,7 @@
 
 from threading import Thread
 import threading
-from LspAlgorithms.GeneticAlgorithms.GATerminator import GATerminator
+from LspAlgorithms.GeneticAlgorithms.PopulationEvaluator import PopulationEvaluator
 from ParameterSearch.ParameterData import ParameterData
 from ..PopInitialization.PopInitializer import PopInitializer
 
@@ -46,9 +46,9 @@ class GeneticAlgorithm:
 		"""
 		"""
 		generationIndex = 0
-		gaTerminator = GATerminator()
+		popEvaluator = PopulationEvaluator()
 
-		while not gaTerminator.toTerminate(population):
+		while popEvaluator.evaluate(population) != "TERMINATE":
 			# if generationIndex == 1:
 			# 	break
 

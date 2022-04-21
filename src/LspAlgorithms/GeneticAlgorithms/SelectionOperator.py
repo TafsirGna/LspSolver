@@ -15,6 +15,22 @@ class SelectionOperator:
         self.population = population
         self.chromosomeIndex = 0
 
+        # self.setRouletteProbabilities()
+
+
+    # def setRouletteProbabilities(self):
+    #     """
+    #     """
+    #     maxCost = self.population.maxCostChromosome.cost + 1
+    #     totalFitness = 0
+    #     for chromosome in self.population.chromosomes:
+    #         chromosome.fitness = (maxCost - chromosome.cost)
+    #         totalFitness += chromosome.fitness
+
+    #     self.rouletteProbabilities = [float(chromosome.fitness/totalFitness) for chromosome in self.population.chromosomes]
+
+    #     # print("Roulette : ", self.rouletteProbabilities)
+
 
     def select(self):
         """
@@ -39,5 +55,7 @@ class SelectionOperator:
             self.chromosomeIndex = 0
         else:
             self.chromosomeIndex += 1
-
+        
         return chromosome, np.random.choice(self.population.chromosomes, p=rouletteProbabilities)
+
+        # return chromosome, np.random.choice(self.population.chromosomes, p=self.rouletteProbabilities)

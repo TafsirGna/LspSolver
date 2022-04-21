@@ -18,14 +18,25 @@ class MutationOperator:
         self.genes = [gene for itemProdGenes in self.chromosome.dnaArray for gene in itemProdGenes]
 
 
-    def process(self):
+    def process(self, strategy = "medium"): # strategy :  medium/advanced
         """
         """
+
+        print("advanced ----", self.chromosome)
         
-        mutations = self.searchMutations()
+        mutations = self.searchMutations(strategy)
         chromosome = self.selectOneMutation(mutations)
-        if chromosome is not None:
-            self.chromosome = chromosome
+
+        if strategy == "medium":
+            if chromosome is not None:
+                self.chromosome = chromosome
+
+        else:
+            if strategy == "advanced":
+                while chromosome is not None:
+                    self.chromosome = chromosome
+                    mutations = self.searchMutations(strategy)
+                    chromosome = self.selectOneMutation(mutations)
 
 		# print("----------------------------------------------------")
         # while betterChromosome is not None:
@@ -38,25 +49,43 @@ class MutationOperator:
         return self.chromosome
 
 
-    def searchMutations(self):
+    def mediumMutationsSearch(self):
+        """
+        """
+        mutations = []
+        while len(mutations) == 0 and len(self.genes) > 0: 
+            gene = random.choice(self.genes)
+            mutations = self.genePossibleMutations(gene, self.chromosome.dnaArray)
+            self.genes.remove(gene)
+
+        return mutations
+
+    def advancedMutationsSearch(self):
+        """
+        """
+        mutations = []
+        for gene in self.genes:
+            mutations += self.genePossibleMutations(gene, self.chromosome.dnaArray)
+
+        return mutations
+
+    def searchMutations(self, strategy = "medium"):
         """
         """
 
         mutations = []
-        # genesList = sorted([gene for itemProdGenes in dnaArray for gene in itemProdGenes], key= lambda gene: gene.cost, reverse=True)
 
-        # for gene in genesList:
-        while len(mutations) == 0 and len(self.genes) > 0:
-            gene = random.choice(self.genes)
-            mutations = self.genePossibleMutations(gene, self.chromosome.dnaArray)
-            self.genes.remove(gene)
-            # mutations += geneMutations
-            # print(gene.item, gene.position, gene.period, geneMutations, '\n')
+        if strategy == "medium":
+            muatations = self.mediumMutationsSearch()
+
+        else: 
+            if strategy == "advanced":
+                mutations = self.advancedMutationsSearch()
         
         return mutations
 
 
-    def selectOneMutation(self, mutations):
+    def selectOneMutation(self, mutations, strategy = "best"): # strategy : random/best
         """
         """
 
@@ -64,7 +93,11 @@ class MutationOperator:
             return None
 
         # mutation = min(mutations, key=lambda pair:pair[2])
-        mutation = random.choice(mutations)
+        if strategy ==  "random":
+            mutation = random.choice(mutations)
+        else:
+            if strategy == "best":
+                mutation = min(mutations, key=lambda mutation: mutation[2] )
 
         result = Chromosome()
         result.dnaArray = mutation[0]

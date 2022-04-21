@@ -41,6 +41,7 @@ ParameterData.instance = ParameterData()
 # c.dnaArray = Chromosome.convertRawDNA([2, 1, 2, 0, 2, 1, 3, 0])
 # # print(Chromosome.sliceDna(c.dnaArray, 2 , 7))
 # # [3, 2, 2, 2, 1, 1, 0, 0]
+# # [2, 2, 2, 3, 1, 0, 0, 1]
 # c.calculateCost()
 # print("cost ((((((((", c.cost)
 # # # [2, 1, 2, 0, 1]
