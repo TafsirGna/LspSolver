@@ -26,7 +26,6 @@ class SearchNode(object):
 		
 		chromosome = Chromosome()
 		chromosome.dnaArray = [[] for _ in InputDataInstance.instance.demandsArrayZipped]
-		# chromosome.dnaArray = [[None for _ in itemDemands] for itemDemands in InputDataInstance.instance.demandsArrayZipped]
 
 		# Wrapping the chromosome in the search node for population initialization purpose
 		root = SearchNode(chromosome, (inputDataInstance.nPeriods - 1))
@@ -45,7 +44,6 @@ class SearchNode(object):
 			return children
 		
 		periodDemands = InputDataInstance.instance.itemDemandsPerPeriod[self.period]
-		# print('pepe ', periodDemands)
 
 		for item in periodDemands:
 			self.itemsToOrder[item] += 1
@@ -61,7 +59,7 @@ class SearchNode(object):
 				node = SearchNode(Chromosome(), self.period - 1)
 				node.lastPlacedItem = self.lastPlacedItem # if we guess a priori that nothing has been produced for this period
 
-				dnaArray = [[copy.deepcopy(gene) for gene in row] for row in self.chromosome.dnaArray]
+				dnaArray = copy.deepcopy(self.chromosome.dnaArray)
 				cost = 0
 				# print("ok Start --- ", dnaArray)
 
@@ -85,7 +83,7 @@ class SearchNode(object):
 						cost += lastPlacedGene.changeOverCost
 
 				# setting node's chomosome period
-				itemsToOrder = [i for i in self.itemsToOrder]
+				itemsToOrder = copy.deepcopy(self.itemsToOrder)
 				itemsToOrder[item] -= 1
 
 				node.itemsToOrder = itemsToOrder

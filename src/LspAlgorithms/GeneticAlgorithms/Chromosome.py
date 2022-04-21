@@ -1,6 +1,7 @@
 #!/usr/bin/python3.5
 # -*-coding: utf-8 -*
 
+from collections import defaultdict
 from operator import itruediv
 import queue
 from turtle import position
@@ -9,6 +10,8 @@ from LspAlgorithms.GeneticAlgorithms.Gene import Gene
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 
 class Chromosome(object):
+
+	pool = defaultdict(lambda: None) 
 
 	def __init__(self):
 		"""
@@ -25,16 +28,16 @@ class Chromosome(object):
 		self.cost = Chromosome.classCalculateCost(self.dnaArray)
 
 
-	def geneAtPeriod(self, period):
-		"""
-		"""
+	# def geneAtPeriod(self, period):
+	# 	"""
+	# 	"""
 
-		for itemGenes in self.dnaArray:
-			for gene in itemGenes:
-				if gene.period == period:
-					return gene
+	# 	for itemGenes in self.dnaArray:
+	# 		for gene in itemGenes:
+	# 			if gene.period == period:
+	# 				return gene
 
-		return None
+	# 	return None
 		
 
 	@classmethod
@@ -88,7 +91,7 @@ class Chromosome(object):
 
 
 	@classmethod
-	def convertRawDNA(cls, rawDnaArray):
+	def createFromRawDNA(cls, rawDnaArray):
 		"""
 		"""
 		dnaArray = [[] for _ in range(InputDataInstance.instance.nItems)]
@@ -106,7 +109,6 @@ class Chromosome(object):
 				prevGene = item, position
 				producedItemsCount[item] += 1
 			
-		# print(dnaArray)
 		return dnaArray
 
 
@@ -116,7 +118,6 @@ class Chromosome(object):
 		"""
 
 		genesList = sorted([gene for itemProdGenes in dnaArray for gene in itemProdGenes], key= lambda gene: gene.period)
-		# genesList = sorted([gene for itemProdGenes in dnaArray for gene in itemProdGenes if gene is not None], key= lambda gene: gene.period)
 
 		prevGene = None
 		stringIdentifier = "0" * InputDataInstance.instance.nPeriods
@@ -135,7 +136,11 @@ class Chromosome(object):
 			prevGene = gene
 			stringIdentifier = stringIdentifier[:gene.period] + str(gene.item + 1) + stringIdentifier[gene.period + 1:]
 
-		return dnaArray, stringIdentifier, cost
+		chromosome = Chromosome()
+		chromosome.dnaArray = dnaArray
+		chromosome.cost = cost
+		chromosome.stringIdentifier = stringIdentifier
+		return chromosome
 
 
 	@classmethod
@@ -161,26 +166,56 @@ class Chromosome(object):
 		return slice
 
 
-	@classmethod
-	def classRenderDnaArray(cls, dnaArray):
-		"""
-		"""
-		result = [0 for _ in range(InputDataInstance.instance.nPeriods)]
+	# @classmethod
+	# def createFromIdentifier(cls, stringIdentifier):
+	# 	"""
+	# 	"""
 
-		for item, itemIndices in enumerate(dnaArray):
-			for gene in itemIndices:
-				if gene is not None:
-					result[gene.period] = item + 1
+	# 	chromosome = Chromosome()
+	# 	chromosome.stringIdentifier = stringIdentifier
 
-		return result
+	# 	prevGene = None
+	# 	producedItemsCount = [0 for _ in range(InputDataInstance.instance.nItems)]
+	# 	cost = 0
+	# 	for period, periodValue in enumerate(stringIdentifier):
+	# 		if periodValue != 0:
+	# 			item = int(periodValue) - 1
+	# 			position = producedItemsCount[item]
+
+	# 			gene = Gene(item, period, position, prevGene)
+	# 			gene.calculateStockingCost()
+	# 			gene.calculateChangeOverCost()
+	# 			gene.calculateCost()
+
+	# 			cost += gene.cost
+	# 			chromosome.dnaArray[item][position] = gene
+	# 			prevGene = item, position
+	# 			producedItemsCount[item] += 1
+
+	# 	chromosome.cost = cost
+	# 	print("test : ", chromosome.dnaArray)
+	# 	return chromosome
+
+	# @classmethod
+	# def classRenderDnaArray(cls, dnaArray):
+	# 	"""
+	# 	"""
+	# 	result = [0 for _ in range(InputDataInstance.instance.nPeriods)]
+
+	# 	for item, itemIndices in enumerate(dnaArray):
+	# 		for gene in itemIndices:
+	# 			if gene is not None:
+	# 				result[gene.period] = item + 1
+
+	# 	return result
 
 
 	def __lt__(self, chromosome):
 		return self.cost < chromosome.cost
 
 	def __repr__(self):
-		return "{} : {}".format(Chromosome.classRenderDnaArray(self.dnaArray), self.cost)
-		return "{} : {}".format(self.stringIdentifier, self.cost)
+		# return "{} : {}".format(Chromosome.classRenderDnaArray(self.dnaArray), self.cost)
+		return "[{}] : {}".format(self.stringIdentifier, self.cost)
 		# return "{} : {} | {} - {} /".format(self.renderDnaArray(), self.cost, Chromosome.calculateCostPlainDNA(Chromosome.classRenderDnaArray(self.dnaArray), InputDataInstance.instance), Chromosome.feasible(self.dnaArray, InputDataInstance.instance))
 
 	def __eq__(self, chromosome):

@@ -1,11 +1,10 @@
-from functools import total_ordering
 from threading import Thread
 import threading
 import random
-from LspAlgorithms.GeneticAlgorithms.CrossOverOperator import CrossOverOperator
-from LspAlgorithms.GeneticAlgorithms.Gene import Gene
-from LspAlgorithms.GeneticAlgorithms.MutationOperator import MutationOperator
-from LspAlgorithms.GeneticAlgorithms.SelectionOperator import SelectionOperator
+from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
+from LspAlgorithms.GeneticAlgorithms.GAOperators.CrossOverOperator import CrossOverOperator
+from LspAlgorithms.GeneticAlgorithms.GAOperators.MutationOperator import MutationOperator
+from LspAlgorithms.GeneticAlgorithms.GAOperators.SelectionOperator import SelectionOperator
 from ParameterSearch.ParameterData import ParameterData
 
 class Population:
@@ -74,6 +73,10 @@ class Population:
         else:
             if self.minCostChromosome.cost > chromosome.cost:
                 self.minCostChromosome = chromosome
+
+        # Chromosome Pool
+        if Chromosome.pool[chromosome.stringIdentifier] is None:
+            Chromosome.pool[chromosome.stringIdentifier] = chromosome
 
         return chromosome
 

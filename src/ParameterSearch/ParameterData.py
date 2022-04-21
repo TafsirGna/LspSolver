@@ -13,7 +13,7 @@ class ParameterData:
         self.mutationRate = 0.1
         self.crossOverRate = 0.8
         self.elitePercentage = 0.5
-        self.nReplicaThreads = 2
+        self.nReplicaThreads = 1
         self.nPrimaryThreads = 1
         self.nMigrants = 1
         self.popUniquesPercentage50 = 0.50

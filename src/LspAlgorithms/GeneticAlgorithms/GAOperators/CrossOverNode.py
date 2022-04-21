@@ -1,7 +1,7 @@
 import copy
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
 from LspAlgorithms.GeneticAlgorithms.Gene import Gene
-from LspAlgorithms.GeneticAlgorithms.MutationOperator import MutationOperator
+from LspAlgorithms.GeneticAlgorithms.GAOperators.MutationOperator import MutationOperator
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 import random
 
@@ -13,11 +13,9 @@ class CrossOverNode:
         """
         """
         self.parentChromosomes = parentChromosomes
-
         self.chromosome = Chromosome()
-
         self.pointer = (0, 0)
-        self.filledPeriods = []
+        # self.prodPeriodsArray = [[None for _ in indices] for indices in InputDataInstance.instance.demandsArrayZipped]
 
 
     def children(self):
@@ -39,7 +37,9 @@ class CrossOverNode:
         item, position = self.pointer[0], self.pointer[1]
         pointer = self.nextPointer()
 
-        # [print(self.pointer, chromosome.dnaArray) for chromosome in self.parentChromosomes]
+        # [print('Parent : ', chromosome.dnaArray) for chromosome in self.parentChromosomes]
+
+        # print("child : ", self.pointer, self.chromosome.dnaArray)
         
         genes = [chromosome.dnaArray[item][position] for chromosome in self.parentChromosomes]
 
@@ -51,19 +51,19 @@ class CrossOverNode:
         for gene in genes:
             # print("Gene - ", gene.item + 1, gene.position, gene.period)
             searchMutation = False
-            if gene.period not in self.filledPeriods:
+            if self.chromosome.stringIdentifier[gene.period] == "0":
                 if (lowerLimit <= gene.period and gene.period < upperLimit):
 
                     node = CrossOverNode(self.parentChromosomes)
                     node.pointer = pointer
-                    # dnaArray = [[gene for gene in itemGenes] for itemGenes in self.chromosome.dnaArray]
+
                     dnaArray = copy.deepcopy(self.chromosome.dnaArray)
                     dnaArray[item][position] = gene
                     node.chromosome.dnaArray = dnaArray
 
-                    filledPeriods = copy.deepcopy(self.filledPeriods)
-                    filledPeriods.append(gene.period)
-                    node.filledPeriods = filledPeriods
+                    stringIdentifier = self.chromosome.stringIdentifier
+                    stringIdentifier = stringIdentifier[:gene.period] + str(gene.item + 1) + stringIdentifier[gene.period + 1:]
+                    node.chromosome.stringIdentifier = stringIdentifier
 
                     children.append(node)
                 else:
@@ -73,6 +73,7 @@ class CrossOverNode:
 
 
             if searchMutation:
+
                 # print("search mutations")
                 mutations = MutationOperator.genePossibleMutations(gene, self.chromosome.dnaArray, False, "null")
                 # print(mutations)
@@ -84,9 +85,9 @@ class CrossOverNode:
                     node.chromosome.dnaArray = mutation[0]
 
                     newPeriod = mutation[1][1][1]
-                    filledPeriods = copy.deepcopy(self.filledPeriods)
-                    filledPeriods.append(newPeriod)
-                    node.filledPeriods = filledPeriods
+                    stringIdentifier = self.chromosome.stringIdentifier
+                    stringIdentifier = stringIdentifier[:newPeriod] + str(gene.item + 1) + stringIdentifier[newPeriod + 1:]
+                    node.chromosome.stringIdentifier = stringIdentifier
                     
                     children.append(node)
 

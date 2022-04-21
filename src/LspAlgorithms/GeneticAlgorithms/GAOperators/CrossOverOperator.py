@@ -1,4 +1,4 @@
-from LspAlgorithms.GeneticAlgorithms.CrossOverNode import CrossOverNode
+from LspAlgorithms.GeneticAlgorithms.GAOperators.CrossOverNode import CrossOverNode
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
 
@@ -18,6 +18,7 @@ class CrossOverOperator:
         """
         """
         node = CrossOverNode(self.parentChromosomes)
+        node.chromosome.stringIdentifier = "0" * InputDataInstance.instance.nPeriods
         return node
 
     
@@ -35,12 +36,11 @@ class CrossOverOperator:
             children = node.children()
             # if len(children) == 0 and node.period < 0:
             if len(children) == 0 and node.pointer == (None, None):
-                chromosome = node.chromosome
-                dnaArray, stringIdentifier, cost = Chromosome.evaluateDnaArray(chromosome.dnaArray)
-                chromosome.dnaArray = dnaArray
-                chromosome.cost = cost
-                chromosome.stringIdentifier = stringIdentifier
-                return chromosome
+
+                if Chromosome.pool[node.chromosome.stringIdentifier] is None:
+                    # return Chromosome.createFromIdentifier(node.chromosome.stringIdentifier)
+                    return Chromosome.evaluateDnaArray(node.chromosome.dnaArray)
+                return Chromosome.pool[node.chromosome.stringIdentifier]
 
             queue += children
 

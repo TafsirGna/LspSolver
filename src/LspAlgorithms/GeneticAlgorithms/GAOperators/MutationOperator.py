@@ -3,7 +3,7 @@ import random
 from LspAlgorithms.GeneticAlgorithms.Gene import Gene
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 from ParameterSearch.ParameterData import ParameterData
-from .Chromosome import Chromosome
+from ..Chromosome import Chromosome
 
 
 class MutationOperator:
@@ -76,7 +76,7 @@ class MutationOperator:
         mutations = []
 
         if strategy == "medium":
-            muatations = self.mediumMutationsSearch()
+            mutations = self.mediumMutationsSearch()
 
         else: 
             if strategy == "advanced":
@@ -97,14 +97,9 @@ class MutationOperator:
             mutation = random.choice(mutations)
         else:
             if strategy == "best":
-                mutation = min(mutations, key=lambda mutation: mutation[2] )
+                mutation = min(mutations, key=lambda chromosome: chromosome.cost )
 
-        result = Chromosome()
-        result.dnaArray = mutation[0]
-        result.stringIdentifier = mutation[1]
-        result.cost = mutation[2]
-
-        return result
+        return copy.deepcopy(mutation)
 
     @classmethod
     def genePossibleMutations(cls, gene1, dnaArray, evaluate = True, strategy = "all"): # strategy can be "all" or "null" only for mutations related to null periods

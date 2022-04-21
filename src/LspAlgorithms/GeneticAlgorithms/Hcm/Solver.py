@@ -12,6 +12,7 @@ class GeneticAlgorithm:
 	"""
 	"""
 
+
 	def __init__(self, inputDataInstance):
 		"""
 		"""

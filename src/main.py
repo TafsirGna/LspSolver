@@ -4,9 +4,9 @@
 # import sys
 import argparse
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
-from LspAlgorithms.GeneticAlgorithms.CrossOverOperator import CrossOverOperator 
+from LspAlgorithms.GeneticAlgorithms.GAOperators.MutationOperator import MutationOperator
+from LspAlgorithms.GeneticAlgorithms.GAOperators.CrossOverOperator import CrossOverOperator 
 from LspAlgorithms.GeneticAlgorithms.Hcm.Solver import GeneticAlgorithm
-from LspAlgorithms.GeneticAlgorithms.MutationOperator import MutationOperator
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.Population import Population
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 from LspInputDataReading.LspInputDataReader import InputDataReader
@@ -51,7 +51,7 @@ ParameterData.instance = ParameterData()
 # print(Chromosome.localSearch([2, 3, 2, 2, 0, 1, 0, 1], InputDataInstance.instance))
 # print(Chromosome.localSearch([2, 3, 2, 2, 0, 1, 0, 1], InputDataInstance.instance))
 
-# # dnaA, dnaB = Chromosome.convertRawDNA([2, 1, 0, 2, 1]), Chromosome.convertRawDNA([2, 1, 2, 0, 1])
+# dnaA, dnaB = Chromosome.convertRawDNA([2, 1, 0, 2, 1]), Chromosome.convertRawDNA([2, 1, 2, 0, 1])
 # dnaA, dnaB = Chromosome.convertRawDNA([1, 2, 2, 2, 1, 3, 0, 0]), Chromosome.convertRawDNA([2, 2, 2, 3, 1, 1, 0, 0])
 # cA, cB = Chromosome(), Chromosome()
 # cAInfos = Chromosome.evaluateDnaArray(dnaA)
