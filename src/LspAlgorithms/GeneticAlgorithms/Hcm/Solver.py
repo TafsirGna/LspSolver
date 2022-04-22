@@ -4,6 +4,7 @@
 from threading import Thread
 import threading
 from LspAlgorithms.GeneticAlgorithms.PopulationEvaluator import PopulationEvaluator
+from LspRuntimeMonitor import LspRuntimeMonitor
 from ParameterSearch.ParameterData import ParameterData
 from ..PopInitialization.PopInitializer import PopInitializer
 
@@ -56,7 +57,8 @@ class GeneticAlgorithm:
 			# self.setElites(population)
 
 			population = population.evolve()
-			print("Population --> ", population)
+
+			LspRuntimeMonitor.output("Population --> " + str(population))
 			
 			generationIndex += 1
 

@@ -1,6 +1,7 @@
 import numpy as np
 
 from LspAlgorithms.GeneticAlgorithms import Chromosome
+from LspRuntimeMonitor import LspRuntimeMonitor
 from ParameterSearch.ParameterData import ParameterData
 
 class PopulationEvaluator:
@@ -12,19 +13,15 @@ class PopulationEvaluator:
         """
         self.flag50Percentage = False
         self.flag25Percentage = False
-        self.popStatistics = {"min": [], "max": [], "mean": [], "std": []}
+        LspRuntimeMonitor.popStatistics = {"min": [], "max": [], "mean": [], "std": []}
 
 
     def evaluate(self, population):
         """
         """
 
-        # Setting the threshold under which a populatioin is set to have converged
-        # threshold = int(ParameterData.instance.convergenceThresholdPercentage * population.popSize)
-        # threshold = 1 if threshold < 1 else threshold
-
-        self.popStatistics["min"].append(population.minCostChromosome.cost)
-        self.popStatistics["max"].append(population.maxCostChromosome.cost)
+        LspRuntimeMonitor.popStatistics["min"].append(population.minCostChromosome.cost)
+        LspRuntimeMonitor.popStatistics["max"].append(population.maxCostChromosome.cost)
 
         uniquesPercentage = float(len(population.uniques) / population.popSize)
 

@@ -10,7 +10,7 @@ from LspAlgorithms.GeneticAlgorithms.Hcm.Solver import GeneticAlgorithm
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.Population import Population
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 from LspInputDataReading.LspInputDataReader import InputDataReader
-from LspStatistics.LspRuntimeStatisticsMonitor import LspRuntimeStatisticsMonitor
+from LspRuntimeMonitor import LspRuntimeMonitor
 from ParameterSearch.ParameterData import ParameterData
 from time import perf_counter
 
@@ -27,6 +27,7 @@ args = parser.parse_args()
 
 # Reading the file to get the problem to solve
 inputFile = args.file  #sys.argv[1]
+LspRuntimeMonitor.verbose = args.verbose
 inputDataReader = InputDataReader()
 inputDataInstance = inputDataReader.readInput(inputFile)
 
@@ -63,23 +64,18 @@ ParameterData.instance = ParameterData()
 # crossOverOperator = CrossOverOperator([cA, cB])
 # print(crossOverOperator.process())
 
-###
-LspRuntimeStatisticsMonitor.instance = LspRuntimeStatisticsMonitor()
-
 # # I create an instance of the genetic algorithm to be used
 lspSolver = GeneticAlgorithm(inputDataInstance)
 
 ##
-if LspRuntimeStatisticsMonitor.instance:
-    LspRuntimeStatisticsMonitor.instance.popInitClockStart = perf_counter()
+LspRuntimeMonitor.started()
 ###
 
 lspSolver.solve()
 
 ###
-if LspRuntimeStatisticsMonitor.instance:
-    LspRuntimeStatisticsMonitor.instance.popInitClockEnd = perf_counter()
+LspRuntimeMonitor.ended()
 ###
 
 # # Reporting all statistics collected when running the selected algo
-LspRuntimeStatisticsMonitor.instance.report()
+LspRuntimeMonitor.report()

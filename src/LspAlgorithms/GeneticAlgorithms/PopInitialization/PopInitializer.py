@@ -8,6 +8,7 @@ from LspAlgorithms.GeneticAlgorithms.PopInitialization.InitNodeGenerator import 
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.InitNodeGeneratorManager import InitNodeGeneratorManager
 # from LspAlgorithms.GeneticAlgorithms.PopInitialization.PopInitThread import PopInitThread
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.Population import Population
+from LspRuntimeMonitor import LspRuntimeMonitor
 from ParameterSearch.ParameterData import ParameterData
 from .InitSearchNode import SearchNode
 from threading import Thread
@@ -41,7 +42,7 @@ class PopInitializer:
         [thread_T.join() for thread_T in self.threads]
         # populations = [popInitThread.population for popInitThread in self.threads]
 
-        print(self.populations)
+        LspRuntimeMonitor.output(str(self.populations))
         return self.populations
 
     def rootNode(self):
@@ -67,12 +68,7 @@ class PopInitializer:
 
         # initQueue = self.initQueue()
         queue = self.rootNode().children()
-
-        # step = math.ceil(float(len(initQueue)) / float(ParameterData.instance.nPrimaryThreads))
-
-        # nodeGeneratorQueues = [initQueue[i:i+step] for i in range(0, len(initQueue), step)]
         nodeGenerators = [InitNodeGenerator([node]) for node in queue]
-        print("queue ", len(nodeGenerators))
         return nodeGenerators
 
 
