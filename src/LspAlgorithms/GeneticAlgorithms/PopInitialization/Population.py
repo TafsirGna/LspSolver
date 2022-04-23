@@ -93,14 +93,14 @@ class Population:
                 with self.selectionOperatorLock:
                     chromosomeA, chromosomeB = selectionOperator.select()
 
-                crossOverOperator = CrossOverOperator([chromosomeA, chromosomeB])
-                chromosome = crossOverOperator.process()
+                chromosome = (CrossOverOperator([chromosomeA, chromosomeB])).process()
+                if not Chromosome.feasible(chromosome):
+                    print("Roooooooooooooooooooooooooooogue")
                 # print("+++", chromosomeA, chromosomeB, chromosome)
 
                 if chromosome is not None and (random.random() < ParameterData.instance.mutationRate):
                     # Proceding to mutate the chromosome
-                    mutationOperator = MutationOperator(chromosome)
-                    chromosome = mutationOperator.process()
+                    chromosome = (MutationOperator()).process(chromosome)
 
             if chromosome is not None:
                 with self._nextPopLock:
@@ -133,8 +133,7 @@ class Population:
         # chromosome = random.choice(self.uniques)
         chromosome = self.chromosomes[index]
 
-        mutationOperator = MutationOperator(chromosome)
-        self.chromosomes[index] = mutationOperator.process(strategy="advanced")
+        self.chromosomes[index] = (MutationOperator()).process(chromosome, strategy="advanced")
 
         return
 

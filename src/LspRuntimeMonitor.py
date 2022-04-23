@@ -5,7 +5,7 @@ from threading import Thread
 from time import perf_counter, time
 from LspLibrary import bcolors
 import time
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 
 class LspRuntimeMonitor:
@@ -77,6 +77,25 @@ class LspRuntimeMonitor:
 
         # Saving all generated output to a default file
         cls.saveOutput()
+
+        cls.plotData()
+
+
+    @classmethod
+    def plotData(cls):
+        """
+        """
+
+        # Plots
+        # Plotting the evolution of the minimal cost over generations
+        plt.plot(list(range(len(cls.popStatistics["max"]))), cls.popStatistics["max"])
+        plt.ylabel("Population maximal cost")
+        plt.show()
+
+        # Plotting the evolution of the minimal cost over generations
+        plt.plot(list(range(len(cls.popStatistics["min"]))), cls.popStatistics["min"])
+        plt.ylabel("Population minimal cost")
+        plt.show()
 
     @classmethod
     def waitingAnimation(cls):

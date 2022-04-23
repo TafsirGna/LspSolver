@@ -59,15 +59,15 @@ class Chromosome(object):
 		
 
 	@classmethod
-	def feasible(cls, dnaArray, inputDataInstance):
+	def feasible(cls, chromosome):
 		"""Checks if a given dnaArray leads to a feasible chromosome
 		"""
 
 		# going through the zipped dna array checking : ->
 		# indices = []
-		for item in range(inputDataInstance.nItems):
-			demands = inputDataInstance.demandsArrayZipped[item]
-			prods = dnaArray[item]
+		for item in range(InputDataInstance.instance.nItems):
+			demands = InputDataInstance.instance.demandsArrayZipped[item]
+			prods = chromosome.dnaArray[item]
 
 			if len(demands) != len(prods): # -> that the number of produced item meets the number of demand
 				return False
@@ -97,6 +97,8 @@ class Chromosome(object):
 		dnaArray = [[] for _ in range(InputDataInstance.instance.nItems)]
 
 		prevGene = None
+		cost = 0
+		stringIdentifier = ""
 		producedItemsCount = [0 for _ in range(InputDataInstance.instance.nItems)]
 		for period, periodValue in enumerate(rawDnaArray):
 			if periodValue != 0:
@@ -104,16 +106,27 @@ class Chromosome(object):
 				position = producedItemsCount[item]
 
 				gene = Gene(item, period, position, prevGene)
+				gene.calculateChangeOverCost()
+				gene.calculateStockingCost()
 				gene.calculateCost()
+
 				dnaArray[item].append(gene)
 				prevGene = item, position
+				cost += gene.cost
 				producedItemsCount[item] += 1
+
+			stringIdentifier += str(periodValue)
 			
-		return dnaArray
+		chromosome = Chromosome()
+		chromosome.dnaArray = dnaArray
+		chromosome.stringIdentifier = stringIdentifier
+		chromosome.cost = cost
+		
+		return chromosome
 
 
 	@classmethod
-	def evaluateDnaArray(cls, dnaArray, focus = []):
+	def evaluateDnaArray(cls, dnaArray):
 		"""
 		"""
 
@@ -123,15 +136,9 @@ class Chromosome(object):
 		stringIdentifier = "0" * InputDataInstance.instance.nPeriods
 		cost = 0
 		for gene in genesList:
-			compute = True
-			
-			if len(focus) > 0 and not ((gene.item, gene.position) in focus):
-				compute = False
-
-			if compute:
-				gene.prevGene = (prevGene.item, prevGene.position) if prevGene is not None else None 
-				gene.calculateChangeOverCost()             
-				gene.calculateCost()
+			gene.prevGene = (prevGene.item, prevGene.position) if prevGene is not None else None 
+			gene.calculateChangeOverCost()             
+			gene.calculateCost()
 			cost += gene.cost
 			prevGene = gene
 			stringIdentifier = stringIdentifier[:gene.period] + str(gene.item + 1) + stringIdentifier[gene.period + 1:]

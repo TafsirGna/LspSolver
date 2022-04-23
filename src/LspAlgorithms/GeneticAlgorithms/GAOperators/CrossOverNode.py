@@ -1,7 +1,6 @@
 import copy
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
-from LspAlgorithms.GeneticAlgorithms.Gene import Gene
-from LspAlgorithms.GeneticAlgorithms.GAOperators.MutationOperator import MutationOperator
+from LspAlgorithms.GeneticAlgorithms.GAOperators.MutationNode import MutationNode
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 import random
 
@@ -15,7 +14,6 @@ class CrossOverNode:
         self.parentChromosomes = parentChromosomes
         self.chromosome = Chromosome()
         self.pointer = (0, 0)
-        # self.prodPeriodsArray = [[None for _ in indices] for indices in InputDataInstance.instance.demandsArrayZipped]
 
 
     def children(self):
@@ -75,19 +73,19 @@ class CrossOverNode:
             if searchMutation:
 
                 # print("search mutations")
-                mutations = MutationOperator.genePossibleMutations(gene, self.chromosome.dnaArray, False, "null")
+                mutations = MutationNode.genePossibleMutations(gene, self.chromosome, False, "null")
                 # print(mutations)
 
                 for mutation in mutations:
 
                     node = CrossOverNode(self.parentChromosomes)
                     node.pointer = pointer
-                    node.chromosome.dnaArray = mutation[0]
+                    node.chromosome = mutation[1]
 
-                    newPeriod = mutation[1][1][1]
-                    stringIdentifier = self.chromosome.stringIdentifier
-                    stringIdentifier = stringIdentifier[:newPeriod] + str(gene.item + 1) + stringIdentifier[newPeriod + 1:]
-                    node.chromosome.stringIdentifier = stringIdentifier
+                    # newPeriod = mutation[1][1][1]
+                    # stringIdentifier = self.chromosome.stringIdentifier
+                    # stringIdentifier = stringIdentifier[:newPeriod] + str(gene.item + 1) + stringIdentifier[newPeriod + 1:]
+                    # node.chromosome.stringIdentifier = stringIdentifier
                     
                     children.append(node)
 
