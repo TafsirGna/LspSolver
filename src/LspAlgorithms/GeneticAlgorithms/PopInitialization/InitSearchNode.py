@@ -20,7 +20,7 @@ class SearchNode(object):
 		self.itemsToOrder.append((InputDataInstance.instance.nPeriods - InputDataInstance.instance.demandsArray.sum()))
 
 	@classmethod
-	def root(cls, inputDataInstance):
+	def root(cls):
 		"""
 		"""
 		
@@ -28,7 +28,7 @@ class SearchNode(object):
 		chromosome.dnaArray = [[] for _ in InputDataInstance.instance.demandsArrayZipped]
 
 		# Wrapping the chromosome in the search node for population initialization purpose
-		root = SearchNode(chromosome, (inputDataInstance.nPeriods - 1))
+		root = SearchNode(chromosome, (InputDataInstance.instance.nPeriods - 1))
 
 		return root
 
@@ -52,15 +52,13 @@ class SearchNode(object):
 
 		for item, itemCount in enumerate(self.itemsToOrder):
 
-			itemsToOrder = None
-
 			if itemCount > 0:
 
 				node = SearchNode(Chromosome(), self.period - 1)
 				node.lastPlacedItem = self.lastPlacedItem # if we guess a priori that nothing has been produced for this period
 
 				dnaArray = copy.deepcopy(self.chromosome.dnaArray)
-				cost = 0
+				additionalCost = 0
 				# print("ok Start --- ", dnaArray)
 
 				if (item < InputDataInstance.instance.nItems):
@@ -69,7 +67,7 @@ class SearchNode(object):
 					gene = Gene(item, self.period, itemProdPosition)
 					gene.calculateStockingCost()
 					gene.calculateCost()
-					cost += gene.cost
+					additionalCost += gene.cost
 					# print("ok --- ", item, self.period, itemProdPosition, gene.cost)
 					dnaArray[item].insert(0, gene)
 
@@ -80,7 +78,7 @@ class SearchNode(object):
 						lastPlacedGene.prevGene = item, itemProdPosition
 						lastPlacedGene.calculateChangeOverCost()
 						lastPlacedGene.calculateCost()
-						cost += lastPlacedGene.changeOverCost
+						additionalCost += lastPlacedGene.changeOverCost
 
 				# setting node's chomosome period
 				itemsToOrder = copy.deepcopy(self.itemsToOrder)
@@ -91,10 +89,9 @@ class SearchNode(object):
 				node.chromosome.dnaArray = dnaArray
 				node.chromosome.stringIdentifier = str(item + 1 if item < InputDataInstance.instance.nItems else 0) + self.chromosome.stringIdentifier
 				# print(node.chromosome.stringIdentifier)
-				node.chromosome.cost = (self.chromosome.cost + cost) 
+				node.chromosome.cost = self.chromosome.cost + additionalCost
 
 				# print("ok End --- ", dnaArray)
-
 				children.append(node)
 
 		children.sort(reverse=True)

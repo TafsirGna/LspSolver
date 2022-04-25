@@ -1,3 +1,4 @@
+from collections import defaultdict
 from threading import Thread
 import threading
 import random
@@ -19,7 +20,7 @@ class Population:
         self._nextPopLock = threading.Lock()
         self.selectionOperatorLock = threading.Lock()
         self.maxCostChromosome, self.minCostChromosome = None, None
-        self.uniques = []
+        self.uniques = defaultdict(lambda: None)
 
         self.popSize = popSize if popSize != None else ParameterData.instance.popSize
 
@@ -27,22 +28,23 @@ class Population:
         """
         """
 
-        self.nextPopulation = Population([], self.popSize)
+        self.nextPopulation = Population(self.elites, self.popSize)
         self.applyGeneticOperators()
         return self.nextPopulation
 
-    
-    def setElites(self):
+
+    def completeInit(self):
         """
         """
-        if len(self.elites) > 0 or len(self.chromosomes) is 0:
-            return
 
-        nElites = int(float(len(self.chromosomes)) * ParameterData.instance.elitePercentage)
-        nElites = ( 1 if nElites < 1 else nElites)
+        chromosomes = sorted(self.uniques.values())
+        self.maxCostChromosome = chromosomes[-1]
+        self.minCostChromosome = chromosomes[0]
+        # print("1111111111111111111111111  ", chromosomes)
+        # print("---------------------", self.maxCostChromosome)
 
-        # self.chromosomes.sorted(key= lambda chromosome: chromosome.cost) 
-        chromosomes = sorted(self.chromosomes)
+        nElites = int(self.popSize * ParameterData.instance.elitePercentage) 
+        nElites = (1 if nElites < 1 else nElites)
 
         self.elites = chromosomes[:nElites]
 
@@ -52,31 +54,23 @@ class Population:
         """
 
         if len(self.chromosomes) >= self.popSize:
-            # self.setElites()
+            # self.completeInit()
             return None
 
         self.chromosomes.append(chromosome)
 
-        if chromosome not in self.uniques:
-            self.uniques.append(chromosome)
-
-        # setting population max cost
-        if self.maxCostChromosome is None:
-            self.maxCostChromosome = chromosome
-        else:
-            if self.maxCostChromosome.cost < chromosome.cost:
-                self.maxCostChromosome = chromosome
-
-        # setting population min cost
-        if self.minCostChromosome is None:
-            self.minCostChromosome = chromosome
-        else:
-            if self.minCostChromosome.cost > chromosome.cost:
-                self.minCostChromosome = chromosome
+        if self.uniques[chromosome.stringIdentifier] is None:
+            self.uniques[chromosome.stringIdentifier] = chromosome 
 
         # Chromosome Pool
         if Chromosome.pool[chromosome.stringIdentifier] is None:
-            Chromosome.pool[chromosome.stringIdentifier] = chromosome
+            Chromosome.pool[chromosome.stringIdentifier] = chromosome   
+
+        # setting population max cost
+        # self.maxCostChromosome = chromosome if self.maxCostChromosome is None or (self.maxCostChromosome is not None and self.maxCostChromosome.cost < chromosome.cost) else self.maxCostChromosome
+
+        # # setting population min cost
+        # self.minCostChromosome = chromosome if self.minCostChromosome is None or (self.minCostChromosome is not None and self.minCostChromosome.cost > chromosome.cost) else self.minCostChromosome
 
         return chromosome
 

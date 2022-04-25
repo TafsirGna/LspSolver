@@ -54,7 +54,7 @@ ParameterData.instance = ParameterData()
 # print((CrossOverOperator([cA, cB])).process())
 
 # # I create an instance of the genetic algorithm to be used
-lspSolver = GeneticAlgorithm(inputDataInstance)
+lspSolver = GeneticAlgorithm()
 
 #
 LspRuntimeMonitor.started()

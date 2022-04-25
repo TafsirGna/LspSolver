@@ -1,9 +1,5 @@
-import queue
-import random
 
 class InitNodeGenerator:
-
-    instance = None
     
     def __init__(self, queue) -> None:
         """

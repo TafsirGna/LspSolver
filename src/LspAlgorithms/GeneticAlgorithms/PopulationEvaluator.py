@@ -20,6 +20,8 @@ class PopulationEvaluator:
         """
         """
 
+        population.completeInit()
+
         LspRuntimeMonitor.popStatistics["min"].append(population.minCostChromosome.cost)
         LspRuntimeMonitor.popStatistics["max"].append(population.maxCostChromosome.cost)
 
@@ -37,9 +39,9 @@ class PopulationEvaluator:
         #         ParameterData.instance.mutationRate *= 2
         #         self.flag50Percentage = True
 
-        #
-        # if uniquesPercentage <= ParameterData.instance.popUniquesPercentage10:
-        #     population.localSeachOneIndividu()
+        
+        if uniquesPercentage <= ParameterData.instance.popUniquesPercentage10:
+            population.localSeachOneIndividu()
 
         #
         if len(population.uniques) == 1:

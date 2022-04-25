@@ -14,12 +14,11 @@ class GeneticAlgorithm:
 	"""
 
 
-	def __init__(self, inputDataInstance):
+	def __init__(self):
 		"""
 		"""
 
-		self.inputDataInstance = inputDataInstance
-		self.popInitializer = PopInitializer(self.inputDataInstance)
+		self.popInitializer = PopInitializer()
 		self.elites = []
 		self.generationIndex = 0
 		self.eliteLock = threading.Lock()
