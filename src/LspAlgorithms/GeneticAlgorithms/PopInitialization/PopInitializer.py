@@ -4,6 +4,7 @@
 import threading
 
 from numpy import math
+from LspAlgorithms.GeneticAlgorithms.LocalSearchEngine import LocalSearchEngine
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.InitNodeGenerator import InitNodeGenerator
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.InitNodeGeneratorManager import InitNodeGeneratorManager
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.Population import Population
@@ -100,6 +101,7 @@ class PopInitializer:
             result = None
             with self.popsLock[mainThreadId]:
                 result = population.add(node.chromosome)
+                # (LocalSearchEngine()).process(node.chromosome, "population", [self.popsLock[mainThreadId], population])
             if result is None:
                 break  
 

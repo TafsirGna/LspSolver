@@ -5,7 +5,7 @@ from LspAlgorithms.GeneticAlgorithms.Gene import Gene
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 
 
-class MutationNode:
+class LocalSearchNode:
     """
     """
 
@@ -32,10 +32,10 @@ class MutationNode:
 
         for itemGenes in self.chromosome.dnaArray:
             for gene in itemGenes:
-                mutations = MutationNode.genePossibleMutations(gene, self.chromosome)
+                mutations = LocalSearchNode.genePossibleMutations(gene, self.chromosome)
                 for mutation in mutations:
                     chromosome = mutation[1]
-                    node = MutationNode(chromosome, self.visitedChromosomes)
+                    node = LocalSearchNode(chromosome, self.visitedChromosomes)
                     # print("Child : ", chromosome)
                     children.append(node)
 

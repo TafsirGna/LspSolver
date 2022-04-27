@@ -27,7 +27,7 @@ class Population:
     def evolve(self):
         """
         """
-
+        print("Eliiiiiites : ", self.elites)
         self.nextPopulation = Population(self.elites, self.popSize)
         self.applyGeneticOperators()
         return self.nextPopulation
@@ -88,8 +88,8 @@ class Population:
                     chromosomeA, chromosomeB = selectionOperator.select()
 
                 chromosome = (CrossOverOperator([chromosomeA, chromosomeB])).process()
-                if not Chromosome.feasible(chromosome):
-                    print("Roooooooooooooooooooooooooooogue")
+                # if not Chromosome.feasible(chromosome):
+                #     print("Roooooooooooooooooooooooooooogue")
                 # print("+++", chromosomeA, chromosomeB, chromosome)
 
                 if chromosome is not None and (random.random() < ParameterData.instance.mutationRate):
@@ -127,7 +127,7 @@ class Population:
         # chromosome = random.choice(self.uniques)
         chromosome = self.chromosomes[index]
 
-        self.chromosomes[index] = (MutationOperator()).process(chromosome, strategy="advanced")
+        self.chromosomes[index] = (MutationOperator()).process(chromosome, strategy="advanced_mutation")
 
         return
 

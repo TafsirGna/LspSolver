@@ -2,10 +2,13 @@
 
 LspSolver is a lot sizing problems **solver tool**. LspSolver started as a research project in the Computer Science Research and Training Institute (IFRI-UAC), intends to apply **intelligence artificial methods** (like genetic algorithms or artificial neural networks) in solving the lot sizing problems. It is developed with speed and modularity in mind.
 
-Installation
+Usage
 ------------
 
-Working on it
+The whole set of input data is stored in the folder `data/input`. Two formats of input files exist, hence the two ways of reading these formats are implemented. Implemented in the first format, `data/input/clsp01.data` is the easiest instance of the set : 2 items, 5 periods. 
+To make the program run on this instance, use the command : 
+
+    python3.6 src/main.py -v data/input/clspInst01.data
 
 Documentation
 -------------
