@@ -13,16 +13,18 @@ class LocalSearchEngine:
     def localSearchNode(self, chromosome):
         """
         """
+
         node = LocalSearchNode(chromosome)
         return node
 
-    def process(self, chromosome, strategy = "simple_mutation", data = []): # strategy :  simple_mutation/advanced_mutation/population
-        """
+
+    def process(self, chromosome, strategy = "simple_mutation", data = []): 
+        """ Process the given chromosome in order to return a mutated version
+        strategy: simple_mutation|advanced_mutation|positive_mutation|population
         """
 
         node = self.localSearchNode(chromosome)
         queue = node.children()
-        depth = 1 if strategy == "easy" else None
         depthIndex = 0
 
         while len(queue) > 0:
@@ -38,6 +40,9 @@ class LocalSearchEngine:
             elif strategy == "simple_mutation":
                 depth = 1
                 if depthIndex == depth:
+                    return node.chromosome
+            elif strategy == "positive_mutation":
+                if node.chromosome.cost < chromosome.cost:
                     return node.chromosome
             elif strategy ==  "advanced_mutation":
                 if len(children) == 0:

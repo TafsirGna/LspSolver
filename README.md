@@ -9,6 +9,7 @@ The whole set of input data is stored in the folder `data/input`. Two formats of
 To make the program run on this instance, use the command : 
 
     python3.6 src/main.py -v data/input/clspInst01.data
+    
 
 Documentation
 -------------

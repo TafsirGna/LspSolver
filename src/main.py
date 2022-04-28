@@ -34,25 +34,6 @@ inputDataInstance = inputDataReader.readInput(inputFile)
 ###
 ParameterData.instance = ParameterData()
 
-# print(Chromosome.feasible([1, 2, 0, 1, 2], InputDataInstance.instance))
-# [2, 2, 2, 3, 1, 0, 0, 1]
-
-# c = Chromosome.createFromRawDNA([2, 1, 0, 1, 2])
-# # c = Chromosome.createFromRawDNA([2, 2, 2, 3, 1, 0, 0, 1])
-# # [3, 2, 2, 2, 1, 1, 0, 0]
-# # [2, 2, 2, 3, 1, 0, 0, 1]
-# print("Chromosome ", c)
-# # # [2, 1, 2, 0, 1]
-# print("1 -- ", (MutationOperator()).process(c, strategy="advanced"))
-
-# print(Chromosome.localSearch([2, 3, 2, 2, 0, 1, 0, 1], InputDataInstance.instance))
-# print(Chromosome.localSearch([2, 3, 2, 2, 0, 1, 0, 1], InputDataInstance.instance))
-
-# cA, cB = Chromosome.createFromRawDNA([2, 1, 0, 2, 1]), Chromosome.createFromRawDNA([2, 1, 2, 0, 1])
-# cA, cB = Chromosome.createFromRawDNA([1, 2, 2, 2, 1, 3, 0, 0]), Chromosome.createFromRawDNA([2, 2, 2, 3, 1, 1, 0, 0])
-# print(cA, "\n", cB, "\n -----------------------------")
-# print((CrossOverOperator([cA, cB])).process())
-
 # # I create an instance of the genetic algorithm to be used
 lspSolver = GeneticAlgorithm()
 
