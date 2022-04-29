@@ -5,7 +5,7 @@ from LspAlgorithms.GeneticAlgorithms.GAOperators.CrossOverOperator import CrossO
 from LspRuntimeMonitor import LspRuntimeMonitor
 from LspInputDataReading.LspInputDataReader import InputDataReader
 
-class TestGAOperators:
+class TestMainFeatures:
     """
     """        
 
@@ -14,8 +14,6 @@ class TestGAOperators:
         """
 
         self.setUpInput()
-
-        print("ooooooooooooooooooooooooooooo")
 
         c = Chromosome.createFromRawDNA([2, 1, 0, 1, 2])
         # c = Chromosome.createFromRawDNA([2, 2, 2, 3, 1, 0, 0, 1])
@@ -52,15 +50,19 @@ class TestGAOperators:
 
         self.setUpInput()
 
-        c = Chromosome.createFromRawDNA([2, 1, 0, 2, 1])
-        (LocalSearchEngine()).process(c)
+        # c = Chromosome.createFromRawDNA([2, 1, 0, 2, 1])
+        c = Chromosome.createFromRawDNA([1, 2, 2, 2, 1, 3, 0, 0])
+        print(c)
+        print((LocalSearchEngine()).process(c, "positive_mutation"))
+
+        assert 0
 
 
     def setUpInput(self):
         """
         """ 
 
-        inputFile = "data/input/clspInst01.data"
+        inputFile = "data/input/clspInst02.data"
         LspRuntimeMonitor.verbose = True
         inputDataReader = InputDataReader()
         inputDataInstance = inputDataReader.readInput(inputFile)

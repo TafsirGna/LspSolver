@@ -6,6 +6,7 @@ from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
 from LspAlgorithms.GeneticAlgorithms.GAOperators.CrossOverOperator import CrossOverOperator
 from LspAlgorithms.GeneticAlgorithms.GAOperators.MutationOperator import MutationOperator
 from LspAlgorithms.GeneticAlgorithms.GAOperators.SelectionOperator import SelectionOperator
+from LspRuntimeMonitor import LspRuntimeMonitor
 from ParameterSearch.ParameterData import ParameterData
 
 class Population:
@@ -14,8 +15,6 @@ class Population:
         """
         """
         self.chromosomes = chromosomes
-        self.elites = []
-        # self.setElites()
         self.nextPopulation = None
         self._nextPopLock = threading.Lock()
         self.selectionOperatorLock = threading.Lock()
@@ -23,12 +22,15 @@ class Population:
         self.uniques = defaultdict(lambda: None)
 
         self.popSize = popSize if popSize != None else ParameterData.instance.popSize
+        self.threadId = None
 
     def evolve(self):
         """
         """
-        print("Eliiiiiites : ", self.elites)
-        self.nextPopulation = Population(self.elites, self.popSize)
+    
+        self.nextPopulation = Population(LspRuntimeMonitor.popsData[self.threadId]["elites"], self.popSize)
+        # print("Eliiiiiiiiiiiiiiiiiiiiites : ", LspRuntimeMonitor.popsData[self.threadId]["elites"])
+        self.nextPopulation.threadId = self.threadId
         self.applyGeneticOperators()
         return self.nextPopulation
 
@@ -40,13 +42,24 @@ class Population:
         chromosomes = sorted(self.uniques.values())
         self.maxCostChromosome = chromosomes[-1]
         self.minCostChromosome = chromosomes[0]
-        # print("1111111111111111111111111  ", chromosomes)
-        # print("---------------------", self.maxCostChromosome)
+        # print("maaaaaaaaaaaaaax-------------", self.maxCostChromosome)
 
-        nElites = int(self.popSize * ParameterData.instance.elitePercentage) 
-        nElites = (1 if nElites < 1 else nElites)
+    
+    def elites(self):
 
-        self.elites = chromosomes[:nElites]
+        chromosomes = sorted(self.uniques.values())
+        elites = []
+
+        if LspRuntimeMonitor.popsData[self.threadId] is not None:
+            nElites = len(LspRuntimeMonitor.popsData[self.threadId]["elites"])
+            if nElites == 0:
+                nElites = int(self.popSize * ParameterData.instance.elitePercentage) 
+                nElites = (1 if nElites < 1 else nElites)
+                elites = chromosomes[:nElites]
+            else:
+                elites = chromosomes[:nElites]
+        # print("After Elite setting -- : ", self.elites)
+        return elites
 
 
     def add(self, chromosome):
@@ -65,12 +78,6 @@ class Population:
         # Chromosome Pool
         if Chromosome.pool[chromosome.stringIdentifier] is None:
             Chromosome.pool[chromosome.stringIdentifier] = chromosome   
-
-        # setting population max cost
-        # self.maxCostChromosome = chromosome if self.maxCostChromosome is None or (self.maxCostChromosome is not None and self.maxCostChromosome.cost < chromosome.cost) else self.maxCostChromosome
-
-        # # setting population min cost
-        # self.minCostChromosome = chromosome if self.minCostChromosome is None or (self.minCostChromosome is not None and self.minCostChromosome.cost > chromosome.cost) else self.minCostChromosome
 
         return chromosome
 

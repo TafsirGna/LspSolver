@@ -16,7 +16,6 @@ class ParameterData:
         self.nReplicaThreads = 1
         self.nPrimaryThreads = 1
         self.nMigrants = 1
-        self.popUniquesPercentage50 = 0.50
         self.popUniquesPercentage25 = 0.25
         self.popUniquesPercentage10 = 0.10
         self.convergenceThresholdPercentage = 0.1

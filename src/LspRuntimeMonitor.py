@@ -1,6 +1,7 @@
 #!/usr/bin/python3.5
 # -*-coding: utf-8 -*
 
+from collections import defaultdict
 from threading import Thread
 from time import perf_counter, time
 from LspLibrary import bcolors
@@ -14,7 +15,8 @@ class LspRuntimeMonitor:
 
     clockStart = None
     clockEnd = None
-    popStatistics = {"min": [], "max": [], "mean": [], "std": []}
+    mutation_strategy = "simple_mutation"
+    popsData = defaultdict(lambda: None)
     outputString = ""
     outputFilePath = "data/output/output.txt"
     verbose = False
@@ -86,14 +88,19 @@ class LspRuntimeMonitor:
         """
         """
 
+        print('-----------------------------------------')
+        print(cls.popsData)
+
+        data = list(cls.popsData.values())[0]
+
         # Plots
         # Plotting the evolution of the minimal cost over generations
-        plt.plot(list(range(len(cls.popStatistics["max"]))), cls.popStatistics["max"])
+        plt.plot(list(range(len(data["max"]))), data["max"])
         plt.ylabel("Population maximal cost")
         plt.show()
 
         # Plotting the evolution of the minimal cost over generations
-        plt.plot(list(range(len(cls.popStatistics["min"]))), cls.popStatistics["min"])
+        plt.plot(list(range(len(data["min"]))), data["min"])
         plt.ylabel("Population minimal cost")
         plt.show()
 

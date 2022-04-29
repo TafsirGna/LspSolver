@@ -3,16 +3,10 @@
 
 # import sys
 import argparse
-from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
-from LspAlgorithms.GeneticAlgorithms.GAOperators.MutationOperator import MutationOperator
-from LspAlgorithms.GeneticAlgorithms.GAOperators.CrossOverOperator import CrossOverOperator 
 from LspAlgorithms.GeneticAlgorithms.Hcm.Solver import GeneticAlgorithm
-from LspAlgorithms.GeneticAlgorithms.PopInitialization.Population import Population
-from LspInputDataReading.LspInputDataInstance import InputDataInstance
 from LspInputDataReading.LspInputDataReader import InputDataReader
 from LspRuntimeMonitor import LspRuntimeMonitor
 from ParameterSearch.ParameterData import ParameterData
-from time import perf_counter
 
 
 # Setting solver's options 

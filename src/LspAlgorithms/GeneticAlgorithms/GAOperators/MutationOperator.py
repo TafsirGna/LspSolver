@@ -1,4 +1,5 @@
 from LspAlgorithms.GeneticAlgorithms.LocalSearchEngine import LocalSearchEngine
+from LspRuntimeMonitor import LspRuntimeMonitor
 
 
 class MutationOperator:
@@ -10,8 +11,8 @@ class MutationOperator:
         """
         pass
 
-    def process(self, chromosome, strategy = "easy"): # strategy :  medium/advanced
+    def process(self, chromosome, strategy = LspRuntimeMonitor.mutation_strategy): # strategy :  medium/advanced
         """
         """
 
-        return (LocalSearchEngine()).process(chromosome)
+        return (LocalSearchEngine()).process(chromosome, strategy)

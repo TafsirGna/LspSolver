@@ -1,6 +1,5 @@
 import random
 import numpy as np
-
 from LspAlgorithms.GeneticAlgorithms import Chromosome
 
 class SelectionOperator:
@@ -24,13 +23,15 @@ class SelectionOperator:
         totalFitness = 0
         for chromosome in self.population.chromosomes:
             chromosome.fitness = (maxCost - chromosome.cost)
-            # if chromosome.fitness < 0:
-            #     print("", maxCost, chromosome.cost)
+            if chromosome.fitness < 0:
+                print("", maxCost, chromosome.cost)
             totalFitness += chromosome.fitness
 
         self.rouletteProbabilities = [float(chromosome.fitness/totalFitness) for chromosome in self.population.chromosomes]
 
-        # print("Roulette : ", self.population.maxCostChromosome, "   ", self.rouletteProbabilities)
+        # print("**************************")
+        # print("Roulette : ", self.population.maxCostChromosome, " \n  \n ", self.population.chromosomes, " \n \n ", self.rouletteProbabilities)
+        # print("++++++++++++++++++++++++++")
 
 
     def select(self):

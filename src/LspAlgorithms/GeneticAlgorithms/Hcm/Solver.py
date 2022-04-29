@@ -3,6 +3,7 @@
 
 from threading import Thread
 import threading
+import uuid
 from LspAlgorithms.GeneticAlgorithms.PopulationEvaluator import PopulationEvaluator
 from LspRuntimeMonitor import LspRuntimeMonitor
 from ParameterSearch.ParameterData import ParameterData
@@ -19,35 +20,18 @@ class GeneticAlgorithm:
 		"""
 
 		self.popInitializer = PopInitializer()
-		self.elites = []
 		self.generationIndex = 0
 		self.eliteLock = threading.Lock()
 
 
-	def setElites(self, population):
+
+	def process(self, population):
 		"""
 		"""
-		population.setElites()
-
-		nElites = int(float(len(population.chromosomes)) * ParameterData.instance.elitePercentage) if len(self.elites) == 0 else len(self.elites)
-		nElites = (1 if nElites < 1 else nElites)
-
-		# making up the new elite group
-		elites = self.elites + population.elites
-		elites.sort()
-		
-		with self.eliteLock:
-			self.elites = elites[:nElites]
-
-		print("Elites --> ", self.elites)
-
-
-
-	def process(self, threadIndex, population):
-		"""
-		"""
+		threadUUID = uuid.uuid4()
 		generationIndex = 0
 		popEvaluator = PopulationEvaluator()
+		population.threadId = threadUUID
 
 		while popEvaluator.evaluate(population) != "TERMINATE":
 			# if generationIndex == 1:
@@ -70,12 +54,12 @@ class GeneticAlgorithm:
 		populations = self.popInitializer.process()
 		
 		threads = []
-		for i in range(ParameterData.instance.nPrimaryThreads):
-			thread_T = Thread(target=self.process, args=(i, populations[i]))
+		# for i in range(ParameterData.instance.nPrimaryThreads):
+		for population in populations:
+			thread_T = Thread(target=self.process, args=(population,))
 			thread_T.start()
 			threads.append(thread_T)
 
 		[thread_T.join() for thread_T in threads]
 
-		# result = (min(self.elites)).cost
 		# print("Result : ", result)
