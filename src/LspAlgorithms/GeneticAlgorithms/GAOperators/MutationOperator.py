@@ -1,4 +1,4 @@
-from LspAlgorithms.GeneticAlgorithms.LocalSearchEngine import LocalSearchEngine
+from LspAlgorithms.GeneticAlgorithms.LocalSearch.LocalSearchEngine import LocalSearchEngine
 from LspRuntimeMonitor import LspRuntimeMonitor
 
 

@@ -126,19 +126,6 @@ class Population:
         [thread_T.join() for thread_T in threads]
 
 
-    def localSeachOneIndividu(self):
-        """ Selection randomly one chromosome upon which an advanced mutation function is performed
-        """
-
-        index = random.randrange(0, self.popSize - 1)
-        # chromosome = random.choice(self.uniques)
-        chromosome = self.chromosomes[index]
-
-        self.chromosomes[index] = (MutationOperator()).process(chromosome, strategy="advanced_mutation")
-
-        return
-
-
     def __repr__(self):
         """
         """

@@ -1,6 +1,6 @@
 import copy
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
-from LspAlgorithms.GeneticAlgorithms.LocalSearchNode import LocalSearchNode
+from LspAlgorithms.GeneticAlgorithms.LocalSearch.LocalSearchNode import LocalSearchNode
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 import random
 
@@ -73,7 +73,7 @@ class CrossOverNode:
             if searchMutation:
 
                 # print("search mutations")
-                mutations = LocalSearchNode.genePossibleMutations(gene, self.chromosome, False, "null")
+                mutations = LocalSearchNode.allGenePossibleMutations(gene, self.chromosome, False, "null")
                 # print(mutations)
 
                 for mutation in mutations:

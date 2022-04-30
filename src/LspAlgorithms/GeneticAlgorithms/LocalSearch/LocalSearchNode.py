@@ -32,7 +32,7 @@ class LocalSearchNode:
 
         for itemGenes in self.chromosome.dnaArray:
             for gene in itemGenes:
-                mutations = LocalSearchNode.genePossibleMutations(gene, self.chromosome)
+                mutations = LocalSearchNode.allGenePossibleMutations(gene, self.chromosome)
                 for mutation in mutations:
                     chromosome = mutation[1]
                     node = LocalSearchNode(chromosome, self.visitedChromosomes)
@@ -107,7 +107,7 @@ class LocalSearchNode:
 
 
     @classmethod
-    def genePossibleMutations(cls, gene1, chromosome, context = "mutation", strategy = "all"): # strategy can be "all" or "null" only for mutations related to null periods
+    def allGenePossibleMutations(cls, gene1, chromosome, context = "mutation", strategy = "all"): # strategy can be "all" or "null" only for mutations related to null periods
         """
         """
 

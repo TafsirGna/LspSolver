@@ -173,35 +173,35 @@ class Chromosome(object):
 		return slice
 
 
-	# @classmethod
-	# def createFromIdentifier(cls, stringIdentifier):
-	# 	"""
-	# 	"""
+	@classmethod
+	def createFromIdentifier(cls, stringIdentifier):
+		"""
+		"""
 
-	# 	chromosome = Chromosome()
-	# 	chromosome.stringIdentifier = stringIdentifier
+		chromosome = Chromosome()
+		chromosome.stringIdentifier = stringIdentifier
 
-	# 	prevGene = None
-	# 	producedItemsCount = [0 for _ in range(InputDataInstance.instance.nItems)]
-	# 	cost = 0
-	# 	for period, periodValue in enumerate(stringIdentifier):
-	# 		if periodValue != 0:
-	# 			item = int(periodValue) - 1
-	# 			position = producedItemsCount[item]
+		prevGene = None
+		producedItemsCount = [0 for _ in range(InputDataInstance.instance.nItems)]
+		cost = 0
+		for period, periodValue in enumerate(stringIdentifier):
+			if periodValue != 0:
+				item = int(periodValue) - 1
+				position = producedItemsCount[item]
 
-	# 			gene = Gene(item, period, position, prevGene)
-	# 			gene.calculateStockingCost()
-	# 			gene.calculateChangeOverCost()
-	# 			gene.calculateCost()
+				gene = Gene(item, period, position, prevGene)
+				gene.calculateStockingCost()
+				gene.calculateChangeOverCost()
+				gene.calculateCost()
 
-	# 			cost += gene.cost
-	# 			chromosome.dnaArray[item][position] = gene
-	# 			prevGene = item, position
-	# 			producedItemsCount[item] += 1
+				cost += gene.cost
+				chromosome.dnaArray[item][position] = gene
+				prevGene = item, position
+				producedItemsCount[item] += 1
 
-	# 	chromosome.cost = cost
-	# 	print("test : ", chromosome.dnaArray)
-	# 	return chromosome
+		chromosome.cost = cost
+		print("test : ", chromosome.dnaArray)
+		return chromosome
 
 	# @classmethod
 	# def classRenderDnaArray(cls, dnaArray):

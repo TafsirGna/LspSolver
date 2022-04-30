@@ -11,7 +11,9 @@ class PopulationEvaluator:
     def __init__(self) -> None:
         """
         """
-        self.flag25Percentage = False
+        self.threshold1Flag = False
+        self.threshold2Flag = False
+        self.threshold3Flag = False
 
 
     def evaluate(self, population):
@@ -38,17 +40,21 @@ class PopulationEvaluator:
 
         
         if uniquesPercentage <= ParameterData.instance.popUniquesPercentage25:
-            if self.flag25Percentage is False:
+            if self.threshold2Flag is False:
                 ParameterData.instance.mutationRate *= 2
-                self.flag25Percentage = True
+                self.threshold2Flag = True
                 LspRuntimeMonitor.mutation_strategy = "positive_mutation"
 
         
-        # if uniquesPercentage <= ParameterData.instance.popUniquesPercentage10:
-        #     population.localSeachOneIndividu()
+        if uniquesPercentage <= ParameterData.instance.popUniquesPercentage10:
+            if self.threshold3Flag is False:
+                # ParameterData.instance.mutationRate *= 2
+                self.threshold3Flag = True
+                LspRuntimeMonitor.mutation_strategy = "absolute_mutation"
 
         #
         if len(population.uniques) == 1:
+            print("Terminaaaaaaaaaaaaaaaaaaaaaaaaaaaate", "\n", population.chromosomes, "\n \n ---", population.uniques)
             return "TERMINATE"
 
         return "CONTINUE"
