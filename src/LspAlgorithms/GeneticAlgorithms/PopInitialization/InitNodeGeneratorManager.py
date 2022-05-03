@@ -15,7 +15,7 @@ class InitNodeGeneratorManager:
     def newInstance(self, callerId):
         """
         """
-
+        
         for _ in range(len(self.nodeGenerators)):
 
             callerGeneratorIndex = self.callers[callerId]

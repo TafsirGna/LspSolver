@@ -2,6 +2,7 @@ from collections import defaultdict
 from threading import Thread
 import threading
 import random
+import concurrent.futures
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
 from LspAlgorithms.GeneticAlgorithms.GAOperators.CrossOverOperator import CrossOverOperator
 from LspAlgorithms.GeneticAlgorithms.GAOperators.MutationOperator import MutationOperator
@@ -15,6 +16,8 @@ class Population:
         """
         """
         self.chromosomes = chromosomes
+        self.elites = None
+
         self.nextPopulation = None
         self._nextPopLock = threading.Lock()
         self.selectionOperatorLock = threading.Lock()
@@ -24,10 +27,16 @@ class Population:
         self.popSize = popSize if popSize != None else ParameterData.instance.popSize
         self.threadId = None
 
+        #
+        for chromosome in self.chromosomes:
+            self.uniques[chromosome.stringIdentifier] = chromosome
+
     def evolve(self):
         """
         """
     
+        self.uniques = defaultdict(lambda: None)
+        # print("Staaaaaaaaaaaaaaaaaaaaart : ", self.uniques, "\n")
         self.nextPopulation = Population(LspRuntimeMonitor.popsData[self.threadId]["elites"], self.popSize)
         # print("Eliiiiiiiiiiiiiiiiiiiiites : ", LspRuntimeMonitor.popsData[self.threadId]["elites"])
         self.nextPopulation.threadId = self.threadId
@@ -44,16 +53,18 @@ class Population:
         self.minCostChromosome = chromosomes[0]
         # print("maaaaaaaaaaaaaax-------------", self.maxCostChromosome)
 
-    
-    def elites(self):
+        self.elites = Population.elites(self)
 
-        chromosomes = sorted(self.uniques.values())
+    @classmethod
+    def elites(cls, population):
+
+        chromosomes = sorted(population.uniques.values())
         elites = []
 
-        if LspRuntimeMonitor.popsData[self.threadId] is not None:
-            nElites = len(LspRuntimeMonitor.popsData[self.threadId]["elites"])
+        if LspRuntimeMonitor.popsData[population.threadId] is not None:
+            nElites = len(LspRuntimeMonitor.popsData[population.threadId]["elites"])
             if nElites == 0:
-                nElites = int(self.popSize * ParameterData.instance.elitePercentage) 
+                nElites = int(population.popSize * ParameterData.instance.elitePercentage) 
                 nElites = (1 if nElites < 1 else nElites)
                 elites = chromosomes[:nElites]
             else:
@@ -67,7 +78,6 @@ class Population:
         """
 
         if len(self.chromosomes) >= self.popSize:
-            # self.completeInit()
             return None
 
         self.chromosomes.append(chromosome)
@@ -116,14 +126,9 @@ class Population:
 
         selectionOperator = SelectionOperator(self)
 
-        threads = []
-
-        for i in range(ParameterData.instance.nReplicaThreads):
-            thread_T = Thread(target=self.threadTask, args=(selectionOperator,))
-            thread_T.start()
-            threads.append(thread_T)
-            
-        [thread_T.join() for thread_T in threads]
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            for i in range(ParameterData.instance.nReplicaThreads):
+                executor.submit(self.threadTask, selectionOperator)
 
 
     def __repr__(self):

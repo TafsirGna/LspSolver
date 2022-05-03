@@ -30,22 +30,21 @@ class PopulationEvaluator:
         LspRuntimeMonitor.popsData[population.threadId]["max"].append(population.maxCostChromosome.cost)
 
         # Elites
-        elites = population.elites()
-        nElites = len(elites)
-        LspRuntimeMonitor.popsData[population.threadId]["elites"] += elites
+        nElites = len(population.elites)
+        LspRuntimeMonitor.popsData[population.threadId]["elites"] += population.elites
         (LspRuntimeMonitor.popsData[population.threadId]["elites"]).sort()
         LspRuntimeMonitor.popsData[population.threadId]["elites"] = (LspRuntimeMonitor.popsData[population.threadId]["elites"])[:nElites]
 
         uniquesPercentage = float(len(population.uniques) / population.popSize)
 
-        
+        #
         if uniquesPercentage <= ParameterData.instance.popUniquesPercentage25:
             if self.threshold2Flag is False:
                 ParameterData.instance.mutationRate *= 2
                 self.threshold2Flag = True
                 LspRuntimeMonitor.mutation_strategy = "positive_mutation"
 
-        
+        #
         if uniquesPercentage <= ParameterData.instance.popUniquesPercentage10:
             if self.threshold3Flag is False:
                 # ParameterData.instance.mutationRate *= 2
@@ -54,7 +53,6 @@ class PopulationEvaluator:
 
         #
         if len(population.uniques) == 1:
-            print("Terminaaaaaaaaaaaaaaaaaaaaaaaaaaaate", "\n", population.chromosomes, "\n \n ---", population.uniques)
             return "TERMINATE"
 
         return "CONTINUE"

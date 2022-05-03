@@ -2,6 +2,7 @@
 # -*-coding: utf-8 -*
 
 from threading import Thread
+import concurrent.futures
 import threading
 import uuid
 from LspAlgorithms.GeneticAlgorithms.PopulationEvaluator import PopulationEvaluator
@@ -30,8 +31,8 @@ class GeneticAlgorithm:
 		"""
 		threadUUID = uuid.uuid4()
 		generationIndex = 0
-		popEvaluator = PopulationEvaluator()
 		population.threadId = threadUUID
+		popEvaluator = PopulationEvaluator()
 
 		while popEvaluator.evaluate(population) != "TERMINATE":
 			# if generationIndex == 1:
@@ -42,6 +43,8 @@ class GeneticAlgorithm:
 			population = population.evolve()
 
 			LspRuntimeMonitor.output("Population --> " + str(population))
+
+			# print("Uniiiiiiiiiiiiiques : ", population.uniques, "\n")
 			
 			generationIndex += 1
 
@@ -53,13 +56,6 @@ class GeneticAlgorithm:
 
 		populations = self.popInitializer.process()
 		
-		threads = []
-		# for i in range(ParameterData.instance.nPrimaryThreads):
-		for population in populations:
-			thread_T = Thread(target=self.process, args=(population,))
-			thread_T.start()
-			threads.append(thread_T)
-
-		[thread_T.join() for thread_T in threads]
-
-		# print("Result : ", result)
+		with concurrent.futures.ThreadPoolExecutor() as executor:
+			for population in populations:
+				executor.submit(self.process, population)
