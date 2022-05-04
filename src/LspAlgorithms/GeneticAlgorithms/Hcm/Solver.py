@@ -24,25 +24,21 @@ class GeneticAlgorithm:
 	def process(self, population):
 		"""
 		"""
+
 		threadUUID = uuid.uuid4()
 		generationIndex = 0
 		population.threadId = threadUUID
 		popEvaluator = PopulationEvaluator()
 
-		while popEvaluator.evaluate(population) != "TERMINATE":
-			# if generationIndex == 1:
+		while popEvaluator.evaluate(population, generationIndex) != "TERMINATE":
+			# if generationIndex == 10:
 			# 	break
-
-			# self.setElites(population)
 
 			population = population.evolve()
 
 			LspRuntimeMonitor.output("Population --> " + str(population))
-
-			# print("Uniiiiiiiiiiiiiques : ", population.uniques, "\n")
 			
 			generationIndex += 1
-
 
 
 	def solve(self):
@@ -52,5 +48,6 @@ class GeneticAlgorithm:
 		populations = self.popInitializer.process()
 		
 		with concurrent.futures.ThreadPoolExecutor() as executor:
-			for population in populations:
-				executor.submit(self.process, population)
+			executor.map(self.process, populations)
+			# for population in populations:
+			# 	executor.submit(self.process, population)

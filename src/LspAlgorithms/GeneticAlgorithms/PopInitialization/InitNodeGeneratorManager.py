@@ -13,7 +13,7 @@ class InitNodeGeneratorManager:
         
         self.callers = defaultdict(lambda: 0)
         self.nodeGenerators = nodeGenerators
-        self._pipeLock = threading.Lock()
+        # self._pipeLock = threading.Lock()
 
     
     def start(self, pipeline):
@@ -34,11 +34,15 @@ class InitNodeGeneratorManager:
 
         while not pipeline.full():
 
+            node = None
             for nodeGenerator in self.nodeGenerators:
                 node = nodeGenerator.generate()
                 if node is None:
                     continue
                 pipeline.put(node.chromosome)
+
+            if node is None:
+                return
 
 
 

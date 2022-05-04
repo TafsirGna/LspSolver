@@ -1,3 +1,4 @@
+import threading
 import numpy as np
 
 from LspAlgorithms.GeneticAlgorithms import Chromosome
@@ -11,12 +12,12 @@ class PopulationEvaluator:
     def __init__(self) -> None:
         """
         """
-        self.threshold1Flag = False
-        self.threshold2Flag = False
-        self.threshold3Flag = False
+        self.threshold1Event = threading.Event()
+        self.threshold2Event = threading.Event()
+        self.threshold3Event = threading.Event()
 
 
-    def evaluate(self, population):
+    def evaluate(self, population, generationIndex):
         """
         """
 
@@ -39,16 +40,17 @@ class PopulationEvaluator:
 
         #
         if uniquesPercentage <= ParameterData.instance.popUniquesPercentage25:
-            if self.threshold2Flag is False:
+            if not self.threshold2Event.is_set():
+                print("7555555555555555555555555555555555555555555555555555555555555555555555555", generationIndex)
                 ParameterData.instance.mutationRate *= 2
-                self.threshold2Flag = True
+                self.threshold2Event.set()
                 LspRuntimeMonitor.mutation_strategy = "positive_mutation"
 
         #
         if uniquesPercentage <= ParameterData.instance.popUniquesPercentage10:
-            if self.threshold3Flag is False:
+            if not self.threshold3Event.is_set():
                 # ParameterData.instance.mutationRate *= 2
-                self.threshold3Flag = True
+                self.threshold3Event.set()
                 LspRuntimeMonitor.mutation_strategy = "absolute_mutation"
 
         #

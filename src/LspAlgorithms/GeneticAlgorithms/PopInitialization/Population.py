@@ -1,8 +1,9 @@
 from collections import defaultdict
-from threading import Thread
-import threading
+from math import ceil
+from queue import Queue
 import random
 import concurrent.futures
+import uuid
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
 from LspAlgorithms.GeneticAlgorithms.GAOperators.CrossOverOperator import CrossOverOperator
 from LspAlgorithms.GeneticAlgorithms.GAOperators.MutationOperator import MutationOperator
@@ -16,32 +17,48 @@ class Population:
         """
         """
         self.chromosomes = chromosomes
+        self.uniques = defaultdict(lambda: None)
+        for chromosome in self.chromosomes:
+            self.uniques[chromosome.stringIdentifier] = chromosome
+
         self.elites = None
 
-        self.nextPopulation = None
-        self._nextPopLock = threading.Lock()
-        self.selectionOperatorLock = threading.Lock()
         self.maxCostChromosome, self.minCostChromosome = None, None
-        self.uniques = defaultdict(lambda: None)
 
         self.popSize = popSize if popSize != None else ParameterData.instance.popSize
         self.threadId = None
 
-        #
-        for chromosome in self.chromosomes:
-            self.uniques[chromosome.stringIdentifier] = chromosome
+        self.threadPipes = defaultdict(lambda: Queue(maxsize=ceil(self.popSize/ParameterData.instance.nReplicaThreads)))
+        self.newPop = None
 
     def evolve(self):
         """
         """
+        selectionOperator = SelectionOperator(self)
+
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            executor.map(self.threadTask, [selectionOperator] * ParameterData.instance.nReplicaThreads)
+            executor.submit(self.getNewPopulation)
+
+        return self.newPop
+
     
-        self.uniques = defaultdict(lambda: None)
-        # print("Staaaaaaaaaaaaaaaaaaaaart : ", self.uniques, "\n")
-        self.nextPopulation = Population(LspRuntimeMonitor.popsData[self.threadId]["elites"], self.popSize)
-        # print("Eliiiiiiiiiiiiiiiiiiiiites : ", LspRuntimeMonitor.popsData[self.threadId]["elites"])
-        self.nextPopulation.threadId = self.threadId
-        self.applyGeneticOperators()
-        return self.nextPopulation
+    def getNewPopulation(self):
+        """
+        """
+
+        self.newPop = Population(LspRuntimeMonitor.popsData[self.threadId]["elites"], self.popSize)
+        self.newPop.threadId = self.threadId
+
+        while len(self.newPop.chromosomes) < self.popSize:
+
+            # print("okooooooooooooooooo 1")
+            for pipe in self.threadPipes.values():
+                # print("okooooooooooooooooo 2")
+                chromosome = pipe.get()
+                result = self.newPop.add(chromosome)
+                if result is None:
+                    return
 
 
     def completeInit(self):
@@ -95,40 +112,25 @@ class Population:
     def threadTask(self, selectionOperator):
         """
         """
+        threadID = uuid.uuid4()
 
-        while len(self.nextPopulation.chromosomes) < self.popSize:
+        while not self.threadPipes[threadID].full():
 
             chromosome = None
             if (random.random() < ParameterData.instance.crossOverRate):
 
-                with self.selectionOperatorLock:
-                    chromosomeA, chromosomeB = selectionOperator.select()
-
+                chromosomeA, chromosomeB = selectionOperator.select()
                 chromosome = (CrossOverOperator([chromosomeA, chromosomeB])).process()
-                # if not Chromosome.feasible(chromosome):
-                #     print("Roooooooooooooooooooooooooooogue")
-                # print("+++", chromosomeA, chromosomeB, chromosome)
 
                 if chromosome is not None and (random.random() < ParameterData.instance.mutationRate):
                     # Proceding to mutate the chromosome
                     chromosome = (MutationOperator()).process(chromosome)
 
             if chromosome is not None:
-                with self._nextPopLock:
-                    if self.nextPopulation.add(chromosome) is None:
-                        return
-            
+                # print("Chromo --- ", chromosome)
+                self.threadPipes[threadID].put(chromosome)
 
-
-    def applyGeneticOperators(self, selection_strategy="roulette_wheel"):
-        """
-        """
-
-        selectionOperator = SelectionOperator(self)
-
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            for i in range(ParameterData.instance.nReplicaThreads):
-                executor.submit(self.threadTask, selectionOperator)
+            # print("Thread : ", threadID, chromosome)
 
 
     def __repr__(self):
