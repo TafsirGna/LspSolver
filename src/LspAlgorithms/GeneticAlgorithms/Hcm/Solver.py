@@ -1,13 +1,11 @@
 #!/usr/bin/python3.5
 # -*-coding: utf-8 -*
 
-from threading import Thread
 import concurrent.futures
 import threading
 import uuid
 from LspAlgorithms.GeneticAlgorithms.PopulationEvaluator import PopulationEvaluator
 from LspRuntimeMonitor import LspRuntimeMonitor
-from ParameterSearch.ParameterData import ParameterData
 from ..PopInitialization.PopInitializer import PopInitializer
 
 
@@ -21,9 +19,6 @@ class GeneticAlgorithm:
 		"""
 
 		self.popInitializer = PopInitializer()
-		self.generationIndex = 0
-		self.eliteLock = threading.Lock()
-
 
 
 	def process(self, population):

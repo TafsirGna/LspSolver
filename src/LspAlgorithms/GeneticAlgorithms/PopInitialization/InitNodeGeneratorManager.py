@@ -1,33 +1,46 @@
 from collections import defaultdict
+import concurrent.futures
+import threading
+import uuid
 
 class InitNodeGeneratorManager:
     """
     """
 
-    def __init__(self, nodeGenerators, strategy = "diversified") -> None:
+    def __init__(self, nodeGenerators) -> None:
         """
         """
         
         self.callers = defaultdict(lambda: 0)
         self.nodeGenerators = nodeGenerators
+        self._pipeLock = threading.Lock()
 
     
-    def newInstance(self, callerId):
+    def start(self, pipeline):
         """
         """
-        
-        for _ in range(len(self.nodeGenerators)):
 
-            callerGeneratorIndex = self.callers[callerId]
-            nodeGenerator = self.nodeGenerators[callerGeneratorIndex]
-            # reinitializing the counter
-            self.callers[callerId] = callerGeneratorIndex + 1 if callerGeneratorIndex < len(self.nodeGenerators) - 1 else 0
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            executor.submit(self.threadTask, pipeline)
+            # executor.map(self.threadTask, self.nodeGenerators, [pipeline] * len(self.nodeGenerators))
+            # for nodeGenerator in self.nodeGenerators:
+            #     executor.submit(self.threadTask, nodeGenerator, pipeline)
 
-            node = nodeGenerator.generate()
-            if node is not None:
-                return node
 
-        return None
+
+    def threadTask(self, pipeline):
+        """
+        """
+
+        while not pipeline.full():
+
+            for nodeGenerator in self.nodeGenerators:
+                node = nodeGenerator.generate()
+                if node is None:
+                    continue
+                pipeline.put(node.chromosome)
+
+
 
 
 

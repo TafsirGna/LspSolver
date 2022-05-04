@@ -1,48 +1,45 @@
 #!/usr/bin/python3.5
 # -*-coding: utf-8 -*
 
-from collections import defaultdict
 import threading
-import uuid
-import concurrent.futures
-
-from numpy import math
-from LspAlgorithms.GeneticAlgorithms.LocalSearch.LocalSearchEngine import LocalSearchEngine
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.InitNodeGenerator import InitNodeGenerator
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.InitNodeGeneratorManager import InitNodeGeneratorManager
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.Population import Population
 from LspRuntimeMonitor import LspRuntimeMonitor
 from ParameterSearch.ParameterData import ParameterData
 from .InitSearchNode import SearchNode
-from threading import Thread
+from queue import Queue
 
 class PopInitializer:
     """
     """
 
-    def __init__(self, strategy = "DFS", criteria = None) -> None:
+    def __init__(self) -> None:
         """
         """
 
-        self.strategy = strategy
-        self.threads = []
-        self.populations = defaultdict(lambda: Population([]))
-        self.lock = threading.Lock()
-        self.popsLock = defaultdict(lambda: threading.Lock())
+        self.populations = [Population([]) for _ in range(ParameterData.instance.nPrimaryThreads)]
+        self.initPipeline = Queue(maxsize=(ParameterData.instance.popSize * ParameterData.instance.nPrimaryThreads))
+        # self.stopInitEvent = threading.Event()
+        
+        # NodeGeneratorManager
         self.nodeGeneratorManager = self.createNodeGeneratorManager()
+        self.nodeGeneratorManager.start(self.initPipeline)
 
 
     def process(self):
         """
         """
 
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            for _ in range(ParameterData.instance.nPrimaryThreads):
-                executor.submit(self.mainThreadTask)
-            # executor.map(self.mainThreadTask)
+        index = 0
+        while not self.initPipeline.empty():
+            chromosome = self.initPipeline.get()
+            self.populations[index].add(chromosome)
+
+            index = index + 1 if index < ParameterData.instance.nPrimaryThreads - 1 else 0 
 
         LspRuntimeMonitor.output(str(self.populations))
-        return self.populations.values()
+        return self.populations
 
 
     def createNodeGeneratorManager(self):
@@ -67,35 +64,3 @@ class PopInitializer:
         nodeGenerators = [InitNodeGenerator([node]) for node in queue]
         return nodeGenerators
 
-
-    def mainThreadTask(self):
-        """Search chromosomes
-        """
-
-        threadUUID = uuid.uuid4()
-
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            for _ in range(ParameterData.instance.nReplicaThreads):
-                executor.submit(self.replicaThreadTask, threadUUID)
-
-        (self.populations[threadUUID]).popSize = len((self.populations[threadUUID]).chromosomes)
-
-
-    def replicaThreadTask(self, mainThreadId):
-        """
-        """
-
-        with self.lock:
-            node = self.nodeGeneratorManager.newInstance(mainThreadId)
-
-        while node is not None: 
-
-            result = None
-            with self.popsLock[mainThreadId]:
-                result = (self.populations[mainThreadId]).add(node.chromosome)
-                # (LocalSearchEngine()).populate(node.chromosome, [self.popsLock[mainThreadId], population])
-            if result is None:
-                break  
-
-            with self.lock:
-                node = self.nodeGeneratorManager.newInstance(mainThreadId)
