@@ -17,6 +17,19 @@ class LocalSearchNode:
         self.visitedChromosomes = defaultdict(lambda: None) if visitedChromosomes is None else visitedChromosomes
 
 
+    def generateChild(self):
+        """
+        """
+
+        for itemGenes in self.chromosome.dnaArray:
+            for gene in itemGenes:
+                for mutation in LocalSearchNode.generateGeneMutations(gene, self.chromosome):
+                    chromosome = mutation[1]
+                    # print("Child : ", chromosome)
+                    yield LocalSearchNode(chromosome)
+
+        return []
+
     def children(self):
         """
         """
@@ -112,6 +125,17 @@ class LocalSearchNode:
         """
 
         mutations = []
+        for mutation in cls.generateGeneMutations(gene1, chromosome, context, strategy):
+            mutations.append(mutation)
+        return mutations
+
+
+    
+    @classmethod
+    def generateGeneMutations(cls, gene1, chromosome, context = "mutation", strategy = "all"):
+        """
+        """
+
         # print('gene1 : ', gene1.item, gene1.position, gene1.period, chromosome)
 
         gene1LowerLimit = 0 if gene1.position == 0 else (chromosome.dnaArray[gene1.item][gene1.position - 1]).period + 1
@@ -124,8 +148,8 @@ class LocalSearchNode:
             period = index + gene1LowerLimit
             if periodValue == 0:
                 swap = [(gene1.item, gene1.position), ( -1, period)]
-                mutation = [chromosome, cls.createMutatedChromosome(chromosome, swap, context), swap]
-                mutations.append(mutation)
+                mutation = [chromosome, LocalSearchNode.createMutatedChromosome(chromosome, swap, context), swap]
+                yield mutation
             else:
                 if strategy == "all":
                     item2 = periodValue - 1
@@ -141,10 +165,10 @@ class LocalSearchNode:
 
                         if (gene2LowerLimit <= gene1.period and gene1.period < gene2UpperLimit) and (gene1LowerLimit <= gene2.period and gene2.period < gene1UpperLimit):
                             swap = [(gene1.item, gene1.position), (gene2.item, gene2.position)]
-                            mutation = [chromosome, cls.createMutatedChromosome(chromosome, swap, context), swap]
-                            mutations.append(mutation)
+                            mutation = [chromosome, LocalSearchNode.createMutatedChromosome(chromosome, swap, context), swap]
+                            yield mutation
 
-        return mutations
+        return []
 
 
     def __lt__(self, node) -> bool:

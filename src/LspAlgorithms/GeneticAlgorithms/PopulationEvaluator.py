@@ -36,7 +36,7 @@ class PopulationEvaluator:
         (LspRuntimeMonitor.popsData[population.threadId]["elites"]).sort()
         LspRuntimeMonitor.popsData[population.threadId]["elites"] = (LspRuntimeMonitor.popsData[population.threadId]["elites"])[:nElites]
 
-        uniquesPercentage = float(len(population.uniques) / population.popSize)
+        uniquesPercentage = float(len(population.uniques) / len(population.chromosomes))
 
         #
         if uniquesPercentage <= ParameterData.instance.popUniquesPercentage25:

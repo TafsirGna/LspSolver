@@ -84,7 +84,7 @@ class TestMainFeatures:
         # c = Chromosome.createFromRawDNA([2, 1, 0, 2, 1])
         c = Chromosome.createFromRawDNA([1, 2, 2, 2, 1, 3, 0, 0])
         print(c)
-        print((LocalSearchEngine()).process(c, "positive_mutation"))
+        print((LocalSearchEngine()).process(c, "simple_mutation"))
 
         assert 0
 

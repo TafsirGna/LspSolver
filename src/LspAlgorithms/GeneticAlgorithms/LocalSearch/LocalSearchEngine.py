@@ -1,5 +1,5 @@
+import numpy as np
 from LspAlgorithms.GeneticAlgorithms.LocalSearch.LocalSearchNode import LocalSearchNode
-from LspAlgorithms.GeneticAlgorithms.LocalSearch.LocalSearchNodeGenerator import LocalSearchNodeGenerator
 from ParameterSearch.ParameterData import ParameterData
 
 class LocalSearchEngine:
@@ -31,16 +31,18 @@ class LocalSearchEngine:
             node = queue[-1]
             queue = queue[:-1]
 
-            children = node.children()
-
-            if strategy == "simple_mutation":
-                depth = 1
-                if depthIndex == depth:
+            children = None
+            if strategy == "simple_mutation": # simple means random here
+                if depthIndex == 1:
+                    # node = np.random.choice(queue)
                     return node.chromosome
+                children = node.children()
             elif strategy == "positive_mutation":
                 if node.chromosome.cost < chromosome.cost:
                     return node.chromosome
+                children = node.children()
             elif strategy ==  "absolute_mutation":
+                children = node.children()
                 if len(children) == 0:
                     return node.chromosome
 
@@ -59,8 +61,7 @@ class LocalSearchEngine:
         queue = []
 
         while len(population.chromosomes) < ParameterData.instance.popSize:
-            nodeGenerator = LocalSearchNodeGenerator(node.chromosome)
-            for child in nodeGenerator.generate():
+            for child in node.generateChild():
                 queue.append(child)
                 result = population.add(child.chromosome)
                 if result is None:

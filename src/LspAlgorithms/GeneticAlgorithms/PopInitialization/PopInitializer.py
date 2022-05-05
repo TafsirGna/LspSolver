@@ -38,6 +38,9 @@ class PopInitializer:
 
             index = index + 1 if index < ParameterData.instance.nPrimaryThreads - 1 else 0 
 
+        for population in self.populations:
+            population.popSize = len(population.chromosomes)
+
         LspRuntimeMonitor.output(str(self.populations))
         return self.populations
 

@@ -48,6 +48,6 @@ class GeneticAlgorithm:
 		populations = self.popInitializer.process()
 		
 		with concurrent.futures.ThreadPoolExecutor() as executor:
-			executor.map(self.process, populations)
+			print(list(executor.map(self.process, populations)))
 			# for population in populations:
 			# 	executor.submit(self.process, population)

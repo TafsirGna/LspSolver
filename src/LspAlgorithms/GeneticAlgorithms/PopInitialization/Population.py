@@ -31,15 +31,17 @@ class Population:
         self.threadPipes = defaultdict(lambda: Queue(maxsize=ceil(self.popSize/ParameterData.instance.nReplicaThreads)))
         self.newPop = None
 
+
     def evolve(self):
         """
         """
         selectionOperator = SelectionOperator(self)
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            executor.map(self.threadTask, [selectionOperator] * ParameterData.instance.nReplicaThreads)
-            executor.submit(self.getNewPopulation)
+            print(list(executor.map(self.threadTask, [selectionOperator] * ParameterData.instance.nReplicaThreads)))
+            # executor.submit(self.getNewPopulation)
 
+        self.getNewPopulation()
         return self.newPop
 
     
@@ -81,7 +83,7 @@ class Population:
         if LspRuntimeMonitor.popsData[population.threadId] is not None:
             nElites = len(LspRuntimeMonitor.popsData[population.threadId]["elites"])
             if nElites == 0:
-                nElites = int(population.popSize * ParameterData.instance.elitePercentage) 
+                nElites = int(len(population.chromosomes) * ParameterData.instance.elitePercentage) 
                 nElites = (1 if nElites < 1 else nElites)
                 elites = chromosomes[:nElites]
             else:
@@ -116,15 +118,16 @@ class Population:
 
         while not self.threadPipes[threadID].full():
 
+            chromosomeA, chromosomeB = selectionOperator.select()
             chromosome = None
             if (random.random() < ParameterData.instance.crossOverRate):
-
-                chromosomeA, chromosomeB = selectionOperator.select()
                 chromosome = (CrossOverOperator([chromosomeA, chromosomeB])).process()
+            else:
+                chromosome = chromosomeA if chromosomeA < chromosomeB else chromosomeB
 
-                if chromosome is not None and (random.random() < ParameterData.instance.mutationRate):
-                    # Proceding to mutate the chromosome
-                    chromosome = (MutationOperator()).process(chromosome)
+            if chromosome is not None and (random.random() < ParameterData.instance.mutationRate):
+                # Proceding to mutate the chromosome
+                chromosome = (MutationOperator()).process(chromosome)
 
             if chromosome is not None:
                 # print("Chromo --- ", chromosome)
