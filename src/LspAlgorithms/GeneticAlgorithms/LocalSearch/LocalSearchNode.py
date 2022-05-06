@@ -130,7 +130,6 @@ class LocalSearchNode:
         return mutations
 
 
-    
     @classmethod
     def generateGeneMutations(cls, gene1, chromosome, context = "mutation", strategy = "all"):
         """

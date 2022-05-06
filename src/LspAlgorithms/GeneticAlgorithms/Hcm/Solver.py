@@ -2,7 +2,6 @@
 # -*-coding: utf-8 -*
 
 import concurrent.futures
-import threading
 import uuid
 from LspAlgorithms.GeneticAlgorithms.PopulationEvaluator import PopulationEvaluator
 from LspRuntimeMonitor import LspRuntimeMonitor
@@ -49,5 +48,3 @@ class GeneticAlgorithm:
 		
 		with concurrent.futures.ThreadPoolExecutor() as executor:
 			print(list(executor.map(self.process, populations)))
-			# for population in populations:
-			# 	executor.submit(self.process, population)

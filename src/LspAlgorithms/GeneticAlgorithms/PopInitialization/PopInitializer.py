@@ -19,27 +19,17 @@ class PopInitializer:
         """
 
         self.populations = [Population([]) for _ in range(ParameterData.instance.nPrimaryThreads)]
-        self.initPipeline = Queue(maxsize=(ParameterData.instance.popSize * ParameterData.instance.nPrimaryThreads))
-        # self.stopInitEvent = threading.Event()
         
         # NodeGeneratorManager
         self.nodeGeneratorManager = self.createNodeGeneratorManager()
-        self.nodeGeneratorManager.start(self.initPipeline)
 
 
     def process(self):
         """
         """
 
-        index = 0
-        while not self.initPipeline.empty():
-            chromosome = self.initPipeline.get()
-            self.populations[index].add(chromosome)
-
-            index = index + 1 if index < ParameterData.instance.nPrimaryThreads - 1 else 0 
-
         for population in self.populations:
-            population.popSize = len(population.chromosomes)
+            population.fill(self.nodeGeneratorManager)
 
         LspRuntimeMonitor.output(str(self.populations))
         return self.populations
@@ -65,5 +55,6 @@ class PopInitializer:
 
         queue = self.rootNode().children()
         nodeGenerators = [InitNodeGenerator([node]) for node in queue]
+
         return nodeGenerators
 

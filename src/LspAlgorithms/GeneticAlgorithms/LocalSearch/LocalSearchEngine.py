@@ -32,7 +32,8 @@ class LocalSearchEngine:
             queue = queue[:-1]
 
             children = None
-            if strategy == "simple_mutation": # simple means random here
+            if strategy == "simple_mutation": 
+                # simple means random here
                 if depthIndex == 1:
                     # node = np.random.choice(queue)
                     return node.chromosome

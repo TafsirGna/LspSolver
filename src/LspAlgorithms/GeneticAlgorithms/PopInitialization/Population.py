@@ -32,6 +32,19 @@ class Population:
         self.newPop = None
 
 
+    def fill(self, nodeGeneratorManager):
+        """
+        """
+        
+        for node in nodeGeneratorManager.getNode():
+            if node is None:
+                break
+            result = self.add(node.chromosome)
+            if result is None:
+                break
+        
+        self.popSize = len(self.chromosomes)
+        
     def evolve(self):
         """
         """

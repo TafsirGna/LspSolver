@@ -1,7 +1,9 @@
 from collections import defaultdict
 import concurrent.futures
+from queue import Queue
 import threading
 import uuid
+from ParameterSearch.ParameterData import ParameterData
 
 class InitNodeGeneratorManager:
     """
@@ -13,38 +15,31 @@ class InitNodeGeneratorManager:
         
         self.callers = defaultdict(lambda: 0)
         self.nodeGenerators = nodeGenerators
-        # self._pipeLock = threading.Lock()
-
-    
-    def start(self, pipeline):
-        """
-        """
+        self.pipelines = defaultdict(lambda: Queue(maxsize=ParameterData.instance.popSize))
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            executor.submit(self.threadTask, pipeline)
-            # executor.map(self.threadTask, self.nodeGenerators, [pipeline] * len(self.nodeGenerators))
-            # for nodeGenerator in self.nodeGenerators:
-            #     executor.submit(self.threadTask, nodeGenerator, pipeline)
+            executor.map(self.startNodeGenerator, self.nodeGenerators)
 
 
-
-    def threadTask(self, pipeline):
+    def startNodeGenerator(self, nodeGenerator):
         """
         """
-
-        while not pipeline.full():
-
-            node = None
-            for nodeGenerator in self.nodeGenerators:
-                node = nodeGenerator.generate()
-                if node is None:
-                    continue
-                pipeline.put(node.chromosome)
-
-            if node is None:
-                return
+        nodeGenerator.generate(self.pipelines[nodeGenerator.uuid])
 
 
+    def getNode(self):
+        """
+        """
+        
+        empties = []
+        while len(empties) < len(self.pipelines):
+            for key in self.pipelines.keys():
+                if self.pipelines[key].empty():
+                    if key not in empties:
+                        empties.append(key)
+                else:
+                    node = self.pipelines[key].get()                    
+                    yield node
 
-
-
+        yield None
+            

@@ -32,71 +32,89 @@ class SearchNode(object):
 
 		return root
 
+
 	def children(self):
 		"""
 		"""
-
 		children = []
 
-		if self.period < 0: # the node is a leaf node
-			# print("Leaf --> ", Chromosome.classRenderDnaArray(self.chromosome.dnaArray), '---', self.chromosome.dnaArray, self.chromosome.cost)
-			# print("---------------------------------------------------------------------------------")
+		if self.period < 0:
 			return children
-		
+
+		for child in self.generateChild():
+			children.append(child)
+
+		return children
+
+
+	def setItemsToOrder(self):
+		"""
+		"""
+
 		periodDemands = InputDataInstance.instance.itemDemandsPerPeriod[self.period]
 
 		for item in periodDemands:
 			self.itemsToOrder[item] += 1
 
-		# print("Parent --> ", Chromosome.classRenderDnaArray(self.chromosome.dnaArray), '            ', self.chromosome.dnaArray, self.chromosome.cost)
+	
+	def orderItem(self, item):
+		"""
+		"""
+
+		node = SearchNode(Chromosome(), self.period - 1)
+		node.lastPlacedItem = self.lastPlacedItem # if we guess a priori that nothing has been produced for this period
+
+		dnaArray = copy.deepcopy(self.chromosome.dnaArray)
+		additionalCost = 0
+		# print("ok Start --- ", dnaArray)
+
+		if (item < InputDataInstance.instance.nItems):
+
+			itemProdPosition = (len(InputDataInstance.instance.demandsArrayZipped[item]) - len(dnaArray[item])) - 1
+			gene = Gene(item, self.period, itemProdPosition)
+			gene.calculateStockingCost()
+			gene.calculateCost()
+			additionalCost += gene.cost
+			# print("ok --- ", item, self.period, itemProdPosition, gene.cost)
+			dnaArray[item].insert(0, gene)
+
+			node.lastPlacedItem = gene.item
+
+			if self.lastPlacedItem != None:
+				lastPlacedGene = (dnaArray[self.lastPlacedItem][0])
+				lastPlacedGene.prevGene = item, itemProdPosition
+				lastPlacedGene.calculateChangeOverCost()
+				lastPlacedGene.calculateCost()
+				additionalCost += lastPlacedGene.changeOverCost
+
+		# setting node's chomosome period
+		itemsToOrder = copy.deepcopy(self.itemsToOrder)
+		itemsToOrder[item] -= 1
+
+		node.itemsToOrder = itemsToOrder
+		
+		node.chromosome.dnaArray = dnaArray
+		node.chromosome.stringIdentifier = str(item + 1 if item < InputDataInstance.instance.nItems else 0) + self.chromosome.stringIdentifier
+		# print(node.chromosome.stringIdentifier)
+		node.chromosome.cost = self.chromosome.cost + additionalCost
+
+		return node
+
+
+	def generateChild(self):
+		"""
+		"""
+
+		if self.period < 0:
+			yield None
+
+		self.setItemsToOrder()
 
 		for item, itemCount in enumerate(self.itemsToOrder):
-
 			if itemCount > 0:
+				node = self.orderItem(item)
+				yield node
 
-				node = SearchNode(Chromosome(), self.period - 1)
-				node.lastPlacedItem = self.lastPlacedItem # if we guess a priori that nothing has been produced for this period
-
-				dnaArray = copy.deepcopy(self.chromosome.dnaArray)
-				additionalCost = 0
-				# print("ok Start --- ", dnaArray)
-
-				if (item < InputDataInstance.instance.nItems):
-
-					itemProdPosition = (len(InputDataInstance.instance.demandsArrayZipped[item]) - len(dnaArray[item])) - 1
-					gene = Gene(item, self.period, itemProdPosition)
-					gene.calculateStockingCost()
-					gene.calculateCost()
-					additionalCost += gene.cost
-					# print("ok --- ", item, self.period, itemProdPosition, gene.cost)
-					dnaArray[item].insert(0, gene)
-
-					node.lastPlacedItem = gene.item
-
-					if self.lastPlacedItem != None:
-						lastPlacedGene = (dnaArray[self.lastPlacedItem][0])
-						lastPlacedGene.prevGene = item, itemProdPosition
-						lastPlacedGene.calculateChangeOverCost()
-						lastPlacedGene.calculateCost()
-						additionalCost += lastPlacedGene.changeOverCost
-
-				# setting node's chomosome period
-				itemsToOrder = copy.deepcopy(self.itemsToOrder)
-				itemsToOrder[item] -= 1
-
-				node.itemsToOrder = itemsToOrder
-				
-				node.chromosome.dnaArray = dnaArray
-				node.chromosome.stringIdentifier = str(item + 1 if item < InputDataInstance.instance.nItems else 0) + self.chromosome.stringIdentifier
-				# print(node.chromosome.stringIdentifier)
-				node.chromosome.cost = self.chromosome.cost + additionalCost
-
-				# print("ok End --- ", dnaArray)
-				children.append(node)
-
-		children.sort(reverse=True)
-
-		return children
 
 	def __repr__(self):
 		return str(self.chromosome.stringIdentifier) + " | " + str(self.period) + " | " + str(self.itemsToOrder) + " | " + str(self.chromosome.dnaArray) + "\n"

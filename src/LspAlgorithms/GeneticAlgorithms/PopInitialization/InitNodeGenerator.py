@@ -1,3 +1,9 @@
+from collections import defaultdict
+import queue
+import uuid
+
+from LspInputDataReading.LspInputDataInstance import InputDataInstance
+
 
 class InitNodeGenerator:
     
@@ -5,21 +11,23 @@ class InitNodeGenerator:
         """
         """
         self.queue = queue
+        self.uuid = uuid.uuid4()
 
-    def generate(self):
+
+    def generate(self, pipeline):
         """
         """
-        
-        while len(self.queue) > 0:
 
+        while len(self.queue) > 0 and not pipeline.full():
             node = self.queue[-1]
-            self.queue = self.queue[:- 1]
+            self.queue = self.queue[:-1]
 
             children = node.children()
-            if len(children) == 0: # leaf node
-                return node
+            if len(children) == 0:
+                # print("Chromosome --- : ", node.chromosome)
+                pipeline.put(node)
 
             self.queue += children
 
         return None
-    
+
