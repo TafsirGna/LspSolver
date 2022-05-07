@@ -14,5 +14,11 @@ class MutationOperator:
     def process(self, chromosome, strategy = "simple_mutation"): # strategy :  medium/advanced
         """
         """
+
         strategy = LspRuntimeMonitor.mutation_strategy
-        return (LocalSearchEngine()).process(chromosome, strategy)
+        result = (LocalSearchEngine()).process(chromosome, strategy)
+        # No mutation found
+        if len(result) == 0:
+            return chromosome
+            
+        return result[0]

@@ -45,9 +45,9 @@ class PopulationEvaluator:
                 print("7555555555555555555555555555555555555555555555555555555555555555555555555", generationIndex)
                 ParameterData.instance.mutationRate *= 2
                 self.threshold2Event.set()
-            #     LspRuntimeMonitor.mutation_strategy = "positive_mutation"
-            # else:
-            #     LspRuntimeMonitor.mutation_strategy = "simple_mutation"
+                LspRuntimeMonitor.mutation_strategy = "positive_mutation"
+            else:
+                LspRuntimeMonitor.mutation_strategy = "simple_mutation"
 
 
         #

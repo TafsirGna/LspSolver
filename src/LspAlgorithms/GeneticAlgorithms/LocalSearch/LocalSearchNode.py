@@ -9,12 +9,11 @@ class LocalSearchNode:
     """
     """
 
-    def __init__(self, chromosome, visitedChromosomes = None) -> None:
+    def __init__(self, chromosome) -> None:
         """
         """
 
         self.chromosome = chromosome
-        self.visitedChromosomes = defaultdict(lambda: None) if visitedChromosomes is None else visitedChromosomes
 
 
     def generateChild(self):
@@ -36,10 +35,7 @@ class LocalSearchNode:
         """
 
         children = []
-        if self.visitedChromosomes[self.chromosome.stringIdentifier] is not None:
-            return children
 
-        self.visitedChromosomes[self.chromosome.stringIdentifier] = self.chromosome
         for child in self.generateChild():
             children.append(child)
 

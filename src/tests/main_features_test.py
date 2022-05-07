@@ -81,11 +81,9 @@ class TestMainFeatures:
 
         self.setUpInput()
 
-        # c = Chromosome.createFromRawDNA([2, 1, 0, 2, 1])
-        # c = Chromosome.createFromRawDNA([1, 2, 2, 2, 1, 3, 0, 0])
-        c = Chromosome.createFromIdentifier("03222101")
+        c = Chromosome.createFromIdentifier("11222300")
         print(c)
-        print((LocalSearchEngine()).process(c, "simple_mutation"))
+        print((LocalSearchEngine()).process(c, "positive_mutation"))
 
         assert 0
 

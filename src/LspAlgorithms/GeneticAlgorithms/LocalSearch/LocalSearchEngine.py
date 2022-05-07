@@ -1,3 +1,5 @@
+from collections import defaultdict
+import threading
 from LspAlgorithms.GeneticAlgorithms.LocalSearch.LocalSearchNode import LocalSearchNode
 from ParameterSearch.ParameterData import ParameterData
 
@@ -6,89 +8,63 @@ class LocalSearchEngine:
     """
 
     def __init__(self) -> None:
-        pass
-
-
-    def localSearchNode(self, chromosome):
         """
         """
 
-        node = LocalSearchNode(chromosome)
-        return node
+        self.chromosome = None
+        self.stopSearchEvent = threading.Event()
 
 
-    # def process(self, chromosome, strategy = "simple_mutation"):
-    #     """Process the given chromosome in order to return a mutated version
-    #     strategy: simple_mutation|absolute_mutation|positive_mutation
-    #     """
-
-    #     depthIndex = [0]
-    #     node = self.localSearchNode(chromosome)
-    #     return self.nextNode(node, depthIndex, strategy)
-
-
-    # def nextNode(self, node, depthIndex, strategy):
-    #     """
-    #     """
-    #     depthIndex[0] += 1
-    #     for child in node.ge
-
-    #     return self.nextNode(node, depthIndex, strategy)
-
-
-    def process(self, chromosome, strategy = "simple_mutation"): 
+    def process(self, chromosome, strategy = "simple_mutation"):
         """Process the given chromosome in order to return a mutated version
         strategy: simple_mutation|absolute_mutation|positive_mutation
         """
 
-        print("mutatioooooooooooooooooooooooooooooooon 1 ", strategy, ParameterData.instance.mutationRate, chromosome)
-        node = self.localSearchNode(chromosome)
-        queue = node.children()
-        depthIndex = 0
+        self.visitedNodes = defaultdict(lambda: None)
+        self.chromosome = chromosome
+        node = LocalSearchNode(chromosome)
+        result = {"depthIndex": 0, "chromosomes": []}
 
-        while len(queue) > 0:
-            node = queue[-1]
-            queue = queue[:-1]
+        self.nextNode(node, strategy, result)
+        return result["chromosomes"]
 
-            children = None
-            if strategy == "simple_mutation": 
-                # simple means random here
-                if depthIndex == 1:
-                    print("mutatioooooooooooooooooooooooooooooooon 2 ", strategy, ParameterData.instance.mutationRate, chromosome)
-                    return node.chromosome
-                children = node.children()
-                depthIndex += 1
-            elif strategy == "positive_mutation":
-                if node.chromosome.cost < chromosome.cost:
-                    return node.chromosome
-                children = node.children()
-            elif strategy ==  "absolute_mutation":
-                children = node.children()
-                if len(children) == 0:
-                    return node.chromosome
 
-            queue += children
+    def nextNode(self, node, strategy, result):
+        """
+        """
+        if self.visitedNodes[node.chromosome.stringIdentifier] is not None:
+            return None
+        self.visitedNodes[node.chromosome.stringIdentifier] = 1
+
+        if strategy == "simple_mutation":
+            if result["depthIndex"] == ParameterData.instance.simpleMutationDepthIndex:
+                result["chromosomes"].append(node.chromosome)
+                self.stopSearchEvent.set()
+                return None
+        elif strategy == "positive_mutation":
+            print(result["depthIndex"], node.chromosome, node.chromosome < self.chromosome)
+            if node.chromosome < self.chromosome:
+                result["chromosomes"].append(node.chromosome)
+                self.stopSearchEvent.set()
+                return 
+        elif strategy == "population":
+            result["chromosomes"].append(node.chromosome)
+
+        result["depthIndex"] += 1
+        children = []
+        for child in node.generateChild():
+            if self.stopSearchEvent.is_set():
+                return None
+            children.append(child)
+            self.nextNode(child, strategy, result)
+
+        # TODO 
+        if strategy == "absolute_mutation":
+            print("Absolute mutation", len(children))
+            if len(children) == 0:
+                result["chromosomes"].append(node.chromosome)
+                return None
 
         return None
 
-
-    def populate(self, chromosome, popSet):
-        """
-        """
-
-        node = self.localSearchNode(chromosome)
-        population = popSet[1]
-        queue = []
-
-        while len(population.chromosomes) < ParameterData.instance.popSize:
-            for child in node.generateChild():
-                queue.append(child)
-                result = population.add(child.chromosome)
-                if result is None:
-                    return
-
-            if len(queue) == 0:
-                return
-            node = queue[-1]
-            queue = queue[:-1]
         

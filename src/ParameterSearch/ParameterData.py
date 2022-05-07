@@ -18,6 +18,7 @@ class ParameterData:
         self.nMigrants = 1
         self.popUniquesPercentage25 = 0.25
         self.popUniquesPercentage10 = 0.10
+        self.simpleMutationDepthIndex = 1
 
     def save(self):
         """

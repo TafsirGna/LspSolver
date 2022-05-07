@@ -187,7 +187,7 @@ class Chromosome(object):
 		producedItemsCount = [0 for _ in range(InputDataInstance.instance.nItems)]
 		cost = 0
 		for period, periodValue in enumerate(stringIdentifier):
-			if periodValue != 0:
+			if int(periodValue) > 0:
 				item = int(periodValue) - 1
 				position = producedItemsCount[item]
 
