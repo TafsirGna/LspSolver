@@ -136,8 +136,10 @@ class Chromosome(object):
 		stringIdentifier = "0" * InputDataInstance.instance.nPeriods
 		cost = 0
 		for gene in genesList:
-			gene.prevGene = (prevGene.item, prevGene.position) if prevGene is not None else None 
-			gene.calculateChangeOverCost()             
+			tmp = (prevGene.item, prevGene.position) if prevGene is not None else None 
+			if tmp != gene.prevGene:
+				gene.prevGene = tmp 
+				gene.calculateChangeOverCost()             
 			gene.calculateCost()
 			cost += gene.cost
 			prevGene = gene

@@ -1,4 +1,3 @@
-import numpy as np
 from LspAlgorithms.GeneticAlgorithms.LocalSearch.LocalSearchNode import LocalSearchNode
 from ParameterSearch.ParameterData import ParameterData
 
@@ -18,11 +17,31 @@ class LocalSearchEngine:
         return node
 
 
+    # def process(self, chromosome, strategy = "simple_mutation"):
+    #     """Process the given chromosome in order to return a mutated version
+    #     strategy: simple_mutation|absolute_mutation|positive_mutation
+    #     """
+
+    #     depthIndex = [0]
+    #     node = self.localSearchNode(chromosome)
+    #     return self.nextNode(node, depthIndex, strategy)
+
+
+    # def nextNode(self, node, depthIndex, strategy):
+    #     """
+    #     """
+    #     depthIndex[0] += 1
+    #     for child in node.ge
+
+    #     return self.nextNode(node, depthIndex, strategy)
+
+
     def process(self, chromosome, strategy = "simple_mutation"): 
-        """ Process the given chromosome in order to return a mutated version
+        """Process the given chromosome in order to return a mutated version
         strategy: simple_mutation|absolute_mutation|positive_mutation
         """
 
+        print("mutatioooooooooooooooooooooooooooooooon 1 ", strategy, ParameterData.instance.mutationRate, chromosome)
         node = self.localSearchNode(chromosome)
         queue = node.children()
         depthIndex = 0
@@ -35,9 +54,10 @@ class LocalSearchEngine:
             if strategy == "simple_mutation": 
                 # simple means random here
                 if depthIndex == 1:
-                    # node = np.random.choice(queue)
+                    print("mutatioooooooooooooooooooooooooooooooon 2 ", strategy, ParameterData.instance.mutationRate, chromosome)
                     return node.chromosome
                 children = node.children()
+                depthIndex += 1
             elif strategy == "positive_mutation":
                 if node.chromosome.cost < chromosome.cost:
                     return node.chromosome
@@ -48,7 +68,6 @@ class LocalSearchEngine:
                     return node.chromosome
 
             queue += children
-            depthIndex += 1
 
         return None
 

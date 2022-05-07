@@ -37,10 +37,11 @@ class CrossOverOperator:
             # if len(children) == 0 and node.period < 0:
             if len(children) == 0 and node.pointer == (None, None):
 
-                if Chromosome.pool[node.chromosome.stringIdentifier] is None:
+                chromosome = Chromosome.pool[node.chromosome.stringIdentifier]
+                if chromosome is None:
                     # return Chromosome.createFromIdentifier(node.chromosome.stringIdentifier)
                     return Chromosome.evaluateDnaArray(node.chromosome.dnaArray)
-                return Chromosome.pool[node.chromosome.stringIdentifier]
+                return chromosome
 
             queue += children
 

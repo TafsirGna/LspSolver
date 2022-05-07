@@ -38,20 +38,27 @@ class PopulationEvaluator:
 
         uniquesPercentage = float(len(population.uniques) / len(population.chromosomes))
 
+
         #
         if uniquesPercentage <= ParameterData.instance.popUniquesPercentage25:
             if not self.threshold2Event.is_set():
                 print("7555555555555555555555555555555555555555555555555555555555555555555555555", generationIndex)
                 ParameterData.instance.mutationRate *= 2
                 self.threshold2Event.set()
-                LspRuntimeMonitor.mutation_strategy = "positive_mutation"
+            #     LspRuntimeMonitor.mutation_strategy = "positive_mutation"
+            # else:
+            #     LspRuntimeMonitor.mutation_strategy = "simple_mutation"
+
 
         #
-        if uniquesPercentage <= ParameterData.instance.popUniquesPercentage10:
-            if not self.threshold3Event.is_set():
-                # ParameterData.instance.mutationRate *= 2
-                self.threshold3Event.set()
-                LspRuntimeMonitor.mutation_strategy = "absolute_mutation"
+        # if uniquesPercentage <= ParameterData.instance.popUniquesPercentage10:
+        #     if not self.threshold3Event.is_set():
+        #         # ParameterData.instance.mutationRate *= 2
+        #         self.threshold3Event.set()
+        #         LspRuntimeMonitor.mutation_strategy = "absolute_mutation"
+        #         print("9999999999999999990000000000000000000000000000000000000000000000000000000", LspRuntimeMonitor.mutation_strategy, generationIndex)
+        #     # else:
+        #     #     LspRuntimeMonitor.mutation_strategy = "simple_mutation"
 
         #
         if len(population.uniques) == 1:

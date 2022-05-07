@@ -45,6 +45,7 @@ class Population:
         
         self.popSize = len(self.chromosomes)
         
+        
     def evolve(self):
         """
         """

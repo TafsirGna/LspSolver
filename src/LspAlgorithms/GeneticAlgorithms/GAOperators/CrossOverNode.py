@@ -81,11 +81,6 @@ class CrossOverNode:
                     node = CrossOverNode(self.parentChromosomes)
                     node.pointer = pointer
                     node.chromosome = mutation[1]
-
-                    # newPeriod = mutation[1][1][1]
-                    # stringIdentifier = self.chromosome.stringIdentifier
-                    # stringIdentifier = stringIdentifier[:newPeriod] + str(gene.item + 1) + stringIdentifier[newPeriod + 1:]
-                    # node.chromosome.stringIdentifier = stringIdentifier
                     
                     children.append(node)
 
@@ -108,29 +103,6 @@ class CrossOverNode:
                  
         return (item, position)
 
-
-    def childrenApproach3(self):
-        """
-        """
-
-        children = []
-
-        # chromosomeA, chromosomeB = (self.parentChromosomes[0], self.parentChromosomes[1]) if self.parentChromosomes[0] < self.parentChromosomes[1] else (self.parentChromosomes[1], self.parentChromosomes[0])
-        # genesList = sorted([gene for itemProdGenes in chromosomeA.dnaArray for gene in itemProdGenes], key= lambda gene: gene.cost)
-
-        # visitedPeriods = []
-        # for geneA in genesList:
-        #     geneB = chromosomeB.dnaArray[geneA.item][geneA.position]
-        #     geneA, geneB = (geneA, geneB) if geneA.stockingCost <= geneB.stockingCost else (geneB, geneA)
-        #     if dnaArray[geneA.item][geneA.position] == None:
-        #         if not(geneA.period in visitedPeriods):
-        #             dnaArray[geneA.item][geneA.position] = geneA
-        #             visitedPeriods.append(geneA.period)
-        #         elif not(geneB.period in visitedPeriods):
-        #             dnaArray[geneB.item][geneB.position] = geneB
-        #             visitedPeriods.append(geneB.period)
-
-        return children
 
     def __repr__(self):
         return "{}".format(self.chromosome)

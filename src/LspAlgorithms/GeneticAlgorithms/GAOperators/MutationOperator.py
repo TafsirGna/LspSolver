@@ -11,8 +11,8 @@ class MutationOperator:
         """
         pass
 
-    def process(self, chromosome, strategy = LspRuntimeMonitor.mutation_strategy): # strategy :  medium/advanced
+    def process(self, chromosome, strategy = "simple_mutation"): # strategy :  medium/advanced
         """
         """
-
+        strategy = LspRuntimeMonitor.mutation_strategy
         return (LocalSearchEngine()).process(chromosome, strategy)

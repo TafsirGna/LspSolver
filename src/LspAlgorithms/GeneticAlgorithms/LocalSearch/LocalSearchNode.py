@@ -30,27 +30,18 @@ class LocalSearchNode:
 
         return []
 
+
     def children(self):
         """
         """
 
-        # print("Parent     : ", self.chromosome)
-
         children = []
-
         if self.visitedChromosomes[self.chromosome.stringIdentifier] is not None:
             return children
 
         self.visitedChromosomes[self.chromosome.stringIdentifier] = self.chromosome
-
-        for itemGenes in self.chromosome.dnaArray:
-            for gene in itemGenes:
-                mutations = LocalSearchNode.allGenePossibleMutations(gene, self.chromosome)
-                for mutation in mutations:
-                    chromosome = mutation[1]
-                    node = LocalSearchNode(chromosome, self.visitedChromosomes)
-                    # print("Child : ", chromosome)
-                    children.append(node)
+        for child in self.generateChild():
+            children.append(child)
 
         children.sort(reverse=True)
         return children
