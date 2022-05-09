@@ -35,10 +35,14 @@ class TestMainFeatures:
 
         self.setUpInput()
 
-        cA, cB = Chromosome.createFromRawDNA([2, 1, 0, 2, 1]), Chromosome.createFromRawDNA([2, 1, 2, 0, 1])
-        cA, cB = Chromosome.createFromRawDNA([1, 2, 2, 2, 1, 3, 0, 0]), Chromosome.createFromRawDNA([2, 2, 2, 3, 1, 1, 0, 0])
+        # cA, cB = Chromosome.createFromRawDNA([2, 1, 0, 2, 1]), Chromosome.createFromRawDNA([2, 1, 2, 0, 1])
+        # cA, cB = Chromosome.createFromRawDNA([1, 2, 2, 2, 1, 3, 0, 0]), Chromosome.createFromRawDNA([2, 2, 2, 3, 1, 1, 0, 0])
+        cA, cB = Chromosome.createFromIdentifier("22032110"), Chromosome.createFromIdentifier("20223110")
+
         print(cA, "\n", cB, "\n -----------------------------")
         print((CrossOverOperator([cA, cB])).process())
+
+        assert 0
 
 
     def test_feasability(self):

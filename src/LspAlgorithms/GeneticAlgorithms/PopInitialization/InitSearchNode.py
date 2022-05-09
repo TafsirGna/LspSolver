@@ -17,7 +17,7 @@ class SearchNode(object):
 
 		self.itemsToOrder = [0 for _ in range(InputDataInstance.instance.nItems)]
 		# then i append the number of periods where no items are to be ordered
-		self.itemsToOrder.append((InputDataInstance.instance.nPeriods - InputDataInstance.instance.demandsArray.sum()))
+		self.itemsToOrder.append(InputDataInstance.instance.nPeriods - InputDataInstance.instance.demandsArray.sum())
 
 	@classmethod
 	def root(cls):

@@ -41,6 +41,18 @@ class Chromosome(object):
 		
 
 	@classmethod
+	def classLightCostCalculation(cls, dnaArray):
+		"""
+		"""
+		cost = 0
+		for itemGenes in dnaArray:
+			for gene in itemGenes:
+				# print("Calculation : ", gene.cost)
+				cost += gene.cost
+		
+		return cost
+
+	@classmethod
 	def classCalculateCost(cls, dnaArray):
 		"""
 		"""

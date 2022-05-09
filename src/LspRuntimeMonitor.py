@@ -89,6 +89,8 @@ class LspRuntimeMonitor:
         """
 
         print('-----------------------------------------')
+        print(f"{bcolors.OKGREEN}Created : {bcolors.ENDC}", cls.outputFilePath)
+        print('-----------------------------------------')
         print(cls.popsData)
 
         data = list(cls.popsData.values())[0]
@@ -103,6 +105,7 @@ class LspRuntimeMonitor:
         plt.plot(list(range(len(data["min"]))), data["min"])
         plt.ylabel("Population minimal cost")
         plt.show()
+        
 
     @classmethod
     def waitingAnimation(cls):

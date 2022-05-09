@@ -22,12 +22,26 @@ class InitNodeGenerator:
             node = self.queue[-1]
             self.queue = self.queue[:-1]
 
-            children = node.children()
-            if len(children) == 0:
-                # print("Chromosome --- : ", node.chromosome)
-                pipeline.put(node)
-
-            self.queue += children
+            self.nextNode(node, pipeline)
 
         return None
+
+
+    def nextNode(self, node, pipeline):
+        """
+        """
+        if node.period < 0:
+            if pipeline.full():
+                return None
+
+            pipeline.put(node)
+            return None
+
+        for child in node.generateChild():
+            if pipeline.full():
+                return None
+            self.nextNode(child, pipeline)
+
+        return None
+
 
