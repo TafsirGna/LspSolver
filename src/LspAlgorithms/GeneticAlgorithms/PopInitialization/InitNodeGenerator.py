@@ -1,8 +1,5 @@
-from collections import defaultdict
-import queue
 import uuid
-
-from LspInputDataReading.LspInputDataInstance import InputDataInstance
+from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
 
 
 class InitNodeGenerator:
@@ -30,10 +27,16 @@ class InitNodeGenerator:
     def nextNode(self, node, pipeline):
         """
         """
+
+        # print("------ : ", node.chromosome, node.itemsToOrder, len(node.chromosome.stringIdentifier))
         if node.period < 0:
             if pipeline.full():
                 return None
 
+            if not Chromosome.feasible(node.chromosome):
+                print("/////////////////////////////////////////////////", node.chromosome)
+
+            node.chromosome.stringIdentifier = tuple(node.chromosome.stringIdentifier)
             pipeline.put(node)
             return None
 

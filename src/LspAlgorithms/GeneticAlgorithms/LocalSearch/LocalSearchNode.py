@@ -1,4 +1,3 @@
-from collections import defaultdict
 import copy
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
 from LspAlgorithms.GeneticAlgorithms.Gene import Gene
@@ -51,12 +50,13 @@ class LocalSearchNode:
         # print("In createMutatedChromosome", chromosome, swap)
 
         # Making up the stringIdentifier of the result chromosome
-        stringIdentifier = chromosome.stringIdentifier
+        stringIdentifier = list(chromosome.stringIdentifier)
 
         gene1Item, gene1Position = swap[0][0], swap[0][1]
         if swap[1][0] == -1:
             newPeriod = swap[1][1]
-            stringIdentifier = stringIdentifier[:newPeriod] + str(gene1Item + 1) + stringIdentifier[newPeriod + 1:]
+            stringIdentifier[newPeriod] = str(gene1Item + 1)
+            stringIdentifier = tuple(stringIdentifier)
             if Chromosome.pool[stringIdentifier] is not None:
                 return Chromosome.pool[stringIdentifier]
             
@@ -81,8 +81,9 @@ class LocalSearchNode:
         else:
             gene2Item, gene2Position = swap[1][0], swap[1][1]
             period1, period2 = (chromosome.dnaArray[gene1Item][gene1Position]).period, (chromosome.dnaArray[gene2Item][gene2Position]).period 
-            stringIdentifier = stringIdentifier[:period1] + str(gene2Item + 1) + stringIdentifier[period1 + 1:]
-            stringIdentifier = stringIdentifier[:period2] + str(gene1Item + 1) + stringIdentifier[period2 + 1:]
+            stringIdentifier[period1] =  str(gene2Item + 1)
+            stringIdentifier[period2] =  str(gene1Item + 1)
+            stringIdentifier = tuple(stringIdentifier)
 
             if Chromosome.pool[stringIdentifier] is not None:
                 return Chromosome.pool[stringIdentifier]

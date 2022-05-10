@@ -1,8 +1,6 @@
 from collections import defaultdict
 import concurrent.futures
 from queue import Queue
-import threading
-import uuid
 from ParameterSearch.ParameterData import ParameterData
 
 class InitNodeGeneratorManager:
@@ -16,9 +14,11 @@ class InitNodeGeneratorManager:
         self.callers = defaultdict(lambda: 0)
         self.nodeGenerators = nodeGenerators
         self.pipelines = defaultdict(lambda: Queue(maxsize=ParameterData.instance.popSize))
+        # self.pipelines = defaultdict(lambda: Queue(maxsize=1))
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
             executor.map(self.startNodeGenerator, self.nodeGenerators)
+            # executor.submit(self.startNodeGenerator, self.nodeGenerators[0])
 
 
     def startNodeGenerator(self, nodeGenerator):

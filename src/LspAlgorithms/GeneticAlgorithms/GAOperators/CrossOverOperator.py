@@ -37,6 +37,9 @@ class CrossOverOperator:
     def nextNode(self, node, result):
         """
         """
+        if node is None:
+            return None
+
         # print("processing : ", node.chromosome, node.blankPeriods, " | ", node.itemsToOrder, ' | ', node.chromosome.dnaArray)
 
         if len(node.blankPeriods) == 0:
@@ -45,7 +48,7 @@ class CrossOverOperator:
                 node.blankPeriods.insert(0, -1)
                 node.catchUpLeftOrders() 
 
-            self.stopSearchEvent.set()
+            node.chromosome.stringIdentifier = tuple(node.chromosome.stringIdentifier)
             chromosome = Chromosome.pool[node.chromosome.stringIdentifier]
             if chromosome is None:
                 # return Chromosome.createFromIdentifier(node.chromosome.stringIdentifier)
@@ -55,8 +58,11 @@ class CrossOverOperator:
                 # print("equal cost : ", chromosome, Chromosome.createFromIdentifier(chromosome.stringIdentifier))
             # print("equal cost : ", chromosome)
             if not Chromosome.feasible(chromosome):
-                print("//////////////////////////////////////////////////////////////////////////")
-            result.append(chromosome)
+                print("processing : ", node.chromosome, node.blankPeriods, " | ", node.itemsToOrder, ' | ', node.chromosome.dnaArray)
+                print("//////////////////////////////////////////////////////////////////////////", self.parentChromosomes)
+            else:
+                self.stopSearchEvent.set()
+                result.append(chromosome)
             return None
 
         for child in node.generateChild():

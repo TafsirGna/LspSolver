@@ -7,6 +7,8 @@ class SearchNode(object):
 	"""
 	"""
 
+	itemsToOrder = None
+
 	def __init__(self, chromosome, period) -> None:
 		"""
 		"""
@@ -15,9 +17,14 @@ class SearchNode(object):
 		self.period = period
 		self.lastPlacedItem = None
 
-		self.itemsToOrder = [0 for _ in range(InputDataInstance.instance.nItems)]
-		# then i append the number of periods where no items are to be ordered
-		self.itemsToOrder.append(InputDataInstance.instance.nPeriods - InputDataInstance.instance.demandsArray.sum())
+		if SearchNode.itemsToOrder is None:
+			SearchNode.itemsToOrder = {i: 0 for i in range(InputDataInstance.instance.nItems)}
+			# then i append the number of periods where no items are to be ordered
+			SearchNode.itemsToOrder[-1] = (InputDataInstance.instance.nPeriods - InputDataInstance.instance.demandsArray.sum())	
+
+		self.itemsToOrder = copy.deepcopy(SearchNode.itemsToOrder)
+
+
 
 	@classmethod
 	def root(cls):
@@ -68,7 +75,7 @@ class SearchNode(object):
 		additionalCost = 0
 		# print("ok Start --- ", dnaArray)
 
-		if (item < InputDataInstance.instance.nItems):
+		if (item >= 0):
 
 			itemProdPosition = (len(InputDataInstance.instance.demandsArrayZipped[item]) - len(dnaArray[item])) - 1
 			gene = Gene(item, self.period, itemProdPosition)
@@ -94,7 +101,9 @@ class SearchNode(object):
 		node.itemsToOrder = itemsToOrder
 		
 		node.chromosome.dnaArray = dnaArray
-		node.chromosome.stringIdentifier = str(item + 1 if item < InputDataInstance.instance.nItems else 0) + self.chromosome.stringIdentifier
+		stringIdentifier = copy.deepcopy(self.chromosome.stringIdentifier)
+		stringIdentifier.insert(0, item + 1) 
+		node.chromosome.stringIdentifier = stringIdentifier
 		# print(node.chromosome.stringIdentifier)
 		node.chromosome.cost = self.chromosome.cost + additionalCost
 
@@ -110,7 +119,7 @@ class SearchNode(object):
 
 		self.setItemsToOrder()
 
-		for item, itemCount in enumerate(self.itemsToOrder):
+		for item, itemCount in self.itemsToOrder.items():
 			if itemCount > 0:
 				node = self.orderItem(item)
 				yield node

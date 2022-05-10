@@ -11,6 +11,8 @@ from LspInputDataReading.LspInputDataInstance import InputDataInstance
 
 class Chromosome(object):
 
+	# ID_SEPARATOR = "-"
+
 	pool = defaultdict(lambda: None) 
 
 	def __init__(self):
@@ -18,7 +20,7 @@ class Chromosome(object):
 		"""
 		self.cost = 0
 		self.dnaArray = [[None for _ in indices] for indices in InputDataInstance.instance.demandsArrayZipped]
-		self.stringIdentifier = ""
+		self.stringIdentifier = []
 
 
 	def calculateCost(self):
@@ -75,6 +77,8 @@ class Chromosome(object):
 		"""Checks if a given dnaArray leads to a feasible chromosome
 		"""
 
+		# print("Not feasible : ", chromosome, chromosome.dnaArray)
+
 		# going through the zipped dna array checking : ->
 		# indices = []
 		for item in range(InputDataInstance.instance.nItems):
@@ -82,19 +86,23 @@ class Chromosome(object):
 			prods = chromosome.dnaArray[item]
 
 			if len(demands) != len(prods): # -> that the number of produced item meets the number of demand
+				print("Not feasible Reason 1", chromosome, chromosome.dnaArray)
 				return False
 
-			for j, demandIndex in enumerate(demands):
+			for j, demand in enumerate(demands):
 				gene = prods[j]
 
 				if gene is None: # -> that item production index is a very period and there's no duplicate value
+					print("Not feasible Reason 2", chromosome, chromosome.dnaArray)
 					return False
 
-				prevProdIndex = (0 if j == 0 else (prods[j - 1]).period) # -> that previous period where the item has bee produced is always less than the current one
-				if (prevProdIndex > gene.period):
+				prevItemProdPeriod = (0 if j == 0 else (prods[j - 1]).period) # -> that previous period where the item has bee produced is always less than the current one
+				if (prevItemProdPeriod > gene.period):
+					print("Not feasible Reason 3", chromosome, chromosome.dnaArray)
 					return False
 
-				if gene.period > demandIndex: # checks that the item is produced before its demand period
+				if gene.period > demand: # checks that the item is produced before its demand period
+					print("Not feasible Reason 4", chromosome, chromosome.dnaArray)
 					return False
 
 				# indices.append(prodIndex)
