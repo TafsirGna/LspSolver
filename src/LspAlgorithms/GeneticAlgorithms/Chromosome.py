@@ -18,13 +18,6 @@ class Chromosome(object):
 		self.stringIdentifier = []
 
 
-	def calculateCost(self):
-		"""
-		"""
-
-		self.cost = Chromosome.classCalculateCost(self.dnaArray)
-
-
 	# def geneAtPeriod(self, period):
 	# 	"""
 	# 	"""
@@ -47,23 +40,6 @@ class Chromosome(object):
 				# print("Calculation : ", gene.cost)
 				cost += gene.cost
 		
-		return cost
-
-	@classmethod
-	def classCalculateCost(cls, dnaArray):
-		"""
-		"""
-
-		cost = 0
-		
-		for itemGenes in dnaArray:
-			for gene in itemGenes:
-				# if gene.cost == 0:
-				gene.calculateStockingCost()
-				gene.calculateChangeOverCost()
-				gene.calculateCost()
-				cost += gene.cost
-
 		return cost
 		
 
@@ -97,7 +73,7 @@ class Chromosome(object):
 					return False
 
 				if gene.period > demand: # checks that the item is produced before its demand period
-					print("Not feasible Reason 4", chromosome, chromosome.dnaArray)
+					print("Not feasible Reason 4", chromosome, chromosome.dnaArray, InputDataInstance.instance.demandsArrayZipped)
 					return False
 
 				# indices.append(prodIndex)
@@ -130,29 +106,6 @@ class Chromosome(object):
 		chromosome.cost = cost
 		chromosome.stringIdentifier = tuple(stringIdentifier)
 		return chromosome
-
-
-	@classmethod
-	def sliceDna(cls, dnaArray, startingPeriod, endingPeriod):
-		"""
-		"""
-
-		genesList = sorted([gene for itemProdGenes in dnaArray for gene in itemProdGenes if gene is not None], key= lambda gene: gene.period)
-		# print([gene.item + 1 for gene in genesList])
-		slice = []
-		cursor = startingPeriod
-		for index, gene1 in enumerate(genesList):
-			if startingPeriod <= gene1.period:
-				for gene2 in genesList[index:]:
-					if gene2 is not None:
-						if (endingPeriod > gene2.period):
-								slice += [0 for _ in range(gene2.period - cursor)] + [gene2.item + 1]
-								cursor = gene2.period + 1
-						else:
-							break
-				break
-
-		return slice
 
 
 	@classmethod

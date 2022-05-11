@@ -32,7 +32,7 @@ class CrossOverNode:
 
         self.chromosome.stringIdentifier = ['*'] * InputDataInstance.instance.nPeriods
         self.itemsToOrder = copy.deepcopy(CrossOverNode.itemsToOrder)
-        print("itemsToOrder before : ", self.itemsToOrder)
+        # print("itemsToOrder before : ", self.itemsToOrder)
 
         positionReckoning = True
         for period in reversed(range(InputDataInstance.instance.nPeriods)):
@@ -57,7 +57,7 @@ class CrossOverNode:
                 self.blankPeriods.insert(0, period)
                 positionReckoning = False
 
-        print("Result id : ", self.parentChromosomes, "\n --- ",self.chromosome.stringIdentifier, self.blankPeriods, self.itemsToOrder, self.chromosome.dnaArray)
+        # print("Result id : ", self.parentChromosomes, "\n --- ",self.chromosome.stringIdentifier, self.blankPeriods, self.itemsToOrder, self.chromosome.dnaArray)
 
 
     def children(self):
@@ -82,7 +82,7 @@ class CrossOverNode:
         gene.calculateCost()
         if self.lastPlacedItem is not None:
             lastPlacedGene = (self.chromosome.dnaArray[self.lastPlacedItem[0]][self.lastPlacedItem[1]])
-            print(" **************** last gene", self.lastPlacedItem, self.prevBlankPeriod, lastPlacedGene, self.chromosome.dnaArray)
+            # print(" **************** last gene", self.lastPlacedItem, self.prevBlankPeriod, lastPlacedGene, self.chromosome.dnaArray)
             lastPlacedGene.prevGene = (item0, position)
             lastPlacedGene.calculateChangeOverCost()
             lastPlacedGene.calculateCost()
@@ -105,13 +105,26 @@ class CrossOverNode:
                 # print("titi : ", itemValue, index)
                 periodValue = (self.prevBlankPeriod - 1) - index
                 itemValue = int(itemValue)
-                if itemValue != 0:
+                if itemValue > 0:
                     item0 = itemValue - 1
                     position = self.itemsToOrder[item0][1]
+
+                    if periodValue > InputDataInstance.instance.demandsArrayZipped[item0][position]:
+                        return False
+
                     self.addGene(item0, periodValue, position)
                     self.itemsToOrder[item0][1] -= 1
                 else:
                     self.itemsToOrder[-1][0] -= 1
+
+        return True
+
+
+    def completeCrossOver(self):
+        """
+        """
+        self.blankPeriods.insert(0, -1)
+        self.catchUpLeftOrders() 
 
 
     def generateChild(self, stopEvent = None):
@@ -121,14 +134,15 @@ class CrossOverNode:
         if stopEvent is not None and stopEvent.is_set():
             yield None
 
-        print("koko", self.blankPeriods, "|", self.itemsToOrder)
+        # print("koko", self.blankPeriods, "|", self.itemsToOrder)
         if len(self.blankPeriods) == 0:
             if self.prevBlankPeriod > 0:
-                self.blankPeriods.insert(0, -1)
-                self.catchUpLeftOrders() 
-            yield None
+                self.completeCrossOver()
+            yield self
 
-        self.catchUpLeftOrders()
+        catchUpResult = self.catchUpLeftOrders()
+        if not catchUpResult:
+            return None
 
         period = self.blankPeriods[-1]
         itemsToOrderKeys = list(self.itemsToOrder.keys())
@@ -137,7 +151,7 @@ class CrossOverNode:
             itemData = self.itemsToOrder[item]
             node = None
             if item >= 0: 
-                print("koko-2", item, itemData)
+                # print("koko-2", item, itemData)
                 if itemData[0] > 0 and InputDataInstance.instance.demandsArrayZipped[item][itemData[1]] >= period:
                     node = self.orderItem(item, period)
 
@@ -177,7 +191,7 @@ class CrossOverNode:
         node.prevBlankPeriod = period
         node.itemsToOrder = itemsToOrder
         node.lastPlacedItem = self.lastPlacedItem
-        print("kitoko", node.chromosome)
+        # print("kitoko", node.chromosome)
 
         return node
         
