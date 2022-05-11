@@ -19,15 +19,16 @@ class TestMainFeatures:
 
         self.setUpInput()
 
-        c = Chromosome.createFromRawDNA([2, 1, 0, 1, 2])
-        # c = Chromosome.createFromRawDNA([2, 2, 2, 3, 1, 0, 0, 1])
+        # c = Chromosome.createFromIdentifier(stringIdentifier=(2, 1, 0, 1, 2))
+        c = Chromosome.createFromIdentifier(stringIdentifier=(2, 2, 2, 3, 1, 0, 0, 1))
         # [3, 2, 2, 2, 1, 1, 0, 0]
         # [2, 2, 2, 3, 1, 0, 0, 1]
         print("Chromosome ", c)
         # # [2, 1, 2, 0, 1]
-        print("1 -- ", (MutationOperator()).process(c, strategy="advanced"))
+        LspRuntimeMonitor.mutation_strategy = "simple_mutation"
+        print("1 -- ", (MutationOperator()).process(c))
 
-        assert 1
+        assert 0
 
     
     def test_crossover(self):
@@ -38,9 +39,9 @@ class TestMainFeatures:
 
         print("+++++++++++++", InputDataInstance.instance.demandsArray.sum())
 
-        # cA, cB = Chromosome.createFromRawDNA([2, 1, 0, 2, 1]), Chromosome.createFromRawDNA([2, 1, 2, 0, 1])
-        # cA, cB = Chromosome.createFromRawDNA([1, 2, 2, 2, 1, 3, 0, 0]), Chromosome.createFromRawDNA([2, 2, 2, 3, 1, 1, 0, 0])
-        cA, cB = Chromosome.createFromIdentifier("0009108654432117"), Chromosome.createFromIdentifier("0001098654432117")
+        # cA, cB = Chromosome.createFromIdentifier(stringIdentifier=(2, 1, 1, 2, 0)), Chromosome.createFromIdentifier(stringIdentifier=(2, 1, 0, 1, 2))
+        cA, cB = Chromosome.createFromIdentifier(stringIdentifier=(2, 0, 2, 3, 2, 1, 1, 0)), Chromosome.createFromIdentifier(stringIdentifier=(0, 2, 3, 2, 2, 1, 0, 1))
+        # cA, cB = Chromosome.createFromIdentifier("0009108654432117"), Chromosome.createFromIdentifier("0001098654432117")
 
         print(cA, "\n", cB, "\n -----------------------------")
         print((CrossOverOperator([cA, cB])).process())
@@ -99,8 +100,8 @@ class TestMainFeatures:
         """
         """ 
 
-        # inputFile = "data/input/clspInst02.data"
-        inputFile = "data/input/pigment15b.dzn"
+        inputFile = "data/input/clspInst02.data"
+        # inputFile = "data/input/pigment15b.dzn"
         # inputFile = "data/input/ps-200-10-80.dzn"
         LspRuntimeMonitor.verbose = True
         inputDataReader = InputDataReader()

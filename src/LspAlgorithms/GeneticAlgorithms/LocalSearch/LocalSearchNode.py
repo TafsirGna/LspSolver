@@ -1,4 +1,5 @@
 import copy
+import random
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
 from LspAlgorithms.GeneticAlgorithms.Gene import Gene
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
@@ -19,12 +20,14 @@ class LocalSearchNode:
         """
         """
 
-        for itemGenes in self.chromosome.dnaArray:
-            for gene in itemGenes:
-                for mutation in LocalSearchNode.generateGeneMutations(gene, self.chromosome):
-                    chromosome = mutation[1]
-                    # print("Child : ", chromosome)
-                    yield LocalSearchNode(chromosome)
+        genes = [gene for itemGenes in self.chromosome.dnaArray for gene in itemGenes]
+        random.shuffle(genes)
+
+        for gene in genes:
+            for mutation in LocalSearchNode.generateGeneMutations(gene, self.chromosome):
+                chromosome = mutation[1]
+                # print("Child : ", chromosome)
+                yield LocalSearchNode(chromosome)
 
         return []
 
@@ -55,7 +58,7 @@ class LocalSearchNode:
         gene1Item, gene1Position = swap[0][0], swap[0][1]
         if swap[1][0] == -1:
             newPeriod = swap[1][1]
-            stringIdentifier[newPeriod] = str(gene1Item + 1)
+            stringIdentifier[newPeriod] = gene1Item + 1
             stringIdentifier = tuple(stringIdentifier)
             if Chromosome.pool[stringIdentifier] is not None:
                 return Chromosome.pool[stringIdentifier]
@@ -81,8 +84,8 @@ class LocalSearchNode:
         else:
             gene2Item, gene2Position = swap[1][0], swap[1][1]
             period1, period2 = (chromosome.dnaArray[gene1Item][gene1Position]).period, (chromosome.dnaArray[gene2Item][gene2Position]).period 
-            stringIdentifier[period1] =  str(gene2Item + 1)
-            stringIdentifier[period2] =  str(gene1Item + 1)
+            stringIdentifier[period1] =  gene2Item + 1
+            stringIdentifier[period2] =  gene1Item + 1
             stringIdentifier = tuple(stringIdentifier)
 
             if Chromosome.pool[stringIdentifier] is not None:
@@ -131,7 +134,9 @@ class LocalSearchNode:
 
         # print("lower and upper limit 1 : ", gene1LowerLimit, gene1UpperLimit)
 
-        for index, periodValue in enumerate(Chromosome.sliceDna(chromosome.dnaArray, gene1LowerLimit, gene1UpperLimit)):
+        stringIdentifierSlice = [(index, periodValue) for index, periodValue in enumerate(chromosome.stringIdentifier[gene1LowerLimit:gene1UpperLimit])]
+        random.shuffle(stringIdentifierSlice)
+        for index, periodValue in stringIdentifierSlice:
             period = index + gene1LowerLimit
             if periodValue == 0:
                 swap = [(gene1.item, gene1.position), ( -1, period)]

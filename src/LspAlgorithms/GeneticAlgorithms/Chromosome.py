@@ -2,16 +2,11 @@
 # -*-coding: utf-8 -*
 
 from collections import defaultdict
-from operator import itruediv
-import queue
-from turtle import position
 import numpy as np
 from LspAlgorithms.GeneticAlgorithms.Gene import Gene
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 
 class Chromosome(object):
-
-	# ID_SEPARATOR = "-"
 
 	pool = defaultdict(lambda: None) 
 
@@ -111,41 +106,6 @@ class Chromosome(object):
 
 
 	@classmethod
-	def createFromRawDNA(cls, rawDnaArray):
-		"""
-		"""
-		dnaArray = [[] for _ in range(InputDataInstance.instance.nItems)]
-
-		prevGene = None
-		cost = 0
-		stringIdentifier = ""
-		producedItemsCount = [0 for _ in range(InputDataInstance.instance.nItems)]
-		for period, periodValue in enumerate(rawDnaArray):
-			if periodValue != 0:
-				item = periodValue - 1
-				position = producedItemsCount[item]
-
-				gene = Gene(item, period, position, prevGene)
-				gene.calculateChangeOverCost()
-				gene.calculateStockingCost()
-				gene.calculateCost()
-
-				dnaArray[item].append(gene)
-				prevGene = item, position
-				cost += gene.cost
-				producedItemsCount[item] += 1
-
-			stringIdentifier += str(periodValue)
-			
-		chromosome = Chromosome()
-		chromosome.dnaArray = dnaArray
-		chromosome.stringIdentifier = stringIdentifier
-		chromosome.cost = cost
-		
-		return chromosome
-
-
-	@classmethod
 	def evaluateDnaArray(cls, dnaArray):
 		"""
 		"""
@@ -153,7 +113,7 @@ class Chromosome(object):
 		genesList = sorted([gene for itemProdGenes in dnaArray for gene in itemProdGenes], key= lambda gene: gene.period)
 
 		prevGene = None
-		stringIdentifier = "0" * InputDataInstance.instance.nPeriods
+		stringIdentifier = [0] * InputDataInstance.instance.nPeriods
 		cost = 0
 		for gene in genesList:
 			tmp = (prevGene.item, prevGene.position) if prevGene is not None else None 
@@ -163,12 +123,12 @@ class Chromosome(object):
 			gene.calculateCost()
 			cost += gene.cost
 			prevGene = gene
-			stringIdentifier = stringIdentifier[:gene.period] + str(gene.item + 1) + stringIdentifier[gene.period + 1:]
+			stringIdentifier[gene.period] = gene.item + 1
 
 		chromosome = Chromosome()
 		chromosome.dnaArray = dnaArray
 		chromosome.cost = cost
-		chromosome.stringIdentifier = stringIdentifier
+		chromosome.stringIdentifier = tuple(stringIdentifier)
 		return chromosome
 
 
@@ -225,26 +185,13 @@ class Chromosome(object):
 		print("test : ", chromosome.dnaArray)
 		return chromosome
 
-	# @classmethod
-	# def classRenderDnaArray(cls, dnaArray):
-	# 	"""
-	# 	"""
-	# 	result = [0 for _ in range(InputDataInstance.instance.nPeriods)]
-
-	# 	for item, itemIndices in enumerate(dnaArray):
-	# 		for gene in itemIndices:
-	# 			if gene is not None:
-	# 				result[gene.period] = item + 1
-
-	# 	return result
-
 
 	def __lt__(self, chromosome):
 		return self.cost < chromosome.cost
 
 	def __repr__(self):
 		# return "{} : {}".format(Chromosome.classRenderDnaArray(self.dnaArray), self.cost)
-		return "[{}] : {}".format(self.stringIdentifier, self.cost)
+		return "{} : {}".format(self.stringIdentifier, self.cost)
 		# return "{} : {} | {} - {} /".format(self.renderDnaArray(), self.cost, Chromosome.calculateCostPlainDNA(Chromosome.classRenderDnaArray(self.dnaArray), InputDataInstance.instance), Chromosome.feasible(self.dnaArray, InputDataInstance.instance))
 
 	def __eq__(self, chromosome):

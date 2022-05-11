@@ -32,7 +32,7 @@ class CrossOverNode:
 
         self.chromosome.stringIdentifier = ['*'] * InputDataInstance.instance.nPeriods
         self.itemsToOrder = copy.deepcopy(CrossOverNode.itemsToOrder)
-        # print("itemsToOrder before : ", self.itemsToOrder)
+        print("itemsToOrder before : ", self.itemsToOrder)
 
         positionReckoning = True
         for period in reversed(range(InputDataInstance.instance.nPeriods)):
@@ -57,7 +57,7 @@ class CrossOverNode:
                 self.blankPeriods.insert(0, period)
                 positionReckoning = False
 
-        # print("Result id : ", self.parentChromosomes, "\n ---",self.chromosome.stringIdentifier, self.blankPeriods, self.itemsToOrder, self.chromosome.dnaArray)
+        print("Result id : ", self.parentChromosomes, "\n --- ",self.chromosome.stringIdentifier, self.blankPeriods, self.itemsToOrder, self.chromosome.dnaArray)
 
 
     def children(self):
@@ -82,10 +82,10 @@ class CrossOverNode:
         gene.calculateCost()
         if self.lastPlacedItem is not None:
             lastPlacedGene = (self.chromosome.dnaArray[self.lastPlacedItem[0]][self.lastPlacedItem[1]])
+            print(" **************** last gene", self.lastPlacedItem, self.prevBlankPeriod, lastPlacedGene, self.chromosome.dnaArray)
             lastPlacedGene.prevGene = (item0, position)
             lastPlacedGene.calculateChangeOverCost()
             lastPlacedGene.calculateCost()
-            # print(" **************** last gene", lastPlacedGene, lastPlacedGene.cost)
 
         self.chromosome.dnaArray[item0][position] = gene
         self.lastPlacedItem = (item0, position)
@@ -114,11 +114,14 @@ class CrossOverNode:
                     self.itemsToOrder[-1][0] -= 1
 
 
-    def generateChild(self):
+    def generateChild(self, stopEvent = None):
         """
         """
 
-        # print("koko", self.blankPeriods, "|", self.itemsToOrder)
+        if stopEvent is not None and stopEvent.is_set():
+            yield None
+
+        print("koko", self.blankPeriods, "|", self.itemsToOrder)
         if len(self.blankPeriods) == 0:
             if self.prevBlankPeriod > 0:
                 self.blankPeriods.insert(0, -1)
@@ -128,48 +131,19 @@ class CrossOverNode:
         self.catchUpLeftOrders()
 
         period = self.blankPeriods[-1]
-        for item, itemData in self.itemsToOrder.items():
+        itemsToOrderKeys = list(self.itemsToOrder.keys())
+        random.shuffle(itemsToOrderKeys)
+        for item in itemsToOrderKeys:
+            itemData = self.itemsToOrder[item]
             node = None
-            if item > 0: 
-                # print("koko 2", item)
+            if item >= 0: 
+                print("koko-2", item, itemData)
                 if itemData[0] > 0 and InputDataInstance.instance.demandsArrayZipped[item][itemData[1]] >= period:
-                    stringIdentifier = copy.deepcopy(self.chromosome.stringIdentifier)
-                    stringIdentifier[period] = item + 1
-                    blankPeriods = copy.deepcopy(self.blankPeriods)
-                    blankPeriods = blankPeriods[:-1]
-                    itemsToOrder = copy.deepcopy(self.itemsToOrder)
-                    itemsToOrder[item][0] -= 1
-                    itemsToOrder[item][1] -= 1
-
-                    node = CrossOverNode(self.parentChromosomes)
-                    node.chromosome.stringIdentifier = stringIdentifier
-                    # dna array
-                    # print("kitoko")
-                    self.addGene(item, period, self.itemsToOrder[item][1])
-                    dnaArray = copy.deepcopy(self.chromosome.dnaArray)
-                    node.chromosome.dnaArray = dnaArray
-                    node.blankPeriods = blankPeriods
-                    node.prevBlankPeriod = period
-                    node.itemsToOrder = itemsToOrder
-                    node.lastPlacedItem = self.lastPlacedItem
+                    node = self.orderItem(item, period)
 
             else: # if zero
                 if self.itemsToOrder[-1][0] > 0:
-                    stringIdentifier = copy.deepcopy(self.chromosome.stringIdentifier)
-                    stringIdentifier[period] = 0
-                    blankPeriods = copy.deepcopy(self.blankPeriods)
-                    blankPeriods = blankPeriods[:-1]
-                    itemsToOrder = copy.deepcopy(self.itemsToOrder)
-                    itemsToOrder[-1][0] -= 1
-
-                    node = CrossOverNode(self.parentChromosomes)
-                    node.chromosome.stringIdentifier = stringIdentifier
-                    dnaArray = copy.deepcopy(self.chromosome.dnaArray)
-                    node.chromosome.dnaArray = dnaArray
-                    node.blankPeriods = blankPeriods
-                    node.prevBlankPeriod = period
-                    node.itemsToOrder = itemsToOrder
-                    node.lastPlacedItem = self.lastPlacedItem
+                    node = self.orderItem(item, period)
 
             if node is None:
                 continue
@@ -178,6 +152,34 @@ class CrossOverNode:
         yield None
             
 
+    def orderItem(self, item, period):
+        """
+        """
+        
+        stringIdentifier = copy.deepcopy(self.chromosome.stringIdentifier)
+        stringIdentifier[period] = item + 1
+        blankPeriods = copy.deepcopy(self.blankPeriods)
+        blankPeriods = blankPeriods[:-1]
+        itemsToOrder = copy.deepcopy(self.itemsToOrder)
+        itemsToOrder[item][0] -= 1
+
+        node = CrossOverNode(self.parentChromosomes)
+        node.chromosome.stringIdentifier = stringIdentifier
+
+        # dna array
+        if item >= 0:
+            itemsToOrder[item][1] -= 1
+            self.addGene(item, period, self.itemsToOrder[item][1])
+
+        dnaArray = copy.deepcopy(self.chromosome.dnaArray)
+        node.chromosome.dnaArray = dnaArray
+        node.blankPeriods = blankPeriods
+        node.prevBlankPeriod = period
+        node.itemsToOrder = itemsToOrder
+        node.lastPlacedItem = self.lastPlacedItem
+        print("kitoko", node.chromosome)
+
+        return node
         
     def __repr__(self):
         return "{}".format(self.chromosome)

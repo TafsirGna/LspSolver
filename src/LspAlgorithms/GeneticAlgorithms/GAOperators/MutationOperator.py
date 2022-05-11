@@ -11,7 +11,7 @@ class MutationOperator:
         """
         pass
 
-    def process(self, chromosome, strategy = "simple_mutation"): # strategy :  medium/advanced
+    def process(self, chromosome): # strategy :  medium/advanced
         """
         """
 

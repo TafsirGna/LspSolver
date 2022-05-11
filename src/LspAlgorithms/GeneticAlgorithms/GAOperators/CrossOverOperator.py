@@ -40,10 +40,10 @@ class CrossOverOperator:
         if node is None:
             return None
 
-        # print("processing : ", node.chromosome, node.blankPeriods, " | ", node.itemsToOrder, ' | ', node.chromosome.dnaArray)
+        print("processing : ", node.chromosome, node.blankPeriods, " | ", node.itemsToOrder, ' | ', node.chromosome.dnaArray)
 
         if len(node.blankPeriods) == 0:
-
+            
             if node.prevBlankPeriod is not None and node.prevBlankPeriod > 0:
                 node.blankPeriods.insert(0, -1)
                 node.catchUpLeftOrders() 
@@ -61,13 +61,15 @@ class CrossOverOperator:
                 print("processing : ", node.chromosome, node.blankPeriods, " | ", node.itemsToOrder, ' | ', node.chromosome.dnaArray)
                 print("//////////////////////////////////////////////////////////////////////////", self.parentChromosomes)
             else:
+                print("after processing : ", node.chromosome, node.blankPeriods, " | ", node.itemsToOrder, ' | ', node.chromosome.dnaArray)
                 self.stopSearchEvent.set()
                 result.append(chromosome)
-            return None
+                return None
 
-        for child in node.generateChild():
+        for child in node.generateChild(self.stopSearchEvent):
+            self.nextNode(child, result)
+            
             if self.stopSearchEvent.is_set():
                 return None
-            self.nextNode(child, result)
 
         return None
