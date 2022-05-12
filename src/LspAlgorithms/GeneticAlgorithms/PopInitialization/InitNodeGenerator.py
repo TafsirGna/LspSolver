@@ -1,5 +1,6 @@
 import uuid
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
+from LspAlgorithms.GeneticAlgorithms.LocalSearch.LocalSearchEngine import LocalSearchEngine
 
 
 class InitNodeGenerator:
@@ -33,11 +34,19 @@ class InitNodeGenerator:
             if pipeline.full():
                 return None
 
-            if not Chromosome.feasible(node.chromosome):
-                print("/////////////////////////////////////////////////", node.chromosome)
+            # if not Chromosome.feasible(node.chromosome):
+            #     print("/////////////////////////////////////////////////", node.chromosome)
 
             node.chromosome.stringIdentifier = tuple(node.chromosome.stringIdentifier)
-            pipeline.put(node)
+            pipeline.put(node.chromosome)
+
+            # #
+            # chromosomes = (LocalSearchEngine().process(node.chromosome, "population"))
+            # for chromosome in chromosomes:
+            #     pipeline.put(chromosome)
+            #     if pipeline.full():
+            #         return None
+
             return None
 
         for child in node.generateChild():

@@ -27,7 +27,7 @@ class InitNodeGeneratorManager:
         nodeGenerator.generate(self.pipelines[nodeGenerator.uuid])
 
 
-    def getNode(self):
+    def getInstance(self):
         """
         """
         
@@ -38,8 +38,8 @@ class InitNodeGeneratorManager:
                     if key not in empties:
                         empties.append(key)
                 else:
-                    node = self.pipelines[key].get()                    
-                    yield node
+                    instance = self.pipelines[key].get()                    
+                    yield instance
 
         yield None
             

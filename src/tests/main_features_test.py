@@ -25,7 +25,7 @@ class TestMainFeatures:
         # [2, 2, 2, 3, 1, 0, 0, 1]
         print("Chromosome ", c)
         # # [2, 1, 2, 0, 1]
-        LspRuntimeMonitor.mutation_strategy = "simple_mutation"
+        LspRuntimeMonitor.mutation_strategy = "population"
         print("1 -- ", (MutationOperator()).process(c))
 
         assert 0

@@ -54,6 +54,7 @@ class LocalSearchNode:
 
         # Making up the stringIdentifier of the result chromosome
         stringIdentifier = list(chromosome.stringIdentifier)
+        dnaArray = None
 
         gene1Item, gene1Position = swap[0][0], swap[0][1]
         if swap[1][0] == -1:
@@ -71,15 +72,6 @@ class LocalSearchNode:
             else:
                 (dnaArray[gene1Item][gene1Position]).period = newPeriod
             dnaArray[gene1Item][gene1Position].calculateStockingCost()
-
-            result = None
-            if context == "mutation":
-                result = Chromosome.evaluateDnaArray(dnaArray)
-            else:
-                result = Chromosome()
-                result.dnaArray = dnaArray
-                result.stringIdentifier = stringIdentifier
-            return result
 
         else:
             gene2Item, gene2Position = swap[1][0], swap[1][1]
@@ -99,26 +91,26 @@ class LocalSearchNode:
             gene1.calculateStockingCost()
             gene2.calculateStockingCost()
 
-            result = None
-            if context == "mutation":
-                result = Chromosome.evaluateDnaArray(dnaArray)
-            else:
-                result = Chromosome()
-                result.dnaArray = dnaArray
-                result.stringIdentifier = stringIdentifier
-            return result
-            
+
+        result = None
+        if context == "mutation":
+            result = Chromosome.evaluateDnaArray(dnaArray)
+        else:
+            result = Chromosome()
+            result.dnaArray = dnaArray
+            result.stringIdentifier = stringIdentifier
+        return result
 
 
-    @classmethod
-    def allGenePossibleMutations(cls, gene1, chromosome, context = "mutation", strategy = "all"): # strategy can be "all" or "null" only for mutations related to null periods
-        """
-        """
+    # @classmethod
+    # def allGenePossibleMutations(cls, gene1, chromosome, context = "mutation", strategy = "all"): # strategy can be "all" or "null" only for mutations related to null periods
+    #     """
+    #     """
 
-        mutations = []
-        for mutation in cls.generateGeneMutations(gene1, chromosome, context, strategy):
-            mutations.append(mutation)
-        return mutations
+    #     mutations = []
+    #     for mutation in cls.generateGeneMutations(gene1, chromosome, context, strategy):
+    #         mutations.append(mutation)
+    #     return mutations
 
 
     @classmethod

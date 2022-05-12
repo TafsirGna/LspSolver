@@ -49,6 +49,9 @@ class LocalSearchEngine:
                 return 
         elif strategy == "population":
             result["chromosomes"].append(node.chromosome)
+            if len(result["chromosomes"]) > ParameterData.instance.popSize:
+                self.stopSearchEvent.set()
+                return
 
         result["depthIndex"] += 1
         children = []

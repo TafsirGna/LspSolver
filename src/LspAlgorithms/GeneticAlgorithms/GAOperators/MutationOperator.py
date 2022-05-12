@@ -17,6 +17,7 @@ class MutationOperator:
 
         strategy = LspRuntimeMonitor.mutation_strategy
         result = (LocalSearchEngine()).process(chromosome, strategy)
+        print("Result : ", result)
         # No mutation found
         if len(result) == 0:
             return chromosome

@@ -17,7 +17,8 @@ class ParameterData:
         self.nPrimaryThreads = 1
         self.nMigrants = 1
         self.popUniquesPercentage25 = 0.25
-        self.popUniquesPercentage10 = 0.10
+        self.popUniquesPercentage50 = 0.5
+        self.popUniquesPercentage10 = 0.1
         self.simpleMutationDepthIndex = 1
 
     def save(self):

@@ -1,8 +1,12 @@
 #!/usr/bin/python3.5
 # -*-coding: utf-8 -*
 
+from collections import defaultdict
 import concurrent.futures
+from queue import Queue
+import threading
 import uuid
+from LspAlgorithms.GeneticAlgorithms.LocalSearch.LocalSearchEngine import LocalSearchEngine
 from LspAlgorithms.GeneticAlgorithms.PopulationEvaluator import PopulationEvaluator
 from LspRuntimeMonitor import LspRuntimeMonitor
 from ..PopInitialization.PopInitializer import PopInitializer
@@ -18,6 +22,22 @@ class GeneticAlgorithm:
 		"""
 
 		self.popInitializer = PopInitializer()
+		# Creating a deamon thread to perform local search
+		self.daemonThreads = defaultdict(lambda: None)
+		self.dThreadPipelines = defaultdict(lambda: {"input": Queue(), "output": Queue()})
+
+
+	def daemonTask(self, mainThreadUUID):
+		"""
+		"""
+
+		dThreadPipelines = self.dThreadPipelines[mainThreadUUID]
+
+		while True:
+			if not dThreadPipelines["input"].empty():
+				chromosome = dThreadPipelines["input"].get()
+				result = (LocalSearchEngine().process(chromosome, "positive_mutation"))
+				dThreadPipelines["output"].put(result)
 
 
 	def process(self, population):
@@ -28,6 +48,13 @@ class GeneticAlgorithm:
 		generationIndex = 0
 		population.threadId = threadUUID
 		popEvaluator = PopulationEvaluator()
+		
+		#
+		dThreadPipelines = self.dThreadPipelines[threadUUID]
+		self.daemonThreads[threadUUID] = threading.Thread(target=self.daemonTask, args=(threadUUID,), daemon=True)
+		# (self.daemonThreads[threadUUID]).start()
+		
+		population.dThreadOutputPipeline = dThreadPipelines["output"] 
 
 		while popEvaluator.evaluate(population, generationIndex) != "TERMINATE":
 			# if generationIndex == 10:
@@ -39,6 +66,7 @@ class GeneticAlgorithm:
 			
 			generationIndex += 1
 
+	# (self.daemonThreads[threadUUID]).
 
 	def solve(self):
 		"""

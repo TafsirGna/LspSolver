@@ -31,15 +31,17 @@ class Population:
         self.threadPipes = defaultdict(lambda: Queue(maxsize=ceil(self.popSize/ParameterData.instance.nReplicaThreads)))
         self.newPop = None
 
+        self.dThreadOutputPipeline = None
+
 
     def fill(self, nodeGeneratorManager):
         """
         """
         
-        for node in nodeGeneratorManager.getNode():
-            if node is None:
+        for instance in nodeGeneratorManager.getInstance():
+            if instance is None:
                 break
-            result = self.add(node.chromosome)
+            result = self.add(instance)
             if result is None:
                 break
         
@@ -56,6 +58,7 @@ class Population:
             # executor.submit(self.getNewPopulation)
 
         self.getNewPopulation()
+        self.newPop.dThreadOutputPipeline =  self.dThreadOutputPipeline
         return self.newPop
 
     
@@ -63,7 +66,13 @@ class Population:
         """
         """
 
-        self.newPop = Population(LspRuntimeMonitor.popsData[self.threadId]["elites"], self.popSize)
+        elites = LspRuntimeMonitor.popsData[self.threadId]["elites"]
+        # checking pipeline status 
+        if not self.dThreadOutputPipeline.empty():
+            chromosome = self.dThreadOutputPipeline.get()
+            elites.append(chromosome)
+
+        self.newPop = Population(elites, self.popSize)
         self.newPop.threadId = self.threadId
 
         while len(self.newPop.chromosomes) < self.popSize:
