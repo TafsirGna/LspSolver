@@ -1,9 +1,12 @@
+import random
 import threading
 import numpy as np
 
 from LspAlgorithms.GeneticAlgorithms import Chromosome
+from LspAlgorithms.GeneticAlgorithms.PopInitialization.Population import Population
 from LspRuntimeMonitor import LspRuntimeMonitor
 from ParameterSearch.ParameterData import ParameterData
+from .LocalSearch.LocalSearchEngine import LocalSearchEngine
 
 class PopulationEvaluator:
     """
@@ -17,27 +20,32 @@ class PopulationEvaluator:
         self.threshold3Event = threading.Event()
 
 
-    def evaluate(self, population, generationIndex):
+    def evaluate(self, population, dThreadInputPipeline, generationIndex):
         """
         """
 
-        population.completeInit()
+        if LspRuntimeMonitor.popsData[population.lineageIdentifier] is None:
+            LspRuntimeMonitor.popsData[population.lineageIdentifier] = {"min": [], "max": [], "mean": [], "std": [], "elites": set()}
 
         # setting min, max, mean
-        if LspRuntimeMonitor.popsData[population.threadId] is None:
-            LspRuntimeMonitor.popsData[population.threadId] = {"min": [], "max": [], "mean": [], "std": [], "elites": []}
+        LspRuntimeMonitor.popsData[population.lineageIdentifier]["min"].append(population.minElement().cost)
+        LspRuntimeMonitor.popsData[population.lineageIdentifier]["max"].append(population.maxElement().cost)
 
-        LspRuntimeMonitor.popsData[population.threadId]["min"].append(population.minCostChromosome.cost)
-        LspRuntimeMonitor.popsData[population.threadId]["max"].append(population.maxCostChromosome.cost)
+        #
+        # uniquesPercentage = float(len(population.uniques) / len(population.chromosomes))
+
+        # #
+        # if uniquesPercentage <= ParameterData.instance.popUniquesPercentage50:
+        #     if not self.threshold2Event.is_set():
+        #         print("55555555555555000000000000000000000000000000000000000000000000000000000000", generationIndex)
+        #         # chromosome = random.choice(population.chromosomes)
+        #         # result = (LocalSearchEngine().process(chromosome, "positive_mutation"))[0]
+        #         # (LspRuntimeMonitor.popsData[population.threadId]["elites"]).add(result)
+        #         self.threshold2Event.set()
 
         # Elites
-        nElites = len(population.elites)
-        LspRuntimeMonitor.popsData[population.threadId]["elites"] += population.elites
-        (LspRuntimeMonitor.popsData[population.threadId]["elites"]).sort()
-        LspRuntimeMonitor.popsData[population.threadId]["elites"] = (LspRuntimeMonitor.popsData[population.threadId]["elites"])[:nElites]
-
-        uniquesPercentage = float(len(population.uniques) / len(population.chromosomes))
-
+        LspRuntimeMonitor.popsData[population.lineageIdentifier]["elites"] = (LspRuntimeMonitor.popsData[population.lineageIdentifier]["elites"]).union(population.elites())
+        LspRuntimeMonitor.popsData[population.lineageIdentifier]["elites"] = set(sorted(LspRuntimeMonitor.popsData[population.lineageIdentifier]["elites"])[:Population.eliteSizes[population.lineageIdentifier]])
 
         # #
         # if uniquesPercentage <= ParameterData.instance.popUniquesPercentage50:
@@ -72,7 +80,7 @@ class PopulationEvaluator:
         #     #     LspRuntimeMonitor.mutation_strategy = "simple_mutation"
 
         #
-        if len(population.uniques) == 1:
+        if len(population.chromosomes) == 1:
             return "TERMINATE"
 
         return "CONTINUE"

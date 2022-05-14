@@ -44,20 +44,18 @@ class GeneticAlgorithm:
 		"""
 		"""
 
-		threadUUID = uuid.uuid4()
 		generationIndex = 0
-		population.threadId = threadUUID
 		popEvaluator = PopulationEvaluator()
 		
 		#
-		dThreadPipelines = self.dThreadPipelines[threadUUID]
-		self.daemonThreads[threadUUID] = threading.Thread(target=self.daemonTask, args=(threadUUID,), daemon=True)
+		dThreadPipelines = self.dThreadPipelines[population.lineageIdentifier]
+		self.daemonThreads[population.lineageIdentifier] = threading.Thread(target=self.daemonTask, args=(population.lineageIdentifier,), daemon=True)
 		# (self.daemonThreads[threadUUID]).start()
 		
 		population.dThreadOutputPipeline = dThreadPipelines["output"] 
 
-		while popEvaluator.evaluate(population, generationIndex) != "TERMINATE":
-			# if generationIndex == 10:
+		while popEvaluator.evaluate(population, dThreadPipelines["input"], generationIndex) != "TERMINATE":
+			# if generationIndex == 1:
 			# 	break
 
 			population = population.evolve()

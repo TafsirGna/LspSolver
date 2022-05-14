@@ -3,6 +3,7 @@ from math import ceil
 from queue import Queue
 import random
 import concurrent.futures
+import threading
 import uuid
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
 from LspAlgorithms.GeneticAlgorithms.GAOperators.CrossOverOperator import CrossOverOperator
@@ -13,23 +14,15 @@ from ParameterSearch.ParameterData import ParameterData
 
 class Population:
 
-    def __init__(self, chromosomes = [], popSize = None) -> None:
+    popSizes = defaultdict(lambda: ParameterData.instance.popSize)
+    eliteSizes = defaultdict(lambda: 0)
+
+    def __init__(self, lineageIdentifier = None) -> None:
         """
         """
-        self.chromosomes = chromosomes
-        self.uniques = defaultdict(lambda: None)
-        for chromosome in self.chromosomes:
-            self.uniques[chromosome.stringIdentifier] = chromosome
-
-        self.elites = None
-
-        self.maxCostChromosome, self.minCostChromosome = None, None
-
-        self.popSize = popSize if popSize != None else ParameterData.instance.popSize
-        self.threadId = None
-
-        self.threadPipes = defaultdict(lambda: Queue(maxsize=ceil(self.popSize/ParameterData.instance.nReplicaThreads)))
-        self.newPop = None
+        self.chromosomes = defaultdict(lambda: None)
+        self.lineageIdentifier = uuid.uuid4() if lineageIdentifier is None else lineageIdentifier 
+        self.popLength = 0
 
         self.dThreadOutputPipeline = None
 
@@ -45,7 +38,7 @@ class Population:
             if result is None:
                 break
         
-        self.popSize = len(self.chromosomes)
+        Population.popSizes[self.lineageIdentifier] = self.popLength
         
         
     def evolve(self):
@@ -53,111 +46,114 @@ class Population:
         """
         selectionOperator = SelectionOperator(self)
 
+        #
+        # checking pipeline status 
+        # if not self.dThreadOutputPipeline.empty():
+        #     chromosome = self.dThreadOutputPipeline.get()
+        #     elites.append(chromosome)
+
+        newPop = Population(self.lineageIdentifier)
+        # filling the elites in the new population
+        for chromosome in list(LspRuntimeMonitor.popsData[self.lineageIdentifier]["elites"]):
+            newPop.add(chromosome)
+
+        popLock = threading.Lock()
+
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            print(list(executor.map(self.threadTask, [selectionOperator] * ParameterData.instance.nReplicaThreads)))
+            print(list(executor.map(self.threadTask, 
+                                        [selectionOperator] * ParameterData.instance.nReplicaThreads, 
+                                        [popLock] * ParameterData.instance.nReplicaThreads,
+                                        [newPop] * ParameterData.instance.nReplicaThreads)))
             # executor.submit(self.getNewPopulation)
 
-        self.getNewPopulation()
-        self.newPop.dThreadOutputPipeline =  self.dThreadOutputPipeline
-        return self.newPop
+        newPop.dThreadOutputPipeline =  self.dThreadOutputPipeline
+        return newPop
 
-    
-    def getNewPopulation(self):
+
+    def elites(self):
         """
         """
 
-        elites = LspRuntimeMonitor.popsData[self.threadId]["elites"]
-        # checking pipeline status 
-        if not self.dThreadOutputPipeline.empty():
-            chromosome = self.dThreadOutputPipeline.get()
-            elites.append(chromosome)
+        # Elites 
+        elites = sorted([element["chromosome"] for element in self.chromosomes.values()])
+        if Population.eliteSizes[self.lineageIdentifier] == 0:
+            size = Population.popSizes[self.lineageIdentifier] * ParameterData.instance.elitePercentage 
+            size = (1 if size < 1 else size)
+            Population.eliteSizes[self.lineageIdentifier] = size
+            
+        return set(elites[:Population.eliteSizes[self.lineageIdentifier]])
+                
 
-        self.newPop = Population(elites, self.popSize)
-        self.newPop.threadId = self.threadId
-
-        while len(self.newPop.chromosomes) < self.popSize:
-
-            # print("okooooooooooooooooo 1")
-            for pipe in self.threadPipes.values():
-                # print("okooooooooooooooooo 2")
-                chromosome = pipe.get()
-                result = self.newPop.add(chromosome)
-                if result is None:
-                    return
-
-
-    def completeInit(self):
+    def maxElement(self):
         """
+        """ 
+        elements = sorted(self.chromosomes.values(), key=lambda element: element["chromosome"])
+        return elements[-1]["chromosome"]
+
+
+    def minElement(self):
         """
-
-        chromosomes = sorted(self.uniques.values())
-        self.maxCostChromosome = chromosomes[-1]
-        self.minCostChromosome = chromosomes[0]
-        # print("maaaaaaaaaaaaaax-------------", self.maxCostChromosome)
-
-        self.elites = Population.elites(self)
-
-    @classmethod
-    def elites(cls, population):
-
-        chromosomes = sorted(population.uniques.values())
-        elites = []
-
-        if LspRuntimeMonitor.popsData[population.threadId] is not None:
-            nElites = len(LspRuntimeMonitor.popsData[population.threadId]["elites"])
-            if nElites == 0:
-                nElites = int(len(population.chromosomes) * ParameterData.instance.elitePercentage) 
-                nElites = (1 if nElites < 1 else nElites)
-                elites = chromosomes[:nElites]
-            else:
-                elites = chromosomes[:nElites]
-        # print("After Elite setting -- : ", self.elites)
-        return elites
+        """    
+        elements = sorted(self.chromosomes.values(), key=lambda element: element["chromosome"])
+        return elements[0]["chromosome"]    
 
 
     def add(self, chromosome):
         """
         """
 
-        if len(self.chromosomes) >= self.popSize:
+        if self.popLength >= Population.popSizes[self.lineageIdentifier]:
             return None
 
-        self.chromosomes.append(chromosome)
-
-        if self.uniques[chromosome.stringIdentifier] is None:
-            self.uniques[chromosome.stringIdentifier] = chromosome 
+        if self.chromosomes[chromosome.stringIdentifier] is None:
+            self.chromosomes[chromosome.stringIdentifier] = {"chromosome": chromosome, "size": 1}
+        else:
+            self.chromosomes[chromosome.stringIdentifier]["size"] += 1
+        
+        self.popLength += 1
 
         # Chromosome Pool
         if Chromosome.pool[chromosome.stringIdentifier] is None:
             Chromosome.pool[chromosome.stringIdentifier] = chromosome   
 
-        return chromosome
+        return self.chromosomes[chromosome.stringIdentifier]
 
 
-    def threadTask(self, selectionOperator):
+    def threadTask(self, selectionOperator, popLock, newPop):
         """
         """
+
         threadID = uuid.uuid4()
+        queue = []
 
-        while not self.threadPipes[threadID].full():
+        while True:
 
-            chromosomeA, chromosomeB = selectionOperator.select()
-            chromosome = None
-            if (random.random() < ParameterData.instance.crossOverRate):
-                chromosome = (CrossOverOperator([chromosomeA, chromosomeB])).process()
-            else:
-                chromosome = chromosomeA if chromosomeA < chromosomeB else chromosomeB
+            while len(queue) < 3:
+                chromosomeA, chromosomeB = selectionOperator.select()
+                chromosome = None
+                if (random.random() < ParameterData.instance.crossOverRate):
+                    chromosome = (CrossOverOperator([chromosomeA, chromosomeB])).process()
+                    # print("Crossover : ", threadID, chromosomeA, chromosomeB, chromosome, len(newPop.chromosomes))
+                else:
+                    chromosome = chromosomeA if chromosomeA < chromosomeB else chromosomeB
 
-            if chromosome is not None and (random.random() < ParameterData.instance.mutationRate):
-                # Proceding to mutate the chromosome
-                chromosome = (MutationOperator()).process(chromosome)
+                # if chromosome is not None and (random.random() < ParameterData.instance.mutationRate):
+                #     # Proceding to mutate the chromosome
+                #     chromosome = (MutationOperator()).process(chromosome)
 
-            if chromosome is not None:
-                # print("Chromo --- ", chromosome)
-                self.threadPipes[threadID].put(chromosome)
+                if chromosome is not None:
+                    # print("Chromo --- ", chromosome)
+                    queue.append(chromosome)
 
-            # print("Thread : ", threadID, chromosome)
+            with popLock:
+                for chromosome in queue:
+                    # print("pop length : ", len(newPop.chromosomes))
+                    result = newPop.add(chromosome)
+                    if result is None:
+                        return
 
+            queue = []
+                    
 
     def __repr__(self):
         """

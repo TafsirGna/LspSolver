@@ -18,7 +18,7 @@ class PopInitializer:
         """
         """
 
-        self.populations = [Population([]) for _ in range(ParameterData.instance.nPrimaryThreads)]
+        self.populations = [Population() for _ in range(ParameterData.instance.nPrimaryThreads)]
         
         # NodeGeneratorManager
         self.nodeGeneratorManager = self.createNodeGeneratorManager()

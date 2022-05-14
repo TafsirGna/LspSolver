@@ -149,3 +149,6 @@ class Chromosome(object):
 
 	def __eq__(self, chromosome):
 		return self.stringIdentifier == chromosome.stringIdentifier
+
+	def __hash__(self) -> int:
+		return hash(self.stringIdentifier)

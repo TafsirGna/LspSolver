@@ -1,6 +1,7 @@
 import random
 import numpy as np
 from LspAlgorithms.GeneticAlgorithms import Chromosome
+from LspRuntimeMonitor import LspRuntimeMonitor
 
 class SelectionOperator:
     """
@@ -10,24 +11,27 @@ class SelectionOperator:
         """
         """
         
-        self.population = population
-        self.chromosomeIndex = 0
+        # self.chromosomeIndex = 0
 
-        self.setRouletteProbabilities()
+        self.setRouletteProbabilities(population)
 
 
-    def setRouletteProbabilities(self):
+    def setRouletteProbabilities(self, population):
         """
         """
-        maxCost = self.population.maxCostChromosome.cost + 1
+
+        self.chromosomes = [element["chromosome"] for element in population.chromosomes.values()]
+
+        maxCost = LspRuntimeMonitor.popsData[population.lineageIdentifier]["max"][-1] + 1
+        print(" maaaaaaaaaaaaaaaaaaaaaaaax : ", maxCost)
         totalFitness = 0
-        for chromosome in self.population.chromosomes:
-            chromosome.fitness = (maxCost - chromosome.cost)
+        for chromosome in self.chromosomes:
+            chromosome.fitness = (maxCost - chromosome.cost) * population.chromosomes[chromosome.stringIdentifier]["size"]
             if chromosome.fitness < 0:
-                print("", maxCost, chromosome.cost)
+                print("------------------------------------------------------", maxCost, chromosome.cost)
             totalFitness += chromosome.fitness
 
-        self.rouletteProbabilities = [float(chromosome.fitness/totalFitness) for chromosome in self.population.chromosomes]
+        self.rouletteProbabilities = [float(chromosome.fitness/totalFitness) for chromosome in self.chromosomes]
 
         # print("**************************")
         # print("Roulette : ", self.population.maxCostChromosome, " \n  \n ", self.population.chromosomes, " \n \n ", self.rouletteProbabilities)
@@ -72,4 +76,4 @@ class SelectionOperator:
         """
         """
 
-        return np.random.choice(self.population.chromosomes, p=self.rouletteProbabilities), np.random.choice(self.population.chromosomes, p=self.rouletteProbabilities)
+        return np.random.choice(self.chromosomes, p=self.rouletteProbabilities), np.random.choice(self.chromosomes, p=self.rouletteProbabilities)

@@ -39,6 +39,7 @@ class LocalSearchNode:
         children = []
 
         for child in self.generateChild():
+            # print("child : ", child)
             children.append(child)
 
         children.sort(reverse=True)
@@ -166,4 +167,4 @@ class LocalSearchNode:
     #     return None
 
     def __repr__(self) -> str:
-        pass
+        return str(self.chromosome)

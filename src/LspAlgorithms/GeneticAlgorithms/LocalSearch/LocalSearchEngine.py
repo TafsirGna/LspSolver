@@ -12,7 +12,7 @@ class LocalSearchEngine:
         """
 
         self.chromosome = None
-        self.stopSearchEvent = threading.Event()
+        self._stopSearchEvent = threading.Event()
 
 
     def process(self, chromosome, strategy = "simple_mutation"):
@@ -20,7 +20,7 @@ class LocalSearchEngine:
         strategy: simple_mutation|absolute_mutation|positive_mutation
         """
 
-        self.visitedNodes = defaultdict(lambda: None)
+        self._visitedNodes = defaultdict(lambda: None)
         self.chromosome = chromosome
         node = LocalSearchNode(chromosome)
         result = {"depthIndex": 0, "chromosomes": []}
@@ -32,31 +32,31 @@ class LocalSearchEngine:
     def nextNode(self, node, strategy, result):
         """
         """
-        if self.visitedNodes[node.chromosome.stringIdentifier] is not None:
+        if self._visitedNodes[node.chromosome.stringIdentifier] is not None:
             return None
-        self.visitedNodes[node.chromosome.stringIdentifier] = 1
+        self._visitedNodes[node.chromosome.stringIdentifier] = 1
 
         if strategy == "simple_mutation":
             if result["depthIndex"] == ParameterData.instance.simpleMutationDepthIndex:
                 result["chromosomes"].append(node.chromosome)
-                self.stopSearchEvent.set()
+                self._stopSearchEvent.set()
                 return None
         elif strategy == "positive_mutation":
             print(result["depthIndex"], node.chromosome, node.chromosome < self.chromosome)
             if node.chromosome < self.chromosome:
                 result["chromosomes"].append(node.chromosome)
-                self.stopSearchEvent.set()
+                self._stopSearchEvent.set()
                 return 
         elif strategy == "population":
             result["chromosomes"].append(node.chromosome)
             if len(result["chromosomes"]) > ParameterData.instance.popSize:
-                self.stopSearchEvent.set()
+                self._stopSearchEvent.set()
                 return
 
         result["depthIndex"] += 1
         children = []
         for child in node.generateChild():
-            if self.stopSearchEvent.is_set():
+            if self._stopSearchEvent.is_set():
                 return None
             children.append(child)
             self.nextNode(child, strategy, result)
@@ -69,5 +69,3 @@ class LocalSearchEngine:
                 return None
 
         return None
-
-        

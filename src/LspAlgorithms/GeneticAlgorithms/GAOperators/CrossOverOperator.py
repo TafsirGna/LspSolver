@@ -26,6 +26,18 @@ class CrossOverOperator:
     def process(self):
         """
         """
+        
+        same = True
+        reference = self.parentChromosomes[0]
+        for chromosome in self.parentChromosomes:
+            if chromosome != reference:
+                same = False
+        
+        if same:
+            return reference
+
+        print("Crossover : ", self.parentChromosomes)
+
 
         node = self.rootNode()
         result = []
