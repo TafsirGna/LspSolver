@@ -31,31 +31,22 @@ class PopulationEvaluator:
         LspRuntimeMonitor.popsData[population.lineageIdentifier]["min"].append(population.minElement().cost)
         LspRuntimeMonitor.popsData[population.lineageIdentifier]["max"].append(population.maxElement().cost)
 
-        #
-        # uniquesPercentage = float(len(population.uniques) / len(population.chromosomes))
-
-        # #
-        # if uniquesPercentage <= ParameterData.instance.popUniquesPercentage50:
-        #     if not self.threshold2Event.is_set():
-        #         print("55555555555555000000000000000000000000000000000000000000000000000000000000", generationIndex)
-        #         # chromosome = random.choice(population.chromosomes)
-        #         # result = (LocalSearchEngine().process(chromosome, "positive_mutation"))[0]
-        #         # (LspRuntimeMonitor.popsData[population.threadId]["elites"]).add(result)
-        #         self.threshold2Event.set()
-
         # Elites
         LspRuntimeMonitor.popsData[population.lineageIdentifier]["elites"] = (LspRuntimeMonitor.popsData[population.lineageIdentifier]["elites"]).union(population.elites())
         LspRuntimeMonitor.popsData[population.lineageIdentifier]["elites"] = set(sorted(LspRuntimeMonitor.popsData[population.lineageIdentifier]["elites"])[:Population.eliteSizes[population.lineageIdentifier]])
 
-        # #
-        # if uniquesPercentage <= ParameterData.instance.popUniquesPercentage50:
-        #     if not self.threshold2Event.is_set():
-        #         print("55555555555555000000000000000000000000000000000000000000000000000000000000", generationIndex)
-        #         ParameterData.instance.mutationRate *= 2
-        #         self.threshold2Event.set()
-        #         LspRuntimeMonitor.mutation_strategy = "positive_mutation"
-        #     else:
-        #         LspRuntimeMonitor.mutation_strategy = "simple_mutation"
+        #
+        uniquesPercentage = float(len(population.chromosomes) / Population.popSizes[population.lineageIdentifier])
+
+        #
+        if uniquesPercentage <= ParameterData.instance.popUniquesPercentage50:
+            if not self.threshold2Event.is_set():
+                print("55555555555555000000000000000000000000000000000000000000000000000000000000", generationIndex)
+                old = max(population.chromosomes.values(), key=lambda element: element["size"])
+                new = (LocalSearchEngine().process(old["chromosome"], "positive_mutation"))[0]
+                if new < old["chromosome"]:
+                    (LspRuntimeMonitor.popsData[population.lineageIdentifier]["elites"]).add(new )
+                self.threshold2Event.set()
 
 
         #

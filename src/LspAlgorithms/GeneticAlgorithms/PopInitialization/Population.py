@@ -137,9 +137,9 @@ class Population:
                 else:
                     chromosome = chromosomeA if chromosomeA < chromosomeB else chromosomeB
 
-                # if chromosome is not None and (random.random() < ParameterData.instance.mutationRate):
-                #     # Proceding to mutate the chromosome
-                #     chromosome = (MutationOperator()).process(chromosome)
+                if chromosome is not None and (random.random() < ParameterData.instance.mutationRate):
+                    # Proceding to mutate the chromosome
+                    chromosome = (MutationOperator()).process(chromosome)
 
                 if chromosome is not None:
                     # print("Chromo --- ", chromosome)

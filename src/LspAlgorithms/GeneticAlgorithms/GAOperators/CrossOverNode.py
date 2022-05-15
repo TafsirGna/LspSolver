@@ -170,7 +170,7 @@ class CrossOverNode:
         """
         """
         
-        stringIdentifier = copy.deepcopy(self.chromosome.stringIdentifier)
+        stringIdentifier = list(self.chromosome.stringIdentifier)
         stringIdentifier[period] = item + 1
         blankPeriods = copy.deepcopy(self.blankPeriods)
         blankPeriods = blankPeriods[:-1]

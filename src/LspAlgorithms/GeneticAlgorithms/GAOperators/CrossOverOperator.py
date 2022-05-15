@@ -1,3 +1,4 @@
+from collections import defaultdict
 import threading
 from LspAlgorithms.GeneticAlgorithms.GAOperators.CrossOverNode import CrossOverNode
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
@@ -12,7 +13,8 @@ class CrossOverOperator:
         """
 
         self.parentChromosomes = parentChromosomes
-        self.stopSearchEvent = threading.Event()
+        self._stopSearchEvent = threading.Event()
+        self._visitedNodes = defaultdict(lambda: None)
 
     
     def rootNode(self):
@@ -36,8 +38,7 @@ class CrossOverOperator:
         if same:
             return reference
 
-        print("Crossover : ", self.parentChromosomes)
-
+        # print("Crossover : ", self.parentChromosomes)
 
         node = self.rootNode()
         result = []
@@ -52,8 +53,15 @@ class CrossOverOperator:
     def nextNode(self, node, result):
         """
         """
+
         if node is None:
             return None
+
+        node.chromosome.stringIdentifier = tuple(node.chromosome.stringIdentifier)
+
+        if self._visitedNodes[node.chromosome.stringIdentifier] is not None:
+            return None
+        self._visitedNodes[node.chromosome.stringIdentifier] = 1
 
         # print("processing : ", node.chromosome, node.blankPeriods, " | ", node.itemsToOrder, ' | ', node.chromosome.dnaArray)
 
@@ -62,7 +70,6 @@ class CrossOverOperator:
             if node.prevBlankPeriod is not None and node.prevBlankPeriod > 0:
                 node.completeCrossOver()
 
-            node.chromosome.stringIdentifier = tuple(node.chromosome.stringIdentifier)
             chromosome = Chromosome.pool[node.chromosome.stringIdentifier]
             if chromosome is None:
                 chromosome = node.chromosome
@@ -72,14 +79,14 @@ class CrossOverOperator:
                 print("//////////////////////////////////////////////////////////////////////////", self.parentChromosomes)
             else:
                 # print("after processing : ", node.chromosome, node.blankPeriods, " | ", node.itemsToOrder, ' | ', node.chromosome.dnaArray)
-                self.stopSearchEvent.set()
+                self._stopSearchEvent.set()
                 result.append(chromosome)
                 return None
 
-        for child in node.generateChild(self.stopSearchEvent):
+        for child in node.generateChild(self._stopSearchEvent):
             self.nextNode(child, result)
             
-            if self.stopSearchEvent.is_set():
+            if self._stopSearchEvent.is_set():
                 return None
 
         return None
