@@ -20,6 +20,7 @@ class CrossOverOperator:
     def rootNode(self):
         """
         """
+
         node = CrossOverNode(self.parentChromosomes)
         node.prepSearch()
         return node
@@ -38,7 +39,7 @@ class CrossOverOperator:
         if same:
             return reference
 
-        # print("Crossover : ", self.parentChromosomes)
+        print("Crossover : ", self.parentChromosomes)
 
         node = self.rootNode()
         result = []
@@ -63,17 +64,12 @@ class CrossOverOperator:
             return None
         self._visitedNodes[node.chromosome.stringIdentifier] = 1
 
-        # print("processing : ", node.chromosome, node.blankPeriods, " | ", node.itemsToOrder, ' | ', node.chromosome.dnaArray)
-
         if len(node.blankPeriods) == 0:
-
-            if node.prevBlankPeriod is not None and node.prevBlankPeriod > 0:
-                node.completeCrossOver()
 
             chromosome = Chromosome.pool[node.chromosome.stringIdentifier]
             if chromosome is None:
-                chromosome = node.chromosome
-                chromosome.cost = Chromosome.classLightCostCalculation(chromosome.dnaArray)
+                chromosome = Chromosome.evaluateDnaArray(node.chromosome.dnaArray)
+
             if not Chromosome.feasible(chromosome):
                 print("processing : ", node.chromosome, node.blankPeriods, " | ", node.itemsToOrder, ' | ', node.chromosome.dnaArray)
                 print("//////////////////////////////////////////////////////////////////////////", self.parentChromosomes)

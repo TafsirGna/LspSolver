@@ -69,7 +69,7 @@ class Chromosome(object):
 
 				prevItemProdPeriod = (0 if j == 0 else (prods[j - 1]).period) # -> that previous period where the item has bee produced is always less than the current one
 				if (prevItemProdPeriod > gene.period):
-					print("Not feasible Reason 3", chromosome, chromosome.dnaArray)
+					print("Not feasible Reason 3", chromosome, chromosome.dnaArray, gene.period)
 					return False
 
 				if gene.period > demand: # checks that the item is produced before its demand period

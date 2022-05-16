@@ -43,7 +43,8 @@ class PopulationEvaluator:
             if not self.threshold2Event.is_set():
                 print("55555555555555000000000000000000000000000000000000000000000000000000000000", generationIndex)
                 old = max(population.chromosomes.values(), key=lambda element: element["size"])
-                new = (LocalSearchEngine().process(old["chromosome"], "positive_mutation"))[0]
+                new = (LocalSearchEngine().process(old["chromosome"], "positive_mutation"))
+                new = old["chromosome"] if len(new) == 0 else new[0]
                 if new < old["chromosome"]:
                     (LspRuntimeMonitor.popsData[population.lineageIdentifier]["elites"]).add(new )
                 self.threshold2Event.set()

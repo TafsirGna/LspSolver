@@ -159,12 +159,12 @@ class LocalSearchNode:
     def __lt__(self, node) -> bool:
         """
         """
-        return self.chromosome.cost < node.chromosome.cost
+        return self.chromosome < node.chromosome
 
-    # def __eq__(self, node) -> bool:
-    #     """
-    #     """
-    #     return None
+    def __eq__(self, node) -> bool:
+        """
+        """
+        return self.chromosome == node.chromosome
 
     def __repr__(self) -> str:
         return str(self.chromosome)
