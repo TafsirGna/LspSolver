@@ -23,7 +23,7 @@ class SelectionOperator:
         self.chromosomes = [element["chromosome"] for element in population.chromosomes.values()]
 
         maxCost = LspRuntimeMonitor.popsData[population.lineageIdentifier]["max"][-1] + 1
-        print(" maaaaaaaaaaaaaaaaaaaaaaaax : ", maxCost)
+        # print(" maaaaaaaaaaaaaaaaaaaaaaaax : ", maxCost)
         totalFitness = 0
         for chromosome in self.chromosomes:
             chromosome.fitness = (maxCost - chromosome.cost) * population.chromosomes[chromosome.stringIdentifier]["size"]

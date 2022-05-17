@@ -47,6 +47,7 @@ class CrossOverOperator:
 
         # TODO
         if len(result) == 0:
+            print("weeeeeeeeeeeeeeeeiiiiiiiiiiiiiiiiiiiiird")
             return min(self.parentChromosomes)
         return result[0]
 

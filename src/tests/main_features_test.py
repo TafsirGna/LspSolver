@@ -81,6 +81,18 @@ class TestMainFeatures:
         assert 0
 
 
+    def test_evaluateDnaArray(self):
+        """
+        """
+
+        self.setUpInput()
+
+        chromosome = Chromosome.createFromIdentifier(stringIdentifier=(10, 0, 0, 0, 9, 8, 7, 6, 5, 4, 4, 2, 1, 1, 3))
+        print(Chromosome.evaluateDnaArray(chromosome.dnaArray))
+
+        assert 0
+
+
     def test_localSearch(self):
         """
         """

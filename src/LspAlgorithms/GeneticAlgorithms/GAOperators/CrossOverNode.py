@@ -113,7 +113,6 @@ class CrossOverNode:
 
         # print("koko", self.blankPeriods, "|", self.itemsToOrder)
         if len(self.blankPeriods) == 0:
-            # self.chromosome = Chromosome.evaluateDnaArray(self.chromosome.dnaArray)
             yield self
 
         period = self.blankPeriods[0]

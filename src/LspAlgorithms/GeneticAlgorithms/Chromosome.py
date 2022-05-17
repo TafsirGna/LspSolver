@@ -2,9 +2,11 @@
 # -*-coding: utf-8 -*
 
 from collections import defaultdict
+import threading
 import numpy as np
 from LspAlgorithms.GeneticAlgorithms.Gene import Gene
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
+import concurrent.futures
 
 class Chromosome(object):
 
@@ -16,18 +18,6 @@ class Chromosome(object):
 		self.cost = 0
 		self.dnaArray = [[None for _ in indices] for indices in InputDataInstance.instance.demandsArrayZipped]
 		self.stringIdentifier = []
-
-
-	# def geneAtPeriod(self, period):
-	# 	"""
-	# 	"""
-
-	# 	for itemGenes in self.dnaArray:
-	# 		for gene in itemGenes:
-	# 			if gene.period == period:
-	# 				return gene
-
-	# 	return None
 		
 
 	@classmethod
@@ -82,29 +72,49 @@ class Chromosome(object):
 
 
 	@classmethod
+	def evaluateDnaArrayTask(cls, taskIndex, slices, arguments):
+		"""
+		"""
+
+		cost = 0
+		for index, gene in enumerate(slices[taskIndex]): 
+			(arguments["chromosome"]).dnaArray[gene.item][gene.position] = gene
+			if index > 0:
+				gene.prevGene = ((slices[taskIndex][index-1]).item, (slices[taskIndex][index-1]).position)
+				gene.calculateChangeOverCost()
+			else:
+				if taskIndex > 0:
+					gene.prevGene = ((slices[taskIndex - 1][-1]).item, (slices[taskIndex - 1][-1]).position)
+					gene.calculateChangeOverCost()
+			gene.calculateCost()
+			cost += gene.cost
+			(arguments["chromosome"]).stringIdentifier[gene.period] = gene.item + 1
+
+		with arguments["lock"]:
+			(arguments["chromosome"]).cost += cost
+		
+
+
+	@classmethod
 	def evaluateDnaArray(cls, dnaArray):
 		"""
 		"""
 
 		genesList = sorted([gene for itemProdGenes in dnaArray for gene in itemProdGenes], key= lambda gene: gene.period)
 
-		prevGene = None
-		stringIdentifier = [0] * InputDataInstance.instance.nPeriods
-		cost = 0
-		for gene in genesList:
-			tmp = (prevGene.item, prevGene.position) if prevGene is not None else None 
-			if tmp != gene.prevGene:
-				gene.prevGene = tmp 
-				gene.calculateChangeOverCost()             
-			gene.calculateCost()
-			cost += gene.cost
-			prevGene = gene
-			stringIdentifier[gene.period] = gene.item + 1
-
 		chromosome = Chromosome()
-		chromosome.dnaArray = dnaArray
-		chromosome.cost = cost
-		chromosome.stringIdentifier = tuple(stringIdentifier)
+		chromosome.stringIdentifier = [0] * InputDataInstance.instance.nPeriods
+		arguments = {"chromosome": chromosome, "lock": threading.Lock()}
+		nThreads = 3
+		# slices = [my_list[i:i + chunk_size] for i in range(0, len(my_list), chunk_size)]
+
+		slices = np.array_split(genesList, nThreads)
+		print("Slices : ", slices)
+		with concurrent.futures.ThreadPoolExecutor() as executor:
+			for index in range(nThreads):
+				executor.submit(cls.evaluateDnaArrayTask, index, slices, arguments)
+		
+		chromosome.stringIdentifier = tuple(chromosome.stringIdentifier)
 		return chromosome
 
 
@@ -135,7 +145,7 @@ class Chromosome(object):
 				producedItemsCount[item] += 1
 
 		chromosome.cost = cost
-		print("test : ", chromosome.dnaArray)
+		# print("test : ", chromosome.dnaArray)
 		return chromosome
 
 

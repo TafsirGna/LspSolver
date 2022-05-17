@@ -29,15 +29,15 @@ class LocalSearchEngine:
 
         result = {"depthIndex": 0, "chromosomes": []}
 
-        if strategy in ["simple_mutation", "absolute_mutation", "population"]:
+        if strategy in ["simple_mutation", "population"]:
             self.dfsNextNode(node, strategy, result)
-        else:
-            self.ucSearch(node, strategy, result)
+        elif strategy in ["absolute_mutation", "positive_mutation"]:
+            self.greedySearch(node, strategy, result)
 
         return result["chromosomes"]
             
 
-    def ucSearch(self, node, strategy, result):
+    def greedySearch(self, node, strategy, result):
         """
         Args - strategy: positive_mutation
         """
