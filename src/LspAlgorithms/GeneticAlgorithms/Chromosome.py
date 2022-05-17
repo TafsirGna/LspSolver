@@ -109,7 +109,7 @@ class Chromosome(object):
 		# slices = [my_list[i:i + chunk_size] for i in range(0, len(my_list), chunk_size)]
 
 		slices = np.array_split(genesList, nThreads)
-		print("Slices : ", slices)
+		# print("Slices : ", slices)
 		with concurrent.futures.ThreadPoolExecutor() as executor:
 			for index in range(nThreads):
 				executor.submit(cls.evaluateDnaArrayTask, index, slices, arguments)

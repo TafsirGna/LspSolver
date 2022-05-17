@@ -1,7 +1,10 @@
+from collections import defaultdict
 import random
+import threading
 import numpy as np
 from LspAlgorithms.GeneticAlgorithms import Chromosome
 from LspRuntimeMonitor import LspRuntimeMonitor
+import concurrent.futures
 
 class SelectionOperator:
     """
@@ -12,8 +15,25 @@ class SelectionOperator:
         """
         
         # self.chromosomeIndex = 0
-
+        self.rouletteProbabilities = [0] * len(population.chromosomes)
         self.setRouletteProbabilities(population)
+
+
+    def fitnessCalculationTask(self,threadIndex, maxCost, slice, result, population):
+        """
+        """
+
+        result["fitnessTabs"][threadIndex] = []
+        fitness = 0
+        for chromosome in slice:
+            chromosome.fitness = (maxCost - chromosome.cost) * population.chromosomes[chromosome.stringIdentifier]["size"]
+            if chromosome.fitness < 0:
+                print("------------------------------------------------------", maxCost, chromosome.cost)
+            fitness += chromosome.fitness
+            result["fitnessTabs"][threadIndex].append(chromosome)
+            
+        with result["lock"]:
+            result["totalFitness"] += fitness
 
 
     def setRouletteProbabilities(self, population):
@@ -23,19 +43,24 @@ class SelectionOperator:
         self.chromosomes = [element["chromosome"] for element in population.chromosomes.values()]
 
         maxCost = LspRuntimeMonitor.popsData[population.lineageIdentifier]["max"][-1] + 1
-        # print(" maaaaaaaaaaaaaaaaaaaaaaaax : ", maxCost)
-        totalFitness = 0
-        for chromosome in self.chromosomes:
-            chromosome.fitness = (maxCost - chromosome.cost) * population.chromosomes[chromosome.stringIdentifier]["size"]
-            if chromosome.fitness < 0:
-                print("------------------------------------------------------", maxCost, chromosome.cost)
-            totalFitness += chromosome.fitness
+        nThreads = 1
+        slices = np.array_split(self.chromosomes, nThreads)
+        result = {"totalFitness": 0, "fitnessTabs": [None] * nThreads, "lock": threading.Lock()}
+
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            for threadIndex in range(nThreads):
+                executor.submit(self.fitnessCalculationTask, threadIndex, maxCost, slices[threadIndex], result, population)
+
+        totalFitness = result["totalFitness"]
+        self.chromosomes = []
+        for fitnessTab in result["fitnessTabs"]:
+            self.chromosomes += fitnessTab
 
         self.rouletteProbabilities = [float(chromosome.fitness/totalFitness) for chromosome in self.chromosomes]
 
-        # print("**************************")
-        # print("Roulette : ", self.population.maxCostChromosome, " \n  \n ", self.population.chromosomes, " \n \n ", self.rouletteProbabilities)
-        # print("++++++++++++++++++++++++++")
+        print("**************************")
+        print("Roulette : ", self.chromosomes, " \n ", self.rouletteProbabilities)
+        print("++++++++++++++++++++++++++")
 
 
     def select(self):

@@ -69,7 +69,7 @@ class CrossOverNode:
 
 
 
-        print("Result id : ", self.parentChromosomes, "\n --- ",self.chromosome.stringIdentifier, self.blankPeriods, self.itemsToOrder, self.chromosome.dnaArray)
+        # print("Result id : ", self.parentChromosomes, "\n --- ",self.chromosome.stringIdentifier, self.blankPeriods, self.itemsToOrder, self.chromosome.dnaArray)
 
 
     def children(self):
