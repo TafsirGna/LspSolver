@@ -1,8 +1,11 @@
 import copy
+import threading
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
 from LspAlgorithms.GeneticAlgorithms.Gene import Gene
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 import random
+import concurrent.futures
+import numpy as np
 
 class CrossOverNode:
     """
@@ -26,16 +29,12 @@ class CrossOverNode:
             CrossOverNode.itemsToOrder[-1] = [InputDataInstance.instance.nPeriods - InputDataInstance.instance.demandsArray.sum()]
 
 
-    def prepSearch(self):
-        """All the genes that have the same period on both chromosomes, are replicated on the result chromosome
+    def prepSearchTask(self, itemListSlice, arguments):
         """
-
-        self.chromosome.stringIdentifier = ['*'] * InputDataInstance.instance.nPeriods
-        self.itemsToOrder = copy.deepcopy(CrossOverNode.itemsToOrder)
-        # print("itemsToOrder before : ", self.itemsToOrder)
-
+        """
+        
         # tracking all common produced items
-        for item in range(InputDataInstance.instance.nItems):
+        for item in itemListSlice:
             for position in range(len(InputDataInstance.instance.demandsArrayZipped[item])):
                 period = (self.parentChromosomes[0].dnaArray[item][position]).period
                 same = True
@@ -46,8 +45,28 @@ class CrossOverNode:
                 if same:
                     self.chromosome.dnaArray[item][position] = copy.deepcopy(self.parentChromosomes[0].dnaArray[item][position])
                     self.chromosome.stringIdentifier[period] = item + 1
-                    self.blankPeriods.remove(period)
-                    self.itemsToOrder[item].remove(position)
+                    
+                    with arguments["lock"]:
+                        self.blankPeriods.remove(period)
+                        self.itemsToOrder[item].remove(position)
+
+
+    def prepSearch(self):
+        """All the genes that have the same period on both chromosomes, are replicated on the result chromosome
+        """
+
+        self.chromosome.stringIdentifier = ['*'] * InputDataInstance.instance.nPeriods
+        self.itemsToOrder = copy.deepcopy(CrossOverNode.itemsToOrder)
+        # print("itemsToOrder before : ", self.itemsToOrder)
+
+        itemListSlices = list(range(InputDataInstance.instance.nItems))
+        nThreads = 2
+        itemListSlices = np.array_split(itemListSlices, nThreads)
+
+        arguments = {"lock": threading.Lock()}
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            for threadIndex in range(nThreads):
+                executor.submit(self.prepSearchTask, itemListSlices[threadIndex], arguments)
 
 
         # tracking all common zeros
@@ -91,17 +110,9 @@ class CrossOverNode:
         gene = Gene(item0, period, position)
         # print(item0, period, position)
         gene.calculateStockingCost()
-        gene.calculateCost()
-        
-        # lastPlacedGene = (self.chromosome.dnaArray[self.lastPlacedItem[0]][self.lastPlacedItem[1]])
-        # # print(" **************** last gene", self.lastPlacedItem, self.prevBlankPeriod, lastPlacedGene, self.chromosome.dnaArray)
-        # lastPlacedGene.prevGene = (item0, position)
-        # lastPlacedGene.calculateChangeOverCost()
-        # lastPlacedGene.calculateCost()
+        # gene.calculateCost()
 
         self.chromosome.dnaArray[item0][position] = gene
-        # self.lastPlacedItem = (item0, position)
-        # print("prou ", self.lastPlacedItem)
 
 
     def generateChild(self, stopEvent = None):

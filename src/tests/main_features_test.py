@@ -21,10 +21,11 @@ class TestMainFeatures:
 
         # c = Chromosome.createFromIdentifier(stringIdentifier=(2, 1, 0, 1, 2))
         # c = Chromosome.createFromIdentifier(stringIdentifier=(0, 2, 2, 2, 3, 1, 0, 1))
-        c = Chromosome.createFromIdentifier(stringIdentifier=(2, 3, 2, 0, 1, 2, 0, 1))
+        # c = Chromosome.createFromIdentifier(stringIdentifier=(2, 3, 2, 0, 1, 2, 0, 1)) 
+        c = Chromosome.createFromIdentifier(stringIdentifier=(0, 2, 2, 2, 1, 1, 3, 0))
         print("Chromosome ", c)
         # # [2, 1, 2, 0, 1]
-        LspRuntimeMonitor.mutation_strategy = "positive_mutation"
+        LspRuntimeMonitor.mutation_strategy = "absolute_mutation"
         print("1 -- ", (MutationOperator()).process(c))
 
         assert 0
@@ -37,8 +38,8 @@ class TestMainFeatures:
         self.setUpInput()
 
         # cA, cB = Chromosome.createFromIdentifier(stringIdentifier=(2, 1, 1, 2, 0)), Chromosome.createFromIdentifier(stringIdentifier=(2, 1, 0, 1, 2))
-        # cA, cB = Chromosome.createFromIdentifier(stringIdentifier=(2, 0, 2, 3, 2, 1, 1, 0)), Chromosome.createFromIdentifier(stringIdentifier=(0, 2, 3, 2, 2, 1, 0, 1))
-        cA, cB = Chromosome.createFromIdentifier(stringIdentifier=(9, 5, 0, 3, 0, 8, 4, 10, 0, 4, 6, 2, 1, 1, 7)), Chromosome.createFromIdentifier(stringIdentifier=(0, 0, 4, 6, 10, 8, 7, 9, 0, 4, 5, 2, 1, 1, 3))
+        cA, cB = Chromosome.createFromIdentifier(stringIdentifier=(2, 0, 2, 3, 2, 1, 1, 0)), Chromosome.createFromIdentifier(stringIdentifier=(0, 2, 3, 2, 2, 1, 0, 1))
+        # cA, cB = Chromosome.createFromIdentifier(stringIdentifier=(9, 5, 0, 3, 0, 8, 4, 10, 0, 4, 6, 2, 1, 1, 7)), Chromosome.createFromIdentifier(stringIdentifier=(0, 0, 4, 6, 10, 8, 7, 9, 0, 4, 5, 2, 1, 1, 3))
         # [(5, 6, 10, 8, 0, 0, 9, 7, 0, 4, 4, 2, 1, 1, 3) : 1811, (7, 2, 8, 5, 10, 9, 0, 0, 0, 4, 4, 6, 1, 1, 3) : 1857] 
 
         print(cA, "\n", cB, "\n -----------------------------")
@@ -110,8 +111,8 @@ class TestMainFeatures:
         """
         """ 
 
-        # inputFile = "data/input/clspInst02.data"
-        inputFile = "data/input/pigment15b.dzn"
+        inputFile = "data/input/clspInst02.data"
+        # inputFile = "data/input/pigment15b.dzn"
         # inputFile = "data/input/ps-200-10-80.dzn"
         LspRuntimeMonitor.verbose = True
         inputDataReader = InputDataReader()

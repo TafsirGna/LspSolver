@@ -43,7 +43,7 @@ class SelectionOperator:
         self.chromosomes = [element["chromosome"] for element in population.chromosomes.values()]
 
         maxCost = LspRuntimeMonitor.popsData[population.lineageIdentifier]["max"][-1] + 1
-        nThreads = 1
+        nThreads = 2
         slices = np.array_split(self.chromosomes, nThreads)
         result = {"totalFitness": 0, "fitnessTabs": [None] * nThreads, "lock": threading.Lock()}
 
@@ -58,9 +58,9 @@ class SelectionOperator:
 
         self.rouletteProbabilities = [float(chromosome.fitness/totalFitness) for chromosome in self.chromosomes]
 
-        print("**************************")
-        print("Roulette : ", self.chromosomes, " \n ", self.rouletteProbabilities)
-        print("++++++++++++++++++++++++++")
+        # print("**************************")
+        # print("Roulette : ", self.chromosomes, " \n ", self.rouletteProbabilities)
+        # print("++++++++++++++++++++++++++")
 
 
     def select(self):

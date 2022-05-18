@@ -4,6 +4,7 @@
 from collections import defaultdict
 import threading
 import numpy as np
+import copy
 from LspAlgorithms.GeneticAlgorithms.Gene import Gene
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 import concurrent.futures
@@ -78,21 +79,22 @@ class Chromosome(object):
 
 		cost = 0
 		for index, gene in enumerate(slices[taskIndex]): 
-			(arguments["chromosome"]).dnaArray[gene.item][gene.position] = gene
 			if index > 0:
 				gene.prevGene = ((slices[taskIndex][index-1]).item, (slices[taskIndex][index-1]).position)
 				gene.calculateChangeOverCost()
 			else:
-				if taskIndex > 0:
-					gene.prevGene = ((slices[taskIndex - 1][-1]).item, (slices[taskIndex - 1][-1]).position)
-					gene.calculateChangeOverCost()
+				gene.prevGene = ((slices[taskIndex - 1][-1]).item, (slices[taskIndex - 1][-1]).position) if taskIndex > 0 else None
+				gene.calculateChangeOverCost()
 			gene.calculateCost()
 			cost += gene.cost
+			(arguments["chromosome"]).dnaArray[gene.item][gene.position] = gene
 			(arguments["chromosome"]).stringIdentifier[gene.period] = gene.item + 1
+			# print("Gene details : ", gene.stockingCost, gene.changeOverCost)
 
 		with arguments["lock"]:
 			(arguments["chromosome"]).cost += cost
-		
+			# print("total : ", (arguments["chromosome"]).cost)
+		 
 
 
 	@classmethod
@@ -104,8 +106,8 @@ class Chromosome(object):
 
 		chromosome = Chromosome()
 		chromosome.stringIdentifier = [0] * InputDataInstance.instance.nPeriods
-		arguments = {"chromosome": chromosome, "lock": threading.Lock()}
-		nThreads = 3
+		nThreads = 2
+		arguments = {"chromosome": chromosome, "lock": threading.Lock(), "costs": [None] * nThreads}
 		# slices = [my_list[i:i + chunk_size] for i in range(0, len(my_list), chunk_size)]
 
 		slices = np.array_split(genesList, nThreads)
@@ -115,6 +117,8 @@ class Chromosome(object):
 				executor.submit(cls.evaluateDnaArrayTask, index, slices, arguments)
 		
 		chromosome.stringIdentifier = tuple(chromosome.stringIdentifier)
+
+		# print("Flaaaaaaaaaaaaaaaaaaaaaaaag", chromosome, Chromosome.createFromIdentifier(chromosome.stringIdentifier).cost)
 		return chromosome
 
 

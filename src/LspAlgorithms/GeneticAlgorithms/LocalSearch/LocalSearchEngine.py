@@ -1,6 +1,6 @@
 from collections import defaultdict
-import queue
 import threading
+from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
 from LspAlgorithms.GeneticAlgorithms.LocalSearch.LocalSearchNode import LocalSearchNode
 from ParameterSearch.ParameterData import ParameterData
 
@@ -28,53 +28,15 @@ class LocalSearchEngine:
         node = LocalSearchNode(chromosome)
 
         result = {"depthIndex": 0, "chromosomes": []}
-
-        if strategy in ["simple_mutation", "population"]:
-            self.dfsNextNode(node, strategy, result)
-        elif strategy in ["absolute_mutation", "positive_mutation"]:
-            self.greedySearch(node, strategy, result)
+        self.dfsNextNode(node, strategy, result)
 
         return result["chromosomes"]
-            
-
-    def greedySearch(self, node, strategy, result):
-        """
-        Args - strategy: positive_mutation
-        """
-
-        queue = [node]
-
-        while len(queue) > 0:
-
-            node = queue[0]
-            queue = queue[1:]
-
-            if self._visitedNodes[node.chromosome.stringIdentifier] is not None:
-                continue
-            self._visitedNodes[node.chromosome.stringIdentifier] = 1
-
-            # print("print")
-            for child in node.generateChild():
-                
-                # print(len(self._visitedNodes), "|", self._visitedNodes[child.chromosome.stringIdentifier])
-
-                if self._visitedNodes[child.chromosome.stringIdentifier] is not None or child in queue:
-                    continue
-
-                if strategy == "positive_mutation":
-                    # print("oooooooooooooooooooooooooooooooooooooooooo", child.chromosome)
-                    if child < self:
-                        result["chromosomes"].append(child.chromosome)
-                        return
-
-                queue.append(child)     
-
-            queue.sort() 
 
 
     def dfsNextNode(self, node, strategy, result):
         """
         """
+        
         if self._visitedNodes[node.chromosome.stringIdentifier] is not None:
             return None
         self._visitedNodes[node.chromosome.stringIdentifier] = 1
@@ -84,6 +46,12 @@ class LocalSearchEngine:
                 result["chromosomes"].append(node.chromosome)
                 self._stopSearchEvent.set()
                 return None
+        elif strategy == "positive_mutation":
+            print("positive_mutation ", result["depthIndex"], node.chromosome, node < self)
+            if node < self:
+                result["chromosomes"].append(node.chromosome)
+                self._stopSearchEvent.set()
+                return 
         elif strategy == "population":
             result["chromosomes"].append(node.chromosome)
             if len(result["chromosomes"]) > ParameterData.instance.popSize:
@@ -93,16 +61,31 @@ class LocalSearchEngine:
         result["depthIndex"] += 1
         children = []
         for child in node.generateChild():
+            # print("loulou ", child.chromosome, Chromosome.createFromIdentifier(child.chromosome.stringIdentifier))
             if self._stopSearchEvent.is_set():
                 return None
-            children.append(child)
-            self.dfsNextNode(child, strategy, result)
+
+            next = False
+            if strategy == "positive_mutation":
+                if child < node:
+                    next = True
+            elif strategy  == "absolute_mutation":
+                    if child < node:
+                        children.append(child)
+                        next = True
+            else:
+                next = True
+
+            if next:
+                self.dfsNextNode(child, strategy, result)
+                
 
         # TODO 
         if strategy == "absolute_mutation":
             print("Absolute mutation", len(children))
             if len(children) == 0:
                 result["chromosomes"].append(node.chromosome)
-                return None
+                self._stopSearchEvent.set()
+                return
 
         return None

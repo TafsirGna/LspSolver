@@ -85,12 +85,12 @@ class LocalSearchNode:
                 return Chromosome.pool[stringIdentifier]
 
             dnaArray = copy.deepcopy(chromosome.dnaArray)
-            gene1 = dnaArray[gene1Item][gene1Position]
-            gene2 = dnaArray[gene2Item][gene2Position]
+            # gene1 = dnaArray[gene1Item][gene1Position]
+            # gene2 = dnaArray[gene2Item][gene2Position]
 
-            gene1.period, gene2.period = gene2.period, gene1.period
-            gene1.calculateStockingCost()
-            gene2.calculateStockingCost()
+            (dnaArray[gene1Item][gene1Position]).period, (dnaArray[gene2Item][gene2Position]).period = dnaArray[gene2Item][gene2Position].period, dnaArray[gene1Item][gene1Position].period
+            dnaArray[gene1Item][gene1Position].calculateStockingCost()
+            dnaArray[gene2Item][gene2Position].calculateStockingCost()
 
 
         result = None

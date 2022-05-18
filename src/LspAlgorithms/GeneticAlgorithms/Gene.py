@@ -53,7 +53,7 @@ class Gene:
         """
         # return "it:{}|pos:{}|peri:{}|cos:{}|prev:({}, {})".format(self.item, self.position, self.period, self.cost, self.prevGene[0] if self.prevGene != None else None, self.prevGene[1] if self.prevGene != None else None)
         # return "{} ({}, {}) ${}".format(self.period, self.prevGene[0] if self.prevGene != None else None, self.prevGene[1] if self.prevGene != None else None, self.cost)
-        return "{}-{}-{}".format(self.item, self.position, self.period)
+        return "{}-{}-{}|{}".format(self.item, self.position, self.period, self.cost)
 
 
 
