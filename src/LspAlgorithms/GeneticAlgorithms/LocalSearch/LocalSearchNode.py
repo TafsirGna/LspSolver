@@ -78,9 +78,11 @@ class LocalSearchNode:
                 cost = chromosome.cost
                 cost -= gene1.cost
 
-                if newPeriod + 1 != gene1.period and newPeriod != gene1.period + 1:
-
-                    nextGene1, nextGene0 = LocalSearchNode.nextProdGene(gene1.period, dnaArray, chromosome.stringIdentifier), LocalSearchNode.nextProdGene(newPeriod, dnaArray, chromosome.stringIdentifier)
+                nextGene1, nextGene0 = LocalSearchNode.nextProdGene(gene1.period, dnaArray, chromosome.stringIdentifier), LocalSearchNode.nextProdGene(newPeriod, dnaArray, chromosome.stringIdentifier)
+                prevGene0 = LocalSearchNode.prevProdGene(newPeriod, dnaArray, chromosome.stringIdentifier)
+                condition1 = nextGene0 is not None and nextGene0 == gene1
+                condition2 = prevGene0 is not None and prevGene0 == gene1
+                if not (condition1 or condition2):
 
                     # print("nextGene1, nextGene0 : ", nextGene1, nextGene0)
                     cost -= nextGene1.changeOverCost if nextGene1 is not None else 0
@@ -104,8 +106,7 @@ class LocalSearchNode:
                         # print("after nextGene0 : ", nextGene0, nextGene0.changeOverCost)
                         cost += nextGene0.changeOverCost
                     else:
-                        previousGene = LocalSearchNode.prevProdGene(newPeriod, dnaArray, chromosome.stringIdentifier)
-                        (dnaArray[gene1Item][gene1Position]).prevGene = (previousGene.item, previousGene.position)
+                        (dnaArray[gene1Item][gene1Position]).prevGene = (prevGene0.item, prevGene0.position)
 
                 (dnaArray[gene1Item][gene1Position]).period = newPeriod
                 (dnaArray[gene1Item][gene1Position]).calculateChangeOverCost()
