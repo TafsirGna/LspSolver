@@ -75,27 +75,27 @@ class Population:
         """
 
         # Elites 
-        elites = sorted([element["chromosome"] for element in self.chromosomes.values()])
+
         if Population.eliteSizes[self.lineageIdentifier] == 0:
             size = Population.popSizes[self.lineageIdentifier] * ParameterData.instance.elitePercentage 
             size = (1 if size < 1 else size)
             Population.eliteSizes[self.lineageIdentifier] = size
             
-        return set(elites[:Population.eliteSizes[self.lineageIdentifier]])
+        return set([self.chromosomes[key]["chromosome"] for key in self.sortedIdentifiers[:Population.eliteSizes[self.lineageIdentifier]]])
                 
 
     def maxElement(self):
         """
-        """ 
-        elements = sorted(self.chromosomes.values(), key=lambda element: element["chromosome"])
-        return elements[-1]["chromosome"]
+        """
+
+        return self.chromosomes[self.sortedIdentifiers[-1]]["chromosome"]
 
 
     def minElement(self):
         """
-        """    
-        elements = sorted(self.chromosomes.values(), key=lambda element: element["chromosome"])
-        return elements[0]["chromosome"]    
+        """
+
+        return self.chromosomes[self.sortedIdentifiers[0]]["chromosome"]    
 
 
     def add(self, chromosome):

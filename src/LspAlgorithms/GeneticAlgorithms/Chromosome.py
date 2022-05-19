@@ -9,6 +9,8 @@ from LspAlgorithms.GeneticAlgorithms.Gene import Gene
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 import concurrent.futures
 
+from ParameterSearch.ParameterData import ParameterData
+
 class Chromosome(object):
 
 	pool = defaultdict(lambda: None) 
@@ -106,7 +108,7 @@ class Chromosome(object):
 
 		chromosome = Chromosome()
 		chromosome.stringIdentifier = [0] * InputDataInstance.instance.nPeriods
-		nThreads = 2
+		nThreads = ParameterData.instance.nReplicaSubThreads
 		arguments = {"chromosome": chromosome, "lock": threading.Lock(), "costs": [None] * nThreads}
 		# slices = [my_list[i:i + chunk_size] for i in range(0, len(my_list), chunk_size)]
 

@@ -21,7 +21,7 @@ class LocalSearchEngine:
         strategy: simple_mutation|absolute_mutation|positive_mutation
         """
 
-        # print("mutatioooooooooooon", strategy, chromosome)
+        print("mutatioooooooooooon", strategy, chromosome)
 
         self._visitedNodes = defaultdict(lambda: None)
         self.chromosome = chromosome
@@ -36,6 +36,8 @@ class LocalSearchEngine:
     def dfsNextNode(self, node, strategy, result):
         """
         """
+
+        # print("*************** Prosus", result["depthIndex"])
         
         if self._visitedNodes[node.chromosome.stringIdentifier] is not None:
             return None
@@ -62,8 +64,6 @@ class LocalSearchEngine:
         children = []
         for child in node.generateChild():
             # print("loulou ", child.chromosome, Chromosome.createFromIdentifier(child.chromosome.stringIdentifier))
-            if self._stopSearchEvent.is_set():
-                return None
 
             next = False
             if strategy == "positive_mutation":
@@ -78,6 +78,9 @@ class LocalSearchEngine:
 
             if next:
                 self.dfsNextNode(child, strategy, result)
+
+            if self._stopSearchEvent.is_set():
+                return None
                 
 
         # TODO 

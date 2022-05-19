@@ -32,9 +32,11 @@ class Gene:
     def calculateChangeOverCost(self):
         """
         """
+
         self.changeOverCost = 0
-        if (self.prevGene != None):
+        if (self.prevGene is not None):
             self.changeOverCost = InputDataInstance.instance.changeOverCostsArray[self.prevGene[0]][self.item]
+            # print("calculate change cost ", self.changeOverCost, self.prevGene)
 
 
 
@@ -53,7 +55,7 @@ class Gene:
         """
         # return "it:{}|pos:{}|peri:{}|cos:{}|prev:({}, {})".format(self.item, self.position, self.period, self.cost, self.prevGene[0] if self.prevGene != None else None, self.prevGene[1] if self.prevGene != None else None)
         # return "{} ({}, {}) ${}".format(self.period, self.prevGene[0] if self.prevGene != None else None, self.prevGene[1] if self.prevGene != None else None, self.cost)
-        return "{}-{}-{}|{}".format(self.item, self.position, self.period, self.cost)
+        return "{}-{}-{}|{} ({}, {})".format(self.item, self.position, self.period, self.cost, self.prevGene[0] if self.prevGene != None else None, self.prevGene[1] if self.prevGene != None else None)
 
 
 

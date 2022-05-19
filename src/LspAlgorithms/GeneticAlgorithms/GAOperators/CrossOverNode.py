@@ -7,6 +7,8 @@ import random
 import concurrent.futures
 import numpy as np
 
+from ParameterSearch.ParameterData import ParameterData
+
 class CrossOverNode:
     """
     """
@@ -60,7 +62,7 @@ class CrossOverNode:
         # print("itemsToOrder before : ", self.itemsToOrder)
 
         itemListSlices = list(range(InputDataInstance.instance.nItems))
-        nThreads = 2
+        nThreads = ParameterData.instance.nReplicaSubThreads
         itemListSlices = np.array_split(itemListSlices, nThreads)
 
         arguments = {"lock": threading.Lock()}

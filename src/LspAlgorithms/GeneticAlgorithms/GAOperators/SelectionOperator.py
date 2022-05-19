@@ -5,6 +5,7 @@ import numpy as np
 from LspAlgorithms.GeneticAlgorithms import Chromosome
 from LspRuntimeMonitor import LspRuntimeMonitor
 import concurrent.futures
+from ParameterSearch.ParameterData import ParameterData
 
 class SelectionOperator:
     """
@@ -43,7 +44,7 @@ class SelectionOperator:
         self.chromosomes = [element["chromosome"] for element in population.chromosomes.values()]
 
         maxCost = LspRuntimeMonitor.popsData[population.lineageIdentifier]["max"][-1] + 1
-        nThreads = 2
+        nThreads = ParameterData.instance.nReplicaSubThreads
         slices = np.array_split(self.chromosomes, nThreads)
         result = {"totalFitness": 0, "fitnessTabs": [None] * nThreads, "lock": threading.Lock()}
 

@@ -24,6 +24,8 @@ class PopulationEvaluator:
         """
         """
 
+        population.sortedIdentifiers = sorted(population.chromosomes.keys(), key=lambda key: population.chromosomes[key]["chromosome"])
+
         if LspRuntimeMonitor.popsData[population.lineageIdentifier] is None:
             LspRuntimeMonitor.popsData[population.lineageIdentifier] = {"min": [], "max": [], "mean": [], "std": [], "elites": set()}
 
@@ -41,12 +43,12 @@ class PopulationEvaluator:
         #
         # if uniquesPercentage <= ParameterData.instance.popUniquesPercentage50:
         #     if not self.threshold2Event.is_set():
-        #         print("55555555555555000000000000000000000000000000000000000000000000000000000000", generationIndex)
         #         old = max(population.chromosomes.values(), key=lambda element: element["size"])
-        #         new = (LocalSearchEngine().process(old["chromosome"], "positive_mutation"))
+        #         new = (LocalSearchEngine().process(old["chromosome"], "absolute_mutation"))
         #         new = old["chromosome"] if len(new) == 0 else new[0]
+        #         print("55555555555555000000000000000000000000000000000000000000000000000000000000", generationIndex, old["chromosome"], new, LspRuntimeMonitor.popsData[population.lineageIdentifier]["elites"])
         #         if new < old["chromosome"]:
-        #             (LspRuntimeMonitor.popsData[population.lineageIdentifier]["elites"]).add(new )
+        #             (LspRuntimeMonitor.popsData[population.lineageIdentifier]["elites"]).add(new)
         #         self.threshold2Event.set()
 
 

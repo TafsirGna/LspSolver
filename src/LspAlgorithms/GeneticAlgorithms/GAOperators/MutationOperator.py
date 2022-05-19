@@ -1,3 +1,4 @@
+from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
 from LspAlgorithms.GeneticAlgorithms.LocalSearch.LocalSearchEngine import LocalSearchEngine
 from LspRuntimeMonitor import LspRuntimeMonitor
 
@@ -21,5 +22,7 @@ class MutationOperator:
         # No mutation found
         if len(result) == 0:
             return chromosome
-            
+        
+        if (result[0]).cost != Chromosome.createFromIdentifier(result[0].stringIdentifier).cost:
+            print("huuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuugggggggggggggge")
         return result[0]
