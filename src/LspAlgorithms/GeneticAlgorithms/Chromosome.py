@@ -120,7 +120,8 @@ class Chromosome(object):
 		
 		chromosome.stringIdentifier = tuple(chromosome.stringIdentifier)
 
-		# print("Flaaaaaaaaaaaaaaaaaaaaaaaag", chromosome, Chromosome.createFromIdentifier(chromosome.stringIdentifier).cost)
+		# if (chromosome.dnaArray == Chromosome.createFromIdentifier(chromosome.stringIdentifier).dnaArray and chromosome.cost == 385):
+		# 	print("Flaaaaaaaaaaaaaaaaaaaaaaaag", chromosome.dnaArray, Chromosome.createFromIdentifier(chromosome.stringIdentifier).dnaArray)
 		return chromosome
 
 
@@ -159,8 +160,8 @@ class Chromosome(object):
 		return self.cost < chromosome.cost
 
 	def __repr__(self):
-		# return "{} : {}".format(Chromosome.classRenderDnaArray(self.dnaArray), self.cost)
 		return "{} : {}".format(self.stringIdentifier, self.cost)
+		# return "{} : {} | {}".format(self.stringIdentifier, self.cost, self.dnaArray)
 		# return "{} : {} | {} - {} /".format(self.renderDnaArray(), self.cost, Chromosome.calculateCostPlainDNA(Chromosome.classRenderDnaArray(self.dnaArray), InputDataInstance.instance), Chromosome.feasible(self.dnaArray, InputDataInstance.instance))
 
 	def __eq__(self, chromosome):

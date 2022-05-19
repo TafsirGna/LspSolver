@@ -18,7 +18,7 @@ class InitNodeGeneratorManager:
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
             executor.map(self.startNodeGenerator, self.nodeGenerators)
-            # executor.submit(self.startNodeGenerator, self.nodeGenerators[0])
+            # executor.submit(self.startNodeGenerator, self.nodeGenerators[1])
 
 
     def startNodeGenerator(self, nodeGenerator):

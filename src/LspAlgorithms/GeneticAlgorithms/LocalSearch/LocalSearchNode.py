@@ -59,7 +59,7 @@ class LocalSearchNode:
         dnaArray = None
 
         gene1Item, gene1Position = swap[0][0], swap[0][1]
-        # print("swap : ", swap, chromosome, chromosome.dnaArray)
+        print("swap : ", swap, chromosome, chromosome.dnaArray)
         if swap[1][0] == -1:
             newPeriod = swap[1][1]
             stringIdentifier[newPeriod] = gene1Item + 1
@@ -87,20 +87,22 @@ class LocalSearchNode:
                     cost -= nextGene0.changeOverCost if nextGene0 is not None else 0
 
                     if nextGene1 is not None:
-                        # print("before nextGene1 : ", nextGene1)
+                        # print("before nextGene1 : ", nextGene1, nextGene1.changeOverCost)
                         nextGene1.prevGene = gene1.prevGene
                         nextGene1.calculateChangeOverCost()
-                        # print("after nextGene1 : ", nextGene1)
+                        nextGene1.calculateCost()
+                        # print("after nextGene1 : ", nextGene1, nextGene1.changeOverCost)
                         cost += nextGene1.changeOverCost
 
                     if nextGene0 is not None:
-                        # print("before nextGene0 : ", nextGene0)
+                        # print("before nextGene0 : ", nextGene0, nextGene0.changeOverCost)
+                        (dnaArray[gene1Item][gene1Position]).prevGene = nextGene0.prevGene 
+
                         nextGene0.prevGene = (gene1.item, gene1.position)
                         nextGene0.calculateChangeOverCost()
-                        # print("after nextGene0 : ", nextGene0)
+                        nextGene0.calculateCost()
+                        # print("after nextGene0 : ", nextGene0, nextGene0.changeOverCost)
                         cost += nextGene0.changeOverCost
-
-                        (dnaArray[gene1Item][gene1Position]).prevGene = nextGene0.prevGene 
                     else:
                         previousGene = LocalSearchNode.prevProdGene(newPeriod, dnaArray, chromosome.stringIdentifier)
                         (dnaArray[gene1Item][gene1Position]).prevGene = (previousGene.item, previousGene.position)
@@ -109,6 +111,8 @@ class LocalSearchNode:
                 (dnaArray[gene1Item][gene1Position]).calculateChangeOverCost()
                 (dnaArray[gene1Item][gene1Position]).calculateStockingCost()
                 (dnaArray[gene1Item][gene1Position]).calculateCost()
+
+                # print("Ending with gene1 : ", (dnaArray[gene1Item][gene1Position]))
 
                 cost += (dnaArray[gene1Item][gene1Position]).cost
 
@@ -153,6 +157,7 @@ class LocalSearchNode:
                         # print("prevGene A: ", prevGene)
                         nextGene.prevGene = prevGene
                         nextGene.calculateChangeOverCost()
+                        nextGene.calculateCost()
                         cost += nextGene.changeOverCost
                         # print("after nextGene A: ", nextGene, nextGene.changeOverCost)
 
@@ -170,6 +175,7 @@ class LocalSearchNode:
                         # print("prevGene B: ", prevGene)
                         nextGene.prevGene = prevGene
                         nextGene.calculateChangeOverCost()
+                        nextGene.calculateCost()
                         cost += nextGene.changeOverCost
                         # print("after nextGene B: ", nextGene, nextGene.changeOverCost)
 
@@ -177,27 +183,29 @@ class LocalSearchNode:
                     gene1.prevGene, gene2.prevGene = gene2.prevGene, gene1.prevGene
                     nextGene1, nextGene2 = LocalSearchNode.nextProdGene(gene1.period, dnaArray, chromosome.stringIdentifier), LocalSearchNode.nextProdGene(gene2.period, dnaArray, chromosome.stringIdentifier)
 
-                    # print("before before nextGene1 nextGene2 : ", nextGene1, nextGene2)
+                    print("before before nextGene1 nextGene2 : ", nextGene1, nextGene2)
 
                     if nextGene1 is not None:
-                        # print("before nextGene1 : ", nextGene1, nextGene1.changeOverCost)
+                        print("before nextGene1 : ", nextGene1, nextGene1.changeOverCost)
                         cost -= nextGene1.changeOverCost
                         prevGene = (gene2.item, gene2.position)
                         # print("prevGene : ", prevGene)
                         nextGene1.prevGene = prevGene
                         nextGene1.calculateChangeOverCost()
+                        nextGene1.calculateCost()
                         cost += nextGene1.changeOverCost 
-                        # print("after nextGene1 : ", nextGene1, nextGene1.changeOverCost)
+                        print("after nextGene1 : ", nextGene1, nextGene1.changeOverCost)
 
                     if nextGene2 is not None:
-                        # print("before nextGene2 : ", nextGene2, nextGene2.changeOverCost)
+                        print("before nextGene2 : ", nextGene2, nextGene2.changeOverCost)
                         cost -= nextGene2.changeOverCost
                         prevGene = (gene1.item, gene1.position)
                         # print("prevGene : ", prevGene)
                         nextGene2.prevGene = prevGene
                         nextGene2.calculateChangeOverCost()
+                        nextGene2.calculateCost()
                         cost += nextGene2.changeOverCost
-                        # print("after nextGene2 : ", nextGene2, nextGene2.changeOverCost)
+                        print("after nextGene2 : ", nextGene2, nextGene2.changeOverCost)
 
                 
             gene1.period, gene2.period = gene2.period, gene1.period

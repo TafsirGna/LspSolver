@@ -48,7 +48,7 @@ class Gene:
     def __eq__(self, gene):
         """
         """
-        return self.item == gene.item and self.position == gene.position and self.period == gene.period # and self.prevGene == gene.prevGene
+        return self.item == gene.item and self.position == gene.position and self.period == gene.period and self.prevGene == gene.prevGene
         
     def __repr__(self):
         """

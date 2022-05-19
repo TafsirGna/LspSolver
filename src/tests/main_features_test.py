@@ -21,11 +21,11 @@ class TestMainFeatures:
 
         # c = Chromosome.createFromIdentifier(stringIdentifier=(2, 1, 0, 1, 2))
         # c = Chromosome.createFromIdentifier(stringIdentifier=(0, 2, 2, 2, 3, 1, 0, 1))
-        c = Chromosome.createFromIdentifier(stringIdentifier=(2, 3, 2, 0, 1, 2, 0, 1)) 
+        c = Chromosome.createFromIdentifier(stringIdentifier=(0, 2, 2, 2, 3, 1, 1, 0)) 
         # c = Chromosome.createFromIdentifier(stringIdentifier=(0, 2, 2, 2, 1, 1, 3, 0))
         print("Chromosome ", c)
         # # [2, 1, 2, 0, 1]
-        LspRuntimeMonitor.mutation_strategy = "positive_mutation"
+        LspRuntimeMonitor.mutation_strategy = "simple_mutation"
         result = (MutationOperator()).process(c)
         print("1 -- ", result, (Chromosome.createFromIdentifier(result.stringIdentifier)))
 

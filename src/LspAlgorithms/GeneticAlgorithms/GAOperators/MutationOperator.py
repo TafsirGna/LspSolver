@@ -24,5 +24,5 @@ class MutationOperator:
             return chromosome
         
         if (result[0]).cost != Chromosome.createFromIdentifier(result[0].stringIdentifier).cost:
-            print("huuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuugggggggggggggge")
+            print("huuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuugggggggggggggge", result[0])
         return result[0]

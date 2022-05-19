@@ -73,7 +73,7 @@ class SearchNode(object):
 
 		dnaArray = copy.deepcopy(self.chromosome.dnaArray)
 		additionalCost = 0
-		# print("ok Start --- ", dnaArray)
+		# print("before Start --- ", dnaArray)
 
 		if (item >= 0):
 
@@ -83,16 +83,19 @@ class SearchNode(object):
 			gene.calculateCost()
 			additionalCost += gene.cost
 			# print("ok --- ", item, self.period, itemProdPosition, gene.cost)
-			dnaArray[item].insert(0, gene)
 
 			node.lastPlacedItem = gene.item
 
+			# print("test 1 : ", gene)
 			if self.lastPlacedItem != None:
 				lastPlacedGene = (dnaArray[self.lastPlacedItem][0])
-				lastPlacedGene.prevGene = item, itemProdPosition
+				lastPlacedGene.prevGene = (item, itemProdPosition)
 				lastPlacedGene.calculateChangeOverCost()
 				lastPlacedGene.calculateCost()
 				additionalCost += lastPlacedGene.changeOverCost
+				# print("test 2 : ", lastPlacedGene)
+
+			dnaArray[item].insert(0, gene)
 
 		# setting node's chomosome period
 		itemsToOrder = copy.deepcopy(self.itemsToOrder)
@@ -104,9 +107,9 @@ class SearchNode(object):
 		stringIdentifier = copy.deepcopy(self.chromosome.stringIdentifier)
 		stringIdentifier.insert(0, item + 1) 
 		node.chromosome.stringIdentifier = stringIdentifier
-		# print(node.chromosome.stringIdentifier)
 		node.chromosome.cost = self.chromosome.cost + additionalCost
 
+		# print("end Start --- ", dnaArray)
 		return node
 
 
