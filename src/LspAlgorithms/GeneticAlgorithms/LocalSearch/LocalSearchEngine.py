@@ -8,6 +8,8 @@ class LocalSearchEngine:
     """
     """
 
+    searchedInstances = defaultdict(lambda: None)
+
     def __init__(self) -> None:
         """
         """
@@ -29,6 +31,9 @@ class LocalSearchEngine:
 
         result = {"depthIndex": 0, "chromosomes": []}
         self.dfsNextNode(node, strategy, result)
+
+        # if len(result["chromosomes"]) and (result["chromosomes"][0]).cost != Chromosome.createFromIdentifier(result["chromosomes"][0].stringIdentifier).cost:
+        #     print("huuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuugggggggggggggge", result[0])
 
         return result["chromosomes"]
 
@@ -59,6 +64,9 @@ class LocalSearchEngine:
             if len(result["chromosomes"]) > ParameterData.instance.popSize:
                 self._stopSearchEvent.set()
                 return
+        elif strategy == "absolute_mutation":
+            if LocalSearchEngine.searchedInstances[self.chromosome] is not None:
+                return LocalSearchEngine.searchedInstances[self.chromosome]
 
         result["depthIndex"] += 1
         children = []
@@ -85,9 +93,11 @@ class LocalSearchEngine:
 
         # TODO 
         if strategy == "absolute_mutation":
-            print("Absolute mutation", len(children))
+            # print("Absolute mutation", len(children))
             if len(children) == 0:
+                LocalSearchEngine.searchedInstances[self.chromosome] = node.chromosome
                 result["chromosomes"].append(node.chromosome)
+                print("Absolute mutation result ", self.chromosome, node.chromosome)
                 self._stopSearchEvent.set()
                 return
 

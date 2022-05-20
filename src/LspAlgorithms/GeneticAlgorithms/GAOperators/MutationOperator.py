@@ -23,6 +23,6 @@ class MutationOperator:
         if len(result) == 0:
             return chromosome
         
-        if (result[0]).cost != Chromosome.createFromIdentifier(result[0].stringIdentifier).cost:
-            print("huuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuugggggggggggggge", result[0])
+        # print("Mutation result : ", chromosome, result[0])
+
         return result[0]

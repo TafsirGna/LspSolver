@@ -39,7 +39,7 @@ class CrossOverOperator:
         if same:
             return reference
 
-        # print("Crossover : ", self.parentChromosomes)
+        print("Crossover : ", self.parentChromosomes)
 
         node = self.rootNode()
         result = []

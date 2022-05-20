@@ -25,6 +25,7 @@ class GeneticAlgorithm:
 		# Creating a deamon thread to perform local search
 		self.daemonThreads = defaultdict(lambda: None)
 		self.dThreadPipelines = defaultdict(lambda: {"input": Queue(), "output": Queue()})
+		self.popEvaluator = PopulationEvaluator()
 
 
 	def daemonTask(self, mainThreadUUID):
@@ -45,7 +46,6 @@ class GeneticAlgorithm:
 		"""
 
 		generationIndex = 0
-		popEvaluator = PopulationEvaluator()
 		
 		#
 		dThreadPipelines = self.dThreadPipelines[population.lineageIdentifier]
@@ -54,7 +54,7 @@ class GeneticAlgorithm:
 		
 		population.dThreadOutputPipeline = dThreadPipelines["output"] 
 
-		while popEvaluator.evaluate(population, dThreadPipelines["input"], generationIndex) != "TERMINATE":
+		while self.popEvaluator.evaluate(population, dThreadPipelines["input"], generationIndex) != "TERMINATE":
 			# if generationIndex == 1:
 			# 	break
 
