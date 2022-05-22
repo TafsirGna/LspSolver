@@ -3,6 +3,7 @@
 
 from collections import defaultdict
 import concurrent.futures
+import multiprocessing
 from queue import Queue
 import threading
 import uuid
@@ -74,3 +75,14 @@ class GeneticAlgorithm:
 		
 		with concurrent.futures.ThreadPoolExecutor() as executor:
 			print(list(executor.map(self.process, populations)))
+
+		# processes = []
+		# for population in populations:
+		# 	process = multiprocessing.Process(target=self.process, args=(population,))
+		# 	process.start()
+		# 	processes.append(process)
+
+		# for process in processes:
+		# 	process.join()
+
+		

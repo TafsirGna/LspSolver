@@ -70,15 +70,17 @@ class CrossOverOperator:
             chromosome = Chromosome.pool[node.chromosome.stringIdentifier]
             if chromosome is None:
                 chromosome = Chromosome.evaluateDnaArray(node.chromosome.dnaArray)
-
-            if not Chromosome.feasible(chromosome):
-                print("processing : ", node.chromosome, node.blankPeriods, " | ", node.itemsToOrder, ' | ', node.chromosome.dnaArray)
-                print("//////////////////////////////////////////////////////////////////////////", self.parentChromosomes)
             else:
-                # print("after processing : ", node.chromosome, node.blankPeriods, " | ", node.itemsToOrder, ' | ', node.chromosome.dnaArray)
-                self._stopSearchEvent.set()
-                result.append(chromosome)
                 return None
+
+            # if not Chromosome.feasible(chromosome):
+            #     print("processing : ", node.chromosome, node.blankPeriods, " | ", node.itemsToOrder, ' | ', node.chromosome.dnaArray)
+            #     print("//////////////////////////////////////////////////////////////////////////", self.parentChromosomes)
+            # else:
+            # print("after processing : ", node.chromosome, node.blankPeriods, " | ", node.itemsToOrder, ' | ', node.chromosome.dnaArray)
+            result.append(chromosome)
+            self._stopSearchEvent.set()
+            return None
 
         for child in node.generateChild(self._stopSearchEvent):
             self.nextNode(child, result)

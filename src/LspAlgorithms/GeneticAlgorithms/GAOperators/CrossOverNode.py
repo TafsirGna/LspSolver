@@ -51,6 +51,7 @@ class CrossOverNode:
                     with arguments["lock"]:
                         self.blankPeriods.remove(period)
                         self.itemsToOrder[item].remove(position)
+                        arguments["usedPeriods"].append((period, position))
 
 
     def prepSearch(self):
@@ -65,11 +66,23 @@ class CrossOverNode:
         nThreads = ParameterData.instance.nReplicaSubThreads
         itemListSlices = np.array_split(itemListSlices, nThreads)
 
-        arguments = {"lock": threading.Lock()}
+        usedPeriods = []
+        arguments = {"lock": threading.Lock(), "usedPeriods": usedPeriods}
         with concurrent.futures.ThreadPoolExecutor() as executor:
             for threadIndex in range(nThreads):
                 executor.submit(self.prepSearchTask, itemListSlices[threadIndex], arguments)
 
+        #Next, 
+        # with concurrent.futures.ThreadPoolExecutor() as executor:
+        #     executor.submit(self.trackCommonZeros)
+        self.trackCommonZeros()
+
+        # print("Result id : ", self.parentChromosomes, "\n --- ",self.chromosome.stringIdentifier, self.blankPeriods, self.itemsToOrder, self.chromosome.dnaArray)
+
+
+    def trackCommonZeros(self):
+        """
+        """
 
         # tracking all common zeros
         blankPeriods = copy.deepcopy(self.blankPeriods)
@@ -88,9 +101,21 @@ class CrossOverNode:
                 self.blankPeriods.remove(period)
                 self.itemsToOrder[-1][0] -= 1
 
+            
 
+    # def prepSearchCostCalculation(self, usedPeriods):
+    #     """
+    #     """
 
-        # print("Result id : ", self.parentChromosomes, "\n --- ",self.chromosome.stringIdentifier, self.blankPeriods, self.itemsToOrder, self.chromosome.dnaArray)
+    #     usedPeriods.sort()
+
+    #     print("Used Period : ", usedPeriods)
+
+    #     for period in usedPeriods:
+    #         item0 = self.chromosome.stringIdentifier[period] - 1
+    #         if period[0] == 0:
+    #             self.chromosome.dnaArray[item0][period[1]].
+
 
 
     def children(self):
@@ -130,6 +155,7 @@ class CrossOverNode:
 
         period = self.blankPeriods[0]
         itemsToOrderKeys = list(self.itemsToOrder.keys())
+        random.seed()
         random.shuffle(itemsToOrderKeys)
         for item in itemsToOrderKeys:
             itemDemands = self.itemsToOrder[item]

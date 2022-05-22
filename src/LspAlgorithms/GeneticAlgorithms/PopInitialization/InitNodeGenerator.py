@@ -1,6 +1,7 @@
 import uuid
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
 from LspAlgorithms.GeneticAlgorithms.LocalSearch.LocalSearchEngine import LocalSearchEngine
+from ParameterSearch.ParameterData import ParameterData
 
 
 class InitNodeGenerator:
@@ -12,47 +13,56 @@ class InitNodeGenerator:
         self.uuid = uuid.uuid4()
 
 
-    def generate(self, pipeline):
+    def generate(self, chromosomes, maxSize):
         """
         """
 
-        while len(self.queue) > 0 and not pipeline.full():
+        while len(self.queue) > 0 and not (chromosomes["full"]).is_set():
             node = self.queue[-1]
             self.queue = self.queue[:-1]
 
-            self.nextNode(node, pipeline)
+            self.nextNode(node, chromosomes, maxSize)
 
         return None
 
 
-    def nextNode(self, node, pipeline):
+    def nextNode(self, node, chromosomes, maxSize):
         """
         """
 
         # print("------ : ", node.chromosome, node.itemsToOrder, len(node.chromosome.stringIdentifier))
         if node.period < 0:
-            if pipeline.full():
-                return None
 
             # if not Chromosome.feasible(node.chromosome):
             #     print("/////////////////////////////////////////////////", node.chromosome)
 
             node.chromosome.stringIdentifier = tuple(node.chromosome.stringIdentifier)
-            pipeline.put(node.chromosome)
 
-            # #
-            # chromosomes = (LocalSearchEngine().process(node.chromosome, "population"))
-            # for chromosome in chromosomes:
-            #     pipeline.put(chromosome)
-            #     if pipeline.full():
-            #         return None
+            #
+            results = (LocalSearchEngine().process(node.chromosome, "population"))
+            with chromosomes["lock"]:
+                if (chromosomes["full"]).is_set():
+                    return None
+
+                print("Pop size : ",len(chromosomes["values"]), maxSize)
+
+                nLeft = maxSize - len(chromosomes["values"])
+                print("leeeeeeeeeeeeeft : ", results[:nLeft], nLeft)    
+                for chromosome in results[:nLeft]:
+                    # print("Dataaaaaa : ", chromosomes["values"])
+                    chromosomes["values"].add(chromosome)
+                    # print("Dataaaaaa : ", chromosome)
+
+                if len(chromosomes["values"]) >= maxSize:
+                    (chromosomes["full"]).set()
+                    return None
 
             return None
 
         for child in node.generateChild():
-            if pipeline.full():
+            if (chromosomes["full"]).is_set():
                 return None
-            self.nextNode(child, pipeline)
+            self.nextNode(child, chromosomes, maxSize)
 
         return None
 

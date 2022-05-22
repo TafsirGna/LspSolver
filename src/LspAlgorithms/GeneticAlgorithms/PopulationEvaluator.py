@@ -1,4 +1,5 @@
 from collections import defaultdict
+import multiprocessing
 import random
 import threading
 import numpy as np
@@ -63,21 +64,45 @@ class PopulationEvaluator:
 
         # Performing a local search to all chromosomes with a given percentage of the entire population
         triggerSize = int(ParameterData.instance.localSearchTriggerSize * Population.popSizes[population.lineageIdentifier])
+        # Thread code 
         with concurrent.futures.ThreadPoolExecutor() as executor:
             for element in population.chromosomes.values():
                 if element["size"] >= triggerSize:
                     chromosome = element["chromosome"]
                     executor.submit(self.performLocalSearch, chromosome, population)
 
+        # Process code
+        # processes = []
+        # for element in population.chromosomes.values():
+        #     if element["size"] >= triggerSize:
+        #         chromosome = element["chromosome"]
+        #         process = multiprocessing.Process(target=self.performLocalSearch, args=(chromosome, population))
+        #         process.start()
+        #         processes.append(process)
+
+        # for process in processes:
+        #     process.join()
+
 
         # Termination condition
         # 1st condition
-        if self.minTerminations[population.lineageIdentifier]["count"] == ParameterData.instance.nIdleGenerations:
+        uniquePercentage = len(population.chromosomes) / Population.popSizes[population.lineageIdentifier]
+
+        if uniquePercentage <= 0.5:
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                for element in population.chromosomes.values():
+                    chromosome = element["chromosome"]
+                    executor.submit(self.performLocalSearch, chromosome, population)
+            
             return "TERMINATE"
 
-        # 2nd condition
-        if len(population.chromosomes) == 1:
-            return "TERMINATE"
+        # # 2nd condition
+        # if self.minTerminations[population.lineageIdentifier]["count"] == ParameterData.instance.nIdleGenerations:
+        #     return "TERMINATE"
+
+        # # 3rd condition
+        # if len(population.chromosomes) == 1:
+        #     return "TERMINATE"
 
         return "CONTINUE"
         

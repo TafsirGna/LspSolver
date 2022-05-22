@@ -35,6 +35,7 @@ class LocalSearchEngine:
         # if len(result["chromosomes"]) and (result["chromosomes"][0]).cost != Chromosome.createFromIdentifier(result["chromosomes"][0].stringIdentifier).cost:
         #     print("huuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuugggggggggggggge", result[0])
 
+        print("mutation results : ", result["chromosomes"])
         return result["chromosomes"]
 
 
@@ -49,19 +50,19 @@ class LocalSearchEngine:
         self._visitedNodes[node.chromosome.stringIdentifier] = 1
 
         if strategy == "simple_mutation":
-            if result["depthIndex"] == ParameterData.instance.simpleMutationDepthIndex:
+            if result["depthIndex"] >= ParameterData.instance.simpleMutationDepthIndex and Chromosome.pool[node.chromosome.stringIdentifier] is None:
                 result["chromosomes"].append(node.chromosome)
                 self._stopSearchEvent.set()
                 return None
         elif strategy == "positive_mutation":
-            print("positive_mutation ", result["depthIndex"], node.chromosome, node < self)
-            if node < self:
+            if node < self and Chromosome.pool[node.chromosome.stringIdentifier] is None:
+                print("positive_mutation ", result["depthIndex"], node.chromosome, node < self)
                 result["chromosomes"].append(node.chromosome)
                 self._stopSearchEvent.set()
                 return 
         elif strategy == "population":
             result["chromosomes"].append(node.chromosome)
-            if len(result["chromosomes"]) > ParameterData.instance.popSize:
+            if len(result["chromosomes"]) > ParameterData.instance.popSize * ParameterData.instance.nPrimaryThreads:
                 self._stopSearchEvent.set()
                 return
         elif strategy == "absolute_mutation":

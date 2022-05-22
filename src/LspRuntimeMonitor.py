@@ -97,9 +97,9 @@ class LspRuntimeMonitor:
 
         # Plots
         # Plotting the evolution of the minimal cost over generations
-        plt.plot(list(range(len(data["max"]))), data["max"])
-        plt.ylabel("Population maximal cost")
-        plt.show()
+        # plt.plot(list(range(len(data["max"]))), data["max"])
+        # plt.ylabel("Population maximal cost")
+        # plt.show()
 
         # Plotting the evolution of the minimal cost over generations
         plt.plot(list(range(len(data["min"]))), data["min"])

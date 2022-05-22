@@ -131,12 +131,14 @@ class Population:
             while len(queue) < 3:
                 chromosomeA, chromosomeB = selectionOperator.select()
                 chromosome = None
+                random.seed()
                 if (random.random() < ParameterData.instance.crossOverRate):
                     chromosome = (CrossOverOperator([chromosomeA, chromosomeB])).process()
                     # print("Crossover : ", threadID, chromosomeA, chromosomeB, chromosome, len(newPop.chromosomes))
                 else:
                     chromosome = chromosomeA if chromosomeA < chromosomeB else chromosomeB
 
+                random.seed()
                 if chromosome is not None and (random.random() < ParameterData.instance.mutationRate):
                     # Proceding to mutate the chromosome
                     chromosome = (MutationOperator()).process(chromosome)

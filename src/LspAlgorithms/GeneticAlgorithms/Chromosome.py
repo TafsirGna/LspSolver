@@ -126,6 +126,43 @@ class Chromosome(object):
 
 
 	@classmethod
+	def nextProdGene(cls, prodPeriod, dnaArray, stringIdentifier):
+		"""
+		"""
+
+		# print("nextProdGene : ", prodPeriod, chromosome.stringIdentifier[prodPeriod + 1:])
+		for index, item in enumerate(stringIdentifier[prodPeriod + 1:]):
+			if item != 0:
+				period = (prodPeriod + 1) + index
+				item0 = item - 1
+				for geneA in dnaArray[item0]:
+					if geneA.period == period:
+						# print('next ', geneA)
+						return geneA
+		
+		# print('next None')
+		return None
+
+	@classmethod
+	def prevProdGene(cls, prodPeriod, dnaArray, stringIdentifier):
+		"""
+		"""
+
+		# print("nextProdGene : ", prodPeriod, chromosome.stringIdentifier[prodPeriod + 1:])
+		for index, item in enumerate(reversed(stringIdentifier[:prodPeriod])):
+			if item != 0:
+				period = (prodPeriod - 1) - index
+				item0 = item - 1
+				for geneA in dnaArray[item0]:
+					if geneA.period == period:
+						# print('next ', geneA)
+						return geneA
+		
+		# print('next None')
+		return None
+
+
+	@classmethod
 	def createFromIdentifier(cls, stringIdentifier):
 		"""
 		"""
