@@ -1,5 +1,6 @@
 from collections import defaultdict
-import multiprocessing
+import multiprocessing as mp
+from queue import Queue
 import random
 import threading
 import numpy as np
@@ -22,7 +23,7 @@ class PopulationEvaluator:
         self.minTerminations = defaultdict(lambda: {"minValue": None, "count": 0})
 
 
-    def performLocalSearch(self, chromosome, population):
+    def performLocalSearch(self, chromosome, population, resultQueue):
         """
         """
 
@@ -30,8 +31,7 @@ class PopulationEvaluator:
         result = (LocalSearchEngine().process(chromosome, "absolute_mutation"))
         result = chromosome if len(result) == 0 else result[0]
         if result < chromosome:
-            (LspRuntimeMonitor.popsData[population.lineageIdentifier]["elites"]).add(result)
-
+            resultQueue.put(result)
 
 
     def evaluate(self, population, dThreadInputPipeline, generationIndex):
@@ -64,24 +64,27 @@ class PopulationEvaluator:
 
         # Performing a local search to all chromosomes with a given percentage of the entire population
         triggerSize = int(ParameterData.instance.localSearchTriggerSize * Population.popSizes[population.lineageIdentifier])
-        # Thread code 
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            for element in population.chromosomes.values():
-                if element["size"] >= triggerSize:
-                    chromosome = element["chromosome"]
-                    executor.submit(self.performLocalSearch, chromosome, population)
 
         # Process code
-        # processes = []
-        # for element in population.chromosomes.values():
-        #     if element["size"] >= triggerSize:
-        #         chromosome = element["chromosome"]
-        #         process = multiprocessing.Process(target=self.performLocalSearch, args=(chromosome, population))
-        #         process.start()
-        #         processes.append(process)
+        processes = []
+        resultQueues = []
+        for element in population.chromosomes.values():
+            if element["size"] >= triggerSize:
+                chromosome = element["chromosome"]
+                resultQueue = Queue()
+                process = mp.Process(target=self.performLocalSearch, args=(chromosome, population, resultQueue))
+                process.start()
+                processes.append(process)
+                resultQueues.append(resultQueue)
 
-        # for process in processes:
-        #     process.join()
+        for process in processes:
+            process.join()
+
+        # adding the results of the local search to the next whole population
+        for resultQueue in resultQueues:
+            if not resultQueue.empty():
+                chromosome = resultQueue.get()
+                (LspRuntimeMonitor.popsData[population.lineageIdentifier]["elites"]).add(chromosome)
 
 
         # Termination condition
@@ -89,10 +92,24 @@ class PopulationEvaluator:
         uniquePercentage = len(population.chromosomes) / Population.popSizes[population.lineageIdentifier]
 
         if uniquePercentage <= 0.5:
-            with concurrent.futures.ThreadPoolExecutor() as executor:
-                for element in population.chromosomes.values():
-                    chromosome = element["chromosome"]
-                    executor.submit(self.performLocalSearch, chromosome, population)
+            resultQueues = []
+            processes = []
+            for element in population.chromosomes.values():
+                chromosome = element["chromosome"]
+                resultQueue = Queue()
+                process = mp.Process(target=self.performLocalSearch, args=(chromosome, population, resultQueue))
+                process.start()
+                processes.append(process)
+                resultQueues.append(resultQueue)
+
+            for process in processes:
+                process.join()
+
+            # adding the results of the local search to the next whole population
+            for resultQueue in resultQueues:
+                if not resultQueue.empty():
+                    chromosome = resultQueue.get()
+                    (LspRuntimeMonitor.popsData[population.lineageIdentifier]["elites"]).add(chromosome)
             
             return "TERMINATE"
 

@@ -1,10 +1,8 @@
 from collections import defaultdict
-import random
-import threading
+import multiprocessing as mp
 import numpy as np
 from LspAlgorithms.GeneticAlgorithms import Chromosome
 from LspRuntimeMonitor import LspRuntimeMonitor
-import concurrent.futures
 from ParameterSearch.ParameterData import ParameterData
 
 class SelectionOperator:
@@ -20,21 +18,21 @@ class SelectionOperator:
         self.setRouletteProbabilities(population)
 
 
-    def fitnessCalculationTask(self,threadIndex, maxCost, slice, result, population):
+    def fitnessCalculationTask(self, maxCost, slice, resultQueue, population):
         """
         """
 
-        result["fitnessTabs"][threadIndex] = []
-        fitness = 0
+        totalFitness = 0
+        fitnessArray = []
         for chromosome in slice:
-            chromosome.fitness = (maxCost - chromosome.cost) * population.chromosomes[chromosome.stringIdentifier]["size"]
-            if chromosome.fitness < 0:
+            fitness = (maxCost - chromosome.cost) * population.chromosomes[chromosome.stringIdentifier]["size"]
+            if fitness < 0:
                 print("------------------------------------------------------", maxCost, chromosome.cost)
-            fitness += chromosome.fitness
-            result["fitnessTabs"][threadIndex].append(chromosome)
-            
-        with result["lock"]:
-            result["totalFitness"] += fitness
+            totalFitness += fitness
+            fitnessArray.append(fitness)
+
+        fitnessArray.append(totalFitness)
+        resultQueue.put(fitnessArray)
 
 
     def setRouletteProbabilities(self, population):
@@ -44,24 +42,44 @@ class SelectionOperator:
         self.chromosomes = [element["chromosome"] for element in population.chromosomes.values()]
 
         maxCost = LspRuntimeMonitor.popsData[population.lineageIdentifier]["max"][-1] + 1
-        nThreads = ParameterData.instance.nReplicaSubThreads
-        slices = np.array_split(self.chromosomes, nThreads)
-        result = {"totalFitness": 0, "fitnessTabs": [None] * nThreads, "lock": threading.Lock()}
+        nProcesses = ParameterData.instance.nReplicaSubThreads
+        slices = np.array_split(self.chromosomes, nProcesses)
 
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            for threadIndex in range(nThreads):
-                executor.submit(self.fitnessCalculationTask, threadIndex, maxCost, slices[threadIndex], result, population)
+        # Process code
 
-        totalFitness = result["totalFitness"]
-        self.chromosomes = []
-        for fitnessTab in result["fitnessTabs"]:
-            self.chromosomes += fitnessTab
+        processes = []
+        resultQueues = []
 
-        self.rouletteProbabilities = [float(chromosome.fitness/totalFitness) for chromosome in self.chromosomes]
+        # with concurrent.futures.ThreadPoolExecutor() as executor:
+        #     for processIndex in range(nProcesses):
+        #         resultQueue = Queue()
+        #         executor.submit(self.fitnessCalculationTask, maxCost, slices[processIndex], resultQueue, population)
+        #         resultQueues.append(resultQueue)
 
-        # print("**************************")
-        # print("Roulette : ", self.chromosomes, " \n ", self.rouletteProbabilities)
-        # print("++++++++++++++++++++++++++")
+        for processIndex in range(nProcesses):
+            resultQueue = mp.Queue()
+            process = mp.Process(target=self.fitnessCalculationTask, args=(maxCost, slices[processIndex], resultQueue, population))
+            process.start()
+            processes.append(process)
+            resultQueues.append(resultQueue)
+
+        for process in processes:
+            process.join()
+
+
+        totalFitness = 0
+        fitnessArray = []
+        # print("lllllllllllllllllllllllllllllll : ", len(processesResult[0]))
+        for resultQueue in resultQueues:
+            result = resultQueue.get()
+            totalFitness += result[-1]
+            fitnessArray += result[:-1]
+
+        self.rouletteProbabilities = [float(fitness/totalFitness) for fitness in fitnessArray]
+
+        print("**************************")
+        print("Roulette : ", self.chromosomes, " \n ", self.rouletteProbabilities)
+        print("++++++++++++++++++++++++++")
 
 
     def select(self):

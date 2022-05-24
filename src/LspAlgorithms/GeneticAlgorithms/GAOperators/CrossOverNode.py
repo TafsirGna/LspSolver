@@ -73,8 +73,6 @@ class CrossOverNode:
                 executor.submit(self.prepSearchTask, itemListSlices[threadIndex], arguments)
 
         #Next, 
-        # with concurrent.futures.ThreadPoolExecutor() as executor:
-        #     executor.submit(self.trackCommonZeros)
         self.trackCommonZeros()
 
         # print("Result id : ", self.parentChromosomes, "\n --- ",self.chromosome.stringIdentifier, self.blankPeriods, self.itemsToOrder, self.chromosome.dnaArray)

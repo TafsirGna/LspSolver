@@ -2,7 +2,7 @@ from collections import defaultdict
 from math import ceil
 from queue import Queue
 import random
-import concurrent.futures
+import numpy as np
 import threading
 import uuid
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
@@ -11,6 +11,7 @@ from LspAlgorithms.GeneticAlgorithms.GAOperators.MutationOperator import Mutatio
 from LspAlgorithms.GeneticAlgorithms.GAOperators.SelectionOperator import SelectionOperator
 from LspRuntimeMonitor import LspRuntimeMonitor
 from ParameterSearch.ParameterData import ParameterData
+import multiprocessing as mp
 
 class Population:
 
@@ -57,14 +58,26 @@ class Population:
         for chromosome in list(LspRuntimeMonitor.popsData[self.lineageIdentifier]["elites"]):
             newPop.add(chromosome)
 
-        popLock = threading.Lock()
+        processes = []
+        resultQueues = []
+        instances = [None] * Population.popSizes[self.lineageIdentifier]
+        instances = np.array_split(instances, ParameterData.instance.nReplicaThreads)
+        for processIndex in range(ParameterData.instance.nReplicaThreads):
+            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ", len(instances[processIndex]))
+            resultQueue = mp.Queue(maxsize=len(instances[processIndex]))
+            process = mp.Process(target=self.threadTask, args=(selectionOperator, resultQueue))
+            process.start()
+            resultQueues.append(resultQueue)
+            processes.append(process)
 
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            print(list(executor.map(self.threadTask, 
-                                        [selectionOperator] * ParameterData.instance.nReplicaThreads, 
-                                        [popLock] * ParameterData.instance.nReplicaThreads,
-                                        [newPop] * ParameterData.instance.nReplicaThreads)))
-            # executor.submit(self.getNewPopulation)
+        for process in processes:
+            process.join()
+
+        for resultQueue in resultQueues:
+            print("//////////////////////// ", resultQueue.qsize())
+            while not resultQueue.empty():
+                chromosome = resultQueue.get()
+                newPop.add(chromosome)
 
         newPop.dThreadOutputPipeline =  self.dThreadOutputPipeline
         return newPop
@@ -119,43 +132,35 @@ class Population:
         return self.chromosomes[chromosome.stringIdentifier]
 
 
-    def threadTask(self, selectionOperator, popLock, newPop):
+    def threadTask(self, selectionOperator, queue):
         """
         """
 
         threadID = uuid.uuid4()
-        queue = []
 
-        while True:
+        while not queue.full():
 
-            while len(queue) < 3:
-                chromosomeA, chromosomeB = selectionOperator.select()
-                chromosome = None
-                random.seed()
-                if (random.random() < ParameterData.instance.crossOverRate):
-                    chromosome = (CrossOverOperator([chromosomeA, chromosomeB])).process()
-                    # print("Crossover : ", threadID, chromosomeA, chromosomeB, chromosome, len(newPop.chromosomes))
-                else:
-                    chromosome = chromosomeA if chromosomeA < chromosomeB else chromosomeB
+            chromosomeA, chromosomeB = selectionOperator.select()
+            chromosome = None
 
-                random.seed()
-                if chromosome is not None and (random.random() < ParameterData.instance.mutationRate):
-                    # Proceding to mutate the chromosome
-                    chromosome = (MutationOperator()).process(chromosome)
+            random.seed()
+            if (random.random() < ParameterData.instance.crossOverRate):
+                chromosome = (CrossOverOperator([chromosomeA, chromosomeB])).process()
+                # print("Crossover : ", threadID, chromosomeA, chromosomeB, chromosome, len(newPop.chromosomes))
+            else:
+                chromosome = chromosomeA if chromosomeA < chromosomeB else chromosomeB
 
-                if chromosome is not None:
-                    # print("Chromo --- ", chromosome)
-                    queue.append(chromosome)
+            random.seed()
+            if chromosome is not None and (random.random() < ParameterData.instance.mutationRate):
+                # Proceding to mutate the chromosome
+                chromosome = (MutationOperator()).process(chromosome)
 
-            with popLock:
-                for chromosome in queue:
-                    # print("pop length : ", len(newPop.chromosomes))
-                    result = newPop.add(chromosome)
-                    if result is None:
-                        return
-
-            queue = []
+            if chromosome is not None:
+                # print("Chromo --- ", chromosome)
+                queue.put(chromosome)
                     
+        print(";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ", queue.qsize())
+
 
     def __repr__(self):
         """
