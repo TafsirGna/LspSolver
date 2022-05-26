@@ -34,6 +34,20 @@ class Chromosome(object):
 				cost += gene.cost
 		
 		return cost
+
+	
+	@classmethod
+	def geneAtPeriod(cls, chromosome, period):
+		"""
+		"""
+
+		item0 = chromosome.stringIdentifier[period] - 1
+
+		for gene in chromosome.dnaArray[item0]:
+			if gene.period == period:
+				return gene
+
+		return None
 		
 
 	@classmethod

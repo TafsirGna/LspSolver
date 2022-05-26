@@ -1,7 +1,11 @@
 from collections import defaultdict
+import random
 import threading
+
+from pyparsing import copy
 from LspAlgorithms.GeneticAlgorithms.GAOperators.CrossOverNode import CrossOverNode
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
+from LspInputDataReading.LspInputDataInstance import InputDataInstance
 
 
 class CrossOverOperator:
@@ -17,22 +21,13 @@ class CrossOverOperator:
         self._visitedNodes = defaultdict(lambda: None)
 
     
-    def rootNode(self):
-        """
-        """
-
-        node = CrossOverNode(self.parentChromosomes)
-        node.prepSearch()
-        return node
-
-    
     def process(self):
         """
         """
         
         same = True
         reference = self.parentChromosomes[0]
-        for chromosome in self.parentChromosomes:
+        for chromosome in self.parentChromosomes: 
             if chromosome != reference:
                 same = False
         
@@ -41,7 +36,16 @@ class CrossOverOperator:
 
         print("Crossover : ", self.parentChromosomes)
 
-        node = self.rootNode()
+        # before launching the recursive search
+        minInstance, maxInstance = (self.parentChromosomes[0], self.parentChromosomes[1]) if self.parentChromosomes[0] < self.parentChromosomes[0] else (self.parentChromosomes[1], self.parentChromosomes[0])
+        random.seed()
+        gapLength = int(InputDataInstance.instance.nPeriods / 4) 
+        crossOverPeriod = random.randint(gapLength, InputDataInstance.instance.nPeriods - (gapLength + 1))
+
+        node = CrossOverNode(maxInstance, crossOverPeriod - 1)
+        node.chromosome = copy.deepcopy(minInstance)
+        node.prepSearchSettings()
+
         result = []
         self.nextNode(node, result)
 
@@ -49,7 +53,11 @@ class CrossOverOperator:
         if len(result) == 0:
             print("weeeeeeeeeeeeeeeeiiiiiiiiiiiiiiiiiiiiird")
             return min(self.parentChromosomes)
-        return result[0]
+
+        chromosome = result[0]
+        # if chromosome.cost != Chromosome.createFromIdentifier(chromosome.stringIdentifier).cost:
+        #     print(" hiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
+        return chromosome
 
     
     def nextNode(self, node, result):
@@ -57,32 +65,29 @@ class CrossOverOperator:
         """
 
         if node is None:
+            print("next node : returning none")
             return None
 
         node.chromosome.stringIdentifier = tuple(node.chromosome.stringIdentifier)
 
         if self._visitedNodes[node.chromosome.stringIdentifier] is not None:
+            print("visited node")
             return None
         self._visitedNodes[node.chromosome.stringIdentifier] = 1
 
-        if len(node.blankPeriods) == 0:
+        # print("next node : ", node.chromosome, node.chromosome.dnaArray, node.period)
 
-            chromosome = Chromosome.pool[node.chromosome.stringIdentifier]
-            if chromosome is None:
-                chromosome = Chromosome.evaluateDnaArray(node.chromosome.dnaArray)
-            else:
-                return None
+        if node.period <= -1:
 
-            # if not Chromosome.feasible(chromosome):
-            #     print("processing : ", node.chromosome, node.blankPeriods, " | ", node.itemsToOrder, ' | ', node.chromosome.dnaArray)
-            #     print("//////////////////////////////////////////////////////////////////////////", self.parentChromosomes)
-            # else:
-            # print("after processing : ", node.chromosome, node.blankPeriods, " | ", node.itemsToOrder, ' | ', node.chromosome.dnaArray)
-            result.append(chromosome)
+            # if not Chromosome.feasible(node.chromosome):
+            #     print("//////////////////////////////////////////////////////////////////////////", self.parentChromosomes, node.chromosome)
+            
+            result.append(node.chromosome)
             self._stopSearchEvent.set()
             return None
 
-        for child in node.generateChild(self._stopSearchEvent):
+        for child in node.generateChild():
+            # print("child loop : ", child)
             self.nextNode(child, result)
             
             if self._stopSearchEvent.is_set():

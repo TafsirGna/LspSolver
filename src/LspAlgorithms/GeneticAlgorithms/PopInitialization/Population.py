@@ -74,7 +74,7 @@ class Population:
             process.join()
 
         for resultQueue in resultQueues:
-            print("//////////////////////// ", resultQueue.qsize())
+            # print("//////////////////////// ", resultQueue.qsize())
             while not resultQueue.empty():
                 chromosome = resultQueue.get()
                 newPop.add(chromosome)

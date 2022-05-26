@@ -1,16 +1,11 @@
 from collections import defaultdict
 import multiprocessing as mp
-from queue import Queue
-import random
-import threading
 import numpy as np
-
 from LspAlgorithms.GeneticAlgorithms import Chromosome
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.Population import Population
 from LspRuntimeMonitor import LspRuntimeMonitor
 from ParameterSearch.ParameterData import ParameterData
 from .LocalSearch.LocalSearchEngine import LocalSearchEngine
-import concurrent.futures
 
 class PopulationEvaluator:
     """
@@ -71,7 +66,7 @@ class PopulationEvaluator:
         for element in population.chromosomes.values():
             if element["size"] >= triggerSize:
                 chromosome = element["chromosome"]
-                resultQueue = Queue()
+                resultQueue = mp.Queue()
                 process = mp.Process(target=self.performLocalSearch, args=(chromosome, population, resultQueue))
                 process.start()
                 processes.append(process)
@@ -96,7 +91,7 @@ class PopulationEvaluator:
             processes = []
             for element in population.chromosomes.values():
                 chromosome = element["chromosome"]
-                resultQueue = Queue()
+                resultQueue = mp.Queue()
                 process = mp.Process(target=self.performLocalSearch, args=(chromosome, population, resultQueue))
                 process.start()
                 processes.append(process)
@@ -110,6 +105,10 @@ class PopulationEvaluator:
                 if not resultQueue.empty():
                     chromosome = resultQueue.get()
                     (LspRuntimeMonitor.popsData[population.lineageIdentifier]["elites"]).add(chromosome)
+
+                    if chromosome.cost < LspRuntimeMonitor.popsData[population.lineageIdentifier]["min"][-1]:
+                        LspRuntimeMonitor.popsData[population.lineageIdentifier]["min"][-1] = chromosome.cost
+
             
             return "TERMINATE"
 
