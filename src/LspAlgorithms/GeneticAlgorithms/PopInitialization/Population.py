@@ -63,18 +63,20 @@ class Population:
         instances = [None] * Population.popSizes[self.lineageIdentifier]
         instances = np.array_split(instances, ParameterData.instance.nReplicaThreads)
         for processIndex in range(ParameterData.instance.nReplicaThreads):
-            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ", len(instances[processIndex]))
+            # print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ", len(instances[processIndex]))
             resultQueue = mp.Queue(maxsize=len(instances[processIndex]))
             process = mp.Process(target=self.threadTask, args=(selectionOperator, resultQueue))
             process.start()
             resultQueues.append(resultQueue)
             processes.append(process)
 
+        # print("bibi")
         for process in processes:
             process.join()
 
+        # print("Priiiince", len(resultQueues))
         for resultQueue in resultQueues:
-            # print("//////////////////////// ", resultQueue.qsize())
+            # print("Priiiince")
             while not resultQueue.empty():
                 chromosome = resultQueue.get()
                 newPop.add(chromosome)
@@ -140,9 +142,11 @@ class Population:
 
         while not queue.full():
 
+            # print("booooooooooooooooooooooooo")
             chromosomeA, chromosomeB = selectionOperator.select()
             chromosome = None
 
+            # print("After selection")
             random.seed()
             if (random.random() < ParameterData.instance.crossOverRate):
                 chromosome = (CrossOverOperator([chromosomeA, chromosomeB])).process()
@@ -151,15 +155,21 @@ class Population:
                 chromosome = chromosomeA if chromosomeA < chromosomeB else chromosomeB
 
             random.seed()
+            # print("After cross over")
             if chromosome is not None and (random.random() < ParameterData.instance.mutationRate):
                 # Proceding to mutate the chromosome
+                # print("mutating")
                 chromosome = (MutationOperator()).process(chromosome)
 
             if chromosome is not None:
-                # print("Chromo --- ", chromosome)
+                # print("Adding new chromosome 1")
+                print(chromosome)
                 queue.put(chromosome)
+                # print("Adding new chromosome 2")
                     
-        print(";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ", queue.qsize())
+        # print(";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ", queue.qsize()) 
+
+        return None
 
 
     def __repr__(self):

@@ -43,8 +43,8 @@ class CrossOverOperator:
         crossOverPeriod = random.randint(gapLength, InputDataInstance.instance.nPeriods - (gapLength + 1))
 
         node = CrossOverNode(maxInstance, crossOverPeriod - 1)
-        node.chromosome = copy.deepcopy(minInstance)
-        node.prepSearchSettings()
+        node.chromosome.stringIdentifier = minInstance.stringIdentifier
+        node.prepSearchSettings(minInstance)
 
         result = []
         self.nextNode(node, result)
@@ -57,6 +57,7 @@ class CrossOverOperator:
         chromosome = result[0]
         # if chromosome.cost != Chromosome.createFromIdentifier(chromosome.stringIdentifier).cost:
         #     print(" hiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
+        print("Cross Over result : ", chromosome)
         return chromosome
 
     
@@ -80,7 +81,8 @@ class CrossOverOperator:
         if node.period <= -1:
 
             # if not Chromosome.feasible(node.chromosome):
-            #     print("//////////////////////////////////////////////////////////////////////////", self.parentChromosomes, node.chromosome)
+            if node.chromosome.dnaArray != Chromosome.createFromIdentifier(node.chromosome.stringIdentifier).dnaArray:
+                print("//////////////////////////////////////////////////////////////////////////", self.parentChromosomes, node.chromosome, node.chromosome.dnaArray)
             
             result.append(node.chromosome)
             self._stopSearchEvent.set()

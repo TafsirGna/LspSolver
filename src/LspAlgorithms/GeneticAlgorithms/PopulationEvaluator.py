@@ -58,13 +58,13 @@ class PopulationEvaluator:
 
 
         # Performing a local search to all chromosomes with a given percentage of the entire population
-        triggerSize = int(ParameterData.instance.localSearchTriggerSize * Population.popSizes[population.lineageIdentifier])
+        # triggerSize = int(ParameterData.instance.localSearchTriggerSize * Population.popSizes[population.lineageIdentifier])
 
         # Process code
         processes = []
         resultQueues = []
         for element in population.chromosomes.values():
-            if element["size"] >= triggerSize:
+            if element["size"] >= 2:
                 chromosome = element["chromosome"]
                 resultQueue = mp.Queue()
                 process = mp.Process(target=self.performLocalSearch, args=(chromosome, population, resultQueue))
@@ -84,41 +84,40 @@ class PopulationEvaluator:
 
         # Termination condition
         # 1st condition
-        uniquePercentage = len(population.chromosomes) / Population.popSizes[population.lineageIdentifier]
+        # uniquePercentage = len(population.chromosomes) / Population.popSizes[population.lineageIdentifier]
 
-        if uniquePercentage <= 0.5:
-            resultQueues = []
-            processes = []
-            for element in population.chromosomes.values():
-                chromosome = element["chromosome"]
-                resultQueue = mp.Queue()
-                process = mp.Process(target=self.performLocalSearch, args=(chromosome, population, resultQueue))
-                process.start()
-                processes.append(process)
-                resultQueues.append(resultQueue)
+        # if uniquePercentage <= 0.5:
+        #     resultQueues = []
+        #     processes = []
+        #     for element in population.chromosomes.values():
+        #         chromosome = element["chromosome"]
+        #         resultQueue = mp.Queue()
+        #         process = mp.Process(target=self.performLocalSearch, args=(chromosome, population, resultQueue))
+        #         process.start()
+        #         processes.append(process)
+        #         resultQueues.append(resultQueue)
 
-            for process in processes:
-                process.join()
+        #     for process in processes:
+        #         process.join()
 
-            # adding the results of the local search to the next whole population
-            for resultQueue in resultQueues:
-                if not resultQueue.empty():
-                    chromosome = resultQueue.get()
-                    (LspRuntimeMonitor.popsData[population.lineageIdentifier]["elites"]).add(chromosome)
+        #     # adding the results of the local search to the next whole population
+        #     for resultQueue in resultQueues:
+        #         if not resultQueue.empty():
+        #             chromosome = resultQueue.get()
+        #             (LspRuntimeMonitor.popsData[population.lineageIdentifier]["elites"]).add(chromosome)
 
-                    if chromosome.cost < LspRuntimeMonitor.popsData[population.lineageIdentifier]["min"][-1]:
-                        LspRuntimeMonitor.popsData[population.lineageIdentifier]["min"][-1] = chromosome.cost
+        #             if chromosome.cost < LspRuntimeMonitor.popsData[population.lineageIdentifier]["min"][-1]:
+        #                 LspRuntimeMonitor.popsData[population.lineageIdentifier]["min"][-1] = chromosome.cost
 
-            
-            return "TERMINATE"
+        #     return "TERMINATE"
 
         # # 2nd condition
         # if self.minTerminations[population.lineageIdentifier]["count"] == ParameterData.instance.nIdleGenerations:
         #     return "TERMINATE"
 
-        # # 3rd condition
-        # if len(population.chromosomes) == 1:
-        #     return "TERMINATE"
+        # 3rd condition
+        if len(population.chromosomes) == 1:
+            return "TERMINATE"
 
         return "CONTINUE"
         

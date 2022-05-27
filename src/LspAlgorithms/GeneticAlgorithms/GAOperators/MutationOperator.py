@@ -24,5 +24,5 @@ class MutationOperator:
             return chromosome
         
         # print("Mutation result : ", chromosome, result[0])
-
-        return result[0]
+        instance = result[0]
+        return instance

@@ -1,12 +1,9 @@
 import copy
-import threading
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
 from LspAlgorithms.GeneticAlgorithms.Gene import Gene
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 import random
-import concurrent.futures
 import numpy as np
-
 from ParameterSearch.ParameterData import ParameterData
 
 class CrossOverNode:
@@ -37,7 +34,7 @@ class CrossOverNode:
         return children
 
 
-    def prepSearchSettings(self):
+    def prepSearchSettings(self, fittestParent):
         """
         """
 
@@ -48,11 +45,12 @@ class CrossOverNode:
 
         # and setting the itemsToOrder property
         gene = None
-        for index, item in enumerate(reversed(self.chromosome.stringIdentifier[self.period + 1:])):
+        for index, item in enumerate(reversed(fittestParent.stringIdentifier[self.period + 1:])):
             self.itemsToOrder[item - 1] -= 1
             # print(" item ", item)
             if item > 0:
-                gene = (Chromosome.geneAtPeriod(self.chromosome, InputDataInstance.instance.nPeriods - (1 + index)))
+                gene = (Chromosome.geneAtPeriod(fittestParent, InputDataInstance.instance.nPeriods - (1 + index)))
+                self.chromosome.dnaArray[gene.item][gene.position] = copy.deepcopy(gene)
                 self.chromosome.cost += gene.cost
 
         self.chromosome.cost -= gene.changeOverCost
@@ -73,9 +71,11 @@ class CrossOverNode:
         gene.calculateCost()
 
         lastGene = Chromosome.nextProdGene(period, self.chromosome.dnaArray, self.chromosome.stringIdentifier)
+        # print("last gene 1 : ", lastGene, (gene.item, gene.position))
         lastGene.prevGene = (gene.item, gene.position)
         lastGene.calculateChangeOverCost()
         lastGene.calculateCost()
+        # print("last gene 2 : ", lastGene)
 
         self.chromosome.dnaArray[item0][position] = gene
         self.chromosome.cost += (gene.cost + lastGene.changeOverCost)

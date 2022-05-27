@@ -150,7 +150,7 @@ class Chromosome(object):
 				period = (prodPeriod + 1) + index
 				item0 = item - 1
 				for geneA in dnaArray[item0]:
-					if geneA.period == period:
+					if geneA is not None and geneA.period == period:
 						# print('next ', geneA)
 						return geneA
 		

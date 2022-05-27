@@ -23,7 +23,7 @@ class LocalSearchEngine:
         strategy: simple_mutation|absolute_mutation|positive_mutation
         """
 
-        print("mutatioooooooooooon", strategy, chromosome)
+        print("mutatioooooooooooon", strategy, chromosome, chromosome.dnaArray)
 
         self._visitedNodes = defaultdict(lambda: None)
         self.chromosome = chromosome
@@ -32,8 +32,8 @@ class LocalSearchEngine:
         result = {"depthIndex": 0, "chromosomes": []}
         self.dfsNextNode(node, strategy, result)
 
-        # if len(result["chromosomes"]) and (result["chromosomes"][0]).cost != Chromosome.createFromIdentifier(result["chromosomes"][0].stringIdentifier).cost:
-        #     print("huuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuugggggggggggggge", result[0])
+        if len(result["chromosomes"]) and (result["chromosomes"][0]).dnaArray != Chromosome.createFromIdentifier(result["chromosomes"][0].stringIdentifier).dnaArray:
+            print(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::", result["chromosomes"][0])
 
         print("mutation results : ", result["chromosomes"])
         return result["chromosomes"]
