@@ -164,7 +164,7 @@ class LocalSearchNode:
                 # print("before before nextGene B: ", nextGene)
 
                 if nextGene is not None:
-                    print("before nextGene B: ", nextGene, nextGene.changeOverCost)
+                    # print("before nextGene B: ", nextGene, nextGene.changeOverCost)
                     cost -= nextGene.changeOverCost
                     prevGene = (gene1.item, gene1.position)
                     # print("prevGene B: ", prevGene)

@@ -32,8 +32,8 @@ class LocalSearchEngine:
         result = {"depthIndex": 0, "chromosomes": []}
         self.dfsNextNode(node, strategy, result)
 
-        if len(result["chromosomes"]) and (result["chromosomes"][0]).dnaArray != Chromosome.createFromIdentifier(result["chromosomes"][0].stringIdentifier).dnaArray:
-            print(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::", result["chromosomes"][0])
+        # if len(result["chromosomes"]) and (result["chromosomes"][0]).dnaArray != Chromosome.createFromIdentifier(result["chromosomes"][0].stringIdentifier).dnaArray:
+        #     print(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::", result["chromosomes"][0])
 
         print("mutation results : ", result["chromosomes"])
         return result["chromosomes"]
@@ -44,22 +44,22 @@ class LocalSearchEngine:
         """
 
         # print("*************** Prosus", result["depthIndex"])
-        
+
         if self._visitedNodes[node.chromosome.stringIdentifier] is not None:
             return None
         self._visitedNodes[node.chromosome.stringIdentifier] = 1
 
         if strategy == "simple_mutation":
-            if result["depthIndex"] >= ParameterData.instance.simpleMutationDepthIndex and Chromosome.pool[node.chromosome.stringIdentifier] is None:
+            if result["depthIndex"] >= ParameterData.instance.simpleMutationDepthIndex: #and Chromosome.pool[node.chromosome.stringIdentifier] is None:
                 result["chromosomes"].append(node.chromosome)
                 self._stopSearchEvent.set()
                 return None
         elif strategy == "positive_mutation":
-            if node < self and Chromosome.pool[node.chromosome.stringIdentifier] is None:
+            if node < self: #and Chromosome.pool[node.chromosome.stringIdentifier] is None:
                 print("positive_mutation ", result["depthIndex"], node.chromosome, node < self)
                 result["chromosomes"].append(node.chromosome)
                 self._stopSearchEvent.set()
-                return 
+                return
         elif strategy == "population":
             result["chromosomes"].append(node.chromosome)
             if len(result["chromosomes"]) > ParameterData.instance.popSize * ParameterData.instance.nPrimaryThreads:
@@ -90,9 +90,9 @@ class LocalSearchEngine:
 
             if self._stopSearchEvent.is_set():
                 return None
-                
 
-        # TODO 
+
+        # TODO
         if strategy == "absolute_mutation":
             # print("Absolute mutation", len(children))
             if len(children) == 0:

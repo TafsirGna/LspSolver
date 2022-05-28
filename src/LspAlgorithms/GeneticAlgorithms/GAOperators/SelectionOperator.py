@@ -9,13 +9,13 @@ class SelectionOperator:
     """
     """
 
-    def __init__(self, population) -> None:
+    def __init__(self, population, popMetrics) -> None:
         """
         """
-        
+
         # self.chromosomeIndex = 0
         self.rouletteProbabilities = [0] * len(population.chromosomes)
-        self.setRouletteProbabilities(population)
+        self.setRouletteProbabilities(population, popMetrics)
 
 
     def fitnessCalculationTask(self, maxCost, slice, resultQueue, population):
@@ -35,13 +35,15 @@ class SelectionOperator:
         resultQueue.put(fitnessArray)
 
 
-    def setRouletteProbabilities(self, population):
+    def setRouletteProbabilities(self, population, popMetrics):
         """
         """
 
         self.chromosomes = [element["chromosome"] for element in population.chromosomes.values()]
 
-        maxCost = LspRuntimeMonitor.popsData[population.lineageIdentifier]["max"][-1] + 1
+        # maxCost = LspRuntimeMonitor.popsData[population.lineageIdentifier]["max"][-1] + 1
+        maxCost = popMetrics["max"] + 1
+
         nProcesses = ParameterData.instance.nReplicaSubThreads
         slices = np.array_split(self.chromosomes, nProcesses)
 
@@ -112,7 +114,7 @@ class SelectionOperator:
     #         self.chromosomeIndex = 0
     #     else:
     #         self.chromosomeIndex += 1
-        
+
     #     return chromosome, np.random.choice(self.population.chromosomes, p=rouletteProbabilities)
 
 
