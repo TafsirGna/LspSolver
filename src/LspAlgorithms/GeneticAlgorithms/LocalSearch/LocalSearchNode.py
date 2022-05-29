@@ -1,3 +1,4 @@
+from collections import defaultdict
 import copy
 import random
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
@@ -9,14 +10,17 @@ class LocalSearchNode:
     """
     """
 
-    def __init__(self, chromosome) -> None:
+    absoluteSearchedInstances = defaultdict(lambda: None)
+
+    def __init__(self, chromosome, rootChromosome = None) -> None:
         """
         """
 
+        self.rootChromosome = rootChromosome
         self.chromosome = chromosome
 
 
-    def generateChild(self):
+    def generateChild(self, depthIndex):
         """
         """
 
@@ -29,9 +33,13 @@ class LocalSearchNode:
             for mutation in LocalSearchNode.generateGeneMutations(gene, self.chromosome):
                 chromosome = mutation[1]
                 # print("Child : ", chromosome)
-                yield LocalSearchNode(chromosome)
+                rootChromosome = self.rootChromosome if self.rootChromosome is not None else self.chromosome
+                if LocalSearchNode.absoluteSearchedInstances[rootChromosome.stringIdentifier] is not None:
+                    (LocalSearchNode.absoluteSearchedInstances[rootChromosome.stringIdentifier]["path"][depthIndex]["moves"]).append(mutation[2])
+                yield LocalSearchNode(chromosome, rootChromosome)
 
-        return []
+        # return []
+        yield None
 
 
     def children(self):
@@ -66,7 +74,7 @@ class LocalSearchNode:
             stringIdentifier = tuple(stringIdentifier)
             if Chromosome.pool[stringIdentifier] is not None:
                 return Chromosome.pool[stringIdentifier]
-            
+
             dnaArray = copy.deepcopy(chromosome.dnaArray)
             gene1 = dnaArray[gene1Item][gene1Position]
 
@@ -94,7 +102,7 @@ class LocalSearchNode:
 
                 if nextGene0 is not None:
                     # print("before nextGene0 : ", nextGene0, nextGene0.changeOverCost)
-                    (dnaArray[gene1Item][gene1Position]).prevGene = nextGene0.prevGene 
+                    (dnaArray[gene1Item][gene1Position]).prevGene = nextGene0.prevGene
 
                     nextGene0.prevGene = (gene1.item, gene1.position)
                     nextGene0.calculateChangeOverCost()
@@ -117,7 +125,7 @@ class LocalSearchNode:
 
         else:
             gene2Item, gene2Position = swap[1][0], swap[1][1]
-            period1, period2 = (chromosome.dnaArray[gene1Item][gene1Position]).period, (chromosome.dnaArray[gene2Item][gene2Position]).period 
+            period1, period2 = (chromosome.dnaArray[gene1Item][gene1Position]).period, (chromosome.dnaArray[gene2Item][gene2Position]).period
             stringIdentifier[period1] =  gene2Item + 1
             stringIdentifier[period2] =  gene1Item + 1
             stringIdentifier = tuple(stringIdentifier)
@@ -131,7 +139,7 @@ class LocalSearchNode:
             # print("dnaArray : ", dnaArray)
             gene1 = (dnaArray[gene1Item][gene1Position])
             gene2 = (dnaArray[gene2Item][gene2Position])
-            
+
             cost = chromosome.cost
 
             cost -= (gene1.cost + gene2.cost)
@@ -188,7 +196,7 @@ class LocalSearchNode:
                     nextGene1.prevGene = prevGene
                     nextGene1.calculateChangeOverCost()
                     nextGene1.calculateCost()
-                    cost += nextGene1.changeOverCost 
+                    cost += nextGene1.changeOverCost
                     # print("after nextGene1 : ", nextGene1, nextGene1.changeOverCost)
 
                 if nextGene2 is not None:
@@ -202,7 +210,7 @@ class LocalSearchNode:
                     cost += nextGene2.changeOverCost
                     # print("after nextGene2 : ", nextGene2, nextGene2.changeOverCost)
 
-                
+
             gene1.period, gene2.period = gene2.period, gene1.period
 
             gene1.calculateStockingCost()
@@ -221,7 +229,7 @@ class LocalSearchNode:
         result.dnaArray = dnaArray
         result.stringIdentifier = stringIdentifier
         result.cost = cost
-            
+
         return result
 
 
@@ -288,7 +296,10 @@ class LocalSearchNode:
     def __eq__(self, node) -> bool:
         """
         """
-        return self.chromosome == node.chromosome
+        return self.chromosome == node.chromosome and self.rootChromosome == node.rootChromosome
 
     def __repr__(self) -> str:
         return str(self.chromosome)
+
+    # def __hash__(self) -> int:
+    #     return hash(self.chromosome.stringIdentifier)

@@ -11,7 +11,8 @@ from ParameterSearch.ParameterData import ParameterData
 
 class TestMainFeatures:
     """
-    """        
+    """
+
 
     def test_mutation(self):
         """
@@ -21,7 +22,7 @@ class TestMainFeatures:
 
         # c = Chromosome.createFromIdentifier(stringIdentifier=(2, 1, 0, 1, 2))
         # c = Chromosome.createFromIdentifier(stringIdentifier=(0, 2, 2, 2, 3, 1, 0, 1))
-        # c = Chromosome.createFromIdentifier(stringIdentifier=(1, 0, 0, 2, 2, 2, 3, 1)) 
+        # c = Chromosome.createFromIdentifier(stringIdentifier=(1, 0, 0, 2, 2, 2, 3, 1))
         c = Chromosome.createFromIdentifier(stringIdentifier=(1, 0, 0, 0, 3, 1, 8, 7, 2, 4, 4, 5, 6, 10, 9))
         print("Chromosome ", c)
         # # [2, 1, 2, 0, 1]
@@ -29,9 +30,12 @@ class TestMainFeatures:
         result = (MutationOperator()).process(c)
         print("1 -- ", result, (Chromosome.createFromIdentifier(result.stringIdentifier)))
 
+        result = (MutationOperator()).process(c)
+        print("2 -- ", result, (Chromosome.createFromIdentifier(result.stringIdentifier)))
+
         assert 0
 
-    
+
     def test_crossover(self):
         """
         """
@@ -41,7 +45,7 @@ class TestMainFeatures:
         # cA, cB = Chromosome.createFromIdentifier(stringIdentifier=(2, 1, 1, 2, 0)), Chromosome.createFromIdentifier(stringIdentifier=(2, 1, 0, 1, 2))
         # cA, cB = Chromosome.createFromIdentifier(stringIdentifier=(0, 0, 2, 2, 3, 1, 2, 1)), Chromosome.createFromIdentifier(stringIdentifier=(2, 0, 2, 1, 1, 2, 3, 0))
         cA, cB = Chromosome.createFromIdentifier(stringIdentifier=(0, 0, 0, 6, 1, 8, 7, 10, 5, 4, 4, 2, 9, 3, 1)), Chromosome.createFromIdentifier(stringIdentifier=(0, 4, 0, 5, 10, 0, 8, 2, 6, 4, 3, 1, 1, 7, 9))
-        # [(5, 6, 10, 8, 0, 0, 9, 7, 0, 4, 4, 2, 1, 1, 3) : 1811, (7, 2, 8, 5, 10, 9, 0, 0, 0, 4, 4, 6, 1, 1, 3) : 1857] 
+        # [(5, 6, 10, 8, 0, 0, 9, 7, 0, 4, 4, 2, 1, 1, 3) : 1811, (7, 2, 8, 5, 10, 9, 0, 0, 0, 4, 4, 6, 1, 1, 3) : 1857]
 
         print(cA, "\n", cB, "\n -----------------------------")
         print((CrossOverOperator([cA, cB])).process())
@@ -58,12 +62,12 @@ class TestMainFeatures:
     def test_popInitialization(self):
         """
         """
-        
+
         self.setUpInput()
 
         (PopInitializer()).process()
 
-        assert 0        
+        assert 0
 
 
     def test_localSearchPopulation(self):
@@ -110,7 +114,7 @@ class TestMainFeatures:
 
     def setUpInput(self):
         """
-        """ 
+        """
 
         # inputFile = "data/input/clspInst02.data"
         inputFile = "data/input/pigment15b.dzn"
@@ -120,4 +124,3 @@ class TestMainFeatures:
         inputDataInstance = inputDataReader.readInput(inputFile)
 
         ParameterData.instance = ParameterData()
-

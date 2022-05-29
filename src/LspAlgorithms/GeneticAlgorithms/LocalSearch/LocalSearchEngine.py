@@ -1,5 +1,6 @@
 from collections import defaultdict
 import threading
+import copy
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
 from LspAlgorithms.GeneticAlgorithms.LocalSearch.LocalSearchNode import LocalSearchNode
 from ParameterSearch.ParameterData import ParameterData
@@ -7,8 +8,6 @@ from ParameterSearch.ParameterData import ParameterData
 class LocalSearchEngine:
     """
     """
-
-    searchedInstances = defaultdict(lambda: None)
 
     def __init__(self) -> None:
         """
@@ -23,7 +22,7 @@ class LocalSearchEngine:
         strategy: simple_mutation|absolute_mutation|positive_mutation
         """
 
-        print("mutatioooooooooooon", strategy, chromosome, chromosome.dnaArray)
+        print("mutatiooooooon", strategy, chromosome, chromosome.dnaArray)
 
         self._visitedNodes = defaultdict(lambda: None)
         self.chromosome = chromosome
@@ -36,6 +35,7 @@ class LocalSearchEngine:
         #     print(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::", result["chromosomes"][0])
 
         print("mutation results : ", result["chromosomes"])
+        # print("Path : ", LocalSearchNode.absoluteSearchedInstances[self.chromosome.stringIdentifier]["path"])
         return result["chromosomes"]
 
 
@@ -66,13 +66,22 @@ class LocalSearchEngine:
                 self._stopSearchEvent.set()
                 return
         elif strategy == "absolute_mutation":
-            if LocalSearchEngine.searchedInstances[self.chromosome] is not None:
-                return LocalSearchEngine.searchedInstances[self.chromosome]
+            if result["depthIndex"] == 0:
+                if LocalSearchNode.absoluteSearchedInstances[self.chromosome.stringIdentifier] is not None:
+                    return self.resumeLocalSearchOn(node, result)
+                LocalSearchNode.absoluteSearchedInstances[self.chromosome.stringIdentifier] = {"path": [], "visitedInstances": defaultdict(lambda: None)}
+            (LocalSearchNode.absoluteSearchedInstances[self.chromosome.stringIdentifier]["path"]).append({"node": node, "moves": []})
+            LocalSearchNode.absoluteSearchedInstances[self.chromosome.stringIdentifier]["visitedInstances"][node.chromosome.stringIdentifier] = 1
 
         result["depthIndex"] += 1
         children = []
-        for child in node.generateChild():
-            # print("loulou ", child.chromosome, Chromosome.createFromIdentifier(child.chromosome.stringIdentifier))
+        depthIndex = result["depthIndex"] - 1
+        for child in node.generateChild(depthIndex):
+
+            if child is None:
+                break
+
+            print("child ", node.chromosome, child.chromosome)
 
             next = False
             if strategy == "positive_mutation":
@@ -96,10 +105,30 @@ class LocalSearchEngine:
         if strategy == "absolute_mutation":
             # print("Absolute mutation", len(children))
             if len(children) == 0:
-                LocalSearchEngine.searchedInstances[self.chromosome] = node.chromosome
                 result["chromosomes"].append(node.chromosome)
                 print("Absolute mutation result ", self.chromosome, node.chromosome)
                 self._stopSearchEvent.set()
                 return
+
+        return None
+
+    def resumeLocalSearchOn(self, node, result):
+        """
+        """
+
+        LocalSearchNode.absoluteSearchedInstances[node.chromosome.stringIdentifier]["path"] = LocalSearchNode.absoluteSearchedInstances[node.chromosome.stringIdentifier]["path"][:-1]
+
+        self._visitedNodes = copy.deepcopy(LocalSearchNode.absoluteSearchedInstances[node.chromosome.stringIdentifier]["visitedInstances"])
+        del self._visitedNodes[(LocalSearchNode.absoluteSearchedInstances[node.chromosome.stringIdentifier]["path"][-1]["node"]).chromosome.stringIdentifier]
+
+        result["depthIndex"] = len(LocalSearchNode.absoluteSearchedInstances[node.chromosome.stringIdentifier]["path"]) - 2
+        for index, element in enumerate(reversed(LocalSearchNode.absoluteSearchedInstances[node.chromosome.stringIdentifier]["path"])):
+            node = element["node"]
+            print("resume local search", node)
+            self.dfsNextNode(node, "absolute_mutation", result)
+
+            if len(result["chromosomes"]) > 0:
+                return None
+
 
         return None

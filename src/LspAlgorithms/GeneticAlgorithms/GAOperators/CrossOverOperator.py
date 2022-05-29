@@ -1,8 +1,6 @@
 from collections import defaultdict
 import random
 import threading
-
-from pyparsing import copy
 from LspAlgorithms.GeneticAlgorithms.GAOperators.CrossOverNode import CrossOverNode
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
@@ -20,17 +18,17 @@ class CrossOverOperator:
         self._stopSearchEvent = threading.Event()
         self._visitedNodes = defaultdict(lambda: None)
 
-    
+
     def process(self):
         """
         """
-        
+
         same = True
         reference = self.parentChromosomes[0]
-        for chromosome in self.parentChromosomes: 
+        for chromosome in self.parentChromosomes:
             if chromosome != reference:
                 same = False
-        
+
         if same:
             return reference
 
@@ -39,7 +37,7 @@ class CrossOverOperator:
         # before launching the recursive search
         minInstance, maxInstance = (self.parentChromosomes[0], self.parentChromosomes[1]) if self.parentChromosomes[0] < self.parentChromosomes[0] else (self.parentChromosomes[1], self.parentChromosomes[0])
         random.seed()
-        gapLength = int(InputDataInstance.instance.nPeriods / 4) 
+        gapLength = int(InputDataInstance.instance.nPeriods / 4)
         crossOverPeriod = random.randint(gapLength, InputDataInstance.instance.nPeriods - (gapLength + 1))
 
         node = CrossOverNode(maxInstance, crossOverPeriod - 1)
@@ -60,7 +58,7 @@ class CrossOverOperator:
         print("Cross Over result : ", chromosome)
         return chromosome
 
-    
+
     def nextNode(self, node, result):
         """
         """
@@ -83,7 +81,7 @@ class CrossOverOperator:
             # if not Chromosome.feasible(node.chromosome):
             # if node.chromosome.dnaArray != Chromosome.createFromIdentifier(node.chromosome.stringIdentifier).dnaArray:
             #     print("//////////////////////////////////////////////////////////////////////////", self.parentChromosomes, node.chromosome, node.chromosome.dnaArray)
-            
+
             # if Chromosome.pool[node.chromosome.stringIdentifier] is not None:
             #     return None
 
@@ -94,7 +92,7 @@ class CrossOverOperator:
         for child in node.generateChild():
             # print("child loop : ", child)
             self.nextNode(child, result)
-            
+
             if self._stopSearchEvent.is_set():
                 return None
 
