@@ -9,13 +9,15 @@ class SelectionOperator:
     """
     """
 
-    def __init__(self, population, popMetrics) -> None:
+    def __init__(self, population, strategy = "roulette_wheel") -> None:
         """
         """
 
         # self.chromosomeIndex = 0
-        self.rouletteProbabilities = [0] * len(population.chromosomes)
-        self.setRouletteProbabilities(population, popMetrics)
+        self.strategy = strategy
+        if self.strategy == "roulette_wheel":
+            self.rouletteProbabilities = [0] * len(population.chromosomes)
+            self.setRouletteProbabilities(population)
 
 
     def fitnessCalculationTask(self, maxCost, slice, resultQueue, population):
@@ -35,19 +37,15 @@ class SelectionOperator:
         resultQueue.put(fitnessArray)
 
 
-    def setRouletteProbabilities(self, population, popMetrics):
+    def setRouletteProbabilities(self, population):
         """
         """
 
         self.chromosomes = [element["chromosome"] for element in population.chromosomes.values()]
-
-        # maxCost = LspRuntimeMonitor.popsData[population.lineageIdentifier]["max"][-1] + 1
-        maxCost = popMetrics["max"] + 1
+        maxCost = LspRuntimeMonitor.popsData[population.lineageIdentifier]["max"][-1] + 1
 
         nProcesses = ParameterData.instance.nReplicaSubThreads
         slices = np.array_split(self.chromosomes, nProcesses)
-
-        # Process code
 
         processes = []
         resultQueues = []
@@ -88,34 +86,12 @@ class SelectionOperator:
         """
         """
 
-        return self.selectApproach2()
+        result = None
 
+        if self.strategy == "roulette_wheel":
+            result = self.selectApproach2()
 
-    # def selectApproach1(self):
-    #     """
-    #     """
-    #     chromosome = self.population.chromosomes[self.chromosomeIndex]
-
-    #     rouletteProbabilities = []
-    #     gapSum = 0
-    #     for oneChromosome in self.population.chromosomes:
-    #         # gap = 0 if oneChromosome == chromosome else self.population.maxCostChromosome.cost - oneChromosome.cost
-    #         gap = chromosome.cost - oneChromosome.cost
-    #         gap = gap if gap >= 0 else 0
-    #         rouletteProbabilities.append(gap)
-    #         gapSum += gap
-
-    #     if gapSum == 0:
-    #         return chromosome, chromosome
-
-    #     rouletteProbabilities = [float(gap/gapSum) for gap in rouletteProbabilities]
-
-    #     if self.chromosomeIndex == len(self.population.chromosomes) - 1:
-    #         self.chromosomeIndex = 0
-    #     else:
-    #         self.chromosomeIndex += 1
-
-    #     return chromosome, np.random.choice(self.population.chromosomes, p=rouletteProbabilities)
+        return result
 
 
     def selectApproach2(self):

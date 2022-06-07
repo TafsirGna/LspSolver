@@ -4,6 +4,7 @@ from queue import Queue
 import random
 import numpy as np
 import threading
+import concurrent.futures
 import uuid
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
 from LspAlgorithms.GeneticAlgorithms.GAOperators.CrossOverOperator import CrossOverOperator
@@ -59,25 +60,17 @@ class Population:
         for chromosome in list(LspRuntimeMonitor.popsData[self.lineageIdentifier]["elites"]):
             newPop.add(chromosome)
 
-        processes = []
         resultQueues = []
         instances = [None] * Population.popSizes[self.lineageIdentifier]
         instances = np.array_split(instances, ParameterData.instance.nReplicaThreads)
-        for processIndex in range(ParameterData.instance.nReplicaThreads):
-            # print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ", len(instances[processIndex]))
-            resultQueue = mp.Queue(maxsize=len(instances[processIndex]))
-            process = mp.Process(target=self.threadTask, args=(self.selectionOperator, resultQueue))
-            process.start()
-            resultQueues.append(resultQueue)
-            processes.append(process)
 
-        # print("bibi")
-        for process in processes:
-            process.join()
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            for processIndex in range(ParameterData.instance.nReplicaThreads):
+                resultQueue = Queue(maxsize=len(instances[processIndex]))
+                executor.submit(self.threadTask, resultQueue)
+                resultQueues.append(resultQueue)
 
-        # print("Priiiince", len(resultQueues))
         for resultQueue in resultQueues:
-            # print("Priiiince")
             while not resultQueue.empty():
                 chromosome = resultQueue.get()
                 newPop.add(chromosome)
@@ -135,7 +128,7 @@ class Population:
         return self.chromosomes[chromosome.stringIdentifier]
 
 
-    def threadTask(self, selectionOperator, queue):
+    def threadTask(self, queue):
         """
         """
 
@@ -144,7 +137,7 @@ class Population:
         while not queue.full():
 
             # print("booooooooooooooooooooooooo")
-            chromosomeA, chromosomeB = selectionOperator.select()
+            chromosomeA, chromosomeB = self.selectionOperator.select()
             chromosome = None
 
             # print("After selection")

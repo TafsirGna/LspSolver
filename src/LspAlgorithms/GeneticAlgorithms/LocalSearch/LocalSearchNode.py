@@ -11,6 +11,7 @@ class LocalSearchNode:
     """
 
     absoluteSearchedInstances = defaultdict(lambda: None)
+    mutationsMemory = defaultdict(lambda: None)
 
     def __init__(self, chromosome, rootChromosome = None) -> None:
         """
@@ -61,6 +62,20 @@ class LocalSearchNode:
         """
         """
 
+        # checking if this combination of chromosome swap has already been visited
+        chromosome1, chromosome2, theChromosome = LocalSearchNode.mutationsMemory[(chromosome.stringIdentifier, swap[0], swap[1])], LocalSearchNode.mutationsMemory[(chromosome.stringIdentifier, swap[1], swap[0])], None
+        if chromosome1 is not None:
+            theChromosome = chromosome1
+
+        if chromosome2 is not None:
+            theChromosome = chromosome2
+
+        if theChromosome is not None:
+            print("SAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWWWWWWWWWWWWWWWWWWWWWWWW")
+            return theChromosome
+
+
+
         # Making up the stringIdentifier of the result chromosome
         stringIdentifier = list(chromosome.stringIdentifier)
         dnaArray = None
@@ -73,6 +88,7 @@ class LocalSearchNode:
             stringIdentifier[(chromosome.dnaArray[gene1Item][gene1Position]).period] = 0
             stringIdentifier = tuple(stringIdentifier)
             if Chromosome.pool[stringIdentifier] is not None:
+                LocalSearchNode.mutationsMemory[(stringIdentifier, swap[0], swap[1])] = Chromosome.pool[stringIdentifier]
                 return Chromosome.pool[stringIdentifier]
 
             dnaArray = copy.deepcopy(chromosome.dnaArray)
@@ -131,6 +147,7 @@ class LocalSearchNode:
             stringIdentifier = tuple(stringIdentifier)
 
             if Chromosome.pool[stringIdentifier] is not None:
+                LocalSearchNode.mutationsMemory[(stringIdentifier, swap[0], swap[1])] = Chromosome.pool[stringIdentifier]
                 return Chromosome.pool[stringIdentifier]
 
             dnaArray = copy.deepcopy(chromosome.dnaArray)
@@ -230,6 +247,7 @@ class LocalSearchNode:
         result.stringIdentifier = stringIdentifier
         result.cost = cost
 
+        LocalSearchNode.mutationsMemory[(result.stringIdentifier, swap[0], swap[1])] = result
         return result
 
 

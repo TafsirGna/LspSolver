@@ -47,13 +47,13 @@ class GeneticAlgorithm:
 		"""
 
 		generationIndex = 0
-		
+
 		#
 		dThreadPipelines = self.dThreadPipelines[population.lineageIdentifier]
 		self.daemonThreads[population.lineageIdentifier] = threading.Thread(target=self.daemonTask, args=(population.lineageIdentifier,), daemon=True)
 		# (self.daemonThreads[threadUUID]).start()
-		
-		population.dThreadOutputPipeline = dThreadPipelines["output"] 
+
+		population.dThreadOutputPipeline = dThreadPipelines["output"]
 
 		while self.popEvaluator.evaluate(population, dThreadPipelines["input"], generationIndex) != "TERMINATE":
 			# if generationIndex == 2:
@@ -62,7 +62,7 @@ class GeneticAlgorithm:
 			population = population.evolve()
 
 			LspRuntimeMonitor.output("Population --> " + str(population))
-			
+
 			generationIndex += 1
 
 	# (self.daemonThreads[threadUUID]).
@@ -72,7 +72,7 @@ class GeneticAlgorithm:
 		"""
 
 		populations = self.popInitializer.process()
-		
+
 		with concurrent.futures.ThreadPoolExecutor() as executor:
 			print(list(executor.map(self.process, populations)))
 
@@ -84,5 +84,3 @@ class GeneticAlgorithm:
 
 		# for process in processes:
 		# 	process.join()
-
-		

@@ -46,11 +46,12 @@ class LocalSearchEngine:
         # print("*************** Prosus", result["depthIndex"])
 
         if self._visitedNodes[node.chromosome.stringIdentifier] is not None:
+            print("returning none")
             return None
         self._visitedNodes[node.chromosome.stringIdentifier] = 1
 
         if strategy == "simple_mutation":
-            if result["depthIndex"] >= ParameterData.instance.simpleMutationDepthIndex: #and Chromosome.pool[node.chromosome.stringIdentifier] is None:
+            if Chromosome.pool[node.chromosome.stringIdentifier] is None: # result["depthIndex"] >= ParameterData.instance.simpleMutationDepthIndex
                 result["chromosomes"].append(node.chromosome)
                 self._stopSearchEvent.set()
                 return None
@@ -66,12 +67,13 @@ class LocalSearchEngine:
                 self._stopSearchEvent.set()
                 return
         elif strategy == "absolute_mutation":
-            if result["depthIndex"] == 0:
+            if node.rootChromosome is None:
                 if LocalSearchNode.absoluteSearchedInstances[self.chromosome.stringIdentifier] is not None:
                     return self.resumeLocalSearchOn(node, result)
                 LocalSearchNode.absoluteSearchedInstances[self.chromosome.stringIdentifier] = {"path": [], "visitedInstances": defaultdict(lambda: None)}
-            (LocalSearchNode.absoluteSearchedInstances[self.chromosome.stringIdentifier]["path"]).append({"node": node, "moves": []})
-            LocalSearchNode.absoluteSearchedInstances[self.chromosome.stringIdentifier]["visitedInstances"][node.chromosome.stringIdentifier] = 1
+            instance = node.rootChromosome if node.rootChromosome is not None else self.chromosome
+            (LocalSearchNode.absoluteSearchedInstances[instance.stringIdentifier]["path"]).append({"node": node, "moves": []})
+            LocalSearchNode.absoluteSearchedInstances[instance.stringIdentifier]["visitedInstances"][node.chromosome.stringIdentifier] = 1
 
         result["depthIndex"] += 1
         children = []
@@ -81,7 +83,7 @@ class LocalSearchEngine:
             if child is None:
                 break
 
-            print("child ", node.chromosome, child.chromosome)
+            # print("child ", node.chromosome, child.chromosome)
 
             next = False
             if strategy == "positive_mutation":
@@ -116,16 +118,20 @@ class LocalSearchEngine:
         """
         """
 
+        print("----------------------- ", LocalSearchNode.absoluteSearchedInstances[node.chromosome.stringIdentifier]["path"])
         LocalSearchNode.absoluteSearchedInstances[node.chromosome.stringIdentifier]["path"] = LocalSearchNode.absoluteSearchedInstances[node.chromosome.stringIdentifier]["path"][:-1]
+        path = copy.deepcopy(LocalSearchNode.absoluteSearchedInstances[node.chromosome.stringIdentifier]["path"])
+        for index, element in enumerate(reversed(path)):
 
-        self._visitedNodes = copy.deepcopy(LocalSearchNode.absoluteSearchedInstances[node.chromosome.stringIdentifier]["visitedInstances"])
-        del self._visitedNodes[(LocalSearchNode.absoluteSearchedInstances[node.chromosome.stringIdentifier]["path"][-1]["node"]).chromosome.stringIdentifier]
+            subNode = element["node"]
 
-        result["depthIndex"] = len(LocalSearchNode.absoluteSearchedInstances[node.chromosome.stringIdentifier]["path"]) - 2
-        for index, element in enumerate(reversed(LocalSearchNode.absoluteSearchedInstances[node.chromosome.stringIdentifier]["path"])):
-            node = element["node"]
-            print("resume local search", node)
-            self.dfsNextNode(node, "absolute_mutation", result)
+            self._visitedNodes = copy.deepcopy(LocalSearchNode.absoluteSearchedInstances[node.chromosome.stringIdentifier]["visitedInstances"])
+            del self._visitedNodes[subNode.chromosome.stringIdentifier]
+
+            result["depthIndex"] = len(path) - (index + 2)
+
+            print("resume local search", subNode)
+            self.dfsNextNode(subNode, "absolute_mutation", result)
 
             if len(result["chromosomes"]) > 0:
                 return None
