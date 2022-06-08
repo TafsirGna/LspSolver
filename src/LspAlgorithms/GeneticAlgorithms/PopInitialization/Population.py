@@ -138,28 +138,29 @@ class Population:
 
             # print("booooooooooooooooooooooooo")
             chromosomeA, chromosomeB = self.selectionOperator.select()
-            chromosome = None
+            chromosomeC, chromosomeD = chromosomeA, chromosomeB
 
             # print("After selection")
             random.seed()
             if (random.random() < ParameterData.instance.crossOverRate):
-                chromosome = (CrossOverOperator([chromosomeA, chromosomeB])).process()
+                chromosomeC, chromosomeD = (CrossOverOperator([chromosomeA, chromosomeB])).process()
                 # print("Crossover : ", threadID, chromosomeA, chromosomeB, chromosome, len(newPop.chromosomes))
-            else:
-                chromosome = chromosomeA if chromosomeA < chromosomeB else chromosomeB
 
+            # 1rst offspring
             random.seed()
-            # print("After cross over")
-            if chromosome is not None and (random.random() < ParameterData.instance.mutationRate):
-                # Proceding to mutate the chromosome
+            if random.random() < ParameterData.instance.mutationRate:
                 # print("mutating")
-                chromosome = (MutationOperator()).process(chromosome)
+                chromosomeC = (MutationOperator()).process(chromosomeC)
 
-            if chromosome is not None:
-                # print("Adding new chromosome 1")
-                # print(chromosome)
-                queue.put(chromosome)
-                # print("Adding new chromosome 2")
+            # 2nd offspring
+            random.seed()
+            if random.random() < ParameterData.instance.mutationRate:
+                # print("mutating")
+                chromosomeD = (MutationOperator()).process(chromosomeD)
+
+            queue.put(chromosomeC)
+            if not queue.full():
+                queue.put(chromosomeD)
 
         # print(";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ", queue.qsize())
 

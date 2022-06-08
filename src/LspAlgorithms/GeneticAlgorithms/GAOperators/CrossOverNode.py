@@ -10,16 +10,21 @@ class CrossOverNode:
     """
     """
 
-    def __init__(self, parent, period) -> None:
+    def __init__(self, parents, period, index) -> None:
         """
         """
         
+        self.parents = parents
         self.chromosome = Chromosome()
-        self.parent = parent
         self.period = period
+        self.index = index
+        self.primary_parent, self.secondary_parent = (parents[0], parents[1])  if self.index == 0 else (parents[1], parents[0])
         
         self.itemsToOrder = {item: len(InputDataInstance.instance.demandsArrayZipped[item]) for item in range(InputDataInstance.instance.nItems)} 
         self.itemsToOrder[-1] = InputDataInstance.instance.nPeriods - InputDataInstance.instance.demandsArray.sum()
+
+        self.chromosome.stringIdentifier = self.primary_parent.stringIdentifier
+        self.prepSearchSettings()
 
 
     def children(self):
@@ -34,7 +39,7 @@ class CrossOverNode:
         return children
 
 
-    def prepSearchSettings(self, fittestParent):
+    def prepSearchSettings(self):
         """
         """
 
@@ -45,11 +50,11 @@ class CrossOverNode:
 
         # and setting the itemsToOrder property
         gene = None
-        for index, item in enumerate(reversed(fittestParent.stringIdentifier[self.period + 1:])):
+        for index, item in enumerate(reversed(self.primary_parent.stringIdentifier[self.period + 1:])):
             self.itemsToOrder[item - 1] -= 1
             # print(" item ", item)
             if item > 0:
-                gene = (Chromosome.geneAtPeriod(fittestParent, InputDataInstance.instance.nPeriods - (1 + index)))
+                gene = (Chromosome.geneAtPeriod(self.primary_parent, InputDataInstance.instance.nPeriods - (1 + index)))
                 self.chromosome.dnaArray[gene.item][gene.position] = copy.deepcopy(gene)
                 self.chromosome.cost += gene.cost
 
@@ -94,7 +99,7 @@ class CrossOverNode:
         itemsToOrderKeys = list(self.itemsToOrder.keys())
 
         # handling the parent
-        parentGene = Chromosome.geneAtPeriod(self.parent, self.period)
+        parentGene = Chromosome.geneAtPeriod(self.secondary_parent, self.period)
         if parentGene is None: # period's item is 0
             if self.itemsToOrder[-1] > 0:
                 yield self.orderItem(-1, self.period)
@@ -132,7 +137,7 @@ class CrossOverNode:
         """
         """
         
-        child = CrossOverNode(self.parent, self.period - 1)
+        child = CrossOverNode(self.parents, self.period - 1, self.index)
 
         stringIdentifier = list(self.chromosome.stringIdentifier)
         stringIdentifier[period] = item + 1

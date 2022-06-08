@@ -4,6 +4,7 @@ import threading
 from LspAlgorithms.GeneticAlgorithms.GAOperators.CrossOverNode import CrossOverNode
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
+import concurrent.futures
 
 
 class CrossOverOperator:
@@ -15,51 +16,46 @@ class CrossOverOperator:
         """
 
         self.parentChromosomes = parentChromosomes
-        self._stopSearchEvent = threading.Event()
-        self._visitedNodes = defaultdict(lambda: None)
+        self._stopSearchEvents = {0: threading.Event(), 1: threading.Event()}
+        self._visitedNodes = {0: defaultdict(lambda: None), 1: defaultdict(lambda: None)}
+        self.offsprings = {0: None, 1: None}
 
 
-    def process(self):
+    def process(self, offspring_result = 2):
         """
         """
 
-        same = True
-        reference = self.parentChromosomes[0]
-        for chromosome in self.parentChromosomes:
-            if chromosome != reference:
-                same = False
+        if offspring_result not in [1,2]:
+            # TODO: throw an error
+            return None, None
 
-        if same:
-            return reference
+        if self.parentChromosomes[0] == self.parentChromosomes[1]:
+            return self.parentChromosomes[0]
 
         print("Crossover : ", self.parentChromosomes)
 
         # before launching the recursive search
-        minInstance, maxInstance = (self.parentChromosomes[0], self.parentChromosomes[1]) if self.parentChromosomes[0] < self.parentChromosomes[0] else (self.parentChromosomes[1], self.parentChromosomes[0])
+        gapLength = int(InputDataInstance.instance.nPeriods / 3)
         random.seed()
-        gapLength = int(InputDataInstance.instance.nPeriods / 4)
         crossOverPeriod = random.randint(gapLength, InputDataInstance.instance.nPeriods - (gapLength + 1))
 
-        node = CrossOverNode(maxInstance, crossOverPeriod - 1)
-        node.chromosome.stringIdentifier = minInstance.stringIdentifier
-        node.prepSearchSettings(minInstance)
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            # node A
+            nodeA = CrossOverNode(self.parentChromosomes, crossOverPeriod - 1, 0)
+            executor.submit(self.nextNode, nodeA)
 
-        result = []
-        self.nextNode(node, result)
+            # adding a second thread if commanded
+            if offspring_result == 2:
+                nodeB = CrossOverNode(self.parentChromosomes, crossOverPeriod - 1, 1)
+                executor.submit(self.nextNode, nodeB)
 
-        # TODO
-        if len(result) == 0:
-            print("weeeeeeeeeeeeeeeeiiiiiiiiiiiiiiiiiiiiird")
-            return min(self.parentChromosomes)
-
-        chromosome = result[0]
         # if chromosome.cost != Chromosome.createFromIdentifier(chromosome.stringIdentifier).cost:
         #     print(" hiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
-        print("Cross Over result : ", chromosome)
-        return chromosome
+        print("Cross Over result : ", self.offsprings)
+        return tuple(self.offsprings.values())
 
 
-    def nextNode(self, node, result):
+    def nextNode(self, node):
         """
         """
 
@@ -69,10 +65,10 @@ class CrossOverOperator:
 
         node.chromosome.stringIdentifier = tuple(node.chromosome.stringIdentifier)
 
-        if self._visitedNodes[node.chromosome.stringIdentifier] is not None:
+        if self._visitedNodes[node.index][node.chromosome.stringIdentifier] is not None:
             print("visited node")
             return None
-        self._visitedNodes[node.chromosome.stringIdentifier] = 1
+        self._visitedNodes[node.index][node.chromosome.stringIdentifier] = 1
 
         # print("next node : ", node.chromosome, node.chromosome.dnaArray, node.period)
 
@@ -85,15 +81,15 @@ class CrossOverOperator:
             # if Chromosome.pool[node.chromosome.stringIdentifier] is not None:
             #     return None
 
-            result.append(node.chromosome)
-            self._stopSearchEvent.set()
+            self.offsprings[node.index] = node.chromosome
+            self._stopSearchEvents[node.index].set()
             return None
 
         for child in node.generateChild():
             # print("child loop : ", child)
-            self.nextNode(child, result)
+            self.nextNode(child)
 
-            if self._stopSearchEvent.is_set():
+            if (self._stopSearchEvents[node.index]).is_set():
                 return None
 
         return None

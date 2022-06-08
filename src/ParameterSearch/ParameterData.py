@@ -22,7 +22,7 @@ class ParameterData:
         self.popUniquesPercentage10 = 0.1
         self.simpleMutationDepthIndex = 1
         self.nReplicaSubThreads = 1
-        self.nIdleGenerations = 12
+        self.nIdleGenerations = 5
         self.localSearchTriggerSize = 0.1
 
     def save(self):
