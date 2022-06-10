@@ -65,6 +65,8 @@ class CrossOverNode:
         stringIdentifier[:self.period + 1] = ['*'] * (self.period + 1)
         self.chromosome.stringIdentifier = stringIdentifier
 
+        # print("creating node : ", self.chromosome.stringIdentifier)
+
 
     def addGene(self, item0, period, position):
         """

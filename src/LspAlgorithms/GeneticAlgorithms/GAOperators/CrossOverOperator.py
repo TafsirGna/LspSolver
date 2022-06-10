@@ -29,10 +29,11 @@ class CrossOverOperator:
             # TODO: throw an error
             return None, None
 
-        if self.parentChromosomes[0] == self.parentChromosomes[1]:
-            return self.parentChromosomes[0]
 
-        print("Crossover : ", self.parentChromosomes)
+        if self.parentChromosomes[0] == self.parentChromosomes[1]:
+            return self.parentChromosomes[0], self.parentChromosomes[1]
+
+        # print("Crossover : ", self.parentChromosomes)
 
         # before launching the recursive search
         gapLength = int(InputDataInstance.instance.nPeriods / 3)
@@ -40,18 +41,19 @@ class CrossOverOperator:
         crossOverPeriod = random.randint(gapLength, InputDataInstance.instance.nPeriods - (gapLength + 1))
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            # node A
-            nodeA = CrossOverNode(self.parentChromosomes, crossOverPeriod - 1, 0)
-            executor.submit(self.nextNode, nodeA)
+            nodes = []
+            # 1rst node
+            nodes.append(CrossOverNode(self.parentChromosomes, crossOverPeriod - 1, 0))
 
-            # adding a second thread if commanded
+            # 2nd node if commanded
             if offspring_result == 2:
-                nodeB = CrossOverNode(self.parentChromosomes, crossOverPeriod - 1, 1)
-                executor.submit(self.nextNode, nodeB)
+                nodes.append(CrossOverNode(self.parentChromosomes, crossOverPeriod - 1, 1))
+
+            print(list(executor.map(self.nextNode, nodes)))
 
         # if chromosome.cost != Chromosome.createFromIdentifier(chromosome.stringIdentifier).cost:
-        #     print(" hiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
-        print("Cross Over result : ", self.offsprings)
+        #     print(" Watch out")
+        print("Cross Over result : ", [self.parentChromosomes, self.offsprings])
         return tuple(self.offsprings.values())
 
 
@@ -75,8 +77,8 @@ class CrossOverOperator:
         if node.period <= -1:
 
             # if not Chromosome.feasible(node.chromosome):
-            # if node.chromosome.dnaArray != Chromosome.createFromIdentifier(node.chromosome.stringIdentifier).dnaArray:
-            #     print("//////////////////////////////////////////////////////////////////////////", self.parentChromosomes, node.chromosome, node.chromosome.dnaArray)
+            if node.chromosome.dnaArray != Chromosome.createFromIdentifier(node.chromosome.stringIdentifier).dnaArray:
+                print("//////////////////////////////////////////////////////////////////////////", self.parentChromosomes, node.chromosome, node.chromosome.dnaArray)
 
             # if Chromosome.pool[node.chromosome.stringIdentifier] is not None:
             #     return None

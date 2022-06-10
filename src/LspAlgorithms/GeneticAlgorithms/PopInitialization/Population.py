@@ -60,22 +60,21 @@ class Population:
         for chromosome in list(LspRuntimeMonitor.popsData[self.lineageIdentifier]["elites"]):
             newPop.add(chromosome)
 
-        resultQueues = []
         instances = [None] * Population.popSizes[self.lineageIdentifier]
         instances = np.array_split(instances, ParameterData.instance.nReplicaThreads)
+        resultQueues = [Queue(maxsize=len(instances[replicaIndex])) for replicaIndex in range(ParameterData.instance.nReplicaThreads)]
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            for processIndex in range(ParameterData.instance.nReplicaThreads):
-                resultQueue = Queue(maxsize=len(instances[processIndex]))
-                executor.submit(self.threadTask, resultQueue)
-                resultQueues.append(resultQueue)
+            print(list(executor.map(self.threadTask, resultQueues)))
 
         for resultQueue in resultQueues:
+            # print("instances :::::::::::::::::::::: ", resultQueue.qsize())
             while not resultQueue.empty():
                 chromosome = resultQueue.get()
                 newPop.add(chromosome)
 
         newPop.dThreadOutputPipeline =  self.dThreadOutputPipeline
+        print("----------------- : ", newPop.popLength, self.popLength)
         return newPop
 
 
@@ -132,38 +131,50 @@ class Population:
         """
         """
 
+        # print("Starting thread")
+
         threadID = uuid.uuid4()
 
         while not queue.full():
 
-            # print("booooooooooooooooooooooooo")
+            # print("looping : ", queue.qsize())
             chromosomeA, chromosomeB = self.selectionOperator.select()
             chromosomeC, chromosomeD = chromosomeA, chromosomeB
 
-            # print("After selection")
+            # print("After selecting")
             random.seed()
-            if (random.random() < ParameterData.instance.crossOverRate):
-                chromosomeC, chromosomeD = (CrossOverOperator([chromosomeA, chromosomeB])).process()
-                # print("Crossover : ", threadID, chromosomeA, chromosomeB, chromosome, len(newPop.chromosomes))
+            if (random.random() <= ParameterData.instance.crossOverRate):
+                try:
+                    # pass
+                    # print("mating")
+                    offsprings = (CrossOverOperator([chromosomeA, chromosomeB])).process()
+                    # print("offsprings : ", offsprings)
+                    chromosomeC, chromosomeD = offsprings
+                except Exception as e:
+                    print("Exception")
+                    raise e
+
+            # print("after mating")
 
             # 1rst offspring
             random.seed()
-            if random.random() < ParameterData.instance.mutationRate:
-                # print("mutating")
+            if random.random() <= ParameterData.instance.mutationRate:
+                # print("mutating C")
                 chromosomeC = (MutationOperator()).process(chromosomeC)
 
             # 2nd offspring
             random.seed()
-            if random.random() < ParameterData.instance.mutationRate:
-                # print("mutating")
+            if random.random() <= ParameterData.instance.mutationRate:
+                # print("mutating D")
                 chromosomeD = (MutationOperator()).process(chromosomeD)
 
+            # print("Queueing C")
             queue.put(chromosomeC)
             if not queue.full():
+                # print("Queueing D")
                 queue.put(chromosomeD)
 
         # print(";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ", queue.qsize())
-
         return None
 
 

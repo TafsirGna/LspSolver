@@ -19,6 +19,7 @@ class PopulationEvaluator:
         """
 
         self.idleGenCounter = defaultdict(lambda: {"fittest": None, "count": 0})
+        self.local_optima = defaultdict(lambda: [])
 
 
     def localSearchArea(self, popLineageIdentifier):
@@ -78,8 +79,6 @@ class PopulationEvaluator:
             # local search areas
             if self.idleGenCounter[population.lineageIdentifier]["count"] == ParameterData.instance.nIdleGenerations:
                 executor.submit(self.localSearchArea, population.lineageIdentifier)
-
-        print("ending")
 
         # Termination
         if len(population.chromosomes) == 1:
