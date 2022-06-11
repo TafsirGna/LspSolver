@@ -55,6 +55,8 @@ class Population:
         #     chromosome = self.dThreadOutputPipeline.get()
         #     elites.append(chromosome)
 
+        self.selectionOperator = SelectionOperator(self)
+
         newPop = Population(self.lineageIdentifier)
         # filling the elites in the new population
         for chromosome in list(LspRuntimeMonitor.popsData[self.lineageIdentifier]["elites"]):

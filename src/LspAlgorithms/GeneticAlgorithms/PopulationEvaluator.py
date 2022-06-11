@@ -1,7 +1,7 @@
 from collections import defaultdict
 import multiprocessing as mp
 import numpy as np
-from LspAlgorithms.GeneticAlgorithms import Chromosome
+from .Chromosome import Chromosome
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.Population import Population
 from LspRuntimeMonitor import LspRuntimeMonitor
 from ParameterSearch.ParameterData import ParameterData
@@ -9,6 +9,7 @@ from .LocalSearch.LocalSearchEngine import LocalSearchEngine
 from LspAlgorithms.GeneticAlgorithms.GAOperators.SelectionOperator import SelectionOperator
 import concurrent.futures
 import threading
+from queue import Queue
 
 class PopulationEvaluator:
     """
@@ -19,19 +20,32 @@ class PopulationEvaluator:
         """
 
         self.idleGenCounter = defaultdict(lambda: {"fittest": None, "count": 0})
-        self.local_optima = defaultdict(lambda: [])
+        self.local_optima = set()
+        self.terminate = False
 
 
-    def localSearchArea(self, popLineageIdentifier):
+    def localSearchArea(self, popLineageIdentifier, resultQueue):
         """
         """
 
-        result = (LocalSearchEngine().process(self.idleGenCounter[popLineageIdentifier["fittest"]], "absolute_mutation"))
+        if self.idleGenCounter[popLineageIdentifier]["fittest"] in self.local_optima:
+            self.terminate = True
+            return None
+
+        result = (LocalSearchEngine().process(self.idleGenCounter[popLineageIdentifier]["fittest"], "absolute_mutation"))
+        # result = (LocalSearchEngine().process(Chromosome.createFromIdentifier(stringIdentifier=(0, 0, 2, 2, 3, 1, 2, 1)), "simple_mutation"))
         # result = (LocalSearchEngine().process(chromosome, "positive_mutation"))
         result = chromosome if len(result) == 0 else result[0]
 
-        if result < element["chromosome"]:
-            (LspRuntimeMonitor.popsData[popLineageIdentifier]["elites"]).add(result)
+        print("ok 1")
+        if self.idleGenCounter[popLineageIdentifier]["fittest"] is not None and result < self.idleGenCounter[popLineageIdentifier]["fittest"]:
+            print("ok 2")
+            resultQueue.put(result)
+
+            if result not in self.local_optima:
+                self.local_optima.add(result)
+
+        print("end")
 
 
     def definePopMetrics(self, population):
@@ -49,7 +63,18 @@ class PopulationEvaluator:
         LspRuntimeMonitor.popsData[population.lineageIdentifier]["elites"] = (LspRuntimeMonitor.popsData[population.lineageIdentifier]["elites"]).union(population.elites())
         LspRuntimeMonitor.popsData[population.lineageIdentifier]["elites"] = set(sorted(LspRuntimeMonitor.popsData[population.lineageIdentifier]["elites"])[:Population.eliteSizes[population.lineageIdentifier]])
 
-        population.selectionOperator = SelectionOperator(population)
+        # population.selectionOperator = SelectionOperator(population)
+
+
+    def processPopulation(self, action, population, resultQueues):
+        """
+        """
+
+        if action == "definePopMetrics":
+            self.definePopMetrics(population)
+
+        if action == "localSearchArea":
+            self.localSearchArea(population.lineageIdentifier, resultQueues[action])
 
 
 
@@ -72,16 +97,29 @@ class PopulationEvaluator:
                 self.idleGenCounter[population.lineageIdentifier]["count"] = 0
 
 
+        resultQueues = defaultdict(lambda: Queue())
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            # defining metrics
-            executor.submit(self.definePopMetrics, population)
+            print(list(executor.map(self.processPopulation, ["localSearchArea", "definePopMetrics"], [population] * 2, [resultQueues] * 2)))
 
-            # local search areas
-            if self.idleGenCounter[population.lineageIdentifier]["count"] == ParameterData.instance.nIdleGenerations:
-                executor.submit(self.localSearchArea, population.lineageIdentifier)
+
+        # with concurrent.futures.ThreadPoolExecutor() as executor:
+        #     # local search areas
+        #     if self.idleGenCounter[population.lineageIdentifier]["count"] >= ParameterData.instance.nIdleGenerations:
+        #         executor.submit(self.localSearchArea, population.lineageIdentifier, resultQueues["localSearchArea"])
+
+        #
+        print("flush")
+        if not (resultQueues["localSearchArea"]).empty():
+            localSearchAreaResult = (resultQueues["localSearchArea"]).get()
+
+            if localSearchAreaResult is not None:
+                # (LspRuntimeMonitor.popsData[popLineageIdentifier]["elites"]).add(result)
+                population.chromosomes[(self.idleGenCounter[population.lineageIdentifier]["fittest"]).stringIdentifier]["size"] -= 1
+                population.add(localSearchAreaResult)
+
 
         # Termination
-        if len(population.chromosomes) == 1:
+        if self.terminate or len(population.chromosomes) == 1:
             return "TERMINATE"
 
         return "CONTINUE"

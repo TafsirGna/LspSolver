@@ -4,6 +4,8 @@ import numpy as np
 from LspAlgorithms.GeneticAlgorithms import Chromosome
 from LspRuntimeMonitor import LspRuntimeMonitor
 from ParameterSearch.ParameterData import ParameterData
+from queue import Queue
+import concurrent.futures
 
 class SelectionOperator:
     """
@@ -48,23 +50,21 @@ class SelectionOperator:
         slices = np.array_split(self.chromosomes, nProcesses)
 
         processes = []
-        resultQueues = []
+        resultQueues = [Queue()] * nProcesses
 
-        # with concurrent.futures.ThreadPoolExecutor() as executor:
-        #     for processIndex in range(nProcesses):
-        #         resultQueue = Queue()
-        #         executor.submit(self.fitnessCalculationTask, maxCost, slices[processIndex], resultQueue, population)
-        #         resultQueues.append(resultQueue)
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            for processIndex in range(nProcesses):
+                executor.submit(self.fitnessCalculationTask, maxCost, slices[processIndex], resultQueues[processIndex], population)
 
-        for processIndex in range(nProcesses):
-            resultQueue = mp.Queue()
-            process = mp.Process(target=self.fitnessCalculationTask, args=(maxCost, slices[processIndex], resultQueue, population))
-            process.start()
-            processes.append(process)
-            resultQueues.append(resultQueue)
+        # for processIndex in range(nProcesses):
+        #     resultQueue = mp.Queue()
+        #     process = mp.Process(target=self.fitnessCalculationTask, args=(maxCost, slices[processIndex], resultQueue, population))
+        #     process.start()
+        #     processes.append(process)
+        #     resultQueues.append(resultQueue)
 
-        for process in processes:
-            process.join()
+        # for process in processes:
+        #     process.join()
 
 
         totalFitness = 0

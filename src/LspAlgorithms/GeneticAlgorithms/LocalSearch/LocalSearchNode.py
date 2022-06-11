@@ -35,8 +35,8 @@ class LocalSearchNode:
                 chromosome = mutation[1]
                 # print("Child : ", chromosome)
                 rootChromosome = self.rootChromosome if self.rootChromosome is not None else self.chromosome
-                if LocalSearchNode.absoluteSearchedInstances[rootChromosome.stringIdentifier] is not None:
-                    (LocalSearchNode.absoluteSearchedInstances[rootChromosome.stringIdentifier]["path"][depthIndex]["moves"]).append(mutation[2])
+                # if LocalSearchNode.absoluteSearchedInstances[rootChromosome.stringIdentifier] is not None:
+                #     (LocalSearchNode.absoluteSearchedInstances[rootChromosome.stringIdentifier]["path"][depthIndex]["moves"]).append(mutation[2])
                 yield LocalSearchNode(chromosome, rootChromosome)
 
         # return []

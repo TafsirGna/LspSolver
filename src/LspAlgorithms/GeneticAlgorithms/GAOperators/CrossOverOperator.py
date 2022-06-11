@@ -77,8 +77,8 @@ class CrossOverOperator:
         if node.period <= -1:
 
             # if not Chromosome.feasible(node.chromosome):
-            if node.chromosome.dnaArray != Chromosome.createFromIdentifier(node.chromosome.stringIdentifier).dnaArray:
-                print("//////////////////////////////////////////////////////////////////////////", self.parentChromosomes, node.chromosome, node.chromosome.dnaArray)
+            # if node.chromosome.dnaArray != Chromosome.createFromIdentifier(node.chromosome.stringIdentifier).dnaArray:
+            #     print("//////////////////////////////////////////////////////////////////////////", self.parentChromosomes, node.chromosome, node.chromosome.dnaArray)
 
             # if Chromosome.pool[node.chromosome.stringIdentifier] is not None:
             #     return None

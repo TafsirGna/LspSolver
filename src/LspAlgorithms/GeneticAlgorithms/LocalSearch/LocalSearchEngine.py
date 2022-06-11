@@ -67,13 +67,21 @@ class LocalSearchEngine:
                 self._stopSearchEvent.set()
                 return
         elif strategy == "absolute_mutation":
-            if node.rootChromosome is None:
-                if LocalSearchNode.absoluteSearchedInstances[self.chromosome.stringIdentifier] is not None:
-                    return self.resumeLocalSearchOn(node, result)
-                LocalSearchNode.absoluteSearchedInstances[self.chromosome.stringIdentifier] = {"path": [], "visitedInstances": defaultdict(lambda: None)}
-            instance = node.rootChromosome if node.rootChromosome is not None else self.chromosome
-            (LocalSearchNode.absoluteSearchedInstances[instance.stringIdentifier]["path"]).append({"node": node, "moves": []})
-            LocalSearchNode.absoluteSearchedInstances[instance.stringIdentifier]["visitedInstances"][node.chromosome.stringIdentifier] = 1
+            # TODO
+            # if node.rootChromosome is None:
+            #     if LocalSearchNode.absoluteSearchedInstances[self.chromosome.stringIdentifier] is not None:
+            #         return self.resumeLocalSearchOn(node, result)
+            #     LocalSearchNode.absoluteSearchedInstances[self.chromosome.stringIdentifier] = {"path": [], "visitedInstances": defaultdict(lambda: None)}
+            # instance = node.rootChromosome if node.rootChromosome is not None else self.chromosome
+            # (LocalSearchNode.absoluteSearchedInstances[instance.stringIdentifier]["path"]).append({"node": node, "moves": []})
+            # LocalSearchNode.absoluteSearchedInstances[instance.stringIdentifier]["visitedInstances"][node.chromosome.stringIdentifier] = 1
+
+            if result["depthIndex"] == 0 and LocalSearchNode.absoluteSearchedInstances[self.chromosome.stringIdentifier] is not None:
+                result["chromosomes"].append(LocalSearchNode.absoluteSearchedInstances[self.chromosome.stringIdentifier])
+                print("Absolute mutation result ", self.chromosome, node.chromosome)
+                self._stopSearchEvent.set()
+                return None
+
 
         result["depthIndex"] += 1
         children = []
@@ -109,6 +117,8 @@ class LocalSearchEngine:
             if len(children) == 0:
                 result["chromosomes"].append(node.chromosome)
                 print("Absolute mutation result ", self.chromosome, node.chromosome)
+                # TODO
+                LocalSearchNode.absoluteSearchedInstances[self.chromosome.stringIdentifier] = node.chromosome
                 self._stopSearchEvent.set()
                 return
 
