@@ -5,10 +5,14 @@ from LspInputDataReading.LspInputDataInstance import InputDataInstance
 import random
 import numpy as np
 from ParameterSearch.ParameterData import ParameterData
+from collections import defaultdict
+import threading
 
 class CrossOverNode:
     """
     """
+
+    crossOverMemory = {"lock": threading.Lock(), "db": defaultdict(lambda: None)}
 
     def __init__(self, parents, period, index) -> None:
         """

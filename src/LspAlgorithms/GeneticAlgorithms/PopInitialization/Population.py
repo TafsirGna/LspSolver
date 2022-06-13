@@ -129,6 +129,17 @@ class Population:
         return self.chromosomes[chromosome.stringIdentifier]
 
 
+    @classmethod
+    def tryMutation(cls, chromosome):
+        """
+        """
+        
+        random.seed()
+        if random.random() <= ParameterData.instance.mutationRate:
+            # print("mutating chromosome")
+            chromosome = (MutationOperator()).process(chromosome)
+
+
     def threadTask(self, queue):
         """
         """
@@ -158,17 +169,12 @@ class Population:
 
             # print("after mating")
 
-            # 1rst offspring
-            random.seed()
-            if random.random() <= ParameterData.instance.mutationRate:
-                # print("mutating C")
-                chromosomeC = (MutationOperator()).process(chromosomeC)
+            # with concurrent.futures.ThreadPoolExecutor() as executor:
+            #     executor.map(Population.tryMutation, [chromosomeC, chromosomeD])
 
-            # 2nd offspring
-            random.seed()
-            if random.random() <= ParameterData.instance.mutationRate:
-                # print("mutating D")
-                chromosomeD = (MutationOperator()).process(chromosomeD)
+            Population.tryMutation(chromosomeC)
+
+            Population.tryMutation(chromosomeD)
 
             # print("Queueing C")
             queue.put(chromosomeC)

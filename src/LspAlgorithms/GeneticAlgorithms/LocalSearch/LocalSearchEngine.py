@@ -4,6 +4,7 @@ import copy
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
 from LspAlgorithms.GeneticAlgorithms.LocalSearch.LocalSearchNode import LocalSearchNode
 from ParameterSearch.ParameterData import ParameterData
+import concurrent.futures
 
 class LocalSearchEngine:
     """
@@ -29,6 +30,17 @@ class LocalSearchEngine:
         node = LocalSearchNode(chromosome)
 
         result = {"depthIndex": 0, "chromosomes": []}
+
+        # if strategy == "absolute_mutation":
+        #     with concurrent.futures.ThreadPoolExecutor() as executor:
+        #         index = 0
+        #         for child in node.generateChild(result["depthIndex"]):
+        #             executor.submit(self.dfsNextNode, child, strategy, result)
+
+        #             index += 1
+        #             if index == 3:
+        #                 break
+        # else:
         self.dfsNextNode(node, strategy, result)
 
         # if len(result["chromosomes"]) and (result["chromosomes"][0]).dnaArray != Chromosome.createFromIdentifier(result["chromosomes"][0].stringIdentifier).dnaArray:
@@ -76,8 +88,8 @@ class LocalSearchEngine:
             # (LocalSearchNode.absoluteSearchedInstances[instance.stringIdentifier]["path"]).append({"node": node, "moves": []})
             # LocalSearchNode.absoluteSearchedInstances[instance.stringIdentifier]["visitedInstances"][node.chromosome.stringIdentifier] = 1
 
-            if result["depthIndex"] == 0 and LocalSearchNode.absoluteSearchedInstances[self.chromosome.stringIdentifier] is not None:
-                result["chromosomes"].append(LocalSearchNode.absoluteSearchedInstances[self.chromosome.stringIdentifier])
+            if result["depthIndex"] == 0 and LocalSearchNode.absoluteSearchedInstances[node.chromosome.stringIdentifier] is not None:
+                result["chromosomes"].append(LocalSearchNode.absoluteSearchedInstances[node.chromosome.stringIdentifier])
                 print("Absolute mutation result ", self.chromosome, node.chromosome)
                 self._stopSearchEvent.set()
                 return None
@@ -116,6 +128,7 @@ class LocalSearchEngine:
             # print("Absolute mutation", len(children))
             if len(children) == 0:
                 result["chromosomes"].append(node.chromosome)
+                (result["chromosomes"]).sort()
                 print("Absolute mutation result ", self.chromosome, node.chromosome)
                 # TODO
                 LocalSearchNode.absoluteSearchedInstances[self.chromosome.stringIdentifier] = node.chromosome

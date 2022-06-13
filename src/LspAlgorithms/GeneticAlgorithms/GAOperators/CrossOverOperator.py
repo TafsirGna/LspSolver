@@ -40,6 +40,16 @@ class CrossOverOperator:
         random.seed()
         crossOverPeriod = random.randint(gapLength, InputDataInstance.instance.nPeriods - (gapLength + 1))
 
+        # checking the crossover memory for previous occurences of this context
+        memoryResult1 = CrossOverNode.crossOverMemory["db"][((self.parentChromosomes[0]).stringIdentifier, (self.parentChromosomes[1]).stringIdentifier, crossOverPeriod)]
+        if  memoryResult1 is not None:
+            return memoryResult1
+
+        memoryResult2 = CrossOverNode.crossOverMemory["db"][((self.parentChromosomes[1]).stringIdentifier, (self.parentChromosomes[0]).stringIdentifier, crossOverPeriod)]
+        if memoryResult2 is not None:
+            return memoryResult2
+
+        # Otherwise
         with concurrent.futures.ThreadPoolExecutor() as executor:
             nodes = []
             # 1rst node
@@ -54,6 +64,11 @@ class CrossOverOperator:
         # if chromosome.cost != Chromosome.createFromIdentifier(chromosome.stringIdentifier).cost:
         #     print(" Watch out")
         print("Cross Over result : ", [self.parentChromosomes, self.offsprings])
+
+        # storing this result in the crossover memory before returning 
+        with CrossOverNode.crossOverMemory["lock"]:
+            CrossOverNode.crossOverMemory["db"][((self.parentChromosomes[0]).stringIdentifier, (self.parentChromosomes[1]).stringIdentifier, crossOverPeriod)] = tuple(self.offsprings.values())
+
         return tuple(self.offsprings.values())
 
 
