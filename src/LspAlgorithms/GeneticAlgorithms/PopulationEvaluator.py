@@ -21,30 +21,32 @@ class PopulationEvaluator:
         """
 
         self.idleGenCounter = defaultdict(lambda: {"fittest": None, "count": 0})
-        self.local_optima = set()
         self.terminate = False
 
 
     def localSearchArea(self, population, resultQueue):
         """
         """
-        print("_______________________________", self.idleGenCounter[population.lineageIdentifier]["count"])
+        # print("_______________________________", self.idleGenCounter[population.lineageIdentifier]["count"])
+        # print("local optima : ", Chromosome.localOptima)
 
-        if self.idleGenCounter[population.lineageIdentifier]["count"] % ParameterData.instance.nIdleGenerations != 0:
-            return None
+        # if self.idleGenCounter[population.lineageIdentifier]["count"] % ParameterData.instance.nIdleGenerations != 0:
+        #     return None
 
-        elements = sorted(population.chromosomes.values(), key=lambda element: element["size"])
+        # elements = sorted(population.chromosomes.values(), key=lambda element: element["size"])
 
-        for element in reversed(elements):
-            if element["chromosome"] not in self.local_optima:
-                chromosome = element["chromosome"]
-                result = (LocalSearchEngine().process(chromosome, "absolute_mutation"))
-                result = result[0]
-                if result < chromosome and result.stringIdentifier not in population.chromosomes.keys():
-                    resultQueue.put(result)
-                    if result not in self.local_optima:
-                        self.local_optima.add(result)
-                    break
+        # for element in reversed(elements):
+        #     if element["chromosome"] not in Chromosome.localOptima["values"]:
+        #         chromosome = element["chromosome"]
+        #         result = (LocalSearchEngine().process(chromosome, "absolute_mutation"))
+        #         result = result[0] if len(result) != 0 else chromosome
+        #         if result < chromosome and result.stringIdentifier not in population.chromosomes.keys():
+        #             resultQueue.put(result)
+        #             break
+
+        # print(" last element size : ", elements[-1]["size"], resultQueue.qsize(), float(elements[-1]["size"] / population.popLength))
+        # if resultQueue.empty() and float(elements[-1]["size"] / population.popLength) >= 0.6:
+        #     self.terminate = True
 
 
     def definePopMetrics(self, population):
@@ -112,11 +114,11 @@ class PopulationEvaluator:
             population.chromosomes[(self.idleGenCounter[population.lineageIdentifier]["fittest"]).stringIdentifier]["size"] -= 1
             population.popLength -= 1
             population.add(localSearchAreaResult)
-            print("poppp : ", population)
+            # print("poppp : ", population)
 
 
         # Termination
-        if len(population.chromosomes) == 1:
+        if self.terminate or len(population.chromosomes) == 1:
             return "TERMINATE"
 
         return "CONTINUE"

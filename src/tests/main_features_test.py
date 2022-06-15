@@ -23,7 +23,7 @@ class TestMainFeatures:
         # c = Chromosome.createFromIdentifier(stringIdentifier=(2, 1, 0, 1, 2))
         # c = Chromosome.createFromIdentifier(stringIdentifier=(0, 2, 2, 2, 3, 1, 0, 1))
         # c = Chromosome.createFromIdentifier(stringIdentifier=(1, 0, 0, 2, 2, 2, 3, 1))
-        c = Chromosome.createFromIdentifier(stringIdentifier=(1, 0, 0, 0, 3, 1, 8, 7, 2, 4, 4, 5, 6, 10, 9))
+        c = Chromosome.createFromIdentifier(stringIdentifier=(0, 0, 0, 8, 6, 10, 9, 5, 7, 2, 4, 4, 1, 1, 3))
         print("Chromosome ", c)
         # # [2, 1, 2, 0, 1]
         LspRuntimeMonitor.mutation_strategy = "absolute_mutation"

@@ -12,12 +12,13 @@ from LspAlgorithms.GeneticAlgorithms.GAOperators.MutationOperator import Mutatio
 from LspAlgorithms.GeneticAlgorithms.GAOperators.SelectionOperator import SelectionOperator
 from LspRuntimeMonitor import LspRuntimeMonitor
 from ParameterSearch.ParameterData import ParameterData
-import multiprocessing as mp
+from ..LocalSearch.LocalSearchEngine import LocalSearchEngine
 
 class Population:
 
     popSizes = defaultdict(lambda: ParameterData.instance.popSize)
     eliteSizes = defaultdict(lambda: 0)
+    initPopLocalOptimaCount = defaultdict(lambda: 0)
 
     def __init__(self, lineageIdentifier = None) -> None:
         """
@@ -38,11 +39,16 @@ class Population:
         for instance in nodeGeneratorManager.getInstance():
             if instance is None:
                 break
+            if Population.initPopLocalOptimaCount[self.lineageIdentifier] < ParameterData.instance.nInitPopLocalOptima:
+                instance = (LocalSearchEngine().process(instance, "absolute_mutation"))[0]
+                print("oooooooooooooooooooooooooooooooooooo", instance)
+                Population.initPopLocalOptimaCount[self.lineageIdentifier] += 1
             result = self.add(instance)
             if result is None:
                 break
 
         Population.popSizes[self.lineageIdentifier] = self.popLength
+        # print(self.popLength)
 
 
     def evolve(self):
@@ -112,7 +118,7 @@ class Population:
         """
         """
 
-        if self.popLength >= Population.popSizes[self.lineageIdentifier]:
+        if self.popLength >= Population.popSizes[self.lineageIdentifier]: # - ParameterData.instance.nInitPopLocalOptima:
             return None
 
         if self.chromosomes[chromosome.stringIdentifier] is None:

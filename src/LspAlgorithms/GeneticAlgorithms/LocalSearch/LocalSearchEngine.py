@@ -79,7 +79,7 @@ class LocalSearchEngine:
                 return
         elif strategy == "population":
             result["chromosomes"].append(node.chromosome)
-            if len(result["chromosomes"]) > ParameterData.instance.popSize * ParameterData.instance.nPrimaryThreads:
+            if len(result["chromosomes"]) > ParameterData.instance.popSize:
                 self._stopSearchEvent.set()
                 return
         elif strategy == "absolute_mutation":
@@ -130,12 +130,17 @@ class LocalSearchEngine:
         # TODO
         if strategy == "absolute_mutation":
             # print("Absolute mutation", len(children))
-            if len(children) == 0:
+            if len(children) == 0 and node.chromosome not in Chromosome.localOptima["values"]:
                 result["chromosomes"].append(node.chromosome)
-                (result["chromosomes"]).sort()
+                # (result["chromosomes"]).sort()
                 print("Absolute mutation result ", self.chromosome, node.chromosome)
                 # TODO
                 LocalSearchNode.absoluteSearchedInstances[self.chromosome.stringIdentifier] = node.chromosome
+
+                with Chromosome.localOptima["lock"]:
+                    if node.chromosome not in Chromosome.localOptima["values"]:
+                        Chromosome.localOptima["values"].add(node.chromosome)
+
                 self._stopSearchEvent.set()
                 return
 

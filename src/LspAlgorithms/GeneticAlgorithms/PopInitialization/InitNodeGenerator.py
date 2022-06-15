@@ -2,10 +2,13 @@ import uuid
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
 from LspAlgorithms.GeneticAlgorithms.LocalSearch.LocalSearchEngine import LocalSearchEngine
 from ParameterSearch.ParameterData import ParameterData
+import threading
 
 
 class InitNodeGenerator:
-    
+    """
+    """
+
     def __init__(self, queue) -> None:
         """
         """
@@ -44,10 +47,10 @@ class InitNodeGenerator:
                 if (chromosomes["full"]).is_set():
                     return None
 
-                print("Pop size : ",len(chromosomes["values"]), maxSize)
+                # print("Pop size : ",len(chromosomes["values"]), maxSize)
 
                 nLeft = maxSize - len(chromosomes["values"])
-                print("leeeeeeeeeeeeeft : ", results[:nLeft], nLeft)    
+                # print("leeeeeeeeeeeeeft : ", results[:nLeft], nLeft)    
                 for chromosome in results[:nLeft]:
                     # print("Dataaaaaa : ", chromosomes["values"])
                     chromosomes["values"].add(chromosome)
