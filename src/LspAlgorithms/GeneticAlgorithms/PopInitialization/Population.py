@@ -169,12 +169,12 @@ class Population:
 
             # print("after mating")
 
-            # with concurrent.futures.ThreadPoolExecutor() as executor:
-            #     executor.map(Population.tryMutation, [chromosomeC, chromosomeD])
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                executor.map(Population.tryMutation, [chromosomeC, chromosomeD])
 
-            Population.tryMutation(chromosomeC)
+            # Population.tryMutation(chromosomeC)
 
-            Population.tryMutation(chromosomeD)
+            # Population.tryMutation(chromosomeD)
 
             # print("Queueing C")
             queue.put(chromosomeC)

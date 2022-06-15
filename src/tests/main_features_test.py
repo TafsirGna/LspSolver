@@ -30,8 +30,8 @@ class TestMainFeatures:
         result = (MutationOperator()).process(c)
         print("1 -- ", result, (Chromosome.createFromIdentifier(result.stringIdentifier)))
 
-        result = (MutationOperator()).process(c)
-        print("2 -- ", result, (Chromosome.createFromIdentifier(result.stringIdentifier)))
+        # result = (MutationOperator()).process(c)
+        # print("2 -- ", result, (Chromosome.createFromIdentifier(result.stringIdentifier)))
 
         assert 0
 

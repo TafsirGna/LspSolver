@@ -5,6 +5,7 @@ from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
 from LspAlgorithms.GeneticAlgorithms.LocalSearch.LocalSearchNode import LocalSearchNode
 from ParameterSearch.ParameterData import ParameterData
 import concurrent.futures
+from LspInputDataReading.LspInputDataInstance import InputDataInstance
 
 class LocalSearchEngine:
     """
@@ -16,6 +17,9 @@ class LocalSearchEngine:
 
         self.chromosome = None
         self._stopSearchEvent = threading.Event()
+
+        if LocalSearchNode.genericGeneIndices is None:
+            LocalSearchNode.genericGeneIndices = [(item, position) for item, itemGenes in enumerate(InputDataInstance.instance.demandsArrayZipped) for position, _ in enumerate(itemGenes)]
 
 
     def process(self, chromosome, strategy = "simple_mutation"):

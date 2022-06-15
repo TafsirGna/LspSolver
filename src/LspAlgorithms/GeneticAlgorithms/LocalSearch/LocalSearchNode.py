@@ -5,6 +5,7 @@ from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
 from LspAlgorithms.GeneticAlgorithms.Gene import Gene
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 import threading
+import numpy as np
 
 
 class LocalSearchNode:
@@ -13,6 +14,7 @@ class LocalSearchNode:
 
     absoluteSearchedInstances = defaultdict(lambda: None)
     mutationsMemory = {"lock": threading.Lock(), "db":defaultdict(lambda: None)}
+    genericGeneIndices = None
 
     def __init__(self, chromosome, rootChromosome = None) -> None:
         """
@@ -27,11 +29,16 @@ class LocalSearchNode:
         """
 
         # print("ooooooooooooook")
-        genes = [gene for itemGenes in self.chromosome.dnaArray for gene in itemGenes]
+        # genes = [gene for itemGenes in self.chromosome.dnaArray for gene in itemGenes]
         random.seed()
-        random.shuffle(genes)
+        # random.shuffle(genes)
+        genesIndices = copy.deepcopy(LocalSearchNode.genericGeneIndices)
+        # print("genesIndices : ", genesIndices)
 
-        for gene in genes:
+        while len(genesIndices) > 0:
+            geneIndex = genesIndices[random.randrange(len(genesIndices))]
+            gene = self.chromosome.dnaArray[geneIndex[0]][geneIndex[1]]
+            genesIndices.remove(geneIndex)
             for mutation in LocalSearchNode.generateGeneMutations(gene, self.chromosome):
                 chromosome = mutation[1]
                 # print("Child : ", chromosome)
