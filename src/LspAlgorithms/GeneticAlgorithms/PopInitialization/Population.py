@@ -76,9 +76,9 @@ class Population:
         # resultQueues = [Queue(maxsize=len(instances[replicaIndex])) for replicaIndex in range(ParameterData.instance.nReplicaThreads)]
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            # executor.map(self.threadTask)
-            for i in range(ParameterData.instance.nReplicaThreads):
-                executor.submit(self.threadTask)
+            print(list(executor.map(self.threadTask, ["placeholder"] * ParameterData.instance.nReplicaThreads)))
+            # for i in range(ParameterData.instance.nReplicaThreads):
+            #     executor.submit(self.threadTask)
 
         self.newPop.dThreadOutputPipeline =  self.dThreadOutputPipeline
         return self.newPop
@@ -144,7 +144,7 @@ class Population:
             chromosome = (MutationOperator()).process(chromosome)
 
 
-    def threadTask(self):
+    def threadTask(self, placeholder = None):
         """
         """
 

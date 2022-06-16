@@ -44,7 +44,7 @@ class CrossOverOperator:
         # before launching the recursive search
         gapLength = int(InputDataInstance.instance.nPeriods / 3)
         # random.seed()
-        crossOverPeriod = random.randint(gapLength, InputDataInstance.instance.nPeriods - (gapLength + 1))
+        self.crossOverPeriod = random.randint(gapLength + 1, InputDataInstance.instance.nPeriods - (gapLength + 1))
 
         # checking the crossover memory for previous occurences of this context
         # memoryResult1 = CrossOverNode.crossOverMemory["db"][((self.parentChromosomes[0]).stringIdentifier, (self.parentChromosomes[1]).stringIdentifier, crossOverPeriod)]
@@ -63,11 +63,11 @@ class CrossOverOperator:
         # self.offsprings[1].stringIdentifier = (["*"] * crossOverPeriod) + list(self.parentChromosomes[1].stringIdentifier[crossOverPeriod:])
 
         # looping
-        print("crossOverPeriod : ", crossOverPeriod)
-        # crossOverPeriod = 5
+        print("crossOverPeriod : ", self.crossOverPeriod)
+        # self.crossOverPeriod = 3
         self.offspringLastPlacedGene = {0: None, 1: None}
         for period in reversed(range(InputDataInstance.instance.nPeriods)):
-            if period >= crossOverPeriod:
+            if period >= self.crossOverPeriod:
                 # First offspring
                 self.replicateGene(offspringIndex = 0, parentIndex = 0, period = period)
 
@@ -77,7 +77,7 @@ class CrossOverOperator:
             else:
 
                 # just after the crossover tipping period, some tasks need to be done such as
-                if period == crossOverPeriod - 1:
+                if period == self.crossOverPeriod - 1:
                     self.offsprings[0].cost -= self.offspringLastPlacedGene[0].changeOverCost
                     self.offsprings[1].cost -= self.offspringLastPlacedGene[1].changeOverCost
 
@@ -95,7 +95,7 @@ class CrossOverOperator:
                 
                 if self.offsprings[0].stringIdentifier[period] == "*":
                     items = [(item, InputDataInstance.instance.stockingCostsArray[item]) for item in self.offspringsItemsToOrder[0] if item >= 0 and self.offspringsItemsToOrder[0][item] > 0 and InputDataInstance.instance.demandsArrayZipped[item][self.offspringsItemsToOrder[0][item] - 1] >= period]
-                    print('sorted : ', sorted(items, key= lambda item: item[1]), items, self.offspringsItemsToOrder[0])
+                    # print('sorted : ', sorted(items, key= lambda item: item[1]), items, self.offspringsItemsToOrder[0])
                     if len(items) == 0:
                         if self.offspringsItemsToOrder[0][-1] > 0:
                             self.orderItem(offspringIndex = 0, item = -1, period = period)
@@ -117,14 +117,18 @@ class CrossOverOperator:
                         item = sorted(items, key= lambda item: item[1])[-1][0]
                         self.orderItem(offspringIndex = 1, item = item, period = period)
 
-            print(" ok : ", self.offsprings)
+            # print(" ok : ", self.offsprings)
 
-        
+        self.offsprings[0].stringIdentifier = tuple(self.offsprings[0].stringIdentifier)
+        self.offsprings[1].stringIdentifier = tuple(self.offsprings[1].stringIdentifier)
 
-        # if chromosome.cost != Chromosome.createFromIdentifier(chromosome.stringIdentifier).cost:
-        #     print(" Watch out")
+        if self.offsprings[0].cost != Chromosome.createFromIdentifier(self.offsprings[0].stringIdentifier).cost:
+            print(" Watch out 0", self.offsprings[0].dnaArray)
 
-        # print("Cross Over result : ", [self.parentChromosomes, self.offsprings])
+        if self.offsprings[1].cost != Chromosome.createFromIdentifier(self.offsprings[1].stringIdentifier).cost:
+            print(" Watch out 1", self.offsprings[1].dnaArray)
+
+        print("Cross Over result : ", [self.parentChromosomes, self.offsprings])
 
         # storing this result in the crossover memory before returning 
         # with CrossOverNode.crossOverMemory["lock"]:
@@ -157,7 +161,7 @@ class CrossOverOperator:
             replicate = True
         else:
             parentGene = (Chromosome.geneAtPeriod(self.parentChromosomes[parentIndex], period))
-            if parentGene.position <= self.offspringsItemsToOrder[offspringIndex][parentGene.item] - 1:
+            if parentGene.position == self.offspringsItemsToOrder[offspringIndex][parentGene.item] - 1:
                 replicate = True
 
         if replicate:
@@ -165,8 +169,21 @@ class CrossOverOperator:
             self.offspringsItemsToOrder[offspringIndex][parentItem - 1] -= 1
 
             if parentItem != 0: # No item has been produced for this period if is none
-                self.offsprings[offspringIndex].dnaArray[parentGene.item][parentGene.position] = copy.deepcopy(parentGene)
-                self.offsprings[offspringIndex].cost += parentGene.cost
+                gene = copy.deepcopy(parentGene)
+
+                cost = 0
+                if offspringIndex != parentIndex:
+                    gene.changeOverCost = 0
+                    gene.calculateCost()
+                    self.offspringLastPlacedGene[offspringIndex].prevGene = (gene.item, gene.position)
+                    self.offspringLastPlacedGene[offspringIndex].calculateChangeOverCost()
+                    self.offspringLastPlacedGene[offspringIndex].calculateCost()
+                    cost += self.offspringLastPlacedGene[offspringIndex].changeOverCost
+
+                cost += gene.cost
+
+                self.offsprings[offspringIndex].dnaArray[parentGene.item][parentGene.position] = gene
+                self.offsprings[offspringIndex].cost += cost
                 self.offspringLastPlacedGene[offspringIndex] = self.offsprings[offspringIndex].dnaArray[parentGene.item][parentGene.position]
                 return self.offsprings[offspringIndex].dnaArray[parentGene.item][parentGene.position]
 
@@ -191,12 +208,14 @@ class CrossOverOperator:
             gene.calculateStockingCost()
             gene.calculateCost()
 
-            self.offspringLastPlacedGene[offspringIndex].prevGene = (gene.item, gene.position)
+            self.offspringLastPlacedGene[offspringIndex].prevGene = (item, position)
             self.offspringLastPlacedGene[offspringIndex].calculateChangeOverCost()
             self.offspringLastPlacedGene[offspringIndex].calculateCost()
 
             self.offsprings[offspringIndex].dnaArray[item][position] = gene
             self.offsprings[offspringIndex].cost += (gene.cost + self.offspringLastPlacedGene[offspringIndex].changeOverCost)
+
+            self.offspringLastPlacedGene[offspringIndex] = gene
 
             return gene
 
@@ -204,9 +223,8 @@ class CrossOverOperator:
 
 
 
-    def optimizeOffsprings(self):
-        """
-        """
-
-        pass
+    # def optimizeOffsprings(self):
+    #     """
+    #     """
+    #     pass
 
