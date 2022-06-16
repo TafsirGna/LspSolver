@@ -100,7 +100,7 @@ class PopulationEvaluator:
 
         resultQueues = defaultdict(lambda: Queue())
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            print(list(executor.map(self.processPopulation, ["localSearchArea", "definePopMetrics"], [population] * 2, [resultQueues] * 2)))
+            executor.map(self.processPopulation, ["localSearchArea", "definePopMetrics"], [population] * 2, [resultQueues] * 2)
 
         #
         if not (resultQueues["localSearchArea"]).empty():

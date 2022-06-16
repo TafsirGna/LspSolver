@@ -30,6 +30,7 @@ class Population:
 
         self.dThreadOutputPipeline = None
         self.selectionOperator = None
+        self.newPopLock = threading.Lock()
 
 
     def fill(self, nodeGeneratorManager):
@@ -40,9 +41,11 @@ class Population:
             if instance is None:
                 break
             if Population.initPopLocalOptimaCount[self.lineageIdentifier] < ParameterData.instance.nInitPopLocalOptima:
-                instance = (LocalSearchEngine().process(instance, "absolute_mutation"))[0]
-                print("oooooooooooooooooooooooooooooooooooo", instance)
-                Population.initPopLocalOptimaCount[self.lineageIdentifier] += 1
+                result = (LocalSearchEngine().process(instance, "absolute_mutation"))
+                if len(result) > 0:
+                    instance = result[0]
+                    print("oooooooooooooooooooooooooooooooooooo", instance)
+                    Population.initPopLocalOptimaCount[self.lineageIdentifier] += 1
             result = self.add(instance)
             if result is None:
                 break
@@ -63,27 +66,22 @@ class Population:
 
         self.selectionOperator = SelectionOperator(self)
 
-        newPop = Population(self.lineageIdentifier)
+        self.newPop = Population(self.lineageIdentifier)
         # filling the elites in the new population
         for chromosome in list(LspRuntimeMonitor.popsData[self.lineageIdentifier]["elites"]):
-            newPop.add(chromosome)
+            self.newPop.add(chromosome)
 
-        instances = [None] * Population.popSizes[self.lineageIdentifier]
-        instances = np.array_split(instances, ParameterData.instance.nReplicaThreads)
-        resultQueues = [Queue(maxsize=len(instances[replicaIndex])) for replicaIndex in range(ParameterData.instance.nReplicaThreads)]
+        # instances = [None] * Population.popSizes[self.lineageIdentifier]
+        # instances = np.array_split(instances, ParameterData.instance.nReplicaThreads)
+        # resultQueues = [Queue(maxsize=len(instances[replicaIndex])) for replicaIndex in range(ParameterData.instance.nReplicaThreads)]
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            print(list(executor.map(self.threadTask, resultQueues)))
+            # executor.map(self.threadTask)
+            for i in range(ParameterData.instance.nReplicaThreads):
+                executor.submit(self.threadTask)
 
-        for resultQueue in resultQueues:
-            # print("instances :::::::::::::::::::::: ", resultQueue.qsize())
-            while not resultQueue.empty():
-                chromosome = resultQueue.get()
-                newPop.add(chromosome)
-
-        newPop.dThreadOutputPipeline =  self.dThreadOutputPipeline
-        print("----------------- : ", newPop.popLength, self.popLength)
-        return newPop
+        self.newPop.dThreadOutputPipeline =  self.dThreadOutputPipeline
+        return self.newPop
 
 
     def elites(self):
@@ -146,7 +144,7 @@ class Population:
             chromosome = (MutationOperator()).process(chromosome)
 
 
-    def threadTask(self, queue):
+    def threadTask(self):
         """
         """
 
@@ -154,39 +152,46 @@ class Population:
 
         threadID = uuid.uuid4()
 
-        while not queue.full():
+        queue = Queue(maxsize=4)
 
-            # print("looping : ", queue.qsize())
-            chromosomeA, chromosomeB = self.selectionOperator.select()
-            chromosomeC, chromosomeD = chromosomeA, chromosomeB
+        while self.newPop.popLength < Population.popSizes[self.lineageIdentifier]:
 
-            # print("After selecting")
-            random.seed()
-            if (random.random() <= ParameterData.instance.crossOverRate):
-                try:
-                    # pass
-                    # print("mating")
-                    offsprings = (CrossOverOperator([chromosomeA, chromosomeB])).process()
-                    # print("offsprings : ", offsprings)
-                    chromosomeC, chromosomeD = offsprings
-                except Exception as e:
-                    print("Exception")
-                    raise e
+            while not queue.full():
 
-            # print("after mating")
+                chromosomeA, chromosomeB = self.selectionOperator.select()
+                chromosomeC, chromosomeD = chromosomeA, chromosomeB
 
-            with concurrent.futures.ThreadPoolExecutor() as executor:
-                executor.map(Population.tryMutation, [chromosomeC, chromosomeD])
+                # print("After selecting")
+                random.seed()
+                if (random.random() <= ParameterData.instance.crossOverRate):
+                    try:
+                        # pass
+                        # print("mating")
+                        offsprings = (CrossOverOperator([chromosomeA, chromosomeB])).process()
+                        # print("offsprings : ", offsprings)
+                        chromosomeC, chromosomeD = offsprings
+                    except Exception as e:
+                        print("Exception")
+                        raise e
 
-            # Population.tryMutation(chromosomeC)
+                # print("after mating")
 
-            # Population.tryMutation(chromosomeD)
+                with concurrent.futures.ThreadPoolExecutor() as executor:
+                    executor.map(Population.tryMutation, [chromosomeC, chromosomeD])
 
-            # print("Queueing C")
-            queue.put(chromosomeC)
-            if not queue.full():
+                # Population.tryMutation(chromosomeC)
+
+                # Population.tryMutation(chromosomeD)
+
+                # print("Queueing C")
+                queue.put(chromosomeC)
                 # print("Queueing D")
                 queue.put(chromosomeD)
+
+            with self.newPopLock:
+                while not queue.empty() and self.newPop.popLength < Population.popSizes[self.lineageIdentifier]:
+                    self.newPop.add(queue.get())
+
 
         # print(";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ", queue.qsize())
         return None

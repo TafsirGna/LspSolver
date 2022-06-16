@@ -27,7 +27,7 @@ class LocalSearchEngine:
         strategy: simple_mutation|absolute_mutation|positive_mutation
         """
 
-        print("mutatiooooooon", strategy, chromosome, chromosome.dnaArray)
+        # print("mutatiooooooon", strategy, chromosome, chromosome.dnaArray)
 
         self._visitedNodes = defaultdict(lambda: None)
         self.chromosome = chromosome
@@ -50,7 +50,7 @@ class LocalSearchEngine:
         # if len(result["chromosomes"]) and (result["chromosomes"][0]).dnaArray != Chromosome.createFromIdentifier(result["chromosomes"][0].stringIdentifier).dnaArray:
         #     print(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::", result["chromosomes"][0])
 
-        print("mutation results : ", result["chromosomes"])
+        # print("mutation results : ", chromosome, result["chromosomes"])
         # print("Path : ", LocalSearchNode.absoluteSearchedInstances[self.chromosome.stringIdentifier]["path"])
         return result["chromosomes"]
 
@@ -62,18 +62,18 @@ class LocalSearchEngine:
         # print("*************** Prosus", result["depthIndex"])
 
         if self._visitedNodes[node.chromosome.stringIdentifier] is not None:
-            print("returning none")
+            # print("returning none")
             return None
         self._visitedNodes[node.chromosome.stringIdentifier] = 1
 
         if strategy == "simple_mutation":
-            if Chromosome.pool[node.chromosome.stringIdentifier] is None: # result["depthIndex"] >= ParameterData.instance.simpleMutationDepthIndex
+            if result["depthIndex"] >= ParameterData.instance.simpleMutationDepthIndex: #Chromosome.pool[node.chromosome.stringIdentifier] is None
                 result["chromosomes"].append(node.chromosome)
                 self._stopSearchEvent.set()
                 return None
         elif strategy == "positive_mutation":
             if node < self: #and Chromosome.pool[node.chromosome.stringIdentifier] is None:
-                print("positive_mutation ", result["depthIndex"], node.chromosome, node < self)
+                # print("positive_mutation ", result["depthIndex"], node.chromosome, node < self)
                 result["chromosomes"].append(node.chromosome)
                 self._stopSearchEvent.set()
                 return
@@ -133,7 +133,7 @@ class LocalSearchEngine:
             if len(children) == 0 and node.chromosome not in Chromosome.localOptima["values"]:
                 result["chromosomes"].append(node.chromosome)
                 # (result["chromosomes"]).sort()
-                print("Absolute mutation result ", self.chromosome, node.chromosome)
+                # print("Absolute mutation result ", self.chromosome, node.chromosome)
                 # TODO
                 LocalSearchNode.absoluteSearchedInstances[self.chromosome.stringIdentifier] = node.chromosome
 

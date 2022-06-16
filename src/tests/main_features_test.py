@@ -13,7 +13,7 @@ class TestMainFeatures:
     """
     """
 
-
+# 
     def test_mutation(self):
         """
         """
@@ -43,8 +43,8 @@ class TestMainFeatures:
         self.setUpInput()
 
         # cA, cB = Chromosome.createFromIdentifier(stringIdentifier=(2, 1, 1, 2, 0)), Chromosome.createFromIdentifier(stringIdentifier=(2, 1, 0, 1, 2))
-        # cA, cB = Chromosome.createFromIdentifier(stringIdentifier=(0, 0, 2, 2, 3, 1, 2, 1)), Chromosome.createFromIdentifier(stringIdentifier=(2, 0, 2, 1, 1, 2, 3, 0))
-        cA, cB = Chromosome.createFromIdentifier(stringIdentifier=(0, 0, 0, 6, 1, 8, 7, 10, 5, 4, 4, 2, 9, 3, 1)), Chromosome.createFromIdentifier(stringIdentifier=(0, 4, 0, 5, 10, 0, 8, 2, 6, 4, 3, 1, 1, 7, 9))
+        cA, cB = Chromosome.createFromIdentifier(stringIdentifier=(0, 0, 2, 2, 3, 1, 2, 1)), Chromosome.createFromIdentifier(stringIdentifier=(2, 0, 2, 1, 1, 2, 3, 0))
+        # cA, cB = Chromosome.createFromIdentifier(stringIdentifier=(0, 0, 0, 6, 1, 8, 7, 10, 5, 4, 4, 2, 9, 3, 1)), Chromosome.createFromIdentifier(stringIdentifier=(0, 4, 0, 5, 10, 0, 8, 2, 6, 4, 3, 1, 1, 7, 9))
         # [(5, 6, 10, 8, 0, 0, 9, 7, 0, 4, 4, 2, 1, 1, 3) : 1811, (7, 2, 8, 5, 10, 9, 0, 0, 0, 4, 4, 6, 1, 1, 3) : 1857]
 
         print(cA, "\n", cB, "\n -----------------------------")
@@ -116,8 +116,8 @@ class TestMainFeatures:
         """
         """
 
-        # inputFile = "data/input/clspInst02.data"
-        inputFile = "data/input/pigment15b.dzn"
+        inputFile = "data/input/clspInst02.data"
+        # inputFile = "data/input/pigment15b.dzn"
         # inputFile = "data/input/ps-200-10-80.dzn"
         LspRuntimeMonitor.verbose = True
         inputDataReader = InputDataReader()

@@ -28,12 +28,10 @@ class LocalSearchNode:
         """
         """
 
-        # print("ooooooooooooook")
         # genes = [gene for itemGenes in self.chromosome.dnaArray for gene in itemGenes]
         random.seed()
         # random.shuffle(genes)
         genesIndices = copy.deepcopy(LocalSearchNode.genericGeneIndices)
-        # print("genesIndices : ", genesIndices)
 
         while len(genesIndices) > 0:
             geneIndex = genesIndices[random.randrange(len(genesIndices))]
@@ -79,7 +77,7 @@ class LocalSearchNode:
             theChromosome = chromosome2
 
         if theChromosome is not None:
-            print("SAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWWWWWWWWWWWWWWWWWWWWWWWW")
+            # print("SAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWWWWWWWWWWWWWWWWWWWWWWWW")
             return theChromosome
 
 
@@ -262,17 +260,6 @@ class LocalSearchNode:
         return result
 
 
-    # @classmethod
-    # def allGenePossibleMutations(cls, gene1, chromosome, strategy = "all"): # strategy can be "all" or "null" only for mutations related to null periods
-    #     """
-    #     """
-
-    #     mutations = []
-    #     for mutation in cls.generateGeneMutations(gene1, chromosome, strategy):
-    #         mutations.append(mutation)
-    #     return mutations
-
-
     @classmethod
     def generateGeneMutations(cls, gene1, chromosome, strategy = "all"):
         """
@@ -286,12 +273,10 @@ class LocalSearchNode:
 
         # print("lower and upper limit 1 : ", gene1LowerLimit, gene1UpperLimit)
 
-        stringIdentifierSlice = [(index, periodValue) for index, periodValue in enumerate(chromosome.stringIdentifier[gene1LowerLimit:gene1UpperLimit])]
-        random.seed()
-        random.shuffle(stringIdentifierSlice)
-
-        for index, periodValue in stringIdentifierSlice:
+        index = len(chromosome.stringIdentifier[gene1LowerLimit:gene1UpperLimit]) - 1
+        for periodValue in reversed(chromosome.stringIdentifier[gene1LowerLimit:gene1UpperLimit]):
             period = index + gene1LowerLimit
+
             if periodValue == 0:
                 swap = [(gene1.item, gene1.position), (-1, period)]
                 mutation = [chromosome, LocalSearchNode.createMutatedChromosome(chromosome, swap), swap]
@@ -313,6 +298,8 @@ class LocalSearchNode:
                             swap = [(gene1.item, gene1.position), (gene2.item, gene2.position)]
                             mutation = [chromosome, LocalSearchNode.createMutatedChromosome(chromosome, swap), swap]
                             yield mutation
+
+            index -= 1
 
         return []
 

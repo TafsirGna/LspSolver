@@ -90,57 +90,6 @@ class Chromosome(object):
 
 
 	@classmethod
-	def evaluateDnaArrayTask(cls, taskIndex, slices, arguments):
-		"""
-		"""
-
-		cost = 0
-		for index, gene in enumerate(slices[taskIndex]): 
-			if index > 0:
-				gene.prevGene = ((slices[taskIndex][index-1]).item, (slices[taskIndex][index-1]).position)
-				gene.calculateChangeOverCost()
-			else:
-				gene.prevGene = ((slices[taskIndex - 1][-1]).item, (slices[taskIndex - 1][-1]).position) if taskIndex > 0 else None
-				gene.calculateChangeOverCost()
-			gene.calculateCost()
-			cost += gene.cost
-			(arguments["chromosome"]).dnaArray[gene.item][gene.position] = gene
-			(arguments["chromosome"]).stringIdentifier[gene.period] = gene.item + 1
-			# print("Gene details : ", gene.stockingCost, gene.changeOverCost)
-
-		with arguments["lock"]:
-			(arguments["chromosome"]).cost += cost
-			# print("total : ", (arguments["chromosome"]).cost)
-		 
-
-
-	@classmethod
-	def evaluateDnaArray(cls, dnaArray):
-		"""
-		"""
-
-		genesList = sorted([gene for itemProdGenes in dnaArray for gene in itemProdGenes], key= lambda gene: gene.period)
-
-		chromosome = Chromosome()
-		chromosome.stringIdentifier = [0] * InputDataInstance.instance.nPeriods
-		nThreads = ParameterData.instance.nReplicaSubThreads
-		arguments = {"chromosome": chromosome, "lock": threading.Lock(), "costs": [None] * nThreads}
-		# slices = [my_list[i:i + chunk_size] for i in range(0, len(my_list), chunk_size)]
-
-		slices = np.array_split(genesList, nThreads)
-		# print("Slices : ", slices)
-		with concurrent.futures.ThreadPoolExecutor() as executor:
-			for index in range(nThreads):
-				executor.submit(cls.evaluateDnaArrayTask, index, slices, arguments)
-		
-		chromosome.stringIdentifier = tuple(chromosome.stringIdentifier)
-
-		# if (chromosome.dnaArray == Chromosome.createFromIdentifier(chromosome.stringIdentifier).dnaArray and chromosome.cost == 385):
-		# 	print("Flaaaaaaaaaaaaaaaaaaaaaaaag", chromosome.dnaArray, Chromosome.createFromIdentifier(chromosome.stringIdentifier).dnaArray)
-		return chromosome
-
-
-	@classmethod
 	def nextProdGene(cls, prodPeriod, dnaArray, stringIdentifier):
 		"""
 		"""
