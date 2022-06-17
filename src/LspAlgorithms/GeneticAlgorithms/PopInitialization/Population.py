@@ -40,12 +40,12 @@ class Population:
         for instance in nodeGeneratorManager.getInstance():
             if instance is None:
                 break
-            if Population.initPopLocalOptimaCount[self.lineageIdentifier] < ParameterData.instance.nInitPopLocalOptima:
-                result = (LocalSearchEngine().process(instance, "absolute_mutation"))
-                if len(result) > 0:
-                    instance = result[0]
-                    print("oooooooooooooooooooooooooooooooooooo", instance)
-                    Population.initPopLocalOptimaCount[self.lineageIdentifier] += 1
+            # if Population.initPopLocalOptimaCount[self.lineageIdentifier] < ParameterData.instance.nInitPopLocalOptima:
+            #     result = (LocalSearchEngine().process(instance, "absolute_mutation"))
+            #     if len(result) > 0:
+            #         instance = result[0]
+            #         print("oooooooooooooooooooooooooooooooooooo", instance)
+            #         Population.initPopLocalOptimaCount[self.lineageIdentifier] += 1
             result = self.add(instance)
             if result is None:
                 break

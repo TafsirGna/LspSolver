@@ -26,12 +26,9 @@ class TestMainFeatures:
         c = Chromosome.createFromIdentifier(stringIdentifier=(0, 0, 0, 8, 6, 10, 9, 5, 7, 2, 4, 4, 1, 1, 3))
         print("Chromosome ", c)
         # # [2, 1, 2, 0, 1]
-        LspRuntimeMonitor.mutation_strategy = "absolute_mutation"
+        LspRuntimeMonitor.mutation_strategy = "simple_mutation"
         result = (MutationOperator()).process(c)
         print("1 -- ", result, (Chromosome.createFromIdentifier(result.stringIdentifier)))
-
-        # result = (MutationOperator()).process(c)
-        # print("2 -- ", result, (Chromosome.createFromIdentifier(result.stringIdentifier)))
 
         assert 0
 
@@ -116,8 +113,8 @@ class TestMainFeatures:
         """
         """
 
-        inputFile = "data/input/clspInst02.data"
-        # inputFile = "data/input/pigment15b.dzn"
+        # inputFile = "data/input/clspInst02.data"
+        inputFile = "data/input/pigment15b.dzn"
         # inputFile = "data/input/ps-200-10-80.dzn"
         LspRuntimeMonitor.verbose = True
         inputDataReader = InputDataReader()

@@ -90,6 +90,18 @@ class Chromosome(object):
 
 
 	@classmethod
+	def geneLowerUpperLimit(cls, chromosome, gene):
+	    """
+	    """
+	    
+	    geneLowerLimit = 0 if gene.position == 0 else (chromosome.dnaArray[gene.item][gene.position - 1]).period + 1
+	    geneUpperLimit = InputDataInstance.instance.demandsArrayZipped[gene.item][gene.position] + 1 if gene.position == len(InputDataInstance.instance.demandsArrayZipped[gene.item]) - 1 else ((chromosome.dnaArray[gene.item][gene.position + 1]).period if (chromosome.dnaArray[gene.item][gene.position + 1]) is not None else InputDataInstance.instance.demandsArrayZipped[gene.item][gene.position] + 1)
+	    geneUpperLimit = InputDataInstance.instance.demandsArrayZipped[gene.item][gene.position] + 1 if InputDataInstance.instance.demandsArrayZipped[gene.item][gene.position] + 1 < geneUpperLimit else geneUpperLimit
+
+	    return geneLowerLimit, geneUpperLimit
+
+
+	@classmethod
 	def nextProdGene(cls, prodPeriod, dnaArray, stringIdentifier):
 		"""
 		"""

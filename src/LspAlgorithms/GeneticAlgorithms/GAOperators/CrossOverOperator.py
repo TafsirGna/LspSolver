@@ -94,7 +94,7 @@ class CrossOverOperator:
                     self.replicateGene(offspringIndex = 0, parentIndex = 1, period = period)
                 
                 if self.offsprings[0].stringIdentifier[period] == "*":
-                    items = [(item, InputDataInstance.instance.stockingCostsArray[item]) for item in self.offspringsItemsToOrder[0] if item >= 0 and self.offspringsItemsToOrder[0][item] > 0 and InputDataInstance.instance.demandsArrayZipped[item][self.offspringsItemsToOrder[0][item] - 1] >= period]
+                    items = [(item, InputDataInstance.instance.stockingCostsArray[item] * (InputDataInstance.instance.demandsArrayZipped[item][self.offspringsItemsToOrder[1][item] - 1] - period)) for item in self.offspringsItemsToOrder[0] if item >= 0 and self.offspringsItemsToOrder[0][item] > 0 and InputDataInstance.instance.demandsArrayZipped[item][self.offspringsItemsToOrder[0][item] - 1] >= period]
                     # print('sorted : ', sorted(items, key= lambda item: item[1]), items, self.offspringsItemsToOrder[0])
                     if len(items) == 0:
                         if self.offspringsItemsToOrder[0][-1] > 0:
@@ -109,7 +109,7 @@ class CrossOverOperator:
                     self.replicateGene(offspringIndex = 1, parentIndex = 0, period = period)
                 
                 if self.offsprings[1].stringIdentifier[period] == "*":
-                    items = [(item, InputDataInstance.instance.stockingCostsArray[item]) for item in self.offspringsItemsToOrder[1] if item >= 0 and self.offspringsItemsToOrder[1][item] > 0 and InputDataInstance.instance.demandsArrayZipped[item][self.offspringsItemsToOrder[1][item] - 1] >= period]
+                    items = [(item, InputDataInstance.instance.stockingCostsArray[item] * (InputDataInstance.instance.demandsArrayZipped[item][self.offspringsItemsToOrder[1][item] - 1] - period)) for item in self.offspringsItemsToOrder[1] if item >= 0 and self.offspringsItemsToOrder[1][item] > 0 and InputDataInstance.instance.demandsArrayZipped[item][self.offspringsItemsToOrder[1][item] - 1] >= period]
                     if len(items) == 0:
                         if self.offspringsItemsToOrder[1][-1] > 0:
                             self.orderItem(offspringIndex = 1, item = -1, period = period)

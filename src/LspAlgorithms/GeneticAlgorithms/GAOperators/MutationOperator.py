@@ -20,9 +20,9 @@ class MutationOperator:
         result = (LocalSearchEngine()).process(chromosome, strategy)
         # print("Result : ", result)
         # No mutation found
-        if len(result) == 0:
-            return chromosome
+        # if len(result) == 0:
+        #     return chromosome
         
-        # print("Mutation result : ", chromosome, result[0])
-        instance = result[0]
-        return instance
+        # # print("Mutation result : ", chromosome, result[0])
+        # instance = result[0]
+        return result
