@@ -42,7 +42,7 @@ class InitNodeGenerator:
             #     print("/////////////////////////////////////////////////", node.chromosome)
 
             node.chromosome.stringIdentifier = tuple(node.chromosome.stringIdentifier)
-            print("chromosome created : ", node.chromosome)
+            # print("chromosome created : ", node.chromosome)
 
             #
             # results = (LocalSearchEngine().process(node.chromosome, "population"))

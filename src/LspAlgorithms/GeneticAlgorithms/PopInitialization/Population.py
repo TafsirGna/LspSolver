@@ -42,8 +42,8 @@ class Population:
                 break
             # if Population.initPopLocalOptimaCount[self.lineageIdentifier] < ParameterData.instance.nInitPopLocalOptima:
             #     result = (LocalSearchEngine().process(instance, "absolute_mutation"))
-            #     if len(result) > 0:
-            #         instance = result[0]
+            #     if result is not None:
+            #         instance = result
             #         print("oooooooooooooooooooooooooooooooooooo", instance)
             #         Population.initPopLocalOptimaCount[self.lineageIdentifier] += 1
             result = self.add(instance)
