@@ -76,8 +76,10 @@ class CrossOverOperator:
 
                 # just after the crossover tipping period, some tasks need to be done such as
                 if period == self.crossOverPeriod - 1:
-                    self.offsprings[0].cost -= self.offspringLastPlacedGene[0].changeOverCost
-                    self.offsprings[1].cost -= self.offspringLastPlacedGene[1].changeOverCost
+                    if self.offspringLastPlacedGene[0] is not None:
+                        self.offsprings[0].cost -= self.offspringLastPlacedGene[0].changeOverCost
+                    if self.offspringLastPlacedGene[1] is not None:
+                        self.offsprings[1].cost -= self.offspringLastPlacedGene[1].changeOverCost
 
                     # self.forcastItems()
 
@@ -166,10 +168,11 @@ class CrossOverOperator:
                 if offspringIndex != parentIndex:
                     gene.changeOverCost = 0
                     gene.calculateCost()
-                    self.offspringLastPlacedGene[offspringIndex].prevGene = (gene.item, gene.position)
-                    self.offspringLastPlacedGene[offspringIndex].calculateChangeOverCost()
-                    self.offspringLastPlacedGene[offspringIndex].calculateCost()
-                    cost += self.offspringLastPlacedGene[offspringIndex].changeOverCost
+                    if self.offspringLastPlacedGene[offspringIndex] is not None:
+                        self.offspringLastPlacedGene[offspringIndex].prevGene = (gene.item, gene.position)
+                        self.offspringLastPlacedGene[offspringIndex].calculateChangeOverCost()
+                        self.offspringLastPlacedGene[offspringIndex].calculateCost()
+                        cost += self.offspringLastPlacedGene[offspringIndex].changeOverCost
 
                 cost += gene.cost
 

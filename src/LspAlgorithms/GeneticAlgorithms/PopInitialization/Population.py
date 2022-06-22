@@ -134,21 +134,25 @@ class Population:
 
 
     @classmethod
-    def tryMutation(cls, chromosome):
+    def tryMutation(cls, chromosome, result = []):
         """
         """
         
         random.seed()
         if random.random() <= ParameterData.instance.mutationRate:
             # print("mutating chromosome")
-            chromosome = (MutationOperator()).process(chromosome)
+            result.append((MutationOperator()).process(chromosome))
+            return None
+
+        result.append(chromosome)
+        return None
 
 
     def threadTask(self, placeholder = None):
         """
         """
 
-        # print("Starting thread")
+        # print("Starting thread", self.newPop.chromosomes)
 
         threadID = uuid.uuid4()
 
@@ -176,17 +180,18 @@ class Population:
 
                 # print("after mating")
 
+                resultC , resultD = [], []
                 with concurrent.futures.ThreadPoolExecutor() as executor:
-                    executor.map(Population.tryMutation, [chromosomeC, chromosomeD])
+                    executor.map(Population.tryMutation, [chromosomeC, chromosomeD], [resultC, resultD])
 
                 # Population.tryMutation(chromosomeC)
 
                 # Population.tryMutation(chromosomeD)
 
-                # print("Queueing C")
-                queue.put(chromosomeC)
-                # print("Queueing D")
-                queue.put(chromosomeD)
+                # print("Queueing C", resultC[0])
+                queue.put(resultC[0])
+                # print("Queueing D", resultD[0])
+                queue.put(resultD[0])
 
             with self.newPopLock:
                 while not queue.empty() and self.newPop.popLength < Population.popSizes[self.lineageIdentifier]:

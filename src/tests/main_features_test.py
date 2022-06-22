@@ -102,9 +102,9 @@ class TestMainFeatures:
 
         self.setUpInput()
 
-        c = Chromosome.createFromIdentifier("11222300")
-        print(c)
-        print((LocalSearchEngine()).process(c, "positive_mutation"))
+        c = Chromosome.createFromIdentifier(stringIdentifier=(0, 0, 2, 2, 3, 1, 2, 1))
+        print("Input : ", c)
+        print("Output : ", (LocalSearchEngine()).process(c, "positive_mutation"))
 
         assert 0
 

@@ -15,7 +15,7 @@ class InitNodeGenerator:
         """
         self.queue = queue
         self.uuid = uuid.uuid4()
-        self.resultQueue = Queue(maxsize = 1)
+        self.resultQueue = Queue(maxsize = 2)
 
 
     def generate(self, chromosomes, maxSize):
@@ -42,33 +42,20 @@ class InitNodeGenerator:
             #     print("/////////////////////////////////////////////////", node.chromosome)
 
             node.chromosome.stringIdentifier = tuple(node.chromosome.stringIdentifier)
+            self.resultQueue.put(node.chromosome)
             # print("chromosome created : ", node.chromosome)
 
-            #
-            # results = (LocalSearchEngine().process(node.chromosome, "population"))
-            # with chromosomes["lock"]:
-            #     if (chromosomes["full"]).is_set():
-            #         return None
+            chromosome = (LocalSearchEngine().process(node.chromosome, "simple_mutation"))
+            if chromosome != node.chromosome:
+                self.resultQueue.put(chromosome)
 
-            #     # print("Pop size : ",len(chromosomes["values"]), maxSize)
+            with chromosomes["lock"]:
+                while not self.resultQueue.empty() and len(chromosomes["values"]) < maxSize:
+                    chromosomes["values"].add(self.resultQueue.get())
 
-            #     nLeft = maxSize - len(chromosomes["values"])
-            #     # print("leeeeeeeeeeeeeft : ", results[:nLeft], nLeft)    
-            #     for chromosome in results[:nLeft]:
-            #         # print("Dataaaaaa : ", chromosomes["values"])
-            #         chromosomes["values"].add(chromosome)
-            #         # print("Dataaaaaa : ", chromosome)
-
-            self.resultQueue.put(node.chromosome)
-
-            if self.resultQueue.full():
-                with chromosomes["lock"]:
-                    while not self.resultQueue.empty() and len(chromosomes["values"]) < maxSize:
-                        chromosomes["values"].add(self.resultQueue.get())
-
-                    if len(chromosomes["values"]) >= maxSize:
-                        (chromosomes["full"]).set()
-                        return None
+                if len(chromosomes["values"]) >= maxSize:
+                    (chromosomes["full"]).set()
+                    return None
 
             return None
 

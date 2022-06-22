@@ -1,6 +1,7 @@
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
 from LspAlgorithms.GeneticAlgorithms.LocalSearch.LocalSearchEngine import LocalSearchEngine
 from LspRuntimeMonitor import LspRuntimeMonitor
+import random
 
 
 class MutationOperator:
@@ -16,7 +17,7 @@ class MutationOperator:
         """
         """
 
-        strategy = LspRuntimeMonitor.mutation_strategy
+        strategy = "positive_mutation" if random.randint(0, 1) == 0 else "simple_mutation" #LspRuntimeMonitor.mutation_strategy
         result = (LocalSearchEngine()).process(chromosome, strategy)
         # print("Result : ", result)
         # No mutation found
