@@ -12,7 +12,7 @@ from LspAlgorithms.GeneticAlgorithms.GAOperators.MutationOperator import Mutatio
 from LspAlgorithms.GeneticAlgorithms.GAOperators.SelectionOperator import SelectionOperator
 from LspRuntimeMonitor import LspRuntimeMonitor
 from ParameterSearch.ParameterData import ParameterData
-from ..LocalSearch.LocalSearchEngine import LocalSearchEngine
+from LspAlgorithms.GeneticAlgorithms.GAOperators.LocalSearchEngine import LocalSearchEngine
 
 class Population:
 
@@ -75,10 +75,14 @@ class Population:
         # instances = np.array_split(instances, ParameterData.instance.nReplicaThreads)
         # resultQueues = [Queue(maxsize=len(instances[replicaIndex])) for replicaIndex in range(ParameterData.instance.nReplicaThreads)]
 
+        # applying selection and then crossover
         with concurrent.futures.ThreadPoolExecutor() as executor:
             print(list(executor.map(self.threadTask, ["placeholder"] * ParameterData.instance.nReplicaThreads)))
             # for i in range(ParameterData.instance.nReplicaThreads):
             #     executor.submit(self.threadTask)
+
+        # Applying mutation
+        (MutationOperator()).processPop(self.newPop)
 
         self.newPop.dThreadOutputPipeline =  self.dThreadOutputPipeline
         return self.newPop
@@ -178,20 +182,10 @@ class Population:
                         print("Exception")
                         raise e
 
-                # print("after mating")
-
-                resultC , resultD = [], []
-                with concurrent.futures.ThreadPoolExecutor() as executor:
-                    executor.map(Population.tryMutation, [chromosomeC, chromosomeD], [resultC, resultD])
-
-                # Population.tryMutation(chromosomeC)
-
-                # Population.tryMutation(chromosomeD)
-
-                # print("Queueing C", resultC[0])
-                queue.put(resultC[0])
-                # print("Queueing D", resultD[0])
-                queue.put(resultD[0])
+                # print("Queueing C")
+                queue.put(chromosomeC)
+                # print("Queueing D")
+                queue.put(chromosomeD)
 
             with self.newPopLock:
                 while not queue.empty() and self.newPop.popLength < Population.popSizes[self.lineageIdentifier]:

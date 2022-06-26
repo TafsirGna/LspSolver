@@ -5,7 +5,7 @@ from .Chromosome import Chromosome
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.Population import Population
 from LspRuntimeMonitor import LspRuntimeMonitor
 from ParameterSearch.ParameterData import ParameterData
-from .LocalSearch.LocalSearchEngine import LocalSearchEngine
+from LspAlgorithms.GeneticAlgorithms.GAOperators.LocalSearchEngine import LocalSearchEngine
 from LspAlgorithms.GeneticAlgorithms.GAOperators.SelectionOperator import SelectionOperator
 import concurrent.futures
 import threading
@@ -27,26 +27,26 @@ class PopulationEvaluator:
     def localSearchArea(self, population, resultQueue):
         """
         """
-        print("_______________________________", self.idleGenCounter[population.lineageIdentifier]["count"])
-        print("local optima : ", Chromosome.localOptima)
+        # print("_______________________________", self.idleGenCounter[population.lineageIdentifier]["count"])
+        # print("local optima : ", Chromosome.localOptima)
 
-        if self.idleGenCounter[population.lineageIdentifier]["count"] % ParameterData.instance.nIdleGenerations != 0:
-            return None
+        # if self.idleGenCounter[population.lineageIdentifier]["count"] % ParameterData.instance.nIdleGenerations != 0 and self.idleGenCounter[population.lineageIdentifier]["count"] != 0:
+        #     return None
 
-        elements = sorted(population.chromosomes.values(), key=lambda element: element["size"])
+        # elements = sorted(population.chromosomes.values(), key=lambda element: element["size"])
 
-        for element in reversed(elements):
-            if element["chromosome"] not in Chromosome.localOptima["values"]:
-                chromosome = element["chromosome"]
-                result = (LocalSearchEngine().process(chromosome, "absolute_mutation"))
-                result = result[0] if len(result) != 0 else chromosome
-                if result < chromosome and result.stringIdentifier not in population.chromosomes.keys():
-                    resultQueue.put(result)
-                    break
+        # for element in reversed(elements):
+        #     if element["chromosome"] not in Chromosome.localOptima["values"]:
+        #         chromosome = element["chromosome"]
+        #         result = (LocalSearchEngine().process(chromosome, "absolute_mutation"))
+        #         if result < chromosome and result.stringIdentifier not in population.chromosomes.keys():
+        #             print("local search piping : ", result)
+        #             resultQueue.put(result)
+        #             break
 
-        print(" last element size : ", elements[-1]["size"], resultQueue.qsize(), float(elements[-1]["size"] / population.popLength))
-        if resultQueue.empty() and float(elements[-1]["size"] / population.popLength) >= 0.6:
-            self.terminate = True
+        # print(" last element size : ", elements[-1]["size"], resultQueue.qsize(), float(elements[-1]["size"] / population.popLength))
+        # if resultQueue.empty() and float(elements[-1]["size"] / population.popLength) >= 0.6:
+        #     self.terminate = True
 
 
     def definePopMetrics(self, population):

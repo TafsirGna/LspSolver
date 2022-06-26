@@ -7,6 +7,7 @@ from ParameterSearch.ParameterData import ParameterData
 import concurrent.futures
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 import random
+import numpy as np
 
 class LocalSearchEngine:
     """
@@ -27,9 +28,9 @@ class LocalSearchEngine:
         #     LocalSearchEngine.genericGeneIndices = [(item, position) for item, itemGenes in enumerate(InputDataInstance.instance.demandsArrayZipped) for position, _ in enumerate(itemGenes)]
 
 
-    def process(self, chromosome, strategy = "positive_mutation"):
+    def process(self, chromosome, strategy = "simple_mutation"):
         """Process the given chromosome in order to return a mutated version
-        strategy: simple_mutation|absolute_mutation|positive_mutation
+        strategy: random_mutation|absolute_mutation|simple_mutation
         """
 
         # print("mutatiooooooon", strategy, chromosome, chromosome.dnaArray)
@@ -39,6 +40,9 @@ class LocalSearchEngine:
         self.searchIndividu(chromosome, strategy)
 
         print("Mutation results : ", strategy, chromosome, self.result)
+
+        if self.result.cost != Chromosome.createFromIdentifier(self.result.stringIdentifier).cost:
+            print("Oaaaaaaaaaaaaaaaaauuuuuuuuuuuuuuuuuuuuuuuuuhhhhhhhhhhhhhhh")
 
         return (self.result if self.result is not None else chromosome)
 
@@ -62,6 +66,8 @@ class LocalSearchEngine:
 
         for period, item in shuffledPeriods:
 
+            periodGene, periodGeneLowerLimit, periodGeneUpperLimit = None, None, None
+
             if item > 0:
                 # print("ouais : ", chromosome, period, item)
                 periodGene = Chromosome.geneAtPeriod(chromosome, period)
@@ -83,62 +89,22 @@ class LocalSearchEngine:
 
                 # print(backwardPeriod, forwardPeriod)
                 if backwardPeriod is not None :
-                    if chromosome.stringIdentifier[backwardPeriod] > 0: 
-                        backwardPeriodGene = Chromosome.geneAtPeriod(chromosome, backwardPeriod)
+                    backwardPeriodTab = [False]
+                    result = self.handleBackwardForwardItem(chromosome, backwardPeriod, "backward", item, strategy, period, periodGene, periodGeneLowerLimit, periodGeneUpperLimit, results, backwardPeriodTab)
+                    if backwardPeriodTab[-1] == True:
+                        backwardPeriod = None
 
-                        backwardPeriodGeneLowerLimit, backwardPeriodGeneUpperLimit = Chromosome.geneLowerUpperLimit(chromosome, backwardPeriodGene)
-                        condition = backwardPeriodGeneLowerLimit <= period and period < backwardPeriodGeneUpperLimit
-
-                        if item > 0:
-                            condition = condition and (periodGeneLowerLimit <= backwardPeriod and backwardPeriod < periodGeneUpperLimit)
-
-                        if condition:
-                            # print("mutating : ", backwardPeriodGene)
-                            swap = [(backwardPeriodGene.item, backwardPeriodGene.position), (-1, period)] if item == 0 else [(backwardPeriodGene.item, backwardPeriodGene.position), (periodGene.item, periodGene.position)] 
-                            mutation = LocalSearchEngine.createMutatedChromosome(chromosome, swap)
-                            # print("Mutation : ", mutation)
-
-                            if strategy == "simple_mutation":
-                                self.result = mutation
-                                return None
-
-                            if mutation.cost < chromosome.cost or (mutation.cost < chromosome.cost and mutation.stringIdentifier != chromosome.stringIdentifier):
-                                if strategy == "positive_mutation":
-                                    self.result = mutation
-                                    return None
-                                elif strategy == "absolute_mutation":
-                                    results.append(mutation)
-                        else:
-                            backwardPeriod = None
+                    if result == "RETURN":
+                        return None
 
                 if forwardPeriod is not None :
-                    if chromosome.stringIdentifier[forwardPeriod] > 0:
-                        forwardPeriodGene = Chromosome.geneAtPeriod(chromosome, forwardPeriod)
+                    forwardPeriodTab = [False]
+                    result = self.handleBackwardForwardItem(chromosome, forwardPeriod, "forward", item, strategy, period, periodGene, periodGeneLowerLimit, periodGeneUpperLimit, results, forwardPeriodTab)
+                    if forwardPeriodTab[-1] == True:
+                        forwardPeriod = None
 
-                        forwardPeriodGeneLowerLimit, forwardPeriodGeneUpperLimit = Chromosome.geneLowerUpperLimit(chromosome, forwardPeriodGene)
-                        condition = forwardPeriodGeneLowerLimit <= period and period < forwardPeriodGeneUpperLimit
-
-                        if item > 0:
-                            condition = condition and (periodGeneLowerLimit <= forwardPeriod and forwardPeriod < periodGeneUpperLimit)
-
-                        if condition:
-                            # print("mutating : ", forwardPeriodGene)
-                            swap = [(forwardPeriodGene.item, forwardPeriodGene.position), (-1, period)] if item == 0 else [(forwardPeriodGene.item, forwardPeriodGene.position), (periodGene.item, periodGene.position)]
-                            mutation = LocalSearchEngine.createMutatedChromosome(chromosome, swap)
-                            # print("Mutation : ", mutation)
-
-                            if strategy == "simple_mutation":
-                                self.result = mutation
-                                return None
-
-                            if mutation.cost < chromosome.cost or (mutation.cost < chromosome.cost and mutation.stringIdentifier != chromosome.stringIdentifier):
-                                if strategy == "positive_mutation":
-                                    self.result = mutation
-                                    return None
-                                elif strategy == "absolute_mutation":
-                                    results.append(mutation)
-                        else:
-                            forwardPeriod = None
+                    if result == "RETURN":
+                        return None
 
                 if backwardPeriod is None and forwardPeriod is None:
                     break
@@ -160,7 +126,56 @@ class LocalSearchEngine:
                 self.result = chromosome
                 self._stopSearchEvent.set()
                 return None
+        elif strategy == "simple_mutation":
+            self.result = np.random.choice(results)
+            return None
 
+
+    def handleBackwardForwardItem(self, chromosome, shiftPeriod, shift, item, strategy, period, periodGene, periodGeneLowerLimit, periodGeneUpperLimit, results, shiftPeriodTab):
+        """
+        """
+        
+        mutation = None
+        if chromosome.stringIdentifier[shiftPeriod] > 0: 
+            shiftPeriodGene = Chromosome.geneAtPeriod(chromosome, shiftPeriod)
+
+            shiftPeriodGeneLowerLimit, shiftPeriodGeneUpperLimit = Chromosome.geneLowerUpperLimit(chromosome, shiftPeriodGene)
+            condition = shiftPeriodGeneLowerLimit <= period and period < shiftPeriodGeneUpperLimit
+
+            if item > 0:
+                condition = condition and (periodGeneLowerLimit <= shiftPeriod and shiftPeriod < periodGeneUpperLimit)
+
+            if condition:
+                # print("mutating : ", backwardPeriodGene)
+                swap = [(shiftPeriodGene.item, shiftPeriodGene.position), (-1, period)] if item == 0 else [(shiftPeriodGene.item, shiftPeriodGene.position), (periodGene.item, periodGene.position)] 
+                mutation = LocalSearchEngine.createMutatedChromosome(chromosome, swap)
+                # print("Mutation : ", mutation)
+            else:
+                # backwardPeriod = None
+                shiftPeriodTab[-1] = True
+        else:
+            if item > 0:
+                if (periodGeneLowerLimit <= shiftPeriod and shiftPeriod < periodGeneUpperLimit):
+                    swap = [(periodGene.item, periodGene.position), (-1, shiftPeriod)]
+                    mutation = LocalSearchEngine.createMutatedChromosome(chromosome, swap)
+                else:
+                    # backwardPeriod = None
+                    shiftPeriodTab[-1] = True
+
+        if mutation is not None:
+            if strategy == "random_mutation":
+                self.result = mutation
+                return "RETURN"
+
+            if strategy == "simple_mutation":
+                results.append(mutation)
+                self.result = mutation
+
+            if mutation.cost < chromosome.cost or (mutation.cost < chromosome.cost and mutation.stringIdentifier != chromosome.stringIdentifier):
+                if strategy == "absolute_mutation":
+                    results.append(mutation)
+                if strategy == "simple_mutation":
+                    return "RETURN"
 
 
     @classmethod

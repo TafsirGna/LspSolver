@@ -1,6 +1,6 @@
 import uuid
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
-from LspAlgorithms.GeneticAlgorithms.LocalSearch.LocalSearchEngine import LocalSearchEngine
+from LspAlgorithms.GeneticAlgorithms.GAOperators.LocalSearchEngine import LocalSearchEngine
 from ParameterSearch.ParameterData import ParameterData
 import threading
 from queue import Queue

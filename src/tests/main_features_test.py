@@ -1,5 +1,5 @@
 from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
-from LspAlgorithms.GeneticAlgorithms.LocalSearch.LocalSearchEngine import LocalSearchEngine
+from LspAlgorithms.GeneticAlgorithms.GAOperators.LocalSearchEngine import LocalSearchEngine
 from LspAlgorithms.GeneticAlgorithms.GAOperators.MutationOperator import MutationOperator
 from LspAlgorithms.GeneticAlgorithms.GAOperators.CrossOverOperator import CrossOverOperator
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
@@ -103,8 +103,9 @@ class TestMainFeatures:
         self.setUpInput()
 
         c = Chromosome.createFromIdentifier(stringIdentifier=(0, 0, 2, 2, 3, 1, 2, 1))
+        # (0, 0, 0, 9, 10, 8, 7, 5, 6, 4, 4, 2, 1, 1, 3)
         print("Input : ", c)
-        print("Output : ", (LocalSearchEngine()).process(c, "positive_mutation"))
+        print("Output : ", (LocalSearchEngine()).process(c, "absolute_mutation"))
 
         assert 0
 

@@ -7,7 +7,7 @@ import multiprocessing
 from queue import Queue
 import threading
 import uuid
-from LspAlgorithms.GeneticAlgorithms.LocalSearch.LocalSearchEngine import LocalSearchEngine
+from LspAlgorithms.GeneticAlgorithms.GAOperators.LocalSearchEngine import LocalSearchEngine
 from LspAlgorithms.GeneticAlgorithms.PopulationEvaluator import PopulationEvaluator
 from LspRuntimeMonitor import LspRuntimeMonitor
 from ..PopInitialization.PopInitializer import PopInitializer
