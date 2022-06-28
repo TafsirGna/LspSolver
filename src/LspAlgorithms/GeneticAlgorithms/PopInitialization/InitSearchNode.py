@@ -2,6 +2,7 @@ from LspAlgorithms.GeneticAlgorithms.Gene import Gene
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 from ..Chromosome import Chromosome
 import copy
+import uuid
 
 class SearchNode(object):
 	"""
@@ -23,6 +24,8 @@ class SearchNode(object):
 			SearchNode.itemsToOrder[-1] = (InputDataInstance.instance.nPeriods - InputDataInstance.instance.demandsArray.sum())	
 
 		self.itemsToOrder = copy.deepcopy(SearchNode.itemsToOrder)
+
+		self.uuid = uuid.uuid4()
 
 
 
@@ -137,3 +140,6 @@ class SearchNode(object):
 
 	def __eq__(self, node):
 		return self.chromosome.stringIdentifier == node.chromosome.stringIdentifier
+
+	def __hash__(self) -> int:
+		return hash(self.uuid)
