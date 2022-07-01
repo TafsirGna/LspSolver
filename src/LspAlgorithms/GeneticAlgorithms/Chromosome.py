@@ -36,6 +36,36 @@ class Chromosome(object):
 		
 		return cost
 
+
+	@classmethod
+	def evalAndFixDnaArray(cls, chromosome):
+		"""
+		"""
+
+		# print("flash : ", chromosome.dnaArray, chromosome)
+		lastProducedItem = None
+		cost = 0
+		itemPositionsTab = [0 for _ in range(InputDataInstance.instance.nItems)]
+		for periodValue in chromosome.stringIdentifier:
+			if periodValue > 0:
+				item = periodValue - 1
+
+				gene = chromosome.dnaArray[item][itemPositionsTab[item]]
+				prevGene = None if lastProducedItem is None else (lastProducedItem, itemPositionsTab[lastProducedItem] - 1)
+				# print("ok : ", gene)
+				if prevGene != gene.prevGene:
+					gene.prevGene = prevGene
+					gene.calculateChangeOverCost()
+					gene.calculateCost()				
+
+				itemPositionsTab[item] += 1
+
+				lastProducedItem = item
+				cost += gene.cost
+
+		# print("after flash : ", chromosome.dnaArray)
+		return cost
+
 	
 	@classmethod
 	def geneAtPeriod(cls, chromosome, period):
