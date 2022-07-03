@@ -16,7 +16,7 @@ class SearchNode(object):
 		
 		self.chromosome = chromosome
 		self.period = period
-		self.lastPlacedItem = None
+		self.lastPlacedGene = None
 
 		if SearchNode.itemsToOrder is None:
 			SearchNode.itemsToOrder = {i: 0 for i in range(InputDataInstance.instance.nItems)}
@@ -72,7 +72,7 @@ class SearchNode(object):
 		"""
 
 		node = SearchNode(Chromosome(), self.period - 1)
-		node.lastPlacedItem = self.lastPlacedItem # if we guess a priori that nothing has been produced for this period
+		node.lastPlacedGene = self.lastPlacedGene # if we guess a priori that nothing has been produced for this period
 
 		dnaArray = copy.deepcopy(self.chromosome.dnaArray)
 		additionalCost = 0
@@ -84,18 +84,21 @@ class SearchNode(object):
 			gene = Gene(item, self.period, itemProdPosition)
 			gene.calculateStockingCost()
 			gene.calculateCost()
+
 			additionalCost += gene.cost
 			# print("ok --- ", item, self.period, itemProdPosition, gene.cost)
 
-			node.lastPlacedItem = gene.item
+			node.lastPlacedGene = gene
 
 			# print("test 1 : ", gene)
-			if self.lastPlacedItem != None:
-				lastPlacedGene = (dnaArray[self.lastPlacedItem][0])
+			if self.lastPlacedGene is not None:
+				lastPlacedGene = (dnaArray[self.lastPlacedGene.item][0])
 				lastPlacedGene.prevGene = (item, itemProdPosition)
 				lastPlacedGene.calculateChangeOverCost()
 				lastPlacedGene.calculateCost()
 				additionalCost += lastPlacedGene.changeOverCost
+
+				gene.nextGene = self.lastPlacedGene
 				# print("test 2 : ", lastPlacedGene)
 
 			dnaArray[item].insert(0, gene)
@@ -125,10 +128,34 @@ class SearchNode(object):
 
 		self.setItemsToOrder()
 
-		for item, itemCount in self.itemsToOrder.items():
-			if itemCount > 0:
-				node = self.orderItem(item)
-				yield node
+		items = self.rateItemsToOrder()
+
+		for item in items:
+			node = self.orderItem(item)
+			yield node
+
+
+	def rateItemsToOrder(self):
+		"""
+		"""
+
+		items = [item for item in self.itemsToOrder if item != -1 and self.itemsToOrder[item] > 0]
+
+		itemsCost = sorted([ \
+						( \
+							item, \
+							InputDataInstance.instance.stockingCostsArray[item] * (InputDataInstance.instance.demandsArrayZipped[item][(len(InputDataInstance.instance.demandsArrayZipped[item]) - len(self.chromosome.dnaArray[item])) - 1] -  self.period) \
+							+ (0 if self.lastPlacedGene is None else InputDataInstance.instance.changeOverCostsArray[item][self.lastPlacedGene.item])
+						) \
+						for item in items \
+		], key=lambda pair: pair[1])
+
+		items = [pair[0] for pair in itemsCost]
+
+		if self.itemsToOrder[-1] > 0:
+			items.append(-1)
+
+		return items
 
 
 	def __repr__(self):

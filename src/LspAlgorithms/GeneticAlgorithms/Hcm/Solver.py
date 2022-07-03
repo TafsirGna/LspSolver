@@ -56,7 +56,7 @@ class GeneticAlgorithm:
 		population.dThreadOutputPipeline = dThreadPipelines["output"]
 
 		while self.popEvaluator.evaluate(population, dThreadPipelines["input"], generationIndex) != "TERMINATE":
-			# if generationIndex == 3:
+			# if generationIndex == 17:
 			# 	break
 
 			population = population.evolve()
@@ -74,7 +74,7 @@ class GeneticAlgorithm:
 
 		populations = self.popInitializer.process()
 
-		with concurrent.futures.ThreadPoolExecutor() as executor:
-			print(list(executor.map(self.process, populations)))
+		# with concurrent.futures.ThreadPoolExecutor() as executor:
+		# 	print(list(executor.map(self.process, populations)))
 
 			

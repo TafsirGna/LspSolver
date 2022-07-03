@@ -12,6 +12,7 @@ class Gene:
         self.cost = 0
         self.position = position
         self.prevGene = prevGene
+        self.nextGene = None
 
         self.changeOverCost = 0
         self.stockingCost = 0

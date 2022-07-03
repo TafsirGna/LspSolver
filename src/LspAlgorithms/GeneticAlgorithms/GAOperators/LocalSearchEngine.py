@@ -65,7 +65,9 @@ class LocalSearchEngine:
         # print("shuffledPeriods : ", shuffledPeriods, chromosome.stringIdentifier)
         # random.shuffle(shuffledPeriods)
 
-        orderedGenes = sorted([gene for itemGenes in chromosome.dnaArray for gene in itemGenes], key=lambda gene: gene.cost, reverse= True)
+        orderedGenes = [gene for itemGenes in chromosome.dnaArray for gene in itemGenes if gene.cost > 0]
+        # orderedGenes.sort(key=lambda gene: gene.cost, reverse= True)
+        random.shuffle(orderedGenes)
 
         # print("ordered : ", orderedGenes)
         for periodGene in orderedGenes:
