@@ -72,6 +72,7 @@ class SearchNode(object):
 		"""
 
 		node = SearchNode(Chromosome(), self.period - 1)
+		node.chromosome.genesByPeriod = copy.deepcopy(self.chromosome.genesByPeriod)
 		node.lastPlacedGene = self.lastPlacedGene # if we guess a priori that nothing has been produced for this period
 
 		dnaArray = copy.deepcopy(self.chromosome.dnaArray)
@@ -98,10 +99,11 @@ class SearchNode(object):
 				lastPlacedGene.calculateCost()
 				additionalCost += lastPlacedGene.changeOverCost
 
-				gene.nextGene = self.lastPlacedGene
+				gene.nextGene = (self.lastPlacedGene.item, self.lastPlacedGene.position)
 				# print("test 2 : ", lastPlacedGene)
 
 			dnaArray[item].insert(0, gene)
+			node.chromosome.genesByPeriod[self.period] = gene
 
 		# setting node's chomosome period
 		itemsToOrder = copy.deepcopy(self.itemsToOrder)

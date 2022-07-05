@@ -114,8 +114,8 @@ class TestMainFeatures:
         """
         """
 
-        # inputFile = "data/input/clspInst02.data"
-        inputFile = "data/input/pigment15b.dzn"
+        inputFile = "data/input/clspInst02.data"
+        # inputFile = "data/input/pigment15b.dzn"
         # inputFile = "data/input/ps-200-10-80.dzn"
         LspRuntimeMonitor.verbose = True
         inputDataReader = InputDataReader()

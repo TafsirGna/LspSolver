@@ -22,6 +22,7 @@ class Chromosome(object):
 		self.cost = 0
 		self.dnaArray = [[None for _ in indices] for indices in InputDataInstance.instance.demandsArrayZipped]
 		self.stringIdentifier = []
+		self.genesByPeriod = defaultdict(lambda: None)
 		
 
 	@classmethod
@@ -43,28 +44,34 @@ class Chromosome(object):
 		"""
 
 		# print("flash : ", chromosome.dnaArray, chromosome)
-		lastProducedItem = None
+		lastProducedGene = None
 		cost = 0
 		itemPositionsTab = [0 for _ in range(InputDataInstance.instance.nItems)]
-		for periodValue in chromosome.stringIdentifier:
+		for period, periodValue in enumerate(chromosome.stringIdentifier):
 			if periodValue > 0:
 				item = periodValue - 1
 
 				gene = chromosome.dnaArray[item][itemPositionsTab[item]]
-				prevGene = None if lastProducedItem is None else (lastProducedItem, itemPositionsTab[lastProducedItem] - 1)
+
+				if lastProducedGene is None:
+					prevGene = None  
+				else:
+					prevGene = (lastProducedGene.item, itemPositionsTab[lastProducedGene.item] - 1)
+					lastProducedGene.nextGene = (gene.item, gene.position)
 				# print("ok : ", gene)
-				if prevGene != gene.prevGene:
-					gene.prevGene = prevGene
-					gene.calculateChangeOverCost()
-					gene.calculateCost()				
+				# if prevGene != gene.prevGene:
+				gene.prevGene = prevGene
+				gene.calculateChangeOverCost()
+				gene.calculateCost()				
 
 				itemPositionsTab[item] += 1
 
-				lastProducedItem = item
+				lastProducedGene = gene
+				chromosome.genesByPeriod[period] = gene
 				cost += gene.cost
 
 		# print("after flash : ", chromosome.dnaArray)
-		return cost
+		chromosome.cost = cost
 
 	
 	@classmethod
@@ -191,6 +198,7 @@ class Chromosome(object):
 
 				cost += gene.cost
 				chromosome.dnaArray[item][position] = gene
+				chromosome.genesByPeriod[period] = gene
 				prevGene = item, position
 				producedItemsCount[item] += 1
 
