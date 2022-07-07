@@ -40,7 +40,7 @@ class TestMainFeatures:
         self.setUpInput()
 
         # cA, cB = Chromosome.createFromIdentifier(stringIdentifier=(2, 1, 1, 2, 0)), Chromosome.createFromIdentifier(stringIdentifier=(2, 1, 0, 1, 2))
-        cA, cB = Chromosome.createFromIdentifier(stringIdentifier=(1, 0, 2, 2, 0, 2, 3, 1)), Chromosome.createFromIdentifier(stringIdentifier=(3, 2, 2, 2, 1, 0, 0, 1))
+        cA, cB = Chromosome.createFromIdentifier(stringIdentifier=(2, 2, 2, 3, 1, 0, 0, 1)), Chromosome.createFromIdentifier(stringIdentifier=(2, 2, 3, 1, 1, 0, 2, 0))
         # cA, cB = Chromosome.createFromIdentifier(stringIdentifier=(0, 0, 0, 6, 1, 8, 7, 10, 5, 4, 4, 2, 9, 3, 1)), Chromosome.createFromIdentifier(stringIdentifier=(0, 4, 0, 5, 10, 0, 8, 2, 6, 4, 3, 1, 1, 7, 9))
         # [(5, 6, 10, 8, 0, 0, 9, 7, 0, 4, 4, 2, 1, 1, 3) : 1811, (7, 2, 8, 5, 10, 9, 0, 0, 0, 4, 4, 6, 1, 1, 3) : 1857]
 
@@ -102,10 +102,11 @@ class TestMainFeatures:
 
         self.setUpInput()
 
-        c = Chromosome.createFromIdentifier(stringIdentifier=(0, 0, 0, 2, 4, 4, 8, 7, 5, 3, 1, 1, 6, 10, 9))
+        # c = Chromosome.createFromIdentifier(stringIdentifier=(0, 0, 0, 2, 4, 4, 8, 7, 5, 3, 1, 1, 6, 10, 9))
+        c = Chromosome.createFromIdentifier(stringIdentifier=(3, 2, 2, 2, 0, 1, 1, 0))
         # (0, 0, 0, 9, 10, 8, 7, 5, 6, 4, 4, 2, 1, 1, 3)
         print("Input : ", c)
-        print("Output : ", (LocalSearchEngine()).process(c, "absolute_mutation"))
+        print("Output : ", (LocalSearchEngine()).process(c, "random_mutation"))
 
         assert 0
 

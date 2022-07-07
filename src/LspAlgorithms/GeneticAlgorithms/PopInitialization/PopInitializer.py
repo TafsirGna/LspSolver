@@ -14,25 +14,31 @@ import numpy as np
 import concurrent.futures
 import uuid
 from collections import defaultdict
+from LspAlgorithms.GeneticAlgorithms.GAOperators.LocalSearchEngine import LocalSearchEngine
 
 class PopInitializer:
     """
     """
 
-    def __init__(self) -> None:
+    SMALL_INSTANCE_CATEGORY = "small"
+    BIG_INSTANCE_CATEGORY = "big"
+    initPoolExpectedSize = None
+
+    def __init__(self, instance_category = BIG_INSTANCE_CATEGORY) -> None:
         """
         """
 
         self.populations = [Population() for _ in range(ParameterData.instance.nPrimaryThreads)]
-        
-        # NodeGeneratorManager
-        # self.nodeGeneratorManager = self.createNodeGeneratorManager()
+
+        if PopInitializer.initPoolExpectedSize is None:
+            PopInitializer.initPoolExpectedSize = initPoolExpectedSize = ParameterData.instance.popSize * ParameterData.instance.nPrimaryThreads
 
         self.initPool = set()
-        self.initPoolExpectedSize = ParameterData.instance.popSize * ParameterData.instance.nPrimaryThreads
-        self.initPoolSizeData = {"lock": threading.Lock(), "sizes": defaultdict(lambda: 0)}
-
-        self.searchInitPop()
+        
+        if instance_category == PopInitializer.SMALL_INSTANCE_CATEGORY:
+            PopInitializerSmallInstanceApproach(self.initPool)   
+        elif instance_category == PopInitializer.BIG_INSTANCE_CATEGORY:
+            PopInitializerBigInstanceApproach(self.initPool)     
 
 
     def process(self):
@@ -59,7 +65,22 @@ class PopInitializer:
         Population.popSizes[self.populations[popIndex].lineageIdentifier] = self.populations[popIndex].popLength
 
 
-    def searchInitPop(self):
+
+
+class PopInitializerSmallInstanceApproach:
+    """
+    """
+
+    def __init__(self, initPool) -> None:
+        """
+        """
+
+        self.initPool = initPool
+        self.initPoolSizeData = {"lock": threading.Lock(), "sizes": defaultdict(lambda: 0)}
+        self.process()
+
+
+    def process(self):
         """
         """
 
@@ -69,8 +90,6 @@ class PopInitializer:
         with concurrent.futures.ThreadPoolExecutor() as executor:
             # executor.map(self.searchPopThreadTask, [queue])
             print(list(executor.map(self.searchPopThreadTask, queues)))
-
-        # print("self.initPool", len(self.initPool))
 
 
     def searchPopThreadTask(self, queue):
@@ -107,13 +126,116 @@ class PopInitializer:
                         self.initPoolSizeData["sizes"][threadID] += 1
                         size += 1
 
-                        if size  >= self.initPoolExpectedSize:
+                        if size  >= PopInitializer.initPoolExpectedSize:
                             break
 
 
 
+class PopInitializerBigInstanceApproach:
+    """
+    """
 
-    
+    def __init__(self, initPool) -> None:
+        """
+        """
+
+        self.initPool = initPool
+        self.initPoolLock = threading.Lock()
+        self.initPoolStopEvent = threading.Event()
+        self.process()
 
 
+    def process(self):
+        """
+        """
+
+        queue = SearchNode.root().children()
+        queues = np.array_split(queue, ParameterData.instance.nReplicaThreads)
+
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            # executor.map(self.searchPopThreadTask, [queue])
+            print(list(executor.map(self.searchPopThreadTask, queues)))
+
+
+    def searchInitPopInstance(self, node):
+        """
+        """
+
+        if node.period == -1:
+            print("Hello : ", node.chromosome)
+            node.chromosome.stringIdentifier = tuple(node.chromosome.stringIdentifier)
+            with self.initPoolLock:
+                self.initPool.add(node.chromosome)
+                if len(self.initPool) >= PopInitializer.initPoolExpectedSize:
+                    self.initPoolStopEvent.set()
+            self.expandInitPopInstance([node.chromosome])
+            return None
+
+        for child in node.generateChild():
+            self.searchInitPopInstance(child)
+            if self.initPoolStopEvent.is_set():
+                return None
+
+
+
+    def searchPopThreadTask(self, queue):
+        """ Uniform cost search
+        """
+
+        threadID = uuid.uuid4()
+        queue = list(queue)
+
+        for node in queue:
+            self.searchInitPopInstance(node)
+
+
+        
+    def expandInitPopInstance(self, queue):
+        """
+        """
+
+        queueSet = set(queue)
+
+        while len(queue) > 0:
+
+            queue.sort()
+
+            print("queue : ", len(queue), len(self.initPool))
+
+            chromosome = queue[0]
+            # print("nooode : ", node)
+            queue = queue[1:]
+
+            # print("coco : ", node)
+            print(chromosome)
+            mutations = (LocalSearchEngine()).process(chromosome, "population")
+            print("mutations : ", mutations)
+
+            with self.initPoolLock:
+
+                for mutation in mutations:
+                    if mutation not in queueSet:
+                        if len(self.initPool) >= PopInitializer.initPoolExpectedSize:
+                            self.initPoolStopEvent.set()
+                            return None
+                        queue.append(mutation)
+                        self.initPool.add(mutation)
+                        queueSet.add(mutation)
+                        # if len(self.initPool) >= PopInitializer.initPoolExpectedSize:
+                        #     self.initPoolStopEvent.set()
+                        #     return None
+
+                # self.initPoolSizeData["sizes"][threadID] = len(queue)
+                # size = 0
+                # for threadId in self.initPoolSizeData["sizes"]:
+                #     size += self.initPoolSizeData["sizes"][threadId]
+
+                # for child in children:
+                #     if child is not None:
+                #         queue.append(child)
+                #         self.initPoolSizeData["sizes"][threadID] += 1
+                #         size += 1
+
+                #         if size  >= PopInitializer.initPoolExpectedSize:
+                #             break
 

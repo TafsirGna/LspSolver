@@ -44,7 +44,7 @@ class CrossOverOperator:
             return self.parentChromosomes[0], self.parentChromosomes[1]
 
         # print("Crossover : ", self.parentChromosomes, self.parentChromosomes[0].dnaArray, self.parentChromosomes[1].dnaArray)
-        print("Crossover : ", self.parentChromosomes, self.parentChromosomes[0].genesByPeriod, self.parentChromosomes[1].genesByPeriod)
+        print("Crossover : ", self.parentChromosomes)
 
         # before launching the recursive search
         gapLength = int(InputDataInstance.instance.nPeriods / 3)
@@ -64,7 +64,7 @@ class CrossOverOperator:
 
         # looping
         print("crossOverPeriod : ", self.crossOverPeriod)
-        # self.crossOverPeriod = 4
+        self.crossOverPeriod = 4
         self.offspringLastPlacedGene = {0: None, 1: None}
 
         self.offsprings[0].stringIdentifier = ["*"] * InputDataInstance.instance.nPeriods
@@ -132,7 +132,6 @@ class CrossOverOperator:
             parent = self.parentChromosomes[(0 if offspringIndex == 0 else 1)]
             parentPeriodValue = parent.stringIdentifier[period]
             if parentPeriodValue > 0:
-                print("genesByPeriod : ", parent.genesByPeriod)
                 parentGene = parent.genesByPeriod[period]
                 self.offsprings[offspringIndex].stringIdentifier[period] = parentPeriodValue
                 self.offsprings[offspringIndex].dnaArray[parentGene.item][parentGene.position] = copy.deepcopy(parentGene)
@@ -152,16 +151,22 @@ class CrossOverOperator:
                         self.offspringsItemsToOrder[offspringIndex].remove((parentGene.item, parentGene.position))
                         itemsCounter[offspringIndex][parentGene.item] -= 1
                     elif parentGene.position < itemsCounter[offspringIndex][parentGene.item] - 1:
-                        if parent == self.primeParent:
+                        if itemsCounter[offspringIndex][parentGene.item] < len(InputDataInstance.instance.demandsArrayZipped[parentGene.item]) :
+                            if parent == self.primeParent:
+                                # cleansing previous productions
+                                for gene in self.offsprings[offspringIndex].dnaArray[parentGene.item]:
+                                    if gene is not None:
+                                        self.offsprings[offspringIndex].dnaArray[parentGene.item][gene.position] = None
+                                        self.offsprings[offspringIndex].stringIdentifier[gene.period] = 0
+                                        self.offspringsItemsToOrder[offspringIndex].add((gene.item, gene.position))
+                                        del self.offsprings[offspringIndex].genesByPeriod[gene.period]
 
-                            # cleansing previous productions
-                            for gene in self.offsprings[offspringIndex].dnaArray[parentGene.item]:
-                                if gene is not None:
-                                    self.offsprings[offspringIndex].dnaArray[parentGene.item][gene.position] = None
-                                    self.offsprings[offspringIndex].stringIdentifier[gene.period] = 0
-                                    self.offspringsItemsToOrder[offspringIndex].add((gene.item, gene.position))
-                                    del self.offsprings[offspringIndex].genesByPeriod[gene.period]
-
+                                self.offsprings[offspringIndex].stringIdentifier[period] = parentPeriodValue
+                                self.offsprings[offspringIndex].dnaArray[parentGene.item][parentGene.position] = copy.deepcopy(parentGene)
+                                self.offsprings[offspringIndex].genesByPeriod[period] = self.offsprings[offspringIndex].dnaArray[parentGene.item][parentGene.position]
+                                self.offspringsItemsToOrder[offspringIndex].remove((parentGene.item, parentGene.position))
+                                itemsCounter[offspringIndex][parentGene.item] = parentGene.position
+                        elif itemsCounter[offspringIndex][parentGene.item] == len(InputDataInstance.instance.demandsArrayZipped[parentGene.item]) :
                             self.offsprings[offspringIndex].stringIdentifier[period] = parentPeriodValue
                             self.offsprings[offspringIndex].dnaArray[parentGene.item][parentGene.position] = copy.deepcopy(parentGene)
                             self.offsprings[offspringIndex].genesByPeriod[period] = self.offsprings[offspringIndex].dnaArray[parentGene.item][parentGene.position]
@@ -228,7 +233,7 @@ class CrossOverOperator:
                         ( \
                             item, \
                             InputDataInstance.instance.stockingCostsArray[item] * (InputDataInstance.instance.demandsArrayZipped[item][itemsCounter[offspringIndex][item] - 1] - period) \
-                            + InputDataInstance.instance.changeOverCostsArray[item][offspringLastPlacedGene[offspringIndex].item] \
+                            + (InputDataInstance.instance.changeOverCostsArray[item][offspringLastPlacedGene[offspringIndex].item] if offspringLastPlacedGene[offspringIndex] is not None else 0) \
                             + (0 if offsprings[offspringIndex].stringIdentifier[period - 1] in ["*", 0] else InputDataInstance.instance.changeOverCostsArray[offsprings[offspringIndex].stringIdentifier[period - 1] - 1][item])
                         ) \
                         for item in items \

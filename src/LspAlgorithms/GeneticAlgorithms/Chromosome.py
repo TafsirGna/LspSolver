@@ -196,6 +196,9 @@ class Chromosome(object):
 				gene.calculateChangeOverCost()
 				gene.calculateCost()
 
+				if prevGene is not None:
+					(chromosome.dnaArray[prevGene[0]][prevGene[1]]).nextGene = (item, position)
+
 				cost += gene.cost
 				chromosome.dnaArray[item][position] = gene
 				chromosome.genesByPeriod[period] = gene

@@ -74,7 +74,7 @@ class GeneticAlgorithm:
 
 		populations = self.popInitializer.process()
 
-		with concurrent.futures.ThreadPoolExecutor() as executor:
-			print(list(executor.map(self.process, populations)))
+		# with concurrent.futures.ThreadPoolExecutor() as executor:
+		# 	print(list(executor.map(self.process, populations)))
 
 			
