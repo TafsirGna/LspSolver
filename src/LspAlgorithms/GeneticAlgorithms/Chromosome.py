@@ -67,7 +67,7 @@ class Chromosome(object):
 				itemPositionsTab[item] += 1
 
 				lastProducedGene = gene
-				chromosome.genesByPeriod[period] = gene
+				# chromosome.genesByPeriod[period] = gene
 				cost += gene.cost
 
 		# print("after flash : ", chromosome.dnaArray)
@@ -179,6 +179,8 @@ class Chromosome(object):
 	def createFromIdentifier(cls, stringIdentifier):
 		"""
 		"""
+
+		print("creating from stringIdentifier : ", stringIdentifier)
 
 		chromosome = Chromosome()
 		chromosome.stringIdentifier = stringIdentifier

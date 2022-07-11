@@ -221,21 +221,4 @@ class PopInitializerBigInstanceApproach:
                         queue.append(mutation)
                         self.initPool.add(mutation)
                         queueSet.add(mutation)
-                        # if len(self.initPool) >= PopInitializer.initPoolExpectedSize:
-                        #     self.initPoolStopEvent.set()
-                        #     return None
-
-                # self.initPoolSizeData["sizes"][threadID] = len(queue)
-                # size = 0
-                # for threadId in self.initPoolSizeData["sizes"]:
-                #     size += self.initPoolSizeData["sizes"][threadId]
-
-                # for child in children:
-                #     if child is not None:
-                #         queue.append(child)
-                #         self.initPoolSizeData["sizes"][threadID] += 1
-                #         size += 1
-
-                #         if size  >= PopInitializer.initPoolExpectedSize:
-                #             break
 
