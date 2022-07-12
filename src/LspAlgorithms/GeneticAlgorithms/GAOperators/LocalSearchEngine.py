@@ -33,7 +33,7 @@ class LocalSearchEngine:
         strategy: random_mutation|absolute_mutation|simple_mutation
         """
 
-        # print("mutatiooooooon", strategy, chromosome, chromosome.dnaArray)
+        print("mutatiooon", strategy, chromosome, chromosome.dnaArray)
 
         self._visitedNodes = defaultdict(lambda: None)
 
@@ -42,12 +42,12 @@ class LocalSearchEngine:
         # print("cro : ", chromosome.genesByPeriod)
         print("Mutation results : ", strategy, chromosome, self.result)
 
-        if strategy != "population":
-            if self.result.dnaArray != Chromosome.createFromIdentifier(self.result.stringIdentifier).dnaArray:
-                print("Oaaaaaaaaaaaaaaaaauuuuuuuuuuuuuuuuuuuuuuuuuhhhhhhhhhhhhhhh")
-                print(self.result.dnaArray, "\n", Chromosome.createFromIdentifier(self.result.stringIdentifier).dnaArray)
+        # if strategy != "population":
+        #     if self.result.dnaArray != Chromosome.createFromIdentifier(self.result.stringIdentifier).dnaArray:
+        #         print("Oaaaaaaaaaaaaaaaaauuuuuuuuuuuuuuuuuuuuuuuuuhhhhhhhhhhhhhhh")
+        #         print(self.result.dnaArray, "\n", Chromosome.createFromIdentifier(self.result.stringIdentifier).dnaArray)
 
-            print("cro ***** : ", self.result.genesByPeriod)
+        #     print("cro ***** : ", self.result.genesByPeriod)
         return (self.result if self.result is not None else chromosome)
 
 
@@ -171,6 +171,12 @@ class LocalSearchEngine:
                 shiftPeriodTab[-1] = True
 
         if mutation is not None:
+            createdMu = Chromosome.createFromIdentifier(mutation.stringIdentifier)
+            # print("mutation : ", createdMu, createdMu.dnaArray, " ------------ ", mutation.dnaArray)
+            if mutation.dnaArray != createdMu.dnaArray:
+                # print("Nooooooooooowwwwwwwwwwwwww", mutation, mutation.dnaArray)
+                print(chromosome, chromosome.dnaArray)
+
             if strategy == "random_mutation":
                 self.result = mutation
                 return "RETURN"
@@ -210,7 +216,7 @@ class LocalSearchEngine:
         dnaArray, genesByPeriod = None, None
 
         gene1Item, gene1Position = swap[0][0], swap[0][1]
-        # print("swap : ", swap, chromosome, chromosome.dnaArray, swap[1][0] == -1)
+        # print("swap : ", swap, chromosome, chromosome.dnaArray)
         if swap[1][0] == -1:
             newPeriod = swap[1][1]
             stringIdentifier[newPeriod] = gene1Item + 1
@@ -363,13 +369,16 @@ class LocalSearchEngine:
                     # print("after nextGene B: ", nextGene, nextGene.changeOverCost)
 
             else:
-                gene1.prevGene, gene2.prevGene = gene2.prevGene, gene1.prevGene
+                # print("gene1, gene2 : ", gene1, gene2)
 
                 if gene1.prevGene is not None:
                     (dnaArray[gene1.prevGene[0]][gene1.prevGene[1]]).nextGene = (gene2.item, gene2.position)
                 if gene2.prevGene is not None:
                     (dnaArray[gene2.prevGene[0]][gene2.prevGene[1]]).nextGene = (gene1.item, gene1.position)
+                    # print("llllllllllllllollllll : ", (dnaArray[gene1.prevGene[0]][gene1.prevGene[1]]))
 
+                gene1.prevGene, gene2.prevGene = gene2.prevGene, gene1.prevGene
+                
                 nextGene1, nextGene2 = None if gene1.nextGene is None else dnaArray[gene1.nextGene[0]][gene1.nextGene[1]], None if gene2.nextGene is None else dnaArray[gene2.nextGene[0]][gene2.nextGene[1]]
 
                 # print("before before nextGene1 nextGene2 : ", nextGene1, nextGene2)

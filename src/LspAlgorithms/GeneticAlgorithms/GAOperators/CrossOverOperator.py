@@ -113,7 +113,7 @@ class CrossOverOperator:
         itemsCounter[0][-1] = InputDataInstance.instance.nPeriods - InputDataInstance.instance.demandsArray.sum()
         itemsCounter[1] = copy.deepcopy(itemsCounter[0])
         
-        print(self.offsprings, self.offspringsItemsToOrder, itemsCounter)
+        # print(self.offsprings, self.offspringsItemsToOrder, itemsCounter)
 
         offspringLastPlacedGene = {0: None, 1: None}
         period = InputDataInstance.instance.nPeriods - 1
@@ -180,11 +180,11 @@ class CrossOverOperator:
         """
         """
 
-        print("Searching : ", period, offspring, offspringItemsToOrder)
+        # print("Searching : ", period, offspring, offspringItemsToOrder)
 
         if period == -1:
             if len(offspringItemsToOrder) == 0:
-                print("offspringIndex : ", offspringIndex, offspring)
+                # print("offspringIndex : ", offspringIndex, offspring)
                 Chromosome.evalAndFixDnaArray(offspring)
                 self.offsprings[offspringIndex] = offspring
                 self._stopSearchEvents[offspringIndex].set()
@@ -193,7 +193,7 @@ class CrossOverOperator:
         # items = self.provideSearchNextMoves(offspringIndex, offspring, offspringItemsToOrder)
         if offspring.stringIdentifier[period] == "*":
             items = self.provideSearchNextMoves(offspringIndex, offspring, period, offspringItemsToOrder, itemsCounter, offspringLastPlacedGene)
-            print('next moves : ', items)
+            # print('next moves : ', items)
             for item in items:
                 offspringCopy = copy.deepcopy(offspring)
                 offspringItemsToOrderCopy = copy.deepcopy(offspringItemsToOrder)
@@ -240,7 +240,7 @@ class CrossOverOperator:
         #             yield pair
 
 
-        print("itemsCounter : ", itemsCounter)
+        # print("itemsCounter : ", itemsCounter)
         items = [item for item in itemsCounter if item >= 0 and itemsCounter[item] > 0 and InputDataInstance.instance.demandsArrayZipped[item][itemsCounter[item] - 1] >= period and (item, itemsCounter[item] - 1) in offspringItemsToOrder]
             
         itemsCost = sorted([ \
@@ -271,7 +271,7 @@ class CrossOverOperator:
         """
         """
 
-        print("producing : ", period, offspring, offspringItemsToOrder)
+        # print("producing : ", period, offspring, offspringItemsToOrder)
 
         # stringIdentifier
         offspring.stringIdentifier[period] = item + 1

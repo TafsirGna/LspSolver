@@ -24,7 +24,7 @@ class PopInitializer:
     BIG_INSTANCE_CATEGORY = "big"
     initPoolExpectedSize = None
 
-    def __init__(self, instance_category = BIG_INSTANCE_CATEGORY) -> None:
+    def __init__(self, instance_category = SMALL_INSTANCE_CATEGORY) -> None:
         """
         """
 
@@ -207,7 +207,6 @@ class PopInitializerBigInstanceApproach:
             queue = queue[1:]
 
             # print("coco : ", node)
-            print(chromosome)
             mutations = (LocalSearchEngine()).process(chromosome, "population")
             print("mutations : ", mutations)
 
