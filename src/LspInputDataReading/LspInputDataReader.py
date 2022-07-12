@@ -12,13 +12,15 @@ class InputDataReader:
     format0KeyValueSeparator = " = "
     format0EndOfLineChar = ";"
 
-    def __init__(self):
+    def __init__(self, format = None):
+        """
+        """
 
         self.fileFormatReadingFunctions = [self.useFormat0, self.useFormat1]
 
-        pass
-
     def getInputFileFormat(self, file):
+        """
+        """
 
         f = open(file, "r")
         firstLine = f.readline()
@@ -92,23 +94,33 @@ class InputDataReader:
                     nItems = int(line)
 
                 if i >= 5 and i < (5 + nItems):
+                    line = line.replace('\n', '')
+                    lineSplit = line.split(" ")
                     data = []
-                    data = line.split(" ")
+                    for nb in lineSplit:
+                        data.append(int(nb)) 
                     chanOverGrid.append(data)
 
                 if i == (5 + nItems + 1):
-                    holdingGrid = line.split(" ")
+                    line = line.replace('\n', '')
+                    lineSplit = line.split(" ")
+                    for nb in lineSplit:
+                        holdingGrid.append(int(nb)) 
 
                 if i >= (5 + nItems + 3) and i < (5 + nItems*2 + 3):
+                    line = line.replace('\n', '')
+                    lineSplit = line.split(" ")
                     data = []
-                    data = line.split(" ")
+                    for nb in lineSplit:
+                        data.append(int(nb))
                     demandsGrid.append(data)
 
                 i += 1
 
-            if nItems != 0 and nPeriods != 0 and demandsGrid != [] and holdingGrid != [] and chanOverGrid != []:
-                return InputDataInstance(nItems,nPeriods,demandsGrid,holdingGrid,chanOverGrid)
-            return 0
+            # if nItems != 0 and nPeriods != 0 and demandsGrid != [] and holdingGrid != [] and chanOverGrid != []:
+            return InputDataInstance(nItems, nPeriods, demandsGrid, holdingGrid, chanOverGrid)
+
+            # return 0
 
     def getReadingFunction(self, file):
         """

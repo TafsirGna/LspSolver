@@ -71,7 +71,7 @@ class GeneticAlgorithm:
 	def solve(self):
 		"""
 		"""
-
+		
 		populations = self.popInitializer.process()
 
 		with concurrent.futures.ThreadPoolExecutor() as executor:

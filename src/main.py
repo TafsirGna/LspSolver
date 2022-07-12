@@ -16,6 +16,7 @@ parser.add_argument("-v", "--verbose", help = "Display on the screen the details
 parser.add_argument("-o", "--output", help = "Redirect the output of the program to a given file")
 parser.add_argument("-n", "--nbThreads", help = "Number of the threads involved in the search", type = int)
 parser.add_argument("-s", "--stats", help = "Display on the screen the stats gathered when applying the algo")
+parser.add_argument("-f", "--format", help = "Set the format that should be used for reading the input")
 
 args = parser.parse_args()
 
@@ -24,6 +25,7 @@ inputFile = args.file  #sys.argv[1]
 LspRuntimeMonitor.verbose = args.verbose
 inputDataReader = InputDataReader()
 inputDataInstance = inputDataReader.readInput(inputFile)
+# print(inputDataInstance)
 
 ###
 ParameterData.instance = ParameterData()
