@@ -82,7 +82,7 @@ class Population:
             #     executor.submit(self.threadTask)
 
         # Applying mutation
-        (MutationOperator()).processPop(self.newPop)
+        # (MutationOperator()).processPop(self.newPop)
 
         self.newPop.dThreadOutputPipeline =  self.dThreadOutputPipeline
         return self.newPop
@@ -167,7 +167,7 @@ class Population:
             while not queue.full():
 
                 chromosomeA, chromosomeB = self.selectionOperator.select()
-                chromosomeC, chromosomeD = chromosomeA, chromosomeB
+                chromosomeC, chromosomeD = None , None
 
                 # print("After selecting")
                 random.seed()
@@ -181,11 +181,15 @@ class Population:
                     except Exception as e:
                         print("Exception")
                         raise e
+                else:
+                    chromosomeC, chromosomeD = chromosomeA, chromosomeB
 
                 # print("Queueing C")
-                queue.put(chromosomeC)
+                if chromosomeC is not None:
+                    queue.put(chromosomeC)
                 # print("Queueing D")
-                queue.put(chromosomeD)
+                if chromosomeD is not None:
+                    queue.put(chromosomeD)
 
             with self.newPopLock:
                 while not queue.empty() and self.newPop.popLength < Population.popSizes[self.lineageIdentifier]:
