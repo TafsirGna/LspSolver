@@ -62,7 +62,7 @@ class CrossOverOperator:
         # Initializing offsprings' stringIdentifier property
 
         # looping
-        self.crossOverPeriod =  4
+        self.crossOverPeriod =  3
         print("crossOverPeriod : ", self.crossOverPeriod)
         self.offspringLastPlacedGene = {0: None, 1: None}
 
@@ -73,21 +73,23 @@ class CrossOverOperator:
 
         if self.offsprings[0] is not None:
             self.offsprings[0].stringIdentifier = tuple(self.offsprings[0].stringIdentifier)
-            if self.offsprings[0].dnaArray != Chromosome.createFromIdentifier(self.offsprings[0].stringIdentifier).dnaArray:
-                print(" Watch out 0", self.offsprings[0].dnaArray, self.offsprings[0].cost)
+            c = Chromosome.createFromIdentifier(self.offsprings[0].stringIdentifier)
+            if self.offsprings[0].dnaArray != c.dnaArray:
+                print(" Watch out 0", self.offsprings[0].dnaArray, " --- ", c.dnaArray)
         else:
             print("Crossover offspring 0 None")
             # del self.offsprings[0]
 
         if self.offsprings[1] is not None:
             self.offsprings[1].stringIdentifier = tuple(self.offsprings[1].stringIdentifier)
-            if self.offsprings[1].dnaArray != Chromosome.createFromIdentifier(self.offsprings[1].stringIdentifier).dnaArray:
+            c = Chromosome.createFromIdentifier(self.offsprings[1].stringIdentifier)
+            if self.offsprings[1].dnaArray != c.dnaArray:
                 print(" Watch out 1", self.offsprings[1].dnaArray)
         else:
             print("Crossover offspring 1 None")
             # del self.offsprings[1]
 
-        # print("Cross Over result : ", [self.parentChromosomes, self.offsprings])
+        print("Cross Over result : ", [self.parentChromosomes, self.offsprings])
 
         # storing this result in the crossover memory before returning 
         # with CrossOverNode.crossOverMemory["lock"]:
@@ -126,7 +128,7 @@ class CrossOverOperator:
         self.offsprings = {0: None, 1: None}
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            for i in [1]:
+            for i in [0, 1]:
                 executor.submit(self.searchFixedOffspring, i, offsprings[i], period, self.offspringsItemsToOrder[i], itemsCounter[i], offspringLastPlacedGene[i], subPrimeParent)
         
         # print(self.offsprings)
@@ -186,16 +188,19 @@ class CrossOverOperator:
         """
         """
 
-        print("Searching : ", period, offspring, offspringLastPlacedGene["value"])
+        # print("Searching : ", period, offspring, offspringLastPlacedGene["value"], "\n", offspring.dnaArray)
 
         if period == -1:
             if len(offspringItemsToOrder) == 0:
-                print("before offspringIndex : ", offspringIndex, offspring)
-                Chromosome.evalAndFixDnaArray(offspring)
-                print("after offspringIndex : ", offspringIndex, offspring)
+                # print("offspringIndex : ", offspringIndex, offspring)
+                # Chromosome.evalAndFixDnaArray(offspring)
+                # print("after offspringIndex : ", offspringIndex, offspring)
                 if self.offsprings[offspringIndex] is None or (self.offsprings[offspringIndex] is not None and offspring < self.offsprings[offspringIndex]):
                     self.offsprings[offspringIndex] = offspring
                 # self._stopSearchEvents[offspringIndex].set()
+            return None
+
+        if self.offsprings[offspringIndex] is not None and offspring >= self.offsprings[offspringIndex]:
             return None
 
         if offspring.stringIdentifier[period] == "*":
@@ -212,12 +217,22 @@ class CrossOverOperator:
                 #     return None
         else:
             itemsCounter[offspring.stringIdentifier[period] - 1] -= 1
-            offspringCopy = copy.deepcopy(offspring)
-            offspringItemsToOrderCopy = copy.deepcopy(offspringItemsToOrder)
-            itemsCounterCopy = copy.deepcopy(itemsCounter)
-            offspringLastPlacedGene["value"] = offspring.genesByPeriod[period]
-            offspringLastPlacedGeneCopy = copy.deepcopy(offspringLastPlacedGene)
-            self.searchFixedOffspring(offspringIndex, offspringCopy, period - 1, offspringItemsToOrderCopy, itemsCounterCopy, offspringLastPlacedGeneCopy, subPrimeParent)
+            gene = offspring.genesByPeriod[period]
+            gene.prevGene = None
+            
+            offspring.cost += gene.stockingCost
+            if offspringLastPlacedGene["value"] is None:
+                gene.nextGene = None
+            else:
+                offspringLastPlacedGene["value"] = offspring.dnaArray[offspringLastPlacedGene["value"].item][offspringLastPlacedGene["value"].position]
+                gene.nextGene = (offspringLastPlacedGene["value"].item, offspringLastPlacedGene["value"].position)
+                offspringLastPlacedGene["value"].prevGene = (gene.item, gene.position)
+                offspringLastPlacedGene["value"].calculateChangeOverCost()
+                offspringLastPlacedGene["value"].calculateCost()
+                offspring.cost += offspringLastPlacedGene["value"].changeOverCost
+
+            offspringLastPlacedGene["value"] = offspring.dnaArray[gene.item][gene.position]
+            self.searchFixedOffspring(offspringIndex, offspring, period - 1, offspringItemsToOrder, itemsCounter, offspringLastPlacedGene, subPrimeParent)
             # if self._stopSearchEvents[offspringIndex].is_set():
             #     return None
 
@@ -287,6 +302,7 @@ class CrossOverOperator:
             if offspringLastPlacedGene["value"] is None:
                 gene.nextGene = None 
             else:
+                offspringLastPlacedGene["value"] = offspring.dnaArray[offspringLastPlacedGene["value"].item][offspringLastPlacedGene["value"].position]
                 gene.nextGene = (offspringLastPlacedGene["value"].item, offspringLastPlacedGene["value"].position) 
                 offspringLastPlacedGene["value"].prevGene = (gene.item, gene.position)
                 offspringLastPlacedGene["value"].calculateChangeOverCost()
@@ -295,7 +311,8 @@ class CrossOverOperator:
 
             offspring.dnaArray[gene.item][gene.position] = gene
             offspring.genesByPeriod[period] = gene
-            offspringLastPlacedGene["value"] = gene
+            offspringLastPlacedGene["value"] = offspring.dnaArray[gene.item][gene.position]
+
             return gene
 
         return None

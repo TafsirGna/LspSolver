@@ -19,7 +19,7 @@ class MutationOperator:
         """
         """
 
-        strategy = "random_mutation"
+        strategy = "simple_mutation"
         result = (LocalSearchEngine()).process(chromosome, strategy)
         
         # # print("Mutation result : ", chromosome, result[0])
