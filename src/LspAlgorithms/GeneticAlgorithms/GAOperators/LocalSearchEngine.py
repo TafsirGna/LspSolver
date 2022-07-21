@@ -40,7 +40,11 @@ class LocalSearchEngine:
         self.searchIndividu(chromosome, strategy)
 
         # print("cro : ", chromosome.genesByPeriod)
-        print("Mutation results : ", strategy, chromosome, self.result, "\n", self.result.dnaArray, Chromosome.createFromIdentifier(self.result.stringIdentifier).cost)
+        print("Mutation results : ", strategy, chromosome, self.result)
+
+        c = Chromosome.createFromIdentifier(self.result.stringIdentifier)
+        if c.dnaArray != self.result.dnaArray or c.cost != self.result.cost or c.genesByPeriod != self.result.genesByPeriod:
+            print("Mutation error : ", self.result, self.result.dnaArray)
 
         # if strategy != "population":
         #     if self.result.dnaArray != Chromosome.createFromIdentifier(self.result.stringIdentifier).dnaArray:
@@ -60,7 +64,6 @@ class LocalSearchEngine:
         if strategy == "absolute_mutation":
             if self._visitedNodes[chromosome.stringIdentifier] is not None:
                 return None
-
             print("chrom : ", chromosome, self.searchDepth) 
 
         # shuffledPeriods = [(period, item) for period, item in enumerate(chromosome.stringIdentifier)]
@@ -71,7 +74,7 @@ class LocalSearchEngine:
         orderedGenes = [gene for itemGenes in chromosome.dnaArray for gene in itemGenes if gene.cost > 0]
         # orderedGenes.sort(key=lambda gene: gene.cost, reverse= True)
 
-        # random.shuffle(orderedGenes)
+        random.shuffle(orderedGenes)
 
         # print("ordered : ", orderedGenes)
         for periodGene in orderedGenes:
@@ -122,7 +125,31 @@ class LocalSearchEngine:
                         backwardPeriod = None
 
                 if forwardPeriod is not None :
-                    pass
+                    if self.areItemsSwitchable(chromosome, periodGene, forwardPeriod, periodGeneLowerLimit, periodGeneUpperLimit):
+                        evaluationData = self.evaluateItemsSwitch(chromosome, periodGene, forwardPeriod)
+                        if strategy == "random_mutation":
+                            self.result = self.switchItems(chromosome, periodGene, forwardPeriod, evaluationData)
+                            return None 
+
+                        if strategy == "population":
+                            results.append(self.switchItems(chromosome, periodGene, forwardPeriod, evaluationData))
+
+                        if strategy == "positive_mutation":
+                            if evaluationData["variance"] > 0:
+                                self.result = self.switchItems(chromosome, periodGene, forwardPeriod, evaluationData)
+                                return None 
+
+                        if strategy == "simple_mutation":
+                            if evaluationData["variance"] > 0:
+                                self.result = self.switchItems(chromosome, periodGene, forwardPeriod, evaluationData)
+                                return None 
+                            results.append(evaluationData)
+
+                        if strategy == "absolute_mutation":
+                            if evaluationData["variance"] > 0:
+                                results.append(evaluationData)
+                    else:
+                        forwardPeriod = None
 
                 if backwardPeriod is None and forwardPeriod is None:
                     break

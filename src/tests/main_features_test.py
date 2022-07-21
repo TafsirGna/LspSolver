@@ -106,7 +106,7 @@ class TestMainFeatures:
         c = Chromosome.createFromIdentifier(stringIdentifier=(0, 0, 2, 2, 2, 1, 3, 1))
         # (0, 0, 0, 9, 10, 8, 7, 5, 6, 4, 4, 2, 1, 1, 3)
         print("Input : ", c)
-        print("Output : ", (LocalSearchEngine()).process(c, "random_mutation"))
+        print("Output : ", (LocalSearchEngine()).process(c, "simple_mutation"))
 
         assert 0
 

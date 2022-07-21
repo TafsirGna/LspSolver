@@ -82,7 +82,7 @@ class Population:
             #     executor.submit(self.threadTask)
 
         # Applying mutation
-        # (MutationOperator()).processPop(self.newPop)
+        (MutationOperator()).processPop(self.newPop)
 
         self.newPop.dThreadOutputPipeline =  self.dThreadOutputPipeline
         return self.newPop
