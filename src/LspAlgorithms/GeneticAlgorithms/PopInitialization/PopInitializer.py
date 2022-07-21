@@ -110,8 +110,10 @@ class PopInitializerSmallInstanceApproach:
                 node.chromosome.stringIdentifier = tuple(node.chromosome.stringIdentifier)
                 self.initPool.add(node.chromosome)
 
-            # print("coco : ", node)
+            # print("coco 1 : ", node)
             children = node.children()
+            # children = node.advancedChildren()
+            # print("coco 2 : ", children)
 
             with self.initPoolSizeData["lock"]:
 
@@ -171,7 +173,10 @@ class PopInitializerBigInstanceApproach:
             self.expandInitPopInstance([node.chromosome])
             return None
 
-        for child in node.generateChild():
+        for child in node.advancedChild():
+        # for child in node.generateChild():
+            # print("prou")
+            # print("chop : ", child)
             self.searchInitPopInstance(child)
             if self.initPoolStopEvent.is_set():
                 return None

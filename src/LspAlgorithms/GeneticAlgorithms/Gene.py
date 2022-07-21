@@ -27,8 +27,8 @@ class Gene:
     def calculateStockingCost(self):
         """
         """
-        self.stockingCost = (InputDataInstance.instance.demandsArrayZipped[self.item][self.position] - self.period) * InputDataInstance.instance.stockingCostsArray[self.item]
 
+        self.stockingCost = (InputDataInstance.instance.demandsArrayZipped[self.item][self.position] - self.period) * InputDataInstance.instance.stockingCostsArray[self.item]
 
     def calculateChangeOverCost(self):
         """

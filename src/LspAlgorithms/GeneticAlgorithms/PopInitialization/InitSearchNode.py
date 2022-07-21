@@ -137,6 +137,37 @@ class SearchNode(object):
 			yield node
 
 
+	def advancedChild(self):
+		"""
+		"""
+
+		children = self.advancedChild()
+		for child in children:
+			yield child
+
+
+
+	def advancedChildren(self, horizon = 2):
+		"""
+		"""
+
+		if self.period <= 0:
+			return self.children()
+
+		queue = [self]
+		startingPeriod = self.period
+
+		while len(queue) > 0 and (queue[0]).period > (startingPeriod - horizon):
+			node = queue[0]
+			queue = queue[1:]
+
+			children = node.children()
+			queue += children
+
+		return queue # sorted(queue)
+
+
+
 	def rateItemsToOrder(self):
 		"""
 		"""

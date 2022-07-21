@@ -22,11 +22,11 @@ class TestMainFeatures:
 
         # c = Chromosome.createFromIdentifier(stringIdentifier=(2, 1, 0, 1, 2))
         # c = Chromosome.createFromIdentifier(stringIdentifier=(0, 2, 2, 2, 3, 1, 0, 1))
-        # c = Chromosome.createFromIdentifier(stringIdentifier=(3, 2, 2, 2, 0, 1, 1, 0))
-        c = Chromosome.createFromIdentifier(stringIdentifier=(0, 0, 0, 2, 4, 4, 8, 7, 5, 3, 1, 1, 6, 10, 9))
+        c = Chromosome.createFromIdentifier(stringIdentifier=(3, 2, 2, 2, 0, 1, 1, 0))
+        # c = Chromosome.createFromIdentifier(stringIdentifier=(0, 0, 0, 2, 4, 4, 8, 7, 5, 3, 1, 1, 6, 10, 9))
         print("Chromosome ", c)
         # # [2, 1, 2, 0, 1]
-        LspRuntimeMonitor.mutation_strategy = "absolute_mutation"
+        LspRuntimeMonitor.mutation_strategy = "random_mutation"
         result = (MutationOperator()).processInstance(c)
         print("1 -- ", result, (Chromosome.createFromIdentifier(result.stringIdentifier)))
 
@@ -106,7 +106,7 @@ class TestMainFeatures:
         c = Chromosome.createFromIdentifier(stringIdentifier=(0, 0, 2, 2, 2, 1, 3, 1))
         # (0, 0, 0, 9, 10, 8, 7, 5, 6, 4, 4, 2, 1, 1, 3)
         print("Input : ", c)
-        print("Output : ", (LocalSearchEngine()).process(c, "population"))
+        print("Output : ", (LocalSearchEngine()).process(c, "random_mutation"))
 
         assert 0
 
