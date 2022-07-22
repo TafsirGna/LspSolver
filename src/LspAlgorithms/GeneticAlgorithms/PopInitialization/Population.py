@@ -176,7 +176,7 @@ class Population:
                         # pass
                         # print("mating")
                         offsprings = (CrossOverOperator([chromosomeA, chromosomeB])).process()
-                        # print("offsprings : ", offsprings)
+                        print("offsprings : ", offsprings)
                         chromosomeC, chromosomeD = offsprings
                     except Exception as e:
                         print("Exception")

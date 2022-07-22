@@ -103,7 +103,7 @@ class SearchNode(object):
 				# print("test 2 : ", lastPlacedGene)
 
 			dnaArray[item].insert(0, gene)
-			node.chromosome.genesByPeriod[self.period] = gene
+			node.chromosome.genesByPeriod[self.period] = (gene.item, gene.position)
 
 		# setting node's chomosome period
 		itemsToOrder = copy.deepcopy(self.itemsToOrder)
