@@ -24,7 +24,7 @@ class PopInitializer:
     BIG_INSTANCE_CATEGORY = "big"
     initPoolExpectedSize = None
 
-    def __init__(self, instance_category = SMALL_INSTANCE_CATEGORY) -> None:
+    def __init__(self, instance_category = BIG_INSTANCE_CATEGORY) -> None:
         """
         """
 
@@ -173,8 +173,8 @@ class PopInitializerBigInstanceApproach:
             self.expandInitPopInstance([node.chromosome])
             return None
 
-        for child in node.advancedChild():
-        # for child in node.generateChild():
+        # for child in node.advancedChild():
+        for child in node.generateChild():
             # print("prou")
             # print("chop : ", child)
             self.searchInitPopInstance(child)

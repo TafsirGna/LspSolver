@@ -82,6 +82,7 @@ class Population:
             #     executor.submit(self.threadTask)
 
         # Applying mutation
+        print("roro : ")
         (MutationOperator()).processPop(self.newPop)
 
         self.newPop.dThreadOutputPipeline =  self.dThreadOutputPipeline

@@ -62,7 +62,7 @@ class CrossOverOperator:
         # Initializing offsprings' stringIdentifier property
 
         # looping
-        self.crossOverPeriod =  3
+        # self.crossOverPeriod =  3
         print("crossOverPeriod : ", self.crossOverPeriod)
         self.offspringLastPlacedGene = {0: None, 1: None}
 
