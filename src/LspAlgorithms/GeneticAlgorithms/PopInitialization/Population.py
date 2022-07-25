@@ -33,36 +33,9 @@ class Population:
         self.newPopLock = threading.Lock()
 
 
-    def fill(self, nodeGeneratorManager):
-        """
-        """
-
-        for instance in nodeGeneratorManager.getInstance():
-            if instance is None:
-                break
-            # if Population.initPopLocalOptimaCount[self.lineageIdentifier] < ParameterData.instance.nInitPopLocalOptima:
-            #     result = (LocalSearchEngine().process(instance, "absolute_mutation"))
-            #     if result is not None:
-            #         instance = result
-            #         print("oooooooooooooooooooooooooooooooooooo", instance)
-            #         Population.initPopLocalOptimaCount[self.lineageIdentifier] += 1
-            result = self.add(instance)
-            if result is None:
-                break
-
-        Population.popSizes[self.lineageIdentifier] = self.popLength
-        # print(self.popLength)
-
-
     def evolve(self):
         """
         """
-
-        #
-        # checking pipeline status
-        # if not self.dThreadOutputPipeline.empty():
-        #     chromosome = self.dThreadOutputPipeline.get()
-        #     elites.append(chromosome)
 
         self.selectionOperator = SelectionOperator(self)
 
@@ -82,7 +55,6 @@ class Population:
             #     executor.submit(self.threadTask)
 
         # Applying mutation
-        print("roro : ")
         (MutationOperator()).processPop(self.newPop)
 
         self.newPop.dThreadOutputPipeline =  self.dThreadOutputPipeline
@@ -139,7 +111,7 @@ class Population:
 
 
     @classmethod
-    def tryMutation(cls, chromosome, result = []):
+    def mutateElement(cls, chromosome, result = []):
         """
         """
         
@@ -196,12 +168,10 @@ class Population:
                 while not queue.empty() and self.newPop.popLength < Population.popSizes[self.lineageIdentifier]:
                     self.newPop.add(queue.get())
 
-
-        # print(";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ", queue.qsize())
         return None
 
 
     def __repr__(self):
         """
         """
-        return "Population : {} : \nCost Total :{} ".format(self.chromosomes, 0)
+        return "Population : {} ".format(self.chromosomes)

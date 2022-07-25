@@ -14,30 +14,31 @@ class LocalSearchEngine:
     """
 
     genericGeneIndices = None
-    mutationsMemory = {"lock": threading.Lock(), "db":defaultdict(lambda: None)}
+    localSearchMemory = {"lock": threading.Lock(), "content":defaultdict(lambda: None)}
 
     def __init__(self) -> None:
         """
         """
 
-        self.searchDepth = 0
         self.result = None
-        self._stopSearchEvent = threading.Event()
 
         # if LocalSearchEngine.genericGeneIndices is None:
         #     LocalSearchEngine.genericGeneIndices = [(item, position) for item, itemGenes in enumerate(InputDataInstance.instance.demandsArrayZipped) for position, _ in enumerate(itemGenes)]
 
 
-    def process(self, chromosome, strategy = "simple_mutation"):
+    def process(self, chromosome, strategy = "simple_mutation", args = None):
         """Process the given chromosome in order to return a mutated version
         strategy: random_mutation|absolute_mutation|simple_mutation
         """
 
         print("mutatiooon", strategy, chromosome, chromosome.dnaArray)
 
-        self._visitedNodes = defaultdict(lambda: None)
+        if strategy == "fitter_than":
+            fitterResult = localSearchMemory["content"]["fitter_than"][(chromosome.stringIdentifier, args["fittest"].stringIdentifier)]
+            if fitterResult is not None:
+                return fitterResult
 
-        self.searchIndividu(chromosome, strategy)
+        self.searchIndividu(chromosome, strategy, args)
 
         # print("cro : ", chromosome.genesByPeriod)
         print("Mutation results : ", strategy, chromosome, self.result)
@@ -53,7 +54,7 @@ class LocalSearchEngine:
         return (self.result if self.result is not None else chromosome)
 
 
-    def searchIndividu(self, chromosome, strategy):
+    def searchIndividu(self, chromosome, strategy, args = None):
         """
         """
 
@@ -92,14 +93,14 @@ class LocalSearchEngine:
 
                 # print(backwardPeriod, forwardPeriod)
                 if backwardPeriod is not None :
-                    result = self.handleAltPeriod(chromosome, strategy, periodGene, backwardPeriod, periodGeneLowerLimit, periodGeneUpperLimit, results)
+                    result = self.handleAltPeriod(chromosome, strategy, periodGene, backwardPeriod, periodGeneLowerLimit, periodGeneUpperLimit, results, args)
                     if result == "RETURN":
                         return None
                     elif result == "SET_ALT_PERIOD_NONE":
                         backwardPeriod = None
 
                 if forwardPeriod is not None :
-                    result = self.handleAltPeriod(chromosome, strategy, periodGene, forwardPeriod, periodGeneLowerLimit, periodGeneUpperLimit, results)
+                    result = self.handleAltPeriod(chromosome, strategy, periodGene, forwardPeriod, periodGeneLowerLimit, periodGeneUpperLimit, results, args)
                     if result == "RETURN":
                         return None
                     elif result == "SET_ALT_PERIOD_NONE":
@@ -115,14 +116,20 @@ class LocalSearchEngine:
             return None
         elif strategy == "population":
             self.result = list(set(results))
-            print(" oooooooooooooooooooo : ", self.result)
             return self.result
         elif strategy == "all_evaluations":
             self.result = results
             return self.result
+        elif strategy == "fitter_than":
+            if self.result is None:
+                self.result = chromosome
+                localSearchMemory["content"]["fitter_than"][(chromosome.stringIdentifier, args["fittest"].stringIdentifier)] = self.result
+                return None
+
+        print("Search ended")
 
 
-    def handleAltPeriod(self, chromosome, strategy, periodGene, altPeriod, periodGeneLowerLimit, periodGeneUpperLimit, results):
+    def handleAltPeriod(self, chromosome, strategy, periodGene, altPeriod, periodGeneLowerLimit, periodGeneUpperLimit, results, args):
         """
         """
 
@@ -143,6 +150,13 @@ class LocalSearchEngine:
                 if self.isSwitchInteresting(chromosome, periodGene, altPeriod):
                     evaluationData = self.evaluateItemsSwitch(chromosome, periodGene, altPeriod)
                     if evaluationData["variance"] > 0:
+                        self.result = self.switchItems(evaluationData)
+                        return "RETURN"
+
+            if strategy == "fitter_than":
+                if self.isSwitchInteresting(chromosome, periodGene, altPeriod):
+                    evaluationData = self.evaluateItemsSwitch(chromosome, periodGene, altPeriod)
+                    if evaluationData["variance"] > 0 and evaluationData["chromosome"].cost - evaluationData["variance"] < args["fittest"].cost:
                         self.result = self.switchItems(evaluationData)
                         return "RETURN"
 
@@ -222,7 +236,7 @@ class LocalSearchEngine:
 
         if chromosome.stringIdentifier[altPeriod] == 0 and altPeriod < periodGene.period:
             nextGene0 = Chromosome.nextProdGene(altPeriod, chromosome.dnaArray, chromosome.stringIdentifier)
-            if nextPeriodGene is not None and nextGene0 == periodGene:
+            if nextGene0 is not None and nextGene0 == periodGene:
                 return False
 
         return True
@@ -367,7 +381,7 @@ class LocalSearchEngine:
                 evaluationData["altPeriodGene"]["prevGene"] = prevPeriodGene
                 evaluationData["altPeriodGene"]["nextGene"] = periodGene
 
-                print("vovo 1 : ", evaluationData)
+                # print("vovo 1 : ", evaluationData)
 
             elif nextAltPeriodGene is not None and nextAltPeriodGene == periodGene:
                 evaluationData["case"] = 2

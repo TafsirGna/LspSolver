@@ -24,29 +24,24 @@ class PopulationEvaluator:
         self.terminate = False
 
 
-    def localSearchArea(self, population, resultQueue):
+    def searchFitterElement(self, population, resultQueue):
         """
         """
-        # print("_______________________________", self.idleGenCounter[population.lineageIdentifier]["count"])
-        # print("local optima : ", Chromosome.localOptima)
 
-        # if self.idleGenCounter[population.lineageIdentifier]["count"] % ParameterData.instance.nIdleGenerations != 0 and self.idleGenCounter[population.lineageIdentifier]["count"] != 0:
-        #     return None
+        print("Searching fitter than : ", population.minElement())
 
-        # elements = sorted(population.chromosomes.values(), key=lambda element: element["size"])
+        for element in population.chromosomes.values():
+            chromosome = element["chromosome"]
+            if chromosome == population.minElement():
+                continue
 
-        # for element in reversed(elements):
-        #     if element["chromosome"] not in Chromosome.localOptima["values"]:
-        #         chromosome = element["chromosome"]
-        #         result = (LocalSearchEngine().process(chromosome, "positive_mutation"))
-        #         if result < chromosome and result.stringIdentifier not in population.chromosomes.keys():
-        #             print("local search piping : ", result)
-        #             resultQueue.put(result)
-        #             break
+            result = (LocalSearchEngine().process(chromosome, "fitter_than", {"fittest": population.minElement()}))
+            print("Tralala : ", chromosome, result, population.minElement())
+            if result != chromosome and result < population.minElement() and result.stringIdentifier not in population.chromosomes.keys():
+                print("Fitter found")
+                resultQueue.put(result)
+                break
 
-        # print(" last element size : ", elements[-1]["size"], resultQueue.qsize(), float(elements[-1]["size"] / population.popLength))
-        # if resultQueue.empty() and float(elements[-1]["size"] / population.popLength) >= 0.6:
-        #     self.terminate = True
 
 
     def definePopMetrics(self, population):
@@ -74,12 +69,12 @@ class PopulationEvaluator:
         if action == "definePopMetrics":
             self.definePopMetrics(population)
 
-        if action == "localSearchArea":
-            self.localSearchArea(population, resultQueues[action])
+        if action == "searchFitterElement":
+            self.searchFitterElement(population, resultQueues[action])
 
 
 
-    def evaluate(self, population, dThreadInputPipeline, generationIndex):
+    def evaluate(self, population, generationIndex):
         """
         """
 
@@ -100,21 +95,24 @@ class PopulationEvaluator:
 
         resultQueues = defaultdict(lambda: Queue())
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            executor.map(self.processPopulation, ["localSearchArea", "definePopMetrics"], [population] * 2, [resultQueues] * 2)
+            executor.map(self.processPopulation, ["searchFitterElement", "definePopMetrics"], [population] * 2, [resultQueues] * 2)
+
 
         #
-        if not (resultQueues["localSearchArea"]).empty():
-            localSearchAreaResult = (resultQueues["localSearchArea"]).get()
-            print("rude", localSearchAreaResult)
+        if not (resultQueues["searchFitterElement"]).empty():
+            print("Adding found fitter element")
+            fitterElement = (resultQueues["searchFitterElement"]).get()
+            print("fitter : ", fitterElement)
 
             elites = sorted(LspRuntimeMonitor.popsData[population.lineageIdentifier]["elites"])
-            if localSearchAreaResult < elites[-1]:
-                (LspRuntimeMonitor.popsData[population.lineageIdentifier]["elites"]).add(localSearchAreaResult)
+            if fitterElement < elites[-1]:
+                (LspRuntimeMonitor.popsData[population.lineageIdentifier]["elites"]).add(fitterElement)
 
             population.chromosomes[(self.idleGenCounter[population.lineageIdentifier]["fittest"]).stringIdentifier]["size"] -= 1
             population.popLength -= 1
-            population.add(localSearchAreaResult)
-            # print("poppp : ", population)
+            population.add(fitterElement)
+
+            print("fitter element added")
 
 
         # Termination

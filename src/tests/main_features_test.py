@@ -103,10 +103,10 @@ class TestMainFeatures:
         self.setUpInput()
 
         # c = Chromosome.createFromIdentifier(stringIdentifier=(0, 0, 0, 2, 4, 4, 8, 7, 5, 3, 1, 1, 6, 10, 9))
-        c = Chromosome.createFromIdentifier(stringIdentifier=(0, 2, 2, 2, 3, 1, 0, 1))
+        c = Chromosome.createFromIdentifier(stringIdentifier=(0, 2, 2, 3, 0, 1, 2, 1))
         # (0, 0, 0, 9, 10, 8, 7, 5, 6, 4, 4, 2, 1, 1, 3)
         print("Input : ", c)
-        print("Output : ", (LocalSearchEngine()).process(c, "absolute_mutation"))
+        print("Output : ", (LocalSearchEngine()).process(c, "fitter_than", {"fittest": Chromosome.createFromIdentifier((0, 2, 2, 2, 3, 1, 0, 1))}))
 
         assert 0
 

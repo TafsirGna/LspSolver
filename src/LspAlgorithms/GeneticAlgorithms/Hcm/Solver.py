@@ -24,22 +24,7 @@ class GeneticAlgorithm:
 
 		self.popInitializer = PopInitializer()
 		# Creating a deamon thread to perform local search
-		self.daemonThreads = defaultdict(lambda: None)
-		self.dThreadPipelines = defaultdict(lambda: {"input": Queue(), "output": Queue()})
 		self.popEvaluator = PopulationEvaluator()
-
-
-	def daemonTask(self, mainThreadUUID):
-		"""
-		"""
-
-		dThreadPipelines = self.dThreadPipelines[mainThreadUUID]
-
-		while True:
-			if not dThreadPipelines["input"].empty():
-				chromosome = dThreadPipelines["input"].get()
-				result = (LocalSearchEngine().process(chromosome, "positive_mutation"))
-				dThreadPipelines["output"].put(result)
 
 
 	def process(self, population):
@@ -48,15 +33,8 @@ class GeneticAlgorithm:
 
 		generationIndex = 0
 
-		#
-		dThreadPipelines = self.dThreadPipelines[population.lineageIdentifier]
-		self.daemonThreads[population.lineageIdentifier] = threading.Thread(target=self.daemonTask, args=(population.lineageIdentifier,), daemon=True)
-		# (self.daemonThreads[threadUUID]).start()
-
-		population.dThreadOutputPipeline = dThreadPipelines["output"]
-
-		while self.popEvaluator.evaluate(population, dThreadPipelines["input"], generationIndex) != "TERMINATE":
-			# if generationIndex == 17:
+		while self.popEvaluator.evaluate(population, generationIndex) != "TERMINATE":
+			# if generationIndex == 3:
 			# 	break
 
 			population = population.evolve()
@@ -64,8 +42,6 @@ class GeneticAlgorithm:
 			LspRuntimeMonitor.output("Population --> " + str(population))
 
 			generationIndex += 1
-
-	# (self.daemonThreads[threadUUID]).
 	
 
 	def solve(self):

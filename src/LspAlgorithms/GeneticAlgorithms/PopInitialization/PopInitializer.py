@@ -2,8 +2,6 @@
 # -*-coding: utf-8 -*
 
 import threading
-# from LspAlgorithms.GeneticAlgorithms.PopInitialization.InitNodeGenerator import InitNodeGenerator
-# from LspAlgorithms.GeneticAlgorithms.PopInitialization.InitNodeGeneratorManager import InitNodeGeneratorManager
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.Population import Population
 from LspRuntimeMonitor import LspRuntimeMonitor
 from ParameterSearch.ParameterData import ParameterData
@@ -63,7 +61,6 @@ class PopInitializer:
             self.populations[popIndex].add(chromosome)
 
         Population.popSizes[self.populations[popIndex].lineageIdentifier] = self.populations[popIndex].popLength
-
 
 
 

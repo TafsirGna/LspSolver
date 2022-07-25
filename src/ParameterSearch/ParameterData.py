@@ -26,6 +26,7 @@ class ParameterData:
         self.localSearchTriggerSize = 0.1
         self.nInitPopLocalOptima = 3
 
+
     def save(self):
         """
         """
