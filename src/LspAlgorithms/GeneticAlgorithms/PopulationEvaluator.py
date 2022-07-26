@@ -24,23 +24,23 @@ class PopulationEvaluator:
         self.terminate = False
 
 
-    def searchFitterElement(self, population, resultQueue):
-        """
-        """
+    # def searchFitterElement(self, population, resultQueue):
+    #     """
+    #     """
 
-        print("Searching fitter than : ", population.minElement())
+    #     print("Searching fitter than : ", population.minElement())
 
-        for element in population.chromosomes.values():
-            chromosome = element["chromosome"]
-            if chromosome == population.minElement():
-                continue
+    #     for element in population.chromosomes.values():
+    #         chromosome = element["chromosome"]
+    #         if chromosome == population.minElement():
+    #             continue
 
-            result = (LocalSearchEngine().process(chromosome, "fitter_than", {"fittest": population.minElement()}))
-            print("Tralala : ", chromosome, result, population.minElement())
-            if result != chromosome and result < population.minElement() and result.stringIdentifier not in population.chromosomes.keys():
-                print("Fitter found")
-                resultQueue.put(result)
-                break
+    #         result = (LocalSearchEngine().process(chromosome, "fitter_than", {"fittest": population.minElement()}))
+    #         print("Tralala : ", chromosome, result, population.minElement())
+    #         if result != chromosome and result < population.minElement() and result.stringIdentifier not in population.chromosomes.keys():
+    #             print("Fitter found")
+    #             resultQueue.put(result)
+    #             break
 
 
 
@@ -69,8 +69,8 @@ class PopulationEvaluator:
         if action == "definePopMetrics":
             self.definePopMetrics(population)
 
-        if action == "searchFitterElement":
-            self.searchFitterElement(population, resultQueues[action])
+        # if action == "searchFitterElement":
+        #     self.searchFitterElement(population, resultQueues[action])
 
 
 
@@ -99,20 +99,20 @@ class PopulationEvaluator:
 
 
         #
-        if not (resultQueues["searchFitterElement"]).empty():
-            print("Adding found fitter element")
-            fitterElement = (resultQueues["searchFitterElement"]).get()
-            print("fitter : ", fitterElement)
+        # if not (resultQueues["searchFitterElement"]).empty():
+        #     print("Adding found fitter element")
+        #     fitterElement = (resultQueues["searchFitterElement"]).get()
+        #     print("fitter : ", fitterElement)
 
-            elites = sorted(LspRuntimeMonitor.popsData[population.lineageIdentifier]["elites"])
-            if fitterElement < elites[-1]:
-                (LspRuntimeMonitor.popsData[population.lineageIdentifier]["elites"]).add(fitterElement)
+        #     elites = sorted(LspRuntimeMonitor.popsData[population.lineageIdentifier]["elites"])
+        #     if fitterElement < elites[-1]:
+        #         (LspRuntimeMonitor.popsData[population.lineageIdentifier]["elites"]).add(fitterElement)
 
-            population.chromosomes[(self.idleGenCounter[population.lineageIdentifier]["fittest"]).stringIdentifier]["size"] -= 1
-            population.popLength -= 1
-            population.add(fitterElement)
+        #     population.chromosomes[(self.idleGenCounter[population.lineageIdentifier]["fittest"]).stringIdentifier]["size"] -= 1
+        #     population.popLength -= 1
+        #     population.add(fitterElement)
 
-            print("fitter element added")
+        #     print("fitter element added")
 
 
         # Termination

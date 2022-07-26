@@ -59,4 +59,8 @@ class Gene:
         return "{}-{}-{}|{} p({}, {}) n({}, {})".format(self.item, self.position, self.period, self.cost, self.prevGene[0] if self.prevGene != None else None, self.prevGene[1] if self.prevGene != None else None, self.nextGene[0] if self.nextGene != None else None, self.nextGene[1] if self.nextGene != None else None)
 
 
+    def __hash__(self) -> int:
+        return hash((self.item, self.position, self.period, self.prevGene, self.nextGene, self.changeOverCost, self.stockingCost)) #, self.cost
+
+
 

@@ -71,24 +71,6 @@ class CrossOverOperator:
 
         self.setOffsprings()
 
-        if self.offsprings[0] is not None:
-            self.offsprings[0].stringIdentifier = tuple(self.offsprings[0].stringIdentifier)
-            c = Chromosome.createFromIdentifier(self.offsprings[0].stringIdentifier)
-            if self.offsprings[0].dnaArray != c.dnaArray:
-                print(" Watch out 0", self.offsprings[0].dnaArray, " --- ", c.dnaArray)
-        else:
-            print("Crossover offspring 0 None")
-            # del self.offsprings[0]
-
-        if self.offsprings[1] is not None:
-            self.offsprings[1].stringIdentifier = tuple(self.offsprings[1].stringIdentifier)
-            c = Chromosome.createFromIdentifier(self.offsprings[1].stringIdentifier)
-            if self.offsprings[1].dnaArray != c.dnaArray:
-                print(" Watch out 1", self.offsprings[1].dnaArray)
-        else:
-            print("Crossover offspring 1 None")
-            # del self.offsprings[1]
-
         print("Cross Over result : ", [self.parentChromosomes, self.offsprings])
 
         # storing this result in the crossover memory before returning 
@@ -130,8 +112,6 @@ class CrossOverOperator:
         with concurrent.futures.ThreadPoolExecutor() as executor:
             for i in [0, 1]:
                 executor.submit(self.searchFixedOffspring, i, offsprings[i], period, self.offspringsItemsToOrder[i], itemsCounter[i], offspringLastPlacedGene[i], subPrimeParent)
-        
-        # print(self.offsprings)
 
 
     def replicatePrimeParentGene(self, period, itemsCounter, subPrimeParent):
@@ -196,7 +176,13 @@ class CrossOverOperator:
                 # Chromosome.evalAndFixDnaArray(offspring)
                 # print("after offspringIndex : ", offspringIndex, offspring)
                 if self.offsprings[offspringIndex] is None or (self.offsprings[offspringIndex] is not None and offspring < self.offsprings[offspringIndex]):
+                    offspring.stringIdentifier = tuple(offspring.stringIdentifier)
                     self.offsprings[offspringIndex] = offspring
+
+                    c = Chromosome.createFromIdentifier(offspring.stringIdentifier)
+                    if offspring.dnaArray != c.dnaArray:
+                        print(" Watch out ",offspringIndex, offsprings.dnaArray, " --- ", c.dnaArray)
+
                 # self._stopSearchEvents[offspringIndex].set()
             return None
 

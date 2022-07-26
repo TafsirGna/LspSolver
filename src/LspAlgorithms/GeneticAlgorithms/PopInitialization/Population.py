@@ -85,7 +85,7 @@ class Population:
     def minElement(self):
         """
         """
-
+        # print("coco: ", self.sortedIdentifiers)
         return self.chromosomes[self.sortedIdentifiers[0]]["chromosome"]
 
 
@@ -104,8 +104,8 @@ class Population:
         self.popLength += 1
 
         # Chromosome Pool
-        if Chromosome.pool[chromosome.stringIdentifier] is None:
-            Chromosome.pool[chromosome.stringIdentifier] = chromosome
+        if chromosome.stringIdentifier not in Chromosome.pool["content"]:
+            Chromosome.pool["content"][chromosome.stringIdentifier] = chromosome
 
         return self.chromosomes[chromosome.stringIdentifier]
 

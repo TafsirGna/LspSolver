@@ -11,6 +11,7 @@ from LspInputDataReading.LspInputDataInstance import InputDataInstance
 import numpy as np
 import concurrent.futures
 import uuid
+from ..Chromosome import Chromosome
 from collections import defaultdict
 from LspAlgorithms.GeneticAlgorithms.GAOperators.LocalSearchEngine import LocalSearchEngine
 
@@ -47,7 +48,7 @@ class PopInitializer:
         chromosomes = np.array_split(chromosomes, ParameterData.instance.nPrimaryThreads)
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            executor.map(self.stuffPopThreadTask, list(range(ParameterData.instance.nPrimaryThreads)), chromosomes)
+            print(list(executor.map(self.stuffPopThreadTask, list(range(ParameterData.instance.nPrimaryThreads)), chromosomes)))
 
         LspRuntimeMonitor.output(str(self.populations))
         return self.populations
@@ -58,7 +59,11 @@ class PopInitializer:
         """
         
         for chromosome in chromosomes:
-            self.populations[popIndex].add(chromosome)
+            Chromosome.pool["content"][chromosome.stringIdentifier] = chromosome
+            result = (LocalSearchEngine().process(chromosome, "positive_mutation"))
+            Chromosome.pool["content"][result.stringIdentifier] = result
+
+            self.populations[popIndex].add(result)
 
         Population.popSizes[self.populations[popIndex].lineageIdentifier] = self.populations[popIndex].popLength
 
