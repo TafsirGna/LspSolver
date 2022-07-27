@@ -20,28 +20,8 @@ class PopulationEvaluator:
         """
         """
 
-        self.idleGenCounter = defaultdict(lambda: {"fittest": None, "count": 0})
+        self.idleGenCounter = 0
         self.terminate = False
-
-
-    # def searchFitterElement(self, population, resultQueue):
-    #     """
-    #     """
-
-    #     print("Searching fitter than : ", population.minElement())
-
-    #     for element in population.chromosomes.values():
-    #         chromosome = element["chromosome"]
-    #         if chromosome == population.minElement():
-    #             continue
-
-    #         result = (LocalSearchEngine().process(chromosome, "fitter_than", {"fittest": population.minElement()}))
-    #         print("Tralala : ", chromosome, result, population.minElement())
-    #         if result != chromosome and result < population.minElement() and result.stringIdentifier not in population.chromosomes.keys():
-    #             print("Fitter found")
-    #             resultQueue.put(result)
-    #             break
-
 
 
     def definePopMetrics(self, population):
@@ -62,15 +42,12 @@ class PopulationEvaluator:
         # population.selectionOperator = SelectionOperator(population)
 
 
-    def processPopulation(self, action, population, resultQueues):
-        """
-        """
+    # def processPopulation(self, action, population, resultQueues):
+    #     """
+    #     """
 
-        if action == "definePopMetrics":
-            self.definePopMetrics(population)
-
-        # if action == "searchFitterElement":
-        #     self.searchFitterElement(population, resultQueues[action])
+    #     if action == "definePopMetrics":
+    #         self.definePopMetrics(population)
 
 
 
@@ -83,36 +60,22 @@ class PopulationEvaluator:
         population.sortedIdentifiers = sorted(population.chromosomes.keys(), key=lambda itemkey: population.chromosomes[itemkey]["chromosome"])
 
         # Termination values
-        if self.idleGenCounter[population.lineageIdentifier]["fittest"] is None:
-            self.idleGenCounter[population.lineageIdentifier]["fittest"] = population.minElement()
+        if population.explored:
+            self.idleGenCounter = 0
         else:
-            if self.idleGenCounter[population.lineageIdentifier]["fittest"] == population.minElement():
-                self.idleGenCounter[population.lineageIdentifier]["count"] += 1
-            else:
-                self.idleGenCounter[population.lineageIdentifier]["fittest"] = population.minElement()
-                self.idleGenCounter[population.lineageIdentifier]["count"] = 0
+            self.idleGenCounter += 1
+            if self.idleGenCounter == ParameterData.instance.nIdleGenerations:
+                self.terminate = True
 
 
-        resultQueues = defaultdict(lambda: Queue())
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            executor.map(self.processPopulation, ["searchFitterElement", "definePopMetrics"], [population] * 2, [resultQueues] * 2)
+        print("Evaluation idleGenCount : ", self.idleGenCounter, population.explored)
 
 
-        #
-        # if not (resultQueues["searchFitterElement"]).empty():
-        #     print("Adding found fitter element")
-        #     fitterElement = (resultQueues["searchFitterElement"]).get()
-        #     print("fitter : ", fitterElement)
+        self.definePopMetrics(population)
 
-        #     elites = sorted(LspRuntimeMonitor.popsData[population.lineageIdentifier]["elites"])
-        #     if fitterElement < elites[-1]:
-        #         (LspRuntimeMonitor.popsData[population.lineageIdentifier]["elites"]).add(fitterElement)
-
-        #     population.chromosomes[(self.idleGenCounter[population.lineageIdentifier]["fittest"]).stringIdentifier]["size"] -= 1
-        #     population.popLength -= 1
-        #     population.add(fitterElement)
-
-        #     print("fitter element added")
+        # resultQueues = defaultdict(lambda: Queue())
+        # with concurrent.futures.ThreadPoolExecutor() as executor:
+        #     executor.map(self.processPopulation, ["searchFitterElement", "definePopMetrics"], [population] * 2, [resultQueues] * 2)
 
 
         # Termination

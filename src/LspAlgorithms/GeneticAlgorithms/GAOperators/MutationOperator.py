@@ -3,6 +3,8 @@ from .LocalSearchEngine import LocalSearchEngine
 from LspRuntimeMonitor import LspRuntimeMonitor
 from ParameterSearch.ParameterData import ParameterData
 import random
+# from collections import defaultdict
+# from ..PopInitialization.Population import Population
 # import numpy as np
 
 
@@ -26,32 +28,39 @@ class MutationOperator:
         return result
 
 
-    def processPop(self, population):
+    def processPop(self, population, mutatedPoolSize):
         """ Got to apply mutation corresponding to the set mutation rate
         """
 
-        mutationSize = int(population.popLength * ParameterData.instance.mutationRate)
+        stringIdentifiers = list(population.chromosomes.keys())
+        tandems = []
+        counterDict = dict()
 
-        count = 0
-
-        while count < mutationSize:
-            stringIdentifiers = list(population.chromosomes.keys())
-            stringIdentifier = stringIdentifiers[random.randint(0, len(stringIdentifiers) - 1)]
+        for _ in range(mutatedPoolSize):
+            
+            stringIdentifier = random.choice(stringIdentifiers)
             element = population.chromosomes[stringIdentifier]
 
             result = self.processInstance(element["chromosome"])
+            tandems.append({"input": element["chromosome"], "output": result})
 
-            if result != element["chromosome"]:
-                population.popLength -= 1
-                if element["size"] == 1:
-                    del population.chromosomes[stringIdentifier]
-                else:
-                    population.chromosomes[stringIdentifier]["size"] -= 1
-                    
-                population.add(result)
-                count += 1
+            if element["chromosome"].stringIdentifier not in counterDict:
+                counterDict[element["chromosome"].stringIdentifier] = 1
+            else:
+                counterDict[element["chromosome"].stringIdentifier] += 1
 
-            # stringIdentifiers.remove(stringIdentifier)
+            if counterDict[element["chromosome"].stringIdentifier] == element["size"]:
+                stringIdentifiers.remove(stringIdentifier)
+
+
+        for tandem in tandems:
+            population.popLength -= 1
+            if population.chromosomes[tandem["input"].stringIdentifier]["size"] == 1:
+                del population.chromosomes[tandem["input"].stringIdentifier]
+            else:
+                population.chromosomes[tandem["input"].stringIdentifier]["size"] -= 1
+                
+            population.add(tandem["output"])
 
         return population
 

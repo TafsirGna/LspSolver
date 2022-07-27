@@ -6,6 +6,7 @@ from LspInputDataReading.LspInputDataInstance import InputDataInstance
 import concurrent.futures
 import copy
 from LspAlgorithms.GeneticAlgorithms.Gene import Gene
+from .LocalSearchEngine import LocalSearchEngine
 
 class CrossOverOperator:
     """
@@ -28,6 +29,7 @@ class CrossOverOperator:
         self.primeParent = self.parentChromosomes[0] if self.parentChromosomes[0] < self.parentChromosomes[1] else self.parentChromosomes[1]
 
         self._stopSearchEvents = {0: threading.Event(), 1: threading.Event()}
+        self.newlyVisited = {0: False, 1: False}
 
 
     def process(self, offspring_result = 2):
@@ -40,7 +42,7 @@ class CrossOverOperator:
 
 
         if self.parentChromosomes[0] == self.parentChromosomes[1]:
-            return self.parentChromosomes[0], self.parentChromosomes[1]
+            return (self.parentChromosomes[0], self.parentChromosomes[1]), False
 
         # print("Crossover : ", self.parentChromosomes, self.parentChromosomes[0].dnaArray, self.parentChromosomes[1].dnaArray)
         print("Crossover : ", self.parentChromosomes)
@@ -77,7 +79,8 @@ class CrossOverOperator:
         # with CrossOverNode.crossOverMemory["lock"]:
         #     CrossOverNode.crossOverMemory["db"][((self.parentChromosomes[0]).stringIdentifier, (self.parentChromosomes[1]).stringIdentifier, crossOverPeriod)] = tuple(self.offsprings.values())
 
-        return tuple(self.offsprings.values())
+        print("newly : ", self.newlyVisited)
+        return (tuple(self.offsprings.values()), True if (self.newlyVisited[0] or self.newlyVisited[1]) else False) 
 
 
 
@@ -168,22 +171,36 @@ class CrossOverOperator:
         """
         """
 
+        # print("Searching : ", offspringIndex, period, offspring)
         # print("Searching : ", period, offspring, offspringLastPlacedGene["value"], "\n", offspring.dnaArray)
 
         if period == -1:
             if len(offspringItemsToOrder) == 0:
                 # print("offspringIndex : ", offspringIndex, offspring)
-                # Chromosome.evalAndFixDnaArray(offspring)
-                # print("after offspringIndex : ", offspringIndex, offspring)
-                if self.offsprings[offspringIndex] is None or (self.offsprings[offspringIndex] is not None and offspring < self.offsprings[offspringIndex]):
-                    offspring.stringIdentifier = tuple(offspring.stringIdentifier)
-                    self.offsprings[offspringIndex] = offspring
+                offspring.stringIdentifier = tuple(offspring.stringIdentifier)
 
-                    c = Chromosome.createFromIdentifier(offspring.stringIdentifier)
-                    if offspring.dnaArray != c.dnaArray:
-                        print(" Watch out ",offspringIndex, offsprings.dnaArray, " --- ", c.dnaArray)
+                c = Chromosome.createFromIdentifier(offspring.stringIdentifier)
+                if offspring.dnaArray != c.dnaArray:
+                    print(" Watch out ",offspringIndex, offsprings.dnaArray, " --- ", c.dnaArray)
 
-                # self._stopSearchEvents[offspringIndex].set()
+                if offspring.stringIdentifier not in Chromosome.pool["content"]:
+                    Chromosome.pool["content"][offspring.stringIdentifier] = offspring
+
+                if LocalSearchEngine.localSearchMemory["content"]["positive_mutation"] is not None and offspring.stringIdentifier in LocalSearchEngine.localSearchMemory["content"]["positive_mutation"] and LocalSearchEngine.localSearchMemory["content"]["positive_mutation"][offspring.stringIdentifier]["data"]["genes"] == []:
+                    # print("Toto : Option 1", )
+                    result = LocalSearchEngine.localSearchMemory["content"]["positive_mutation"][offspring.stringIdentifier]["result"]
+                    result = result if result is not None else offspring
+                    if self.offsprings[offspringIndex] is None or (self.offsprings[offspringIndex] is not None and result < self.offsprings[offspringIndex]):
+                        self.offsprings[offspringIndex] = result
+                    return None
+
+                result = LocalSearchEngine().process(offspring, "positive_mutation")
+                self.offsprings[offspringIndex] = result
+                Chromosome.pool["content"][result.stringIdentifier] = result
+
+                self.newlyVisited[offspringIndex] = True
+                self._stopSearchEvents[offspringIndex].set()
+
             return None
 
         if self.offsprings[offspringIndex] is not None and offspring >= self.offsprings[offspringIndex]:
@@ -199,8 +216,8 @@ class CrossOverOperator:
                 offspringLastPlacedGeneCopy = copy.deepcopy(offspringLastPlacedGene)
                 self.orderItem(offspringCopy, item, period, offspringItemsToOrderCopy, itemsCounterCopy, offspringLastPlacedGeneCopy)
                 self.searchFixedOffspring(offspringIndex, offspringCopy, period - 1, offspringItemsToOrderCopy, itemsCounterCopy, offspringLastPlacedGeneCopy, subPrimeParent)
-                # if self._stopSearchEvents[offspringIndex].is_set():
-                #     return None
+                if self._stopSearchEvents[offspringIndex].is_set():
+                    return None
         else:
             itemsCounter[offspring.stringIdentifier[period] - 1] -= 1
             gene = offspring.dnaArray[(offspring.genesByPeriod[period])[0]][(offspring.genesByPeriod[period])[1]]
@@ -221,8 +238,8 @@ class CrossOverOperator:
 
             offspringLastPlacedGene["value"] = offspring.dnaArray[gene.item][gene.position]
             self.searchFixedOffspring(offspringIndex, offspring, period - 1, offspringItemsToOrder, itemsCounter, offspringLastPlacedGene, subPrimeParent)
-            # if self._stopSearchEvents[offspringIndex].is_set():
-            #     return None
+            if self._stopSearchEvents[offspringIndex].is_set():
+                return None
 
 
     def provideSearchNextMoves(self, offspringIndex, offspring, period, offspringItemsToOrder, itemsCounter, offspringLastPlacedGene, subPrimeParent):

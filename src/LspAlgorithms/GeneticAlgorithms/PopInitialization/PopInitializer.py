@@ -66,6 +66,7 @@ class PopInitializer:
             self.populations[popIndex].add(result)
 
         Population.popSizes[self.populations[popIndex].lineageIdentifier] = self.populations[popIndex].popLength
+        Population.mutatedPoolSize[self.populations[popIndex].lineageIdentifier] = int(self.populations[popIndex].popLength * ParameterData.instance.mutationRate)
 
 
 

@@ -19,6 +19,7 @@ class Population:
     popSizes = defaultdict(lambda: ParameterData.instance.popSize)
     eliteSizes = defaultdict(lambda: 0)
     initPopLocalOptimaCount = defaultdict(lambda: 0)
+    mutatedPoolSize = defaultdict(lambda: 0)
 
     def __init__(self, lineageIdentifier = None) -> None:
         """
@@ -31,6 +32,7 @@ class Population:
         self.dThreadOutputPipeline = None
         self.selectionOperator = None
         self.newPopLock = threading.Lock()
+        self.explored = False
 
 
     def evolve(self):
@@ -55,7 +57,7 @@ class Population:
             #     executor.submit(self.threadTask)
 
         # Applying mutation
-        (MutationOperator()).processPop(self.newPop)
+        (MutationOperator()).processPop(self.newPop, Population.mutatedPoolSize[self.lineageIdentifier])
 
         self.newPop.dThreadOutputPipeline =  self.dThreadOutputPipeline
         return self.newPop
@@ -104,8 +106,8 @@ class Population:
         self.popLength += 1
 
         # Chromosome Pool
-        if chromosome.stringIdentifier not in Chromosome.pool["content"]:
-            Chromosome.pool["content"][chromosome.stringIdentifier] = chromosome
+        # if chromosome.stringIdentifier not in Chromosome.pool["content"]:
+        #     Chromosome.pool["content"][chromosome.stringIdentifier] = chromosome
 
         return self.chromosomes[chromosome.stringIdentifier]
 
@@ -144,12 +146,13 @@ class Population:
 
                 # print("After selecting")
                 random.seed()
+                explored = False
                 if (random.random() <= ParameterData.instance.crossOverRate):
+                    # print("crossing over")
                     try:
-                        # pass
-                        # print("mating")
-                        offsprings = (CrossOverOperator([chromosomeA, chromosomeB])).process()
-                        print("offsprings : ", offsprings)
+                        results = (CrossOverOperator([chromosomeA, chromosomeB])).process()
+                        offsprings = results[0]
+                        explored = results[1]
                         chromosomeC, chromosomeD = offsprings
                     except Exception as e:
                         print("Exception")
@@ -157,12 +160,17 @@ class Population:
                 else:
                     chromosomeC, chromosomeD = chromosomeA, chromosomeB
 
-                # print("Queueing C")
-                if chromosomeC is not None:
+                if not self.newPop.explored and explored:
+                    self.newPop.explored = explored
+
+                print("Queueing C")
+                if chromosomeC is not None and not queue.full():
                     queue.put(chromosomeC)
-                # print("Queueing D")
-                if chromosomeD is not None:
+                print("Queueing D")
+                if chromosomeD is not None and not queue.full():
                     queue.put(chromosomeD)
+
+                # print("done")
 
             with self.newPopLock:
                 while not queue.empty() and self.newPop.popLength < Population.popSizes[self.lineageIdentifier]:
@@ -174,4 +182,4 @@ class Population:
     def __repr__(self):
         """
         """
-        return "Population : {} ".format(self.chromosomes)
+        return "Population : {} | explored : {}".format(self.chromosomes, self.explored)
