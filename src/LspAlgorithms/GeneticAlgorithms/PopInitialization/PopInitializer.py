@@ -27,7 +27,7 @@ class PopInitializer:
         """
         """
 
-        self.populations = [Population() for _ in range(ParameterData.instance.nPrimaryThreads)]
+        self.primeThreadIdentifiers = [uuid.uuid4() for _ in range(ParameterData.instance.nPrimaryThreads)]
 
         if PopInitializer.initPoolExpectedSize is None:
             PopInitializer.initPoolExpectedSize = initPoolExpectedSize = ParameterData.instance.popSize * ParameterData.instance.nPrimaryThreads
@@ -50,24 +50,19 @@ class PopInitializer:
         with concurrent.futures.ThreadPoolExecutor() as executor:
             print(list(executor.map(self.stuffPopThreadTask, list(range(ParameterData.instance.nPrimaryThreads)), chromosomes)))
 
-        LspRuntimeMonitor.output(str(self.populations))
-        return self.populations
+        LspRuntimeMonitor.output(str(self.primeThreadIdentifiers))
+        return self.primeThreadIdentifiers
 
 
     def stuffPopThreadTask(self, popIndex, chromosomes):
         """
         """
-        
+
         for chromosome in chromosomes:
-            Chromosome.pool["content"][chromosome.stringIdentifier] = chromosome
-            result = (LocalSearchEngine().process(chromosome, "positive_mutation"))
-            Chromosome.pool["content"][result.stringIdentifier] = result
+            Chromosome.pool[self.primeThreadIdentifiers[popIndex]]["content"][chromosome.stringIdentifier] = chromosome
 
-            self.populations[popIndex].add(result)
-
-        Population.popSizes[self.populations[popIndex].lineageIdentifier] = self.populations[popIndex].popLength
-        Population.mutatedPoolSize[self.populations[popIndex].lineageIdentifier] = int(self.populations[popIndex].popLength * ParameterData.instance.mutationRate)
-
+        Population.popSizes[self.primeThreadIdentifiers[popIndex]] = len(Chromosome.pool[self.primeThreadIdentifiers[popIndex]]["content"])
+        Population.mutatedPoolSize[self.primeThreadIdentifiers[popIndex]] = int(len(Chromosome.pool[self.primeThreadIdentifiers[popIndex]]["content"]) * ParameterData.instance.mutationRate)
 
 
 class PopInitializerSmallInstanceApproach:

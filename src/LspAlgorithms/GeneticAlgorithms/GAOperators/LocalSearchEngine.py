@@ -16,7 +16,6 @@ class LocalSearchEngine:
     genericGeneIndices = None
     localSearchMemory = {"lock": threading.Lock(), "content":defaultdict(lambda: None)}
     evaluationDataPool = {"lock": threading.Lock(), "content": dict()}
-    # visitedChroms = {"lock": threading.Lock(), "content": dict()}
 
     def __init__(self) -> None:
         """
@@ -27,7 +26,6 @@ class LocalSearchEngine:
 
     def process(self, chromosome, strategy = "simple_mutation", args = None):
         """Process the given chromosome in order to return a mutated version
-        strategy: random_mutation|absolute_mutation|simple_mutation
         """
 
         print("mutatiooon", strategy, chromosome, chromosome.dnaArray)
@@ -154,19 +152,31 @@ class LocalSearchEngine:
         if self.areItemsSwitchable(chromosome, periodGene, altPeriod, periodGeneLowerLimit, periodGeneUpperLimit):
 
             mStringIdentifier = self.mutationStringIdentifier(chromosome.stringIdentifier, periodGene.period, altPeriod)
-            matchingChromosome = None if mStringIdentifier not in Chromosome.pool["content"] else Chromosome.pool["content"][mStringIdentifier]
-            if matchingChromosome is None:
-                evaluationData = None if mStringIdentifier not in LocalSearchEngine.evaluationDataPool["content"] else LocalSearchEngine.evaluationDataPool["content"][mStringIdentifier]
+            evaluationDataKey1 = (chromosome.stringIdentifier, periodGene.period, altPeriod)
+            evaluationDataKey2 = (chromosome.stringIdentifier, altPeriod, periodGene.period)
 
-            if strategy == "random_mutation":
-                if matchingChromosome is not None:
-                    self.result = matchingChromosome
-                else:
-                    if evaluationData is None:
-                        evaluationData = self.evaluateItemsSwitch(chromosome, periodGene, altPeriod)
-                        LocalSearchEngine.evaluationDataPool["content"][mStringIdentifier] = evaluationData
-                    self.result = self.switchItems(evaluationData)
-                return "RETURN"
+            # TODO
+            globalPool = dict()
+            for pool in Chromosome.pool:
+                globalPool.update(pool["content"])
+
+            matchingChromosome = None if mStringIdentifier not in globalPool else globalPool
+            if matchingChromosome is None:
+                evaluationData = None
+                if evaluationDataKey1 in LocalSearchEngine.evaluationDataPool["content"]:
+                    evaluationData = LocalSearchEngine.evaluationDataPool["content"][evaluationDataKey1]
+                elif evaluationDataKey2 in LocalSearchEngine.evaluationDataPool["content"]:
+                    evaluationData = LocalSearchEngine.evaluationDataPool["content"][evaluationDataKey2]
+
+            # if strategy == "random_mutation":
+            #     if matchingChromosome is not None:
+            #         self.result = matchingChromosome
+            #     else:
+            #         if evaluationData is None:
+            #             evaluationData = self.evaluateItemsSwitch(chromosome, periodGene, altPeriod)
+            #             LocalSearchEngine.evaluationDataPool["content"][(chromosome.stringIdentifier, periodGene.period, altPeriod)] = evaluationData
+            #         self.result = self.switchItems(evaluationData)
+            #     return "RETURN"
 
             if strategy == "population":
                 if matchingChromosome is not None:
@@ -174,16 +184,20 @@ class LocalSearchEngine:
                 else:
                     if evaluationData is None:
                         evaluationData = self.evaluateItemsSwitch(chromosome, periodGene, altPeriod)
-                        LocalSearchEngine.evaluationDataPool["content"][mStringIdentifier] = evaluationData
+                        LocalSearchEngine.evaluationDataPool["content"][(chromosome.stringIdentifier, periodGene.period, altPeriod)] = evaluationData
                     results.append(self.switchItems(evaluationData))
 
             if strategy == "all_evaluations":
                 if matchingChromosome is not None:
-                    evaluationData = None if mStringIdentifier not in LocalSearchEngine.evaluationDataPool["content"] else LocalSearchEngine.evaluationDataPool["content"][mStringIdentifier]
+                    evaluationData = None
+                    if evaluationDataKey1 in LocalSearchEngine.evaluationDataPool["content"]:
+                        evaluationData = LocalSearchEngine.evaluationDataPool["content"][evaluationDataKey1]
+                    elif evaluationDataKey2 in LocalSearchEngine.evaluationDataPool["content"]:
+                        evaluationData = LocalSearchEngine.evaluationDataPool["content"][evaluationDataKey2]
                 
                 if evaluationData is None:
                     evaluationData = self.evaluateItemsSwitch(chromosome, periodGene, altPeriod)
-                    LocalSearchEngine.evaluationDataPool["content"][mStringIdentifier] = evaluationData
+                    LocalSearchEngine.evaluationDataPool["content"][(chromosome.stringIdentifier, periodGene.period, altPeriod)] = evaluationData
                 results.append(evaluationData)
 
             if strategy == "positive_mutation":
@@ -196,7 +210,7 @@ class LocalSearchEngine:
                     if self.isSwitchInteresting(chromosome, periodGene, altPeriod):
                         if evaluationData is None:
                             evaluationData = self.evaluateItemsSwitch(chromosome, periodGene, altPeriod)
-                            LocalSearchEngine.evaluationDataPool["content"][mStringIdentifier] = evaluationData
+                            LocalSearchEngine.evaluationDataPool["content"][(chromosome.stringIdentifier, periodGene.period, altPeriod)] = evaluationData
                         if evaluationData["variance"] > 0:
                             self.result = self.switchItems(evaluationData)
                             ok = True
@@ -216,7 +230,7 @@ class LocalSearchEngine:
             #         if self.isSwitchInteresting(chromosome, periodGene, altPeriod):
             #             if evaluationData is None:
             #                 evaluationData = self.evaluateItemsSwitch(chromosome, periodGene, altPeriod)
-            #                 LocalSearchEngine.evaluationDataPool["content"][mStringIdentifier] = evaluationData
+            #                 LocalSearchEngine.evaluationDataPool["content"][(chromosome.stringIdentifier, periodGene.period, altPeriod)] = evaluationData
             #             if evaluationData["variance"] > 0 and evaluationData["chromosome"].cost - evaluationData["variance"] < args["fittest"].cost:
             #                 self.result = self.switchItems(evaluationData)
             #                 return "RETURN"
@@ -230,7 +244,7 @@ class LocalSearchEngine:
                 else:
                     if evaluationData is None:
                         evaluationData = self.evaluateItemsSwitch(chromosome, periodGene, altPeriod)
-                        LocalSearchEngine.evaluationDataPool["content"][mStringIdentifier] = evaluationData
+                        LocalSearchEngine.evaluationDataPool["content"][(chromosome.stringIdentifier, periodGene.period, altPeriod)] = evaluationData
                     if evaluationData["variance"] > 0:
                         self.result = self.switchItems(evaluationData)
                         return "RETURN"

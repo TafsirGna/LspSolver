@@ -7,12 +7,21 @@ import concurrent.futures
 import copy
 from LspAlgorithms.GeneticAlgorithms.Gene import Gene
 from .LocalSearchEngine import LocalSearchEngine
+from ..PopInitialization.Population import Population
+from ParameterSearch.ParameterData import ParameterData
 
 class CrossOverOperator:
     """
     """
 
-    def __init__(self, parentChromosomes) -> None:
+    def __init__(self) -> None:
+        """
+        """
+
+        pass
+
+
+    def initCrossOver(self, parentChromosomes):
         """
         """
 
@@ -32,9 +41,43 @@ class CrossOverOperator:
         self.newlyVisited = {0: False, 1: False}
 
 
-    def process(self, offspring_result = 2):
+
+    def process(self, population):
         """
         """
+
+        chromosomes = set()
+        self.population = population
+
+        while len(chromosomes) < Population.popSizes[population.threadIdentifier]:
+            chromosomeA, chromosomeB = population.selectionOperator.select()
+            chromosomeC, chromosomeD = None, None
+
+            if (random.random() <= ParameterData.instance.crossOverRate):
+                try:
+                    results = self.mate([chromosomeA, chromosomeB])
+                    offsprings = results[0]
+                    explored = results[1]
+                    chromosomeC, chromosomeD = offsprings
+                except Exception as e:
+                    raise e
+            else:
+                chromosomeC, chromosomeD = chromosomeA, chromosomeB
+
+            chromosomes.add(chromosomeC)
+            if len(chromosomes) < Population.popSizes[population.threadIdentifier]:
+                chromosomes.add(chromosomeD)
+
+        return chromosomes
+
+
+
+
+    def mate(self, parentChromosomes, offspring_result = 2):
+        """
+        """
+
+        self.initCrossOver(parentChromosomes)
 
         if offspring_result not in [1, 2]:
             # TODO: throw an error
@@ -112,9 +155,12 @@ class CrossOverOperator:
         offsprings = copy.deepcopy(self.offsprings)
         self.offsprings = {0: None, 1: None}
 
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            for i in [0, 1]:
-                executor.submit(self.searchFixedOffspring, i, offsprings[i], period, self.offspringsItemsToOrder[i], itemsCounter[i], offspringLastPlacedGene[i], subPrimeParent)
+        for i in [0, 1]:
+            self.searchFixedOffspring(i, offsprings[i], period, self.offspringsItemsToOrder[i], itemsCounter[i], offspringLastPlacedGene[i], subPrimeParent)
+
+        # with concurrent.futures.ThreadPoolExecutor() as executor:
+        #     for i in [0, 1]:
+        #         executor.submit(self.searchFixedOffspring, i, offsprings[i], period, self.offspringsItemsToOrder[i], itemsCounter[i], offspringLastPlacedGene[i], subPrimeParent)
 
 
     def replicatePrimeParentGene(self, period, itemsCounter, subPrimeParent):
@@ -183,8 +229,13 @@ class CrossOverOperator:
                 if offspring.dnaArray != c.dnaArray:
                     print(" Watch out ",offspringIndex, offsprings.dnaArray, " --- ", c.dnaArray)
 
-                if offspring.stringIdentifier not in Chromosome.pool["content"]:
-                    Chromosome.pool["content"][offspring.stringIdentifier] = offspring
+                globalPool = dict()
+                for identifier in Chromosome.pool:
+                    globalPool.update(Chromosome.pool[identifier]["content"])
+
+                if offspring.stringIdentifier not in globalPool:
+                    print("ok", Chromosome.pool[self.population.threadIdentifier])
+                    # Chromosome.pool[self.population.threadIdentifier]["content"][offspring.stringIdentifier] = offspring
 
                 if LocalSearchEngine.localSearchMemory["content"]["positive_mutation"] is not None and offspring.stringIdentifier in LocalSearchEngine.localSearchMemory["content"]["positive_mutation"] and LocalSearchEngine.localSearchMemory["content"]["positive_mutation"][offspring.stringIdentifier]["data"]["genes"] == []:
                     # print("Toto : Option 1", )
@@ -193,10 +244,6 @@ class CrossOverOperator:
                     if self.offsprings[offspringIndex] is None or (self.offsprings[offspringIndex] is not None and result < self.offsprings[offspringIndex]):
                         self.offsprings[offspringIndex] = result
                     return None
-
-                result = LocalSearchEngine().process(offspring, "positive_mutation")
-                self.offsprings[offspringIndex] = result
-                Chromosome.pool["content"][result.stringIdentifier] = result
 
                 self.newlyVisited[offspringIndex] = True
                 self._stopSearchEvents[offspringIndex].set()

@@ -13,7 +13,7 @@ from ParameterSearch.ParameterData import ParameterData
 
 class Chromosome(object):
 
-	pool = {"lock": threading.Lock(), "content": dict()} 
+	pool = defaultdict(lambda: {"lock": threading.Lock(), "content": dict()}) 
 	localOptima = {"lock": threading.Lock(), "values": set()}
 
 	def __init__(self):
@@ -23,69 +23,6 @@ class Chromosome(object):
 		self.dnaArray = [[None for _ in indices] for indices in InputDataInstance.instance.demandsArrayZipped]
 		self.stringIdentifier = []
 		self.genesByPeriod = defaultdict(lambda: None)
-		
-
-	@classmethod
-	def classLightCostCalculation(cls, dnaArray):
-		"""
-		"""
-		cost = 0
-		for itemGenes in dnaArray:
-			for gene in itemGenes:
-				# print("Calculation : ", gene.cost)
-				cost += gene.cost
-		
-		return cost
-
-
-	# @classmethod
-	# def evalAndFixDnaArray(cls, chromosome):
-	# 	"""
-	# 	"""
-
-	# 	# print("flash : ", chromosome.dnaArray, chromosome)
-	# 	lastProducedGene = None
-	# 	cost = 0
-	# 	itemPositionsTab = [0 for _ in range(InputDataInstance.instance.nItems)]
-	# 	for period, periodValue in enumerate(chromosome.stringIdentifier):
-	# 		if periodValue > 0:
-	# 			item = periodValue - 1
-
-	# 			gene = chromosome.dnaArray[item][itemPositionsTab[item]]
-
-	# 			if lastProducedGene is None:
-	# 				prevGene = None  
-	# 			else:
-	# 				prevGene = (lastProducedGene.item, itemPositionsTab[lastProducedGene.item] - 1)
-	# 				lastProducedGene.nextGene = (gene.item, gene.position)
-	# 			# print("ok : ", gene)
-	# 			# if prevGene != gene.prevGene:
-	# 			gene.prevGene = prevGene
-	# 			gene.calculateChangeOverCost()
-	# 			gene.calculateCost()				
-
-	# 			itemPositionsTab[item] += 1
-
-	# 			lastProducedGene = gene
-	# 			# chromosome.genesByPeriod[period] = gene
-	# 			cost += gene.cost
-
-	# 	# print("after flash : ", chromosome.dnaArray)
-	# 	chromosome.cost = cost
-
-	
-	@classmethod
-	def geneAtPeriod(cls, chromosome, period):
-		"""
-		"""
-
-		item0 = chromosome.stringIdentifier[period] - 1
-
-		for gene in chromosome.dnaArray[item0]:
-			if gene.period == period:
-				return gene
-
-		return None
 		
 
 	@classmethod

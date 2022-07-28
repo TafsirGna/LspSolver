@@ -15,23 +15,22 @@ class SelectionOperator:
         """
         """
 
-        # self.chromosomeIndex = 0
+        self.population = population
         self.strategy = strategy
         if self.strategy == "roulette_wheel":
-            self.rouletteProbabilities = [0] * len(population.chromosomes)
-            self.setRouletteProbabilities(population)
+            self.rouletteProbabilities = [0] * len(self.population.chromosomes)
+            self.setRouletteProbabilities()
 
 
-    def fitnessCalculationTask(self, maxCost, slice, resultQueue, population):
+    def fitnessCalculationTask(self, slice, resultQueue):
         """
         """
 
+        maxCost = self.population.chromosomes[-1].cost + 1
         totalFitness = 0
         fitnessArray = []
         for chromosome in slice:
-            fitness = (maxCost - chromosome.cost) * population.chromosomes[chromosome.stringIdentifier]["size"]
-            if fitness < 0:
-                print("------------------------------------------------------", maxCost, chromosome.cost)
+            fitness = maxCost - chromosome.cost
             totalFitness += fitness
             fitnessArray.append(fitness)
 
@@ -39,37 +38,22 @@ class SelectionOperator:
         resultQueue.put(fitnessArray)
 
 
-    def setRouletteProbabilities(self, population):
+    def setRouletteProbabilities(self):
         """
         """
 
-        self.chromosomes = [element["chromosome"] for element in population.chromosomes.values()]
-        maxCost = LspRuntimeMonitor.popsData[population.lineageIdentifier]["max"][-1] + 1
-
-        nProcesses = ParameterData.instance.nReplicaSubThreads
-        slices = np.array_split(self.chromosomes, nProcesses)
+        nThreads = ParameterData.instance.nReplicaSubThreads
+        slices = np.array_split(self.population.chromosomes, nThreads)
 
         processes = []
-        resultQueues = [Queue()] * nProcesses
+        resultQueues = [Queue()] * nThreads
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            for processIndex in range(nProcesses):
-                executor.submit(self.fitnessCalculationTask, maxCost, slices[processIndex], resultQueues[processIndex], population)
-
-        # for processIndex in range(nProcesses):
-        #     resultQueue = mp.Queue()
-        #     process = mp.Process(target=self.fitnessCalculationTask, args=(maxCost, slices[processIndex], resultQueue, population))
-        #     process.start()
-        #     processes.append(process)
-        #     resultQueues.append(resultQueue)
-
-        # for process in processes:
-        #     process.join()
+            print(list(executor.map(self.fitnessCalculationTask, slices, resultQueues)))
 
 
         totalFitness = 0
         fitnessArray = []
-        # print("lllllllllllllllllllllllllllllll : ", len(processesResult[0]))
         for resultQueue in resultQueues:
             result = resultQueue.get()
             totalFitness += result[-1]
@@ -78,7 +62,7 @@ class SelectionOperator:
         self.rouletteProbabilities = [float(fitness/totalFitness) for fitness in fitnessArray]
 
         print("**************************")
-        print("Roulette : ", self.chromosomes, " \n ", self.rouletteProbabilities)
+        print("Roulette : ", self.population.chromosomes, " \n ", self.rouletteProbabilities)
         print("++++++++++++++++++++++++++")
 
 
@@ -98,4 +82,4 @@ class SelectionOperator:
         """
         """
 
-        return np.random.choice(self.chromosomes, p=self.rouletteProbabilities), np.random.choice(self.chromosomes, p=self.rouletteProbabilities)
+        return np.random.choice(self.population.chromosomes, p=self.rouletteProbabilities), np.random.choice(self.population.chromosomes, p=self.rouletteProbabilities)
