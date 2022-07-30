@@ -79,7 +79,6 @@ class LocalSearchEngine:
         # random.shuffle(selectedGenes)
 
         # print("selected : ", selectedGenes)
-        # for periodGene in selectedGenes:
         while len(self.selectedGenes) > 0:
             periodGene = random.choice(self.selectedGenes)
 

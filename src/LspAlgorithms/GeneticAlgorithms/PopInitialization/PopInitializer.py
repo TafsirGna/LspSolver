@@ -23,7 +23,7 @@ class PopInitializer:
     BIG_INSTANCE_CATEGORY = "big"
     initPoolExpectedSize = None
 
-    def __init__(self, instance_category = BIG_INSTANCE_CATEGORY) -> None:
+    def __init__(self, instance_category = SMALL_INSTANCE_CATEGORY) -> None:
         """
         """
 
@@ -165,9 +165,10 @@ class PopInitializerBigInstanceApproach:
             print("Hello : ", node.chromosome)
             node.chromosome.stringIdentifier = tuple(node.chromosome.stringIdentifier)
             with self.initPoolLock:
-                self.initPool.add(node.chromosome)
                 if len(self.initPool) >= PopInitializer.initPoolExpectedSize:
                     self.initPoolStopEvent.set()
+                    return None
+                self.initPool.add(node.chromosome)
             self.expandInitPopInstance([node.chromosome])
             return None
 

@@ -46,7 +46,7 @@ class CrossOverOperator:
         """
         """
 
-        chromosomes = set()
+        chromosomes = list()
         self.population = population
 
         while len(chromosomes) < Population.popSizes[population.threadIdentifier]:
@@ -64,9 +64,11 @@ class CrossOverOperator:
             else:
                 chromosomeC, chromosomeD = chromosomeA, chromosomeB
 
-            chromosomes.add(chromosomeC)
+            chromosomes.append(chromosomeC)
             if len(chromosomes) < Population.popSizes[population.threadIdentifier]:
-                chromosomes.add(chromosomeD)
+                chromosomes.append(chromosomeD)
+
+            print("chromosomes length : ", len(chromosomes), Population.popSizes[population.threadIdentifier])
 
         return chromosomes
 
@@ -155,12 +157,12 @@ class CrossOverOperator:
         offsprings = copy.deepcopy(self.offsprings)
         self.offsprings = {0: None, 1: None}
 
-        for i in [0, 1]:
-            self.searchFixedOffspring(i, offsprings[i], period, self.offspringsItemsToOrder[i], itemsCounter[i], offspringLastPlacedGene[i], subPrimeParent)
+        # for i in [0, 1]:
+        #     self.searchFixedOffspring(i, offsprings[i], period, self.offspringsItemsToOrder[i], itemsCounter[i], offspringLastPlacedGene[i], subPrimeParent)
 
-        # with concurrent.futures.ThreadPoolExecutor() as executor:
-        #     for i in [0, 1]:
-        #         executor.submit(self.searchFixedOffspring, i, offsprings[i], period, self.offspringsItemsToOrder[i], itemsCounter[i], offspringLastPlacedGene[i], subPrimeParent)
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            for i in [0, 1]:
+                executor.submit(self.searchFixedOffspring, i, offsprings[i], period, self.offspringsItemsToOrder[i], itemsCounter[i], offspringLastPlacedGene[i], subPrimeParent)
 
 
     def replicatePrimeParentGene(self, period, itemsCounter, subPrimeParent):
@@ -233,24 +235,17 @@ class CrossOverOperator:
                 for identifier in Chromosome.pool:
                     globalPool.update(Chromosome.pool[identifier]["content"])
 
+                if self.offsprings[offspringIndex] is None or (self.offsprings[offspringIndex] is not None and offspring < self.offsprings[offspringIndex]):
+                    self.offsprings[offspringIndex] = offspring
+
                 if offspring.stringIdentifier not in globalPool:
-                    print("ok", Chromosome.pool[self.population.threadIdentifier])
-                    # Chromosome.pool[self.population.threadIdentifier]["content"][offspring.stringIdentifier] = offspring
-
-                if LocalSearchEngine.localSearchMemory["content"]["positive_mutation"] is not None and offspring.stringIdentifier in LocalSearchEngine.localSearchMemory["content"]["positive_mutation"] and LocalSearchEngine.localSearchMemory["content"]["positive_mutation"][offspring.stringIdentifier]["data"]["genes"] == []:
-                    # print("Toto : Option 1", )
-                    result = LocalSearchEngine.localSearchMemory["content"]["positive_mutation"][offspring.stringIdentifier]["result"]
-                    result = result if result is not None else offspring
-                    if self.offsprings[offspringIndex] is None or (self.offsprings[offspringIndex] is not None and result < self.offsprings[offspringIndex]):
-                        self.offsprings[offspringIndex] = result
-                    return None
-
-                self.newlyVisited[offspringIndex] = True
+                    Chromosome.pool[self.population.threadIdentifier]["content"][offspring.stringIdentifier] = offspring
+                    self.newlyVisited[offspringIndex] = True
                 self._stopSearchEvents[offspringIndex].set()
 
             return None
 
-        if self.offsprings[offspringIndex] is not None and offspring >= self.offsprings[offspringIndex]:
+        if self.offsprings[offspringIndex] is not None and offspring > self.offsprings[offspringIndex]:
             return None
 
         if offspring.stringIdentifier[period] == "*":
