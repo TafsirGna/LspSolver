@@ -13,7 +13,7 @@ from ParameterSearch.ParameterData import ParameterData
 
 class Chromosome(object):
 
-	pool = defaultdict(lambda: {"lock": threading.Lock(), "content": dict()}) 
+	pool = {"lock": threading.Lock(), "content": dict()}
 	localOptima = {"lock": threading.Lock(), "values": set()}
 
 	def __init__(self):

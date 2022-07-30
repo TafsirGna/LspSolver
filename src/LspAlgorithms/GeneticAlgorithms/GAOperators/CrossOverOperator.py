@@ -9,6 +9,8 @@ from LspAlgorithms.GeneticAlgorithms.Gene import Gene
 from .LocalSearchEngine import LocalSearchEngine
 from ..PopInitialization.Population import Population
 from ParameterSearch.ParameterData import ParameterData
+from .LocalSearchEngine import LocalSearchEngine
+from LspAlgorithms.GeneticAlgorithms.PseudoChromosome import PseudoChromosome
 
 class CrossOverOperator:
     """
@@ -51,6 +53,12 @@ class CrossOverOperator:
 
         while len(chromosomes) < Population.popSizes[population.threadIdentifier]:
             chromosomeA, chromosomeB = population.selectionOperator.select()
+
+            if isinstance(chromosomeA, PseudoChromosome):
+                chromosomeA = LocalSearchEngine.switchItems(chromosomeA.value)
+            if isinstance(chromosomeB, PseudoChromosome):
+                chromosomeB = LocalSearchEngine.switchItems(chromosomeB.value)
+
             chromosomeC, chromosomeD = None, None
 
             if (random.random() <= ParameterData.instance.crossOverRate):
@@ -88,6 +96,10 @@ class CrossOverOperator:
 
         if self.parentChromosomes[0] == self.parentChromosomes[1]:
             return (self.parentChromosomes[0], self.parentChromosomes[1]), False
+
+        # for parentChromosome in self.parentChromosomes:
+        #     if not isinstance(parentChromosome, Chromosome):
+        #         parentChromosome = LocalSearchEngine.switchItems(parentChromosome.value)
 
         # print("Crossover : ", self.parentChromosomes, self.parentChromosomes[0].dnaArray, self.parentChromosomes[1].dnaArray)
         print("Crossover : ", self.parentChromosomes)
@@ -231,15 +243,17 @@ class CrossOverOperator:
                 if offspring.dnaArray != c.dnaArray:
                     print(" Watch out ",offspringIndex, offsprings.dnaArray, " --- ", c.dnaArray)
 
-                globalPool = dict()
-                for identifier in Chromosome.pool:
-                    globalPool.update(Chromosome.pool[identifier]["content"])
-
                 if self.offsprings[offspringIndex] is None or (self.offsprings[offspringIndex] is not None and offspring < self.offsprings[offspringIndex]):
                     self.offsprings[offspringIndex] = offspring
 
-                if offspring.stringIdentifier not in globalPool:
-                    Chromosome.pool[self.population.threadIdentifier]["content"][offspring.stringIdentifier] = offspring
+                inPool = False
+                with Chromosome.pool["lock"]:
+                    if offspring.stringIdentifier in Chromosome.pool["content"]:
+                        inPool = True
+
+                if not inPool:
+                    with Chromosome.pool["lock"]:
+                        Chromosome.pool["content"][offspring.stringIdentifier] = {"threadId": self.population.threadIdentifier, "value": offspring}
                     self.newlyVisited[offspringIndex] = True
                 self._stopSearchEvents[offspringIndex].set()
 

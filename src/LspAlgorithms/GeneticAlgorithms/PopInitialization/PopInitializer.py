@@ -50,7 +50,7 @@ class PopInitializer:
         with concurrent.futures.ThreadPoolExecutor() as executor:
             print(list(executor.map(self.stuffPopThreadTask, list(range(ParameterData.instance.nPrimaryThreads)), chromosomes)))
 
-        LspRuntimeMonitor.output(str(self.primeThreadIdentifiers))
+        LspRuntimeMonitor.output(str(Chromosome.pool))
         return self.primeThreadIdentifiers
 
 
@@ -58,11 +58,12 @@ class PopInitializer:
         """
         """
 
-        for chromosome in chromosomes:
-            Chromosome.pool[self.primeThreadIdentifiers[popIndex]]["content"][chromosome.stringIdentifier] = chromosome
+        with Chromosome.pool["lock"]:
+            for chromosome in chromosomes:
+                Chromosome.pool["content"][chromosome.stringIdentifier] = {"threadId": self.primeThreadIdentifiers[popIndex], "value":chromosome}
 
-        Population.popSizes[self.primeThreadIdentifiers[popIndex]] = len(Chromosome.pool[self.primeThreadIdentifiers[popIndex]]["content"])
-        Population.mutatedPoolSize[self.primeThreadIdentifiers[popIndex]] = int(len(Chromosome.pool[self.primeThreadIdentifiers[popIndex]]["content"]) * ParameterData.instance.mutationRate)
+        Population.popSizes[self.primeThreadIdentifiers[popIndex]] = len(Chromosome.pool["content"])
+        Population.mutatedPoolSize[self.primeThreadIdentifiers[popIndex]] = int(len(Chromosome.pool["content"]) * ParameterData.instance.mutationRate)
 
 
 class PopInitializerSmallInstanceApproach:
@@ -74,7 +75,7 @@ class PopInitializerSmallInstanceApproach:
         """
 
         self.initPool = initPool
-        self.initPoolSizeData = {"lock": threading.Lock(), "sizes": defaultdict(lambda: 0)}
+        self.initPoolSizeData = {"lock": threading.Lock(), "size": 0}
         self.process()
 
 
@@ -83,6 +84,7 @@ class PopInitializerSmallInstanceApproach:
         """
 
         queue = SearchNode.root().children()
+        self.initPoolSizeData["size"] = len(queue)
         queues = np.array_split(queue, ParameterData.instance.nReplicaThreads)
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -107,27 +109,19 @@ class PopInitializerSmallInstanceApproach:
             if node.period == -1: # No children
                 node.chromosome.stringIdentifier = tuple(node.chromosome.stringIdentifier)
                 self.initPool.add(node.chromosome)
+                continue
 
-            # print("coco 1 : ", node)
-            children = node.children()
             # children = node.advancedChildren()
-            # print("coco 2 : ", children)
-
-            with self.initPoolSizeData["lock"]:
-
-                self.initPoolSizeData["sizes"][threadID] = len(queue)
-                size = 0
-                for threadId in self.initPoolSizeData["sizes"]:
-                    size += self.initPoolSizeData["sizes"][threadId]
-
-                for child in children:
-                    if child is not None:
-                        queue.append(child)
-                        self.initPoolSizeData["sizes"][threadID] += 1
-                        size += 1
-
-                        if size  >= PopInitializer.initPoolExpectedSize:
-                            break
+            removed = False
+            for child in node.generateChild():
+                with self.initPoolSizeData["lock"]:
+                    if not removed:
+                        self.initPoolSizeData["size"] -= 1
+                        removed = True
+                    if self.initPoolSizeData["size"] >= PopInitializer.initPoolExpectedSize:
+                        break
+                    queue.append(child)
+                    self.initPoolSizeData["size"] += 1
 
 
 

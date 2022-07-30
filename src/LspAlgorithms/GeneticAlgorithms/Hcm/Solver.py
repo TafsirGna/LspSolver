@@ -40,7 +40,8 @@ class GeneticAlgorithm:
 			LspRuntimeMonitor.popsData[primeThreadIdentifier] = {"min": [], "max": [], "mean": [], "std": []}
 
 		while True:
-			chromosomes = sorted(Chromosome.pool[primeThreadIdentifier]["content"].values())[:Population.popSizes[primeThreadIdentifier]]
+			chromosomes = {element["value"] for element in Chromosome.pool["content"].values() if element["threadId"] == primeThreadIdentifier}
+			chromosomes = sorted(chromosomes)[:Population.popSizes[primeThreadIdentifier]]
 			
 			# check whether to stop or not
 			# if generationIndex == 10:
@@ -52,12 +53,13 @@ class GeneticAlgorithm:
 			if idleGenCounter == ParameterData.instance.nIdleGenerations:
 				break
 
+
 			# Stats
 			LspRuntimeMonitor.popsData[primeThreadIdentifier]["min"].append(chromosomes[0].cost)
 
 			# building population
 			population = Population(primeThreadIdentifier, chromosomes)
-			population.localSearch()
+			# population.localSearch()
 
 			# crossing over
 			chromosomes = CrossOverOperator().process(population)
