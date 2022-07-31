@@ -26,7 +26,9 @@ class MutationOperator:
         chromosomes = set()
         while len(chromosomes) < Population.mutatedPoolSize[population.threadIdentifier]:
             
+            # print("population's chromosomes : ", population.chromosomes)
             chromosome = random.choice(population.chromosomes)
+            print("picked chromosome : ", chromosome)
             if chromosome.stringIdentifier not in chromosomes:
                 (LocalSearchEngine()).process(chromosome, "simple_mutation", {"threadId": population.threadIdentifier})
                 chromosomes.add(chromosome.stringIdentifier)

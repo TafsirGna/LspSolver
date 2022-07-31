@@ -61,14 +61,14 @@ class GeneticAlgorithm:
 
 			# Stats
 			LspRuntimeMonitor.popsData[primeThreadIdentifier]["min"].append(chromosomes[0].cost)
-			print("Miiiiiiiiiiiinnnnnnnnnnnn : ", chromosomes[0].cost, idleGenCounter)
+			# print("Miiiiiiiiiiiinnnnnnnnnnnn : ", chromosomes[0].cost, idleGenCounter)
 
 			# crossing over
 			chromosomes = CrossOverOperator().process(population)
 			population.chromosomes = chromosomes
 
 			# applying mutation
-			MutationOperator().process(population)
+			# MutationOperator().process(population)
 
 			LspRuntimeMonitor.output("Population --> " + str(population))
 

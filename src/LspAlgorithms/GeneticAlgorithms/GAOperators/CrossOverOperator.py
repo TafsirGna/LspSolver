@@ -40,7 +40,6 @@ class CrossOverOperator:
         self.primeParent = self.parentChromosomes[0] if self.parentChromosomes[0] < self.parentChromosomes[1] else self.parentChromosomes[1]
 
         self._stopSearchEvents = {0: threading.Event(), 1: threading.Event()}
-        self.newlyVisited = {0: False, 1: False}
 
 
 
@@ -62,19 +61,27 @@ class CrossOverOperator:
             chromosomeC, chromosomeD = None, None
 
             if (random.random() <= ParameterData.instance.crossOverRate):
+                # print("Heck yeah crossover")
                 try:
                     results = self.mate([chromosomeA, chromosomeB])
-                    offsprings = results[0]
-                    explored = results[1]
+                    offsprings = results
                     chromosomeC, chromosomeD = offsprings
                 except Exception as e:
                     raise e
             else:
+                # print("No crossover")
                 chromosomeC, chromosomeD = chromosomeA, chromosomeB
 
-            chromosomes.append(chromosomeC)
+            if chromosomeC is None:
+                print("chromosomeC None")
+            else:
+                chromosomes.append(chromosomeC)
+
             if len(chromosomes) < Population.popSizes[population.threadIdentifier]:
-                chromosomes.append(chromosomeD)
+                if chromosomeD is None:
+                    print("chromosomeD None")
+                else:
+                    chromosomes.append(chromosomeD)
 
             print("chromosomes length : ", len(chromosomes), Population.popSizes[population.threadIdentifier])
 
@@ -95,7 +102,7 @@ class CrossOverOperator:
 
 
         if self.parentChromosomes[0] == self.parentChromosomes[1]:
-            return (self.parentChromosomes[0], self.parentChromosomes[1]), False
+            return (self.parentChromosomes[0], self.parentChromosomes[1])
 
         # for parentChromosome in self.parentChromosomes:
         #     if not isinstance(parentChromosome, Chromosome):
@@ -136,8 +143,7 @@ class CrossOverOperator:
         # with CrossOverNode.crossOverMemory["lock"]:
         #     CrossOverNode.crossOverMemory["db"][((self.parentChromosomes[0]).stringIdentifier, (self.parentChromosomes[1]).stringIdentifier, crossOverPeriod)] = tuple(self.offsprings.values())
 
-        print("newly : ", self.newlyVisited)
-        return (tuple(self.offsprings.values()), True if (self.newlyVisited[0] or self.newlyVisited[1]) else False) 
+        return tuple(self.offsprings.values())
 
 
 
@@ -254,8 +260,10 @@ class CrossOverOperator:
                 if not inPool:
                     with Chromosome.pool["lock"]:
                         Chromosome.pool["content"][offspring.stringIdentifier] = {"threadId": self.population.threadIdentifier, "value": offspring}
-                    self.newlyVisited[offspringIndex] = True
-                    self._stopSearchEvents[offspringIndex].set()
+                else:
+                    (LocalSearchEngine().process(offspring, "simple_mutation", {"threadId": self.population.threadIdentifier}))
+                    
+                self._stopSearchEvents[offspringIndex].set()
 
             return None
 
