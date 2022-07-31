@@ -255,7 +255,7 @@ class CrossOverOperator:
                     with Chromosome.pool["lock"]:
                         Chromosome.pool["content"][offspring.stringIdentifier] = {"threadId": self.population.threadIdentifier, "value": offspring}
                     self.newlyVisited[offspringIndex] = True
-                self._stopSearchEvents[offspringIndex].set()
+                    self._stopSearchEvents[offspringIndex].set()
 
             return None
 

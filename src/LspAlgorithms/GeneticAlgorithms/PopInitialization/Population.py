@@ -35,9 +35,14 @@ class Population:
         """
         """
 
+        for chromosome in self.chromosomes:
+            result = (LocalSearchEngine().process(chromosome, "simple_mutation", {"threadId": self.threadIdentifier}))
+            if result < chromosome:
+                break
 
 
     def __repr__(self):
         """
         """
+        
         return "Population : {}".format(self.chromosomes)

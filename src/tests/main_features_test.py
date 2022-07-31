@@ -13,26 +13,6 @@ class TestMainFeatures:
     """
     """
 
-# 
-    def test_mutation(self):
-        """
-        """
-
-        self.setUpInput()
-
-        # c = Chromosome.createFromIdentifier(stringIdentifier=(2, 1, 0, 1, 2))
-        # c = Chromosome.createFromIdentifier(stringIdentifier=(0, 2, 2, 2, 3, 1, 0, 1))
-        c = Chromosome.createFromIdentifier(stringIdentifier=(3, 2, 2, 2, 0, 1, 1, 0))
-        # c = Chromosome.createFromIdentifier(stringIdentifier=(0, 0, 0, 2, 4, 4, 8, 7, 5, 3, 1, 1, 6, 10, 9))
-        print("Chromosome ", c)
-        # # [2, 1, 2, 0, 1]
-        LspRuntimeMonitor.mutation_strategy = "random_mutation"
-        result = (MutationOperator()).processInstance(c)
-        print("1 -- ", result, (Chromosome.createFromIdentifier(result.stringIdentifier)))
-
-        assert 0
-
-
     def test_crossover(self):
         """
         """
@@ -102,11 +82,12 @@ class TestMainFeatures:
 
         self.setUpInput()
 
-        # c = Chromosome.createFromIdentifier(stringIdentifier=(0, 0, 0, 2, 4, 4, 8, 7, 5, 3, 1, 1, 6, 10, 9))
-        c = Chromosome.createFromIdentifier(stringIdentifier=(0, 2, 2, 3, 0, 1, 2, 1))
+        c = Chromosome.createFromIdentifier(stringIdentifier=(5, 4, 4, 1, 2, 5, 5, 2, 3, 2, 1, 3, 2, 1, 1, 3, 3, 2, 2, 4))
+        # c = Chromosome.createFromIdentifier(stringIdentifier=(0, 2, 2, 3, 0, 1, 2, 1))
         # (0, 0, 0, 9, 10, 8, 7, 5, 6, 4, 4, 2, 1, 1, 3)
         print("Input : ", c)
-        print("Output : ", (LocalSearchEngine()).process(c, "fitter_than", {"fittest": Chromosome.createFromIdentifier((0, 2, 2, 2, 3, 1, 0, 1))}))
+        # print("Output : ", (LocalSearchEngine()).process(c, "fitter_than", {"fittest": Chromosome.createFromIdentifier((0, 2, 2, 2, 3, 1, 0, 1))}))
+        print("Output : ", (LocalSearchEngine()).process(c, "simple_mutation", {"threadId": 1}))
 
         assert 0
 
@@ -115,8 +96,9 @@ class TestMainFeatures:
         """
         """
 
-        inputFile = "data/input/clspInst01.data"
+        # inputFile = "data/input/clspInst02.data"
         # inputFile = "data/input/pigment15b.dzn"
+        inputFile = "data/input/instancesWith20periods/1"
         # inputFile = "data/input/ps-200-10-80.dzn"
         LspRuntimeMonitor.verbose = True
         inputDataReader = InputDataReader()

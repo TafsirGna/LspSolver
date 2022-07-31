@@ -68,7 +68,7 @@ class GeneticAlgorithm:
 			population.chromosomes = chromosomes
 
 			# applying mutation
-			# MutationOperator().process(population)
+			MutationOperator().process(population)
 
 			LspRuntimeMonitor.output("Population --> " + str(population))
 

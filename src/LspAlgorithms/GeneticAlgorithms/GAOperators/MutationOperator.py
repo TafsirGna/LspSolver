@@ -18,16 +18,6 @@ class MutationOperator:
 
         pass
 
-    # def processChrom(self, chromosome): # strategy :  medium/advanced
-    #     """
-    #     """
-
-    #     strategy = "random_mutation"
-    #     result = (LocalSearchEngine()).process(chromosome, strategy)
-        
-    #     # # print("Mutation result : ", chromosome, result[0])
-    #     return result
-
 
     def process(self, population):
         """ Got to apply mutation corresponding to the set mutation rate
