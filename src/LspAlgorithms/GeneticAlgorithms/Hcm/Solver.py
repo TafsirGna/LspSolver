@@ -47,26 +47,28 @@ class GeneticAlgorithm:
 			# if generationIndex == 10:
 			# 	break
 
-			if generationIndex > 1 and chromosomes[0].cost == LspRuntimeMonitor.popsData[primeThreadIdentifier]["min"][-1]:
-				idleGenCounter += 1
+			if generationIndex > 1:
+				idleGenCounter = idleGenCounter + 1 if chromosomes[0].cost == LspRuntimeMonitor.popsData[primeThreadIdentifier]["min"][-1] else 1
 
 			if idleGenCounter == ParameterData.instance.nIdleGenerations:
 				break
 
+			# building population
+			population = Population(primeThreadIdentifier, chromosomes)
+			
+			if idleGenCounter > 1:
+				population.localSearch()
 
 			# Stats
 			LspRuntimeMonitor.popsData[primeThreadIdentifier]["min"].append(chromosomes[0].cost)
-
-			# building population
-			population = Population(primeThreadIdentifier, chromosomes)
-			# population.localSearch()
+			print("Miiiiiiiiiiiinnnnnnnnnnnn : ", chromosomes[0].cost, idleGenCounter)
 
 			# crossing over
 			chromosomes = CrossOverOperator().process(population)
 			population.chromosomes = chromosomes
 
 			# applying mutation
-			MutationOperator().process(population)
+			# MutationOperator().process(population)
 
 			LspRuntimeMonitor.output("Population --> " + str(population))
 

@@ -116,7 +116,7 @@ class LocalSearchEngine:
 
         if strategy == "simple_mutation":
             pick = np.random.choice(results)
-            self.result = pick if isinstance(pick, Chromosome) else LocalSearchEngine.switchItems(pick)
+            self.result = pick if isinstance(pick, Chromosome) else LocalSearchEngine.switchItems(pick.value)
             return None
         elif strategy == "population":
             self.result = list(set(results))
@@ -220,17 +220,18 @@ class LocalSearchEngine:
                     results.append(Chromosome.pool["content"][mStringIdentifier]["value"])
                 else:
                     evaluationData = self.evaluateItemsSwitch(chromosome, periodGene, altPeriod)
+                    pseudoChromosome = PseudoChromosome(evaluationData)
                     with LocalSearchEngine.evaluationDataPool["lock"]:
                         LocalSearchEngine.evaluationDataPool["content"][(chromosome.stringIdentifier, periodGene.period, altPeriod)] = evaluationData
 
                     with Chromosome.pool["lock"]:
                         if mStringIdentifier not in Chromosome.pool["content"]:
-                            Chromosome.pool["content"][mStringIdentifier] = {"threadId": args["threadId"], "value": PseudoChromosome(evaluationData)}
+                            Chromosome.pool["content"][mStringIdentifier] = {"threadId": args["threadId"], "value": pseudoChromosome}
 
                     if evaluationData["variance"] > 0:
-                        self.result = evaluationData
+                        self.result = pseudoChromosome
                         return "RETURN"
-                    results.append(evaluationData)
+                    results.append(pseudoChromosome)
         else:
             return "SET_ALT_PERIOD_NONE"
 
