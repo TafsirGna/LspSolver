@@ -32,10 +32,14 @@ class LocalSearchEngine:
 
         print("mutatiooon", strategy, chromosome, chromosome.dnaArray if (isinstance(chromosome, Chromosome)) else None)
 
-        if strategy == "positive_mutation":
-            if LocalSearchEngine.localSearchMemory["content"]["positive_mutation"] is not None and chromosome.stringIdentifier in LocalSearchEngine.localSearchMemory["content"]["positive_mutation"]:
-                if LocalSearchEngine.localSearchMemory["content"]["positive_mutation"][chromosome.stringIdentifier]["data"]["genes"] == []:
-                    return LocalSearchEngine.localSearchMemory["content"]["positive_mutation"][chromosome.stringIdentifier]["result"] if LocalSearchEngine.localSearchMemory["content"]["positive_mutation"][chromosome.stringIdentifier]["result"] is not None else chromosome
+        with Chromosome.localOptima["lock"]:
+            if chromosome.stringIdentifier in Chromosome.localOptima["content"]:
+                return chromosome
+
+        # if strategy == "positive_mutation":
+        #     if LocalSearchEngine.localSearchMemory["content"]["positive_mutation"] is not None and chromosome.stringIdentifier in LocalSearchEngine.localSearchMemory["content"]["positive_mutation"]:
+        #         if LocalSearchEngine.localSearchMemory["content"]["positive_mutation"][chromosome.stringIdentifier]["data"]["genes"] == []:
+        #             return LocalSearchEngine.localSearchMemory["content"]["positive_mutation"][chromosome.stringIdentifier]["result"] if LocalSearchEngine.localSearchMemory["content"]["positive_mutation"][chromosome.stringIdentifier]["result"] is not None else chromosome
 
         self.searchIndividu(chromosome, strategy, args)
 
@@ -115,6 +119,9 @@ class LocalSearchEngine:
             # if len(results) > 0:
             #     pick = np.random.choice(results)
             #     self.result = pick if isinstance(pick, Chromosome) else LocalSearchEngine.switchItems(pick.value)
+            with Chromosome.localOptima["lock"]:
+                if chromosome.stringIdentifier not in Chromosome.localOptima["content"]:
+                    Chromosome.localOptima["content"].add(chromosome.stringIdentifier)
             self.result = chromosome
             return None
         elif strategy == "population":

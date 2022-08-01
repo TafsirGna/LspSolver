@@ -34,7 +34,7 @@ class GeneticAlgorithm:
 		"""
 
 		generationIndex = 0
-		idleGenCounter = 0
+		idleGenCounter = 1
 
 		if LspRuntimeMonitor.popsData[primeThreadIdentifier] is None:
 			LspRuntimeMonitor.popsData[primeThreadIdentifier] = {"min": [], "max": [], "mean": [], "std": []}
@@ -61,7 +61,7 @@ class GeneticAlgorithm:
 
 			# Stats
 			LspRuntimeMonitor.popsData[primeThreadIdentifier]["min"].append(chromosomes[0].cost)
-			# print("Miiiiiiiiiiiinnnnnnnnnnnn : ", chromosomes[0].cost, idleGenCounter)
+			print("Miiiiiiiiiiiinnnnnnnnnnnn : ", chromosomes[0].cost, idleGenCounter)
 
 			# crossing over
 			chromosomes = CrossOverOperator().process(population)

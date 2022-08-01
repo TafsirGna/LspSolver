@@ -115,13 +115,12 @@ class CrossOverOperator:
         self.crossOverPeriod = random.randint(gapLength + 1, InputDataInstance.instance.nPeriods - (gapLength + 1))
 
         # checking the crossover memory for previous occurences of this context
-        # memoryResult1 = CrossOverNode.crossOverMemory["db"][((self.parentChromosomes[0]).stringIdentifier, (self.parentChromosomes[1]).stringIdentifier, crossOverPeriod)]
-        # if  memoryResult1 is not None:
-        #     return memoryResult1
-
-        # memoryResult2 = CrossOverNode.crossOverMemory["db"][((self.parentChromosomes[1]).stringIdentifier, (self.parentChromosomes[0]).stringIdentifier, crossOverPeriod)]
-        # if memoryResult2 is not None:
-        #     return memoryResult2
+        memoryResult = None
+        with CrossOverOperator.crossOverMemory["lock"]:
+            memoryResult = CrossOverOperator.crossOverMemory["content"][((self.parentChromosomes[0]).stringIdentifier, (self.parentChromosomes[1]).stringIdentifier, self.crossOverPeriod)] if CrossOverOperator.crossOverMemory["content"][((self.parentChromosomes[0]).stringIdentifier, (self.parentChromosomes[1]).stringIdentifier, self.crossOverPeriod)] is not None else \
+                                (CrossOverOperator.crossOverMemory["content"][((self.parentChromosomes[1]).stringIdentifier, (self.parentChromosomes[0]).stringIdentifier, self.crossOverPeriod)] if CrossOverOperator.crossOverMemory["content"][((self.parentChromosomes[1]).stringIdentifier, (self.parentChromosomes[0]).stringIdentifier, self.crossOverPeriod)] is not None else None)
+        if  memoryResult is not None:
+            return memoryResult
 
         # Initializing offsprings' stringIdentifier property
 
@@ -138,8 +137,8 @@ class CrossOverOperator:
         print("Cross Over result : ", [self.parentChromosomes, self.offsprings])
 
         # storing this result in the crossover memory before returning 
-        # with CrossOverNode.crossOverMemory["lock"]:
-        #     CrossOverNode.crossOverMemory["db"][((self.parentChromosomes[0]).stringIdentifier, (self.parentChromosomes[1]).stringIdentifier, crossOverPeriod)] = tuple(self.offsprings.values())
+        with CrossOverOperator.crossOverMemory["lock"]:
+            CrossOverOperator.crossOverMemory["content"][((self.parentChromosomes[0]).stringIdentifier, (self.parentChromosomes[1]).stringIdentifier, self.crossOverPeriod)] = tuple(self.offsprings.values())
 
         return tuple(self.offsprings.values())
 
