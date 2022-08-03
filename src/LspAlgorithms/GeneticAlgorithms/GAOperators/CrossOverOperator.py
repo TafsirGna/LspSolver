@@ -41,7 +41,7 @@ class CrossOverOperator:
 
         self.parentChromosomes = (self.parentChromosomes[0], self.parentChromosomes[1]) if self.parentChromosomes[0] < self.parentChromosomes[1] else (self.parentChromosomes[1], self.parentChromosomes[0])
 
-        self._stopSearchEvents = {0: threading.Event(), 1: threading.Event()}
+        # self._stopSearchEvents = {0: threading.Event(), 1: threading.Event()}
 
 
 
@@ -120,6 +120,9 @@ class CrossOverOperator:
             memoryResult = CrossOverOperator.crossOverMemory["content"][((self.parentChromosomes[0]).stringIdentifier, (self.parentChromosomes[1]).stringIdentifier, self.crossOverPeriod)] if CrossOverOperator.crossOverMemory["content"][((self.parentChromosomes[0]).stringIdentifier, (self.parentChromosomes[1]).stringIdentifier, self.crossOverPeriod)] is not None else \
                                 (CrossOverOperator.crossOverMemory["content"][((self.parentChromosomes[1]).stringIdentifier, (self.parentChromosomes[0]).stringIdentifier, self.crossOverPeriod)] if CrossOverOperator.crossOverMemory["content"][((self.parentChromosomes[1]).stringIdentifier, (self.parentChromosomes[0]).stringIdentifier, self.crossOverPeriod)] is not None else None)
         if  memoryResult is not None:
+            print("Retrieving crossover results : ", memoryResult)
+            for offspring in memoryResult:
+                LocalSearchEngine().process(offspring, "simple_mutation", {"threadId": self.population.threadIdentifier})
             return memoryResult
 
         # Initializing offsprings' stringIdentifier property
@@ -227,7 +230,7 @@ class CrossOverOperator:
 
 
 
-    def searchOffspring(self, offspringIndex, offspring, itemsCounter, offspringLastPlacedGene):
+    def searchOffspring(self, offspringIndex, offspring, itemsCounter, offspringLastPlacedGene, searchHorizon = 2):
         """
         """
 
@@ -245,6 +248,43 @@ class CrossOverOperator:
             for prodChoice in self.listProdChoices(**searchArgs):
                 queue.append(prodChoice)
                 break
+
+
+
+    # def searchOffspring(self, offspringIndex, offspring, itemsCounter, offspringLastPlacedGene, searchHorizon = 2):
+    #     """
+    #     """
+
+    #     period = InputDataInstance.instance.nPeriods - 1
+    #     higherLevelQueue = [{"offspringIndex": offspringIndex, "offspring": offspring, "itemsCounter": itemsCounter, "period": period, "offspringItemsToOrder": self.offspringsItemsToOrder[offspringIndex], "offspringLastPlacedGene": offspringLastPlacedGene}]
+    #     sArgs = higherLevelQueue[0]
+
+    #     while sArgs["period"] >= -1:
+
+    #         # leaf node
+    #         if self.isLeafReached(**sArgs):
+    #             period = searchArgs["period"]
+    #             break
+
+    #         queue = [sArgs]
+    #         print("arrrrrrrrrrrrg : ", sArgs)
+    #         while len(queue) > 0 and (queue[0])["period"] > sArgs["period"] - searchHorizon:
+    #             searchArgs = queue[0]
+    #             queue = queue[1:]
+
+    #             # leaf node
+    #             if self.isLeafReached(**searchArgs):
+    #                 period = searchArgs["period"]
+    #                 return None
+
+    #             for prodChoice in self.listProdChoices(**searchArgs):
+    #                 queue.append(prodChoice)
+    #                 # break
+
+    #         print("len  : ", len(queue))
+    #         higherLevelQueue = copy.deepcopy(queue)
+    #         sArgs = sorted(higherLevelQueue, key=lambda item: item["offspring"])[0]
+    #         # break
 
 
 
@@ -275,9 +315,6 @@ class CrossOverOperator:
                         # Chromosome.pool["content"][offspring.stringIdentifier] = {"threadId": 1, "value": offspring}
                 else:
                     (LocalSearchEngine().process(offspring, "simple_mutation", {"threadId": self.population.threadIdentifier}))
-                    # (LocalSearchEngine().process(offspring, "simple_mutation", {"threadId": 1}))
-                    
-                self._stopSearchEvents[offspringIndex].set()
 
             return True
 
