@@ -11,7 +11,7 @@ from LspAlgorithms.GeneticAlgorithms.GAOperators.LocalSearchEngine import LocalS
 from LspRuntimeMonitor import LspRuntimeMonitor
 from ..PopInitialization.PopInitializer import PopInitializer
 from ..PopInitialization.Population import Population
-from ..Chromosome import Chromosome
+from ..PopInitialization.Chromosome import Chromosome
 from ..GAOperators.CrossOverOperator import CrossOverOperator
 from ..GAOperators.MutationOperator import MutationOperator
 from ParameterSearch.ParameterData import ParameterData

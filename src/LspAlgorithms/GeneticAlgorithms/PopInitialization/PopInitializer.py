@@ -11,7 +11,7 @@ from LspInputDataReading.LspInputDataInstance import InputDataInstance
 import numpy as np
 import concurrent.futures
 import uuid
-from ..Chromosome import Chromosome
+from ..PopInitialization.Chromosome import Chromosome
 from collections import defaultdict
 from LspAlgorithms.GeneticAlgorithms.GAOperators.LocalSearchEngine import LocalSearchEngine
 

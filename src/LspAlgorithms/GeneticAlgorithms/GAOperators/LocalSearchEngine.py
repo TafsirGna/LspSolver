@@ -1,8 +1,8 @@
 from collections import defaultdict
 import threading
 import copy
-from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
-from LspAlgorithms.GeneticAlgorithms.PseudoChromosome import PseudoChromosome
+from LspAlgorithms.GeneticAlgorithms.PopInitialization.Chromosome import Chromosome
+from LspAlgorithms.GeneticAlgorithms.PopInitialization.PseudoChromosome import PseudoChromosome
 # from LspAlgorithms.GeneticAlgorithms.LocalSearch.LocalSearchNode import LocalSearchNode
 from ParameterSearch.ParameterData import ParameterData
 import concurrent.futures

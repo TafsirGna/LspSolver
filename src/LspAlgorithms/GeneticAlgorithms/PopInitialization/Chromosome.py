@@ -5,7 +5,7 @@ from collections import defaultdict
 import threading
 import numpy as np
 import copy
-from LspAlgorithms.GeneticAlgorithms.Gene import Gene
+from LspAlgorithms.GeneticAlgorithms.PopInitialization.Gene import Gene
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 import concurrent.futures
 

@@ -6,7 +6,7 @@ import numpy as np
 import threading
 import concurrent.futures
 import uuid
-from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
+from LspAlgorithms.GeneticAlgorithms.PopInitialization.Chromosome import Chromosome
 from LspAlgorithms.GeneticAlgorithms.GAOperators.SelectionOperator import SelectionOperator
 from LspRuntimeMonitor import LspRuntimeMonitor
 from ParameterSearch.ParameterData import ParameterData
@@ -35,7 +35,7 @@ class Population:
         """
         """
 
-        print("waaaaaaaaaaaaaaaaaaaaaakandaaaaaaaaaaaaaaaaaa")
+        # print("waaaaaaaaaaaaaaaaaaaaaakandaaaaaaaaaaaaaaaaaa")
         for chromosome in self.chromosomes:
             result = (LocalSearchEngine().process(chromosome, "simple_mutation", {"threadId": self.threadIdentifier}))
             if result < chromosome:

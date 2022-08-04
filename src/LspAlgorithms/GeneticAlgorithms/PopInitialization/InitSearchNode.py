@@ -1,6 +1,6 @@
-from LspAlgorithms.GeneticAlgorithms.Gene import Gene
+from LspAlgorithms.GeneticAlgorithms.PopInitialization.Gene import Gene
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
-from ..Chromosome import Chromosome
+from ..PopInitialization.Chromosome import Chromosome
 import copy
 import uuid
 

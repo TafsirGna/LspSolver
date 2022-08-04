@@ -1,16 +1,16 @@
 from collections import defaultdict
 import random
 import threading
-from LspAlgorithms.GeneticAlgorithms.Chromosome import Chromosome
+from LspAlgorithms.GeneticAlgorithms.PopInitialization.Chromosome import Chromosome
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 import concurrent.futures
 import copy
-from LspAlgorithms.GeneticAlgorithms.Gene import Gene
+from LspAlgorithms.GeneticAlgorithms.PopInitialization.Gene import Gene
 from .LocalSearchEngine import LocalSearchEngine
 from ..PopInitialization.Population import Population
 from ParameterSearch.ParameterData import ParameterData
 from .LocalSearchEngine import LocalSearchEngine
-from LspAlgorithms.GeneticAlgorithms.PseudoChromosome import PseudoChromosome
+from LspAlgorithms.GeneticAlgorithms.PopInitialization.PseudoChromosome import PseudoChromosome
 
 class CrossOverOperator:
     """
