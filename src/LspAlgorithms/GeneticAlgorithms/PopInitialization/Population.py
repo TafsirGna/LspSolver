@@ -8,7 +8,7 @@ import concurrent.futures
 import uuid
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.Chromosome import Chromosome
 from LspAlgorithms.GeneticAlgorithms.GAOperators.SelectionOperator import SelectionOperator
-from LspRuntimeMonitor import LspRuntimeMonitor
+from LspAlgorithms.GeneticAlgorithms.LspRuntimeMonitor import LspRuntimeMonitor
 from ParameterSearch.ParameterData import ParameterData
 from LspAlgorithms.GeneticAlgorithms.GAOperators.LocalSearchEngine import LocalSearchEngine
 

@@ -11,13 +11,13 @@ class ParameterData:
         """
 
         self.popSize = 50
-        self.mutationRate = 0.05
+        # self.mutationRate = 0.05
         self.crossOverRate = 0.8
-        self.elitePercentage = 0.01
+        # self.elitePercentage = 0.01
         self.nReplicaThreads = 1
         self.nPrimaryThreads = 1
-        self.nMigrants = 1
-        self.maxRandomMutationDepthIndex = 1
+        # self.nMigrants = 1
+        self.maxSimpleMutationDepthIndex = 1
         self.nReplicaSubThreads = 1
         self.nIdleGenerations = 5
 

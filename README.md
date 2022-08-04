@@ -8,7 +8,7 @@ Usage
 The whole set of input data is stored in the folder `data/input`. Two formats of input files exist, hence the two ways of reading these formats are implemented. Implemented in the first format, `data/input/clsp01.data` is the easiest instance of the set : 2 items, 5 periods. 
 To make the program run on this instance, use the command : 
 
-    python3.6 src/main.py -v data/input/clspInst01.data
+    python3.6 src/hcm_main.py -v data/input/clspInst01.data
     
 
 Documentation

@@ -3,7 +3,7 @@
 
 import threading
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.Population import Population
-from LspRuntimeMonitor import LspRuntimeMonitor
+from LspAlgorithms.GeneticAlgorithms.LspRuntimeMonitor import LspRuntimeMonitor
 from ParameterSearch.ParameterData import ParameterData
 from .InitSearchNode import SearchNode
 from queue import Queue
@@ -50,7 +50,7 @@ class PopInitializer:
         with concurrent.futures.ThreadPoolExecutor() as executor:
             print(list(executor.map(self.stuffPopThreadTask, list(range(ParameterData.instance.nPrimaryThreads)), chromosomes)))
 
-        LspRuntimeMonitor.output(str(Chromosome.pool))
+        LspRuntimeMonitor.instance.output(str(Chromosome.pool))
         return self.primeThreadIdentifiers
 
 
@@ -63,7 +63,7 @@ class PopInitializer:
                 Chromosome.pool["content"][chromosome.stringIdentifier] = {"threadId": self.primeThreadIdentifiers[popIndex], "value":chromosome}
 
         Population.popSizes[self.primeThreadIdentifiers[popIndex]] = len(Chromosome.pool["content"])
-        Population.mutatedPoolSize[self.primeThreadIdentifiers[popIndex]] = int(len(Chromosome.pool["content"]) * ParameterData.instance.mutationRate)
+        # Population.mutatedPoolSize[self.primeThreadIdentifiers[popIndex]] = int(len(Chromosome.pool["content"]) * ParameterData.instance.mutationRate)
 
 
 class PopInitializerSmallInstanceApproach:

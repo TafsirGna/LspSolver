@@ -1,6 +1,6 @@
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.Chromosome import Chromosome
 from .LocalSearchEngine import LocalSearchEngine
-from LspRuntimeMonitor import LspRuntimeMonitor
+from LspAlgorithms.GeneticAlgorithms.LspRuntimeMonitor import LspRuntimeMonitor
 from ParameterSearch.ParameterData import ParameterData
 import random
 # from collections import defaultdict

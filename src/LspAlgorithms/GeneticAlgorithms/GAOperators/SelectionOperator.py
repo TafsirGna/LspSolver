@@ -2,7 +2,6 @@ from collections import defaultdict
 import multiprocessing as mp
 import numpy as np
 from LspAlgorithms.GeneticAlgorithms.PopInitialization import Chromosome
-from LspRuntimeMonitor import LspRuntimeMonitor
 from ParameterSearch.ParameterData import ParameterData
 from queue import Queue
 import concurrent.futures

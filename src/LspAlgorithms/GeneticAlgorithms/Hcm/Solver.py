@@ -8,7 +8,7 @@ from queue import Queue
 import threading
 import uuid
 from LspAlgorithms.GeneticAlgorithms.GAOperators.LocalSearchEngine import LocalSearchEngine
-from LspRuntimeMonitor import LspRuntimeMonitor
+from LspAlgorithms.GeneticAlgorithms.LspRuntimeMonitor import LspRuntimeMonitor
 from ..PopInitialization.PopInitializer import PopInitializer
 from ..PopInitialization.Population import Population
 from ..PopInitialization.Chromosome import Chromosome
@@ -36,9 +36,6 @@ class GeneticAlgorithm:
 		generationIndex = 0
 		idleGenCounter = 1
 
-		if LspRuntimeMonitor.popsData[primeThreadIdentifier] is None:
-			LspRuntimeMonitor.popsData[primeThreadIdentifier] = {"min": [], "max": [], "mean": [], "std": []}
-
 		while True:
 			chromosomes = {element["value"] for element in Chromosome.pool["content"].values() if element["threadId"] == primeThreadIdentifier}
 			chromosomes = sorted(chromosomes)[:Population.popSizes[primeThreadIdentifier]]
@@ -48,7 +45,7 @@ class GeneticAlgorithm:
 			# 	break
 
 			if generationIndex > 1:
-				idleGenCounter = idleGenCounter + 1 if chromosomes[0].cost == LspRuntimeMonitor.popsData[primeThreadIdentifier]["min"][-1] else 1
+				idleGenCounter = idleGenCounter + 1 if chromosomes[0].cost == LspRuntimeMonitor.instance.popsData[primeThreadIdentifier]["min"][-1] else 1
 
 			if idleGenCounter == ParameterData.instance.nIdleGenerations:
 				break
@@ -60,7 +57,7 @@ class GeneticAlgorithm:
 				population.localSearch()
 
 			# Stats
-			LspRuntimeMonitor.popsData[primeThreadIdentifier]["min"].append(chromosomes[0].cost)
+			LspRuntimeMonitor.instance.popsData[primeThreadIdentifier]["min"].append(chromosomes[0].cost)
 			print("Miiiiiiiiiiiinnnnnnnnnnnn : ", chromosomes[0].cost, idleGenCounter)
 
 			# crossing over
@@ -70,7 +67,7 @@ class GeneticAlgorithm:
 			# applying mutation
 			# MutationOperator().process(population)
 
-			LspRuntimeMonitor.output("Population --> " + str(population))
+			LspRuntimeMonitor.instance.output("Population --> " + str(population))
 
 			generationIndex += 1
 	
