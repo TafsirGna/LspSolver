@@ -3,7 +3,6 @@ import threading
 import copy
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.Chromosome import Chromosome
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.PseudoChromosome import PseudoChromosome
-# from LspAlgorithms.GeneticAlgorithms.LocalSearch.LocalSearchNode import LocalSearchNode
 from ParameterSearch.ParameterData import ParameterData
 import concurrent.futures
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
@@ -57,18 +56,18 @@ class LocalSearchEngine:
             chromosome = LocalSearchEngine.switchItems(chromosome.value)
 
         results = []
-        self.selectedGenes = None
+        selectedGenes = None
 
         if chromosome.stringIdentifier not in LocalSearchEngine.localSearchMemory["content"]["simple_mutation"]:
             LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][chromosome.stringIdentifier] = {"genes": [gene for itemGenes in chromosome.dnaArray for gene in itemGenes if gene.cost > 0], "results": dict()}
-        self.selectedGenes = LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][chromosome.stringIdentifier]["genes"]
+        selectedGenes = LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][chromosome.stringIdentifier]["genes"]
 
         # print("Searching individu !!!")
 
         # print("selected : ", selectedGenes)
-        while len(self.selectedGenes) > 0:
-            periodGene = random.choice(self.selectedGenes)
-            # periodGene = self.selectedGenes[0]
+        while len(selectedGenes) > 0:
+            periodGene = random.choice(selectedGenes)
+            # periodGene = selectedGenes[0]
 
             # print("gene : ", periodGene)
             periodGeneLowerLimit, periodGeneUpperLimit = Chromosome.geneLowerUpperLimit(chromosome, periodGene)
@@ -89,14 +88,14 @@ class LocalSearchEngine:
 
                 # print(backwardPeriod, forwardPeriod)
                 if backwardPeriod is not None :
-                    result = self.handleAltPeriod(chromosome, strategy, periodGene, backwardPeriod, periodGeneLowerLimit, periodGeneUpperLimit, results, args)
+                    result = self.handleAltPeriod(chromosome, strategy, periodGene, backwardPeriod, periodGeneLowerLimit, periodGeneUpperLimit, results, selectedGenes, args)
                     if result == "RETURN":
                         return None
                     elif result == "SET_ALT_PERIOD_NONE":
                         backwardPeriod = None
 
                 if forwardPeriod is not None :
-                    result = self.handleAltPeriod(chromosome, strategy, periodGene, forwardPeriod, periodGeneLowerLimit, periodGeneUpperLimit, results, args)
+                    result = self.handleAltPeriod(chromosome, strategy, periodGene, forwardPeriod, periodGeneLowerLimit, periodGeneUpperLimit, results, selectedGenes, args)
                     if result == "RETURN":
                         return None
                     elif result == "SET_ALT_PERIOD_NONE":
@@ -107,10 +106,9 @@ class LocalSearchEngine:
 
                 increment += 1     
 
-            self.selectedGenes.remove(periodGene)
+            selectedGenes.remove(periodGene)
 
-
-        LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][chromosome.stringIdentifier]["genes"] = self.selectedGenes
+        LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][chromosome.stringIdentifier]["genes"] = selectedGenes
         
         if strategy == "simple_mutation":
             # if len(results) > 0:
@@ -126,7 +124,7 @@ class LocalSearchEngine:
         print("Search ended")
 
 
-    def handleAltPeriod(self, chromosome, strategy, periodGene, altPeriod, periodGeneLowerLimit, periodGeneUpperLimit, results, args):
+    def handleAltPeriod(self, chromosome, strategy, periodGene, altPeriod, periodGeneLowerLimit, periodGeneUpperLimit, results, selectedGenes, args):
         """
         """
 
@@ -154,16 +152,21 @@ class LocalSearchEngine:
 
                     if evaluationData["variance"] > 0:
                         # self.result = pseudoChromosome
-                        LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][chromosome.stringIdentifier]["genes"] = self.selectedGenes
-                        LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][chromosome.stringIdentifier]["results"][mStringIdentifier] = (Chromosome.pool["content"][mStringIdentifier]["value"]).cost
+                        LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][chromosome.stringIdentifier]["genes"] = selectedGenes
+                        LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][chromosome.stringIdentifier]["results"][mStringIdentifier] = pseudoChromosome.cost
                         self.searchIndividu(pseudoChromosome, strategy, args)
                         return "RETURN"
-            else:
-                
-                if strategy == "simple_mutation":
-                    if mStringIdentifier not in LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][chromosome.stringIdentifier]["results"] and (Chromosome.pool["content"][mStringIdentifier]["value"]) < chromosome:
-                        LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][chromosome.stringIdentifier]["results"][mStringIdentifier] = (Chromosome.pool["content"][mStringIdentifier]["value"]).cost
 
+            # else:
+            #     if strategy == "simple_mutation":
+            #         if mStringIdentifier not in LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][chromosome.stringIdentifier]["results"] and (Chromosome.pool["content"][mStringIdentifier]["value"]) < chromosome:
+            #             LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][chromosome.stringIdentifier]["results"][mStringIdentifier] = (Chromosome.pool["content"][mStringIdentifier]["value"]).cost
+
+            #         if (Chromosome.pool["content"][mStringIdentifier]["value"]) < chromosome:
+            #             LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][chromosome.stringIdentifier]["genes"] = selectedGenes
+            #             LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][chromosome.stringIdentifier]["results"][mStringIdentifier] = (Chromosome.pool["content"][mStringIdentifier]["value"]).cost
+            #             self.searchIndividu((Chromosome.pool["content"][mStringIdentifier]["value"]), strategy, args)
+            #             # return "RETURN"
         else:
             return "SET_ALT_PERIOD_NONE"
 
@@ -294,12 +297,12 @@ class LocalSearchEngine:
 
 
         # testing the result
-        c = Chromosome.createFromIdentifier(mutation.stringIdentifier)
-        if c.dnaArray != mutation.dnaArray or c.cost != mutation.cost or c.genesByPeriod != mutation.genesByPeriod:
-            print("Mutation error : ", mutation.cost != c.cost, mutation.genesByPeriod != c.genesByPeriod, mutation.dnaArray != c.dnaArray, "\n",
-                mutation.cost, c.cost, "\n",
-                # mutation.genesByPeriod, " --- ", c.genesByPeriod, "\n", 
-                mutation.dnaArray, c.dnaArray)
+        # c = Chromosome.createFromIdentifier(mutation.stringIdentifier)
+        # if c.dnaArray != mutation.dnaArray or c.cost != mutation.cost or c.genesByPeriod != mutation.genesByPeriod:
+        #     print("Mutation error : ", mutation.cost != c.cost, mutation.genesByPeriod != c.genesByPeriod, mutation.dnaArray != c.dnaArray, "\n",
+        #         mutation.cost, c.cost, "\n",
+        #         # mutation.genesByPeriod, " --- ", c.genesByPeriod, "\n", 
+        #         mutation.dnaArray, c.dnaArray)
 
 
         print("Switch done")

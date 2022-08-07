@@ -267,8 +267,8 @@ class CrossOverOperator:
     #             break
 
     #         queue = [sArgs]
-    #         print("arrrrrrrrrrrrg : ", sArgs)
-    #         while len(queue) > 0 and (queue[0])["period"] > sArgs["period"] - searchHorizon:
+    #         # print("arrrrrrrrrrrrg : ", sArgs)
+    #         while len(queue) > 0 and  (queue[0])["period"] > -1 and (queue[0])["period"] > sArgs["period"] - searchHorizon:
     #             searchArgs = queue[0]
     #             queue = queue[1:]
 
@@ -281,10 +281,12 @@ class CrossOverOperator:
     #                 queue.append(prodChoice)
     #                 # break
 
-    #         print("len  : ", len(queue))
+    #         # print("len  : ", len(queue))
     #         higherLevelQueue = copy.deepcopy(queue)
     #         sArgs = sorted(higherLevelQueue, key=lambda item: item["offspring"])[0]
     #         # break
+
+    #     print("Printing offspring ", offspringIndex, self.offsprings[offspringIndex])
 
 
 
@@ -311,8 +313,8 @@ class CrossOverOperator:
 
                 if not inPool:
                     with Chromosome.pool["lock"]:
-                        Chromosome.pool["content"][offspring.stringIdentifier] = {"threadId": self.population.threadIdentifier, "value": offspring}
-                        # Chromosome.pool["content"][offspring.stringIdentifier] = {"threadId": 1, "value": offspring}
+                        # Chromosome.pool["content"][offspring.stringIdentifier] = {"threadId": self.population.threadIdentifier, "value": offspring}
+                        Chromosome.pool["content"][offspring.stringIdentifier] = {"threadId": 1, "value": offspring}
                 else:
                     (LocalSearchEngine().process(offspring, "simple_mutation", {"threadId": self.population.threadIdentifier}))
 
