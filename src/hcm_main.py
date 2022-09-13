@@ -64,5 +64,5 @@ for _ in range(nIterations):
 
 
 print("Global Data : ", globalData)
-file = LspRuntimeMonitor.outputFolderPath+"/"+"stats_data.txt"
+file = LspRuntimeMonitor.outputFolderPath+"/"+"stats_data.csv"
 lspLib.printGlobalResults(file, globalData)
