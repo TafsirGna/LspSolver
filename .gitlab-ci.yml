@@ -1,0 +1,13 @@
+default:
+  image: python:latest
+
+before_script:
+  - python --version  # For debugging
+  - pip install virtualenv
+  - virtualenv venv
+  - source venv/bin/activate
+
+test_job:
+  stage: test
+  script:
+    - python3.6 src/hcm_main.py -v data/input/clspInst02.data
