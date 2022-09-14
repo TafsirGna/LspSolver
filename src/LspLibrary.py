@@ -22,18 +22,15 @@ class bcolors:
 
 
 
-
-
-
 ###
 # Print Global Results
 ###
 
-def printRow(fileStream):
-    """
-    """
+# def printRow(fileStream):
+#     """
+#     """
     
-    fileStream.write("-"*140+"\n")
+#     fileStream.write("-"*140+"\n")
 
 
 def printGlobalResults(file, globalData):
