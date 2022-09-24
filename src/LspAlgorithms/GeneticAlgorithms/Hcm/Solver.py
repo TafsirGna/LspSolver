@@ -21,7 +21,6 @@ class GeneticAlgorithm:
 	"""
 	"""
 
-
 	def __init__(self):
 		"""
 		"""
@@ -29,53 +28,75 @@ class GeneticAlgorithm:
 		self.popInitializer = PopInitializer()
 
 
-	def process(self, primeThreadIdentifier):
+	def applyGA(self, primeThreadIdentifiers):
 		"""
 		"""
 
-		generationIndex = 0
-		idleGenCounter = 1
+		self.generationIndex = 0
+		self.idleGenCounters = dict({primeThreadIdentifier: 1 for primeThreadIdentifier in primeThreadIdentifiers})
 
 		while True:
-			chromosomes = {element["value"] for element in Chromosome.pool["content"].values() if element["threadId"] == primeThreadIdentifier}
-			chromosomes = sorted(chromosomes)[:Population.popSizes[primeThreadIdentifier]]
 			
 			# check whether to stop or not
-			# if generationIndex == 10:
+			# if self.generationIndex == 10:
 			# 	break
 
-			if generationIndex > 1:
-				idleGenCounter = idleGenCounter + 1 if chromosomes[0].cost == LspRuntimeMonitor.instance.popsData[primeThreadIdentifier]["min"][-1] else 1
+			with concurrent.futures.ThreadPoolExecutor() as executor:
+				print(list(executor.map(self.processGenPop, primeThreadIdentifiers)))
 
-			if idleGenCounter == ParameterData.instance.nIdleGenerations:
+			print("ok 1")
+			LspRuntimeMonitor.instance.output("Population --> " + str(Chromosome.pool["content"]))
+			print("ok 2")
+
+			# Determine if it's to be terminated or not
+			terminate = True
+
+			for idleGenCounter in self.idleGenCounters.values():
+				if idleGenCounter < ParameterData.instance.nIdleGenerations:
+					terminate = False
+					break
+
+			if terminate:
 				break
 
-			# building population
-			population = Population(primeThreadIdentifier, chromosomes)
-			
-			if idleGenCounter > 1:
-				population.localSearch()
+			self.generationIndex += 1
 
-			# Stats
-			LspRuntimeMonitor.instance.popsData[primeThreadIdentifier]["min"].append(chromosomes[0].cost)
-			print("Miiiiiiiiiiiinnnnnnnnnnnn : ", chromosomes[0].cost, idleGenCounter)
 
-			# crossing over
-			chromosomes = CrossOverOperator().process(population)
-			population.chromosomes = chromosomes
+	def processGenPop(self, primeThreadIdentifier):
+		"""
+		"""
 
-			# applying mutation
-			MutationOperator().process(population)
+		if self.idleGenCounters[primeThreadIdentifier] == ParameterData.instance.nIdleGenerations:
+			return
 
-			LspRuntimeMonitor.instance.output("Population --> " + str(population))
+		# building population
+		population = Population(primeThreadIdentifier)
 
-			generationIndex += 1
-	
+		if self.generationIndex > 1:
+			self.idleGenCounters[primeThreadIdentifier] = self.idleGenCounters[primeThreadIdentifier] + 1 if population.chromosomes[0].cost == LspRuntimeMonitor.instance.popsData[primeThreadIdentifier]["min"][-1] else 1
+
+		if self.idleGenCounters[primeThreadIdentifier] == ParameterData.instance.nIdleGenerations:
+			return
+		
+		if self.idleGenCounters[primeThreadIdentifier] > 1:
+			population.localSearch()
+
+		# Stats
+		LspRuntimeMonitor.instance.popsData[primeThreadIdentifier]["min"].append(population.chromosomes[0].cost)
+		print("Miiiiiiiiiiiinnnnnnnnnnnn : ", population.chromosomes[0].cost, self.idleGenCounters[primeThreadIdentifier])
+
+		# crossing over
+		chromosomes = CrossOverOperator().process(population)
+		population.chromosomes = chromosomes
+
+		# applying mutation
+		# MutationOperator().process(population)
+
 
 	def terminate(self, threadIdentifier):
 		"""
 		"""
-
+		pass
 
 
 	def solve(self):
@@ -84,7 +105,6 @@ class GeneticAlgorithm:
 		
 		primeThreadIdentifiers = self.popInitializer.process()
 
-		with concurrent.futures.ThreadPoolExecutor() as executor:
-			print(list(executor.map(self.process, primeThreadIdentifiers)))
+		self.applyGA(primeThreadIdentifiers)
 
 			

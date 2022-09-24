@@ -16,13 +16,18 @@ class Population:
 
     popSizes = defaultdict(lambda: ParameterData.instance.popSize)
     mutatedPoolSize = defaultdict(lambda: 0)
+    popEntropySizes = defaultdict(lambda: 0)
 
-    def __init__(self, threadIdentifier, chromosomes) -> None:
+    def __init__(self, threadIdentifier) -> None:
         """
         """
 
         self.threadIdentifier = threadIdentifier
-        self.chromosomes = chromosomes
+        tempPopSize = (Population.popSizes[threadIdentifier] - Population.popEntropySizes[threadIdentifier])
+        chromosomes = sorted({element["value"] for element in Chromosome.pool["content"].values() if element["threadId"] == threadIdentifier})
+        self.chromosomes = chromosomes[:tempPopSize]
+        self.chromosomes += random.sample(chromosomes[tempPopSize:], k=Population.popEntropySizes[threadIdentifier])
+        self.chromosomes.sort()
         self.selectionOperator = SelectionOperator(self)
 
 
