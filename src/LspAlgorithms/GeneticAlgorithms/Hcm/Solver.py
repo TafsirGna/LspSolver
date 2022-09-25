@@ -44,19 +44,9 @@ class GeneticAlgorithm:
 			with concurrent.futures.ThreadPoolExecutor() as executor:
 				print(list(executor.map(self.processGenPop, primeThreadIdentifiers)))
 
-			print("ok 1")
 			LspRuntimeMonitor.instance.output("Population --> " + str(Chromosome.pool["content"]))
-			print("ok 2")
 
-			# Determine if it's to be terminated or not
-			terminate = True
-
-			for idleGenCounter in self.idleGenCounters.values():
-				if idleGenCounter < ParameterData.instance.nIdleGenerations:
-					terminate = False
-					break
-
-			if terminate:
+			if self.terminateProcess():
 				break
 
 			self.generationIndex += 1
@@ -93,18 +83,26 @@ class GeneticAlgorithm:
 		# MutationOperator().process(population)
 
 
-	def terminate(self, threadIdentifier):
+	def terminateProcess(self):
 		"""
 		"""
-		pass
+
+		# Determine if it's to be terminated or not
+		for idleGenCounter in self.idleGenCounters.values():
+			if idleGenCounter < ParameterData.instance.nIdleGenerations:
+				return False
+		return True
+	
 
 
 	def solve(self):
 		"""
 		"""
 		
+		# create the initial population
 		primeThreadIdentifiers = self.popInitializer.process()
 
+		# apply genetic algorithms to this initial population
 		self.applyGA(primeThreadIdentifiers)
 
 			

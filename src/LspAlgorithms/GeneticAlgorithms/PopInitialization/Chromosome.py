@@ -13,8 +13,9 @@ from ParameterSearch.ParameterData import ParameterData
 
 class Chromosome(object):
 
-	pool = {"lock": threading.Lock(), "content": dict()}
+	pool = dict({"lock": threading.Lock(), "content": dict()})
 	# localOptima = {"lock": threading.Lock(), "content": set()}
+	popByThread = defaultdict(lambda: dict())
 
 	def __init__(self):
 		"""

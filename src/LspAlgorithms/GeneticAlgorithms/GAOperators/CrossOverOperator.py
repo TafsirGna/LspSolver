@@ -313,8 +313,9 @@ class CrossOverOperator:
 
                 if not inPool:
                     with Chromosome.pool["lock"]:
-                        # Chromosome.pool["content"][offspring.stringIdentifier] = {"threadId": self.population.threadIdentifier, "value": offspring}
-                        Chromosome.pool["content"][offspring.stringIdentifier] = {"threadId": 1, "value": offspring}
+                        Chromosome.pool["content"][offspring.stringIdentifier] = self.population.threadIdentifier
+                        # Chromosome.pool["content"][offspring.stringIdentifier] = {"threadId": 1, "value": offspring}
+                    Chromosome.popByThread[self.population.threadIdentifier][offspring.stringIdentifier] = offspring
                 else:
                     (LocalSearchEngine().process(offspring, "simple_mutation", {"threadId": self.population.threadIdentifier}))
 

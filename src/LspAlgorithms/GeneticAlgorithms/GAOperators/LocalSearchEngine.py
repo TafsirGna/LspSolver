@@ -8,6 +8,7 @@ import concurrent.futures
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 import random
 import numpy as np
+# from ..PopInitialization.Population import Population
 
 class LocalSearchEngine:
     """
@@ -148,7 +149,8 @@ class LocalSearchEngine:
                     pseudoChromosome = PseudoChromosome(evaluationData)
                     with Chromosome.pool["lock"]:
                         if mStringIdentifier not in Chromosome.pool["content"]:
-                            Chromosome.pool["content"][mStringIdentifier] = {"threadId": args["threadId"], "value": pseudoChromosome}
+                            Chromosome.pool["content"][mStringIdentifier] = args["threadId"] # {"threadId": args["threadId"], "value": pseudoChromosome}
+                            Chromosome.popByThread[args["threadId"]][mStringIdentifier] = pseudoChromosome
 
                     if evaluationData["variance"] > 0:
                         # self.result = pseudoChromosome

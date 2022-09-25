@@ -60,7 +60,8 @@ class PopInitializer:
 
         for chromosome in chromosomes:
             with Chromosome.pool["lock"]:
-                Chromosome.pool["content"][chromosome.stringIdentifier] = {"threadId": self.primeThreadIdentifiers[popIndex], "value":chromosome}
+                Chromosome.pool["content"][chromosome.stringIdentifier] = self.primeThreadIdentifiers[popIndex]
+            Chromosome.popByThread[self.primeThreadIdentifiers[popIndex]][chromosome.stringIdentifier] = chromosome
 
         Population.popSizes[self.primeThreadIdentifiers[popIndex]] = len(chromosomes)
         Population.popEntropySizes[self.primeThreadIdentifiers[popIndex]] = int(len(chromosomes) * ParameterData.instance.popEntropy)

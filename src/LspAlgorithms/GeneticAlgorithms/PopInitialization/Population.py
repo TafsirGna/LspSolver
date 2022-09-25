@@ -1,11 +1,8 @@
 from collections import defaultdict
-from math import ceil
-from queue import Queue
+# from math import ceil
 import random
-import numpy as np
+# import numpy as np
 import threading
-import concurrent.futures
-import uuid
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.Chromosome import Chromosome
 from LspAlgorithms.GeneticAlgorithms.GAOperators.SelectionOperator import SelectionOperator
 from LspAlgorithms.GeneticAlgorithms.LspRuntimeMonitor import LspRuntimeMonitor
@@ -24,23 +21,19 @@ class Population:
 
         self.threadIdentifier = threadIdentifier
         tempPopSize = (Population.popSizes[threadIdentifier] - Population.popEntropySizes[threadIdentifier])
-        chromosomes = sorted({element["value"] for element in Chromosome.pool["content"].values() if element["threadId"] == threadIdentifier})
+        chromosomes = sorted((Chromosome.popByThread[threadIdentifier]).values())
         self.chromosomes = chromosomes[:tempPopSize]
         self.chromosomes += random.sample(chromosomes[tempPopSize:], k=Population.popEntropySizes[threadIdentifier])
         self.chromosomes.sort()
         self.selectionOperator = SelectionOperator(self)
 
-
-    # instances = [None] * Population.popSizes[self.lineageIdentifier]
     # instances = np.array_split(instances, ParameterData.instance.nReplicaThreads)
-    # resultQueues = [Queue(maxsize=len(instances[replicaIndex])) for replicaIndex in range(ParameterData.instance.nReplicaThreads)]
 
 
     def localSearch(self):
         """
         """
 
-        # print("waaaaaaaaaaaaaaaaaaaaaakandaaaaaaaaaaaaaaaaaa")
         for chromosome in self.chromosomes:
             result = (LocalSearchEngine().process(chromosome, "simple_mutation", {"threadId": self.threadIdentifier}))
             if result < chromosome:
