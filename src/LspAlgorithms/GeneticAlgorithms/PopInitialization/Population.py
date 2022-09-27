@@ -8,6 +8,7 @@ from LspAlgorithms.GeneticAlgorithms.GAOperators.SelectionOperator import Select
 from LspAlgorithms.GeneticAlgorithms.LspRuntimeMonitor import LspRuntimeMonitor
 from ParameterSearch.ParameterData import ParameterData
 from LspAlgorithms.GeneticAlgorithms.GAOperators.LocalSearchEngine import LocalSearchEngine
+import bisect
 
 class Population:
 
@@ -20,14 +21,29 @@ class Population:
         """
 
         self.threadIdentifier = threadIdentifier
-        tempPopSize = (Population.popSizes[threadIdentifier] - Population.popEntropySizes[threadIdentifier])
-        chromosomes = sorted((Chromosome.popByThread[threadIdentifier]).values())
-        self.chromosomes = chromosomes[:tempPopSize]
-        self.chromosomes += random.sample(chromosomes[tempPopSize:], k=Population.popEntropySizes[threadIdentifier])
-        self.chromosomes.sort()
+
+        self.setChromosomes()
+        
         self.selectionOperator = SelectionOperator(self)
 
     # instances = np.array_split(instances, ParameterData.instance.nReplicaThreads)
+
+
+    def setChromosomes(self):
+        """
+        """
+
+        self.chromosomes = list(Chromosome.popByThread[self.threadIdentifier]["sortedList"]["list"])
+        identifiers = set(Chromosome.popByThread[self.threadIdentifier]["sortedList"]["identifiers"])
+        pool = list((Chromosome.popByThread[self.threadIdentifier]["content"]).values())
+        while len(self.chromosomes) < Population.popSizes[self.threadIdentifier]:
+            chromosome = random.sample(pool, 1)[0]
+            if chromosome.stringIdentifier in identifiers:
+                continue
+            bisect.insort_left(self.chromosomes, chromosome)
+            identifiers.add(chromosome.stringIdentifier)
+
+        print("----------------------------------- : ", len(self.chromosomes), len(Chromosome.popByThread[self.threadIdentifier]["sortedList"]["list"]))
 
 
     def localSearch(self):

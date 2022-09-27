@@ -9,6 +9,7 @@ from LspInputDataReading.LspInputDataInstance import InputDataInstance
 import random
 import numpy as np
 # from ..PopInitialization.Population import Population
+from LspAlgorithms.GeneticAlgorithms.LspRuntimeMonitor import LspRuntimeMonitor
 
 class LocalSearchEngine:
     """
@@ -151,6 +152,7 @@ class LocalSearchEngine:
                         if mStringIdentifier not in Chromosome.pool["content"]:
                             Chromosome.pool["content"][mStringIdentifier] = args["threadId"] # {"threadId": args["threadId"], "value": pseudoChromosome}
                             Chromosome.popByThread[args["threadId"]][mStringIdentifier] = pseudoChromosome
+                            Chromosome.insertInSortedList(Chromosome.popByThread[args["threadId"]]["sortedList"], pseudoChromosome, LspRuntimeMonitor.instance.sortedListLength[args["threadId"]])
 
                     if evaluationData["variance"] > 0:
                         # self.result = pseudoChromosome

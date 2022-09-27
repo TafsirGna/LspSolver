@@ -8,23 +8,43 @@ import copy
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.Gene import Gene
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 import concurrent.futures
-
+import bisect
 from ParameterSearch.ParameterData import ParameterData
 
 class Chromosome(object):
 
 	pool = dict({"lock": threading.Lock(), "content": dict()})
 	# localOptima = {"lock": threading.Lock(), "content": set()}
-	popByThread = defaultdict(lambda: dict())
+	popByThread = defaultdict(lambda: dict({"content": dict(), "sortedList": {"list": list(), "identifiers": set()}}))
 
 	def __init__(self):
 		"""
 		"""
+		
 		self.cost = 0
 		self.dnaArray = [[None for _ in indices] for indices in InputDataInstance.instance.demandsArrayZipped]
 		self.stringIdentifier = []
 		self.genesByPeriod = defaultdict(lambda: None)
 		
+
+	@classmethod
+	def insertInSortedList(cls, sortedList, chromosome, sortedListLength):
+		"""
+		"""
+
+		if chromosome.stringIdentifier in sortedList["identifiers"]:
+			return
+
+		if len(sortedList["list"]) >= sortedListLength and (chromosome > sortedList["list"][-1] or chromosome == sortedList["list"][-1]):
+			return
+
+		bisect.insort_left(sortedList["list"], chromosome)
+		(sortedList["identifiers"]).add(chromosome.stringIdentifier)
+
+		for item in sortedList["list"][sortedListLength:]:
+			(sortedList["identifiers"]).remove(item.stringIdentifier)
+
+		sortedList["list"] = sortedList["list"][:sortedListLength]
 
 	@classmethod
 	def feasible(cls, chromosome):

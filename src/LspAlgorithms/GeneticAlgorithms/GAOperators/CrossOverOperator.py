@@ -11,6 +11,7 @@ from ..PopInitialization.Population import Population
 from ParameterSearch.ParameterData import ParameterData
 from .LocalSearchEngine import LocalSearchEngine
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.PseudoChromosome import PseudoChromosome
+from LspAlgorithms.GeneticAlgorithms.LspRuntimeMonitor import LspRuntimeMonitor
 
 class CrossOverOperator:
     """
@@ -315,7 +316,8 @@ class CrossOverOperator:
                     with Chromosome.pool["lock"]:
                         Chromosome.pool["content"][offspring.stringIdentifier] = self.population.threadIdentifier
                         # Chromosome.pool["content"][offspring.stringIdentifier] = {"threadId": 1, "value": offspring}
-                    Chromosome.popByThread[self.population.threadIdentifier][offspring.stringIdentifier] = offspring
+                    Chromosome.popByThread[self.population.threadIdentifier]["content"][offspring.stringIdentifier] = offspring
+                    Chromosome.insertInSortedList(Chromosome.popByThread[self.population.threadIdentifier]["sortedList"], offspring, LspRuntimeMonitor.instance.sortedListLength[self.population.threadIdentifier])
                 else:
                     (LocalSearchEngine().process(offspring, "simple_mutation", {"threadId": self.population.threadIdentifier}))
 

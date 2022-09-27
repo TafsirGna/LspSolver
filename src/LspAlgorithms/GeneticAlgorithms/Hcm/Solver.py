@@ -44,7 +44,7 @@ class GeneticAlgorithm:
 			with concurrent.futures.ThreadPoolExecutor() as executor:
 				print(list(executor.map(self.processGenPop, primeThreadIdentifiers)))
 
-			LspRuntimeMonitor.instance.output("Population --> " + str(Chromosome.pool["content"]))
+			# LspRuntimeMonitor.instance.output("Population --> " + str((Chromosome.pool["content"]).keys()))
 
 			if self.terminateProcess():
 				break
@@ -81,6 +81,8 @@ class GeneticAlgorithm:
 
 		# applying mutation
 		# MutationOperator().process(population)
+
+		LspRuntimeMonitor.instance.output("Population --> " + str((Chromosome.popByThread[primeThreadIdentifier]["sortedList"]["identifiers"])))
 
 
 	def terminateProcess(self):

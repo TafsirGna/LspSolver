@@ -80,5 +80,6 @@ class SelectionOperator:
     def selectApproach2(self):
         """
         """
+        # print("*************** : ",  len(self.population.chromosomes), len(self.rouletteProbabilities))
 
         return np.random.choice(self.population.chromosomes, p=self.rouletteProbabilities), np.random.choice(self.population.chromosomes, p=self.rouletteProbabilities)
