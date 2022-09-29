@@ -33,17 +33,15 @@ class Population:
         """
         """
 
+        diffSet = set((Chromosome.popByThread[self.threadIdentifier]["content"]).values()).difference(set(Chromosome.popByThread[self.threadIdentifier]["sortedList"]["list"]))
+        # print("°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°° : ", len(diffSet), Population.popEntropySizes[self.threadIdentifier])
+        diffSet = random.sample(diffSet, Population.popEntropySizes[self.threadIdentifier])
         self.chromosomes = list(Chromosome.popByThread[self.threadIdentifier]["sortedList"]["list"])
-        identifiers = set(Chromosome.popByThread[self.threadIdentifier]["sortedList"]["identifiers"])
-        pool = list((Chromosome.popByThread[self.threadIdentifier]["content"]).values())
-        while len(self.chromosomes) < Population.popSizes[self.threadIdentifier]:
-            chromosome = random.sample(pool, 1)[0]
-            if chromosome.stringIdentifier in identifiers:
-                continue
-            bisect.insort_left(self.chromosomes, chromosome)
-            identifiers.add(chromosome.stringIdentifier)
 
-        print("----------------------------------- : ", len(self.chromosomes), len(Chromosome.popByThread[self.threadIdentifier]["sortedList"]["list"]))
+        for chromosome in diffSet:
+            bisect.insort_left(self.chromosomes, chromosome)
+
+        # print("----------------------------------- : ", len(self.chromosomes), len(Chromosome.popByThread[self.threadIdentifier]["sortedList"]["list"]))
 
 
     def localSearch(self):

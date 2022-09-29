@@ -38,14 +38,13 @@ class GeneticAlgorithm:
 		while True:
 			
 			# check whether to stop or not
-			# if self.generationIndex == 10:
-			# 	break
+			if self.generationIndex == 20:
+				break
 
 			with concurrent.futures.ThreadPoolExecutor() as executor:
 				print(list(executor.map(self.processGenPop, primeThreadIdentifiers)))
 
-			# LspRuntimeMonitor.instance.output("Population --> " + str((Chromosome.pool["content"]).keys()))
-
+			# check whether to stop the process or not
 			if self.terminateProcess():
 				break
 
@@ -56,24 +55,11 @@ class GeneticAlgorithm:
 		"""
 		"""
 
-		if self.idleGenCounters[primeThreadIdentifier] == ParameterData.instance.nIdleGenerations:
+		if self.idleGenCounters[primeThreadIdentifier] >= ParameterData.instance.nIdleGenerations:
 			return
 
 		# building population
 		population = Population(primeThreadIdentifier)
-
-		if self.generationIndex > 1:
-			self.idleGenCounters[primeThreadIdentifier] = self.idleGenCounters[primeThreadIdentifier] + 1 if population.chromosomes[0].cost == LspRuntimeMonitor.instance.popsData[primeThreadIdentifier]["min"][-1] else 1
-
-		if self.idleGenCounters[primeThreadIdentifier] == ParameterData.instance.nIdleGenerations:
-			return
-		
-		if self.idleGenCounters[primeThreadIdentifier] > 1:
-			population.localSearch()
-
-		# Stats
-		LspRuntimeMonitor.instance.popsData[primeThreadIdentifier]["min"].append(population.chromosomes[0].cost)
-		print("Miiiiiiiiiiiinnnnnnnnnnnn : ", population.chromosomes[0].cost, self.idleGenCounters[primeThreadIdentifier])
 
 		# crossing over
 		chromosomes = CrossOverOperator().process(population)
@@ -81,6 +67,16 @@ class GeneticAlgorithm:
 
 		# applying mutation
 		# MutationOperator().process(population)
+
+		if self.generationIndex > 0:
+			self.idleGenCounters[primeThreadIdentifier] = self.idleGenCounters[primeThreadIdentifier] + 1 if (Chromosome.popByThread[primeThreadIdentifier]["sortedList"]["list"][0]).cost == LspRuntimeMonitor.instance.popsData[primeThreadIdentifier]["min"][-1] else 1
+
+		# if self.idleGenCounters[primeThreadIdentifier] > 1:
+		# 	population.localSearch()
+
+		# Stats
+		LspRuntimeMonitor.instance.popsData[primeThreadIdentifier]["min"].append((Chromosome.popByThread[primeThreadIdentifier]["sortedList"]["list"][0]).cost)
+		# print("Miiiiiiiiiiiinnnnnnnnnnnn : ", population.chromosomes[0].cost, self.idleGenCounters[primeThreadIdentifier])
 
 		LspRuntimeMonitor.instance.output("Population --> " + str((Chromosome.popByThread[primeThreadIdentifier]["sortedList"]["identifiers"])))
 
@@ -95,7 +91,6 @@ class GeneticAlgorithm:
 				return False
 		return True
 	
-
 
 	def solve(self):
 		"""

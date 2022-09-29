@@ -133,11 +133,6 @@ class Chromosome(object):
 		return None
 
 
-	# @classmethod
-	# def classGenesByPeriod(cls, chromosome):
-	# 	return dict({period: gene for itemGenes in chromosome.dnaArray for gene in itemGenes})
-
-
 	@classmethod
 	def createFromIdentifier(cls, stringIdentifier):
 		"""
