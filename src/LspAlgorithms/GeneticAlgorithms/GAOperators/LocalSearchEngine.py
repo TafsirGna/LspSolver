@@ -130,16 +130,16 @@ class LocalSearchEngine:
         """
         """
 
-        if self.areItemsSwitchable(chromosome, periodGene, altPeriod, periodGeneLowerLimit, periodGeneUpperLimit):
+        if LocalSearchEngine.areItemsSwitchable(chromosome, periodGene, altPeriod, periodGeneLowerLimit, periodGeneUpperLimit):
 
-            mStringIdentifier = self.mutationStringIdentifier(chromosome.stringIdentifier, periodGene.period, altPeriod)
+            mStringIdentifier = LocalSearchEngine.mutationStringIdentifier(chromosome.stringIdentifier, periodGene.period, altPeriod)
             inPool = True
             with Chromosome.pool["lock"]:
                 if mStringIdentifier not in Chromosome.pool["content"]:
                     inPool =  False
 
             if not inPool:
-                evaluationData = self.evaluateItemsSwitch(chromosome, periodGene, altPeriod)
+                evaluationData = LocalSearchEngine.evaluateItemsSwitch(chromosome, periodGene, altPeriod)
                 with LocalSearchEngine.evaluationDataPool["lock"]:
                     LocalSearchEngine.evaluationDataPool["content"][(chromosome.stringIdentifier, periodGene.period, altPeriod)] = evaluationData
 
@@ -151,7 +151,7 @@ class LocalSearchEngine:
                     with Chromosome.pool["lock"]:
                         if mStringIdentifier not in Chromosome.pool["content"]:
                             Chromosome.pool["content"][mStringIdentifier] = args["threadId"] # {"threadId": args["threadId"], "value": pseudoChromosome}
-                            Chromosome.popByThread[args["threadId"]][mStringIdentifier] = pseudoChromosome
+                            Chromosome.popByThread[args["threadId"]]["content"][mStringIdentifier] = pseudoChromosome
                             Chromosome.insertInSortedList(Chromosome.popByThread[args["threadId"]]["sortedList"], pseudoChromosome, LspRuntimeMonitor.instance.sortedListLength[args["threadId"]])
 
                     if evaluationData["variance"] > 0:
@@ -175,7 +175,8 @@ class LocalSearchEngine:
             return "SET_ALT_PERIOD_NONE"
 
 
-    def areItemsSwitchable(self, chromosome, periodGene, altPeriod, periodGeneLowerLimit, periodGeneUpperLimit):
+    @classmethod
+    def areItemsSwitchable(cls, chromosome, periodGene, altPeriod, periodGeneLowerLimit, periodGeneUpperLimit):
         """
         """
 
@@ -313,7 +314,8 @@ class LocalSearchEngine:
         return mutation
 
 
-    def mutationStringIdentifier(self, stringIdentifier, period, altPeriod):
+    @classmethod
+    def mutationStringIdentifier(cls, stringIdentifier, period, altPeriod):
         """
         """
 # 
@@ -323,14 +325,15 @@ class LocalSearchEngine:
         return tuple(stringIdentifier)
 
 
-    def evaluateItemsSwitch(self, chromosome, periodGene, altPeriod):
+    @classmethod
+    def evaluateItemsSwitch(cls, chromosome, periodGene, altPeriod):
         """
         """
 
         print("Evaluating : --- ", chromosome, periodGene.period, altPeriod, chromosome.dnaArray)
 
         evaluationData = {"chromosome": chromosome, "variance": periodGene.cost, "periodGene": {}, "altPeriodGene": {}, "altPeriod": altPeriod, "period": periodGene.period}
-        evaluationData["newStringIdentifier"] = self.mutationStringIdentifier(chromosome.stringIdentifier, periodGene.period, altPeriod)
+        evaluationData["newStringIdentifier"] = LocalSearchEngine.mutationStringIdentifier(chromosome.stringIdentifier, periodGene.period, altPeriod)
         if chromosome.stringIdentifier[altPeriod] > 0: 
             altPeriodGene = chromosome.dnaArray[(chromosome.genesByPeriod[altPeriod])[0]][(chromosome.genesByPeriod[altPeriod])[1]]
             evaluationData["variance"] += altPeriodGene.cost

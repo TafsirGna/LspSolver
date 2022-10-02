@@ -25,6 +25,19 @@ class Chromosome(object):
 		self.dnaArray = [[None for _ in indices] for indices in InputDataInstance.instance.demandsArrayZipped]
 		self.stringIdentifier = []
 		self.genesByPeriod = defaultdict(lambda: None)
+
+
+	@classmethod
+	def distanceMeasure(cls, chromosomeA, chromosomeB):
+		"""
+		"""
+
+		count = 0
+		for period in range(InputDataInstance.instance.nPeriods):
+			if chromosomeA.stringIdentifier[period] != chromosomeB.stringIdentifier[period]:
+				count += 1
+
+		return count
 		
 
 	@classmethod

@@ -101,5 +101,3 @@ class GeneticAlgorithm:
 
 		# apply genetic algorithms to this initial population
 		self.applyGA(primeThreadIdentifiers)
-
-			
