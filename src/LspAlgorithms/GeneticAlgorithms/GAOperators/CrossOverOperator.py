@@ -3,9 +3,9 @@ import random
 import threading
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.Chromosome import Chromosome
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
-import concurrent.futures
-import copy
-from LspAlgorithms.GeneticAlgorithms.PopInitialization.Gene import Gene
+# import concurrent.futures
+# import copy
+# from LspAlgorithms.GeneticAlgorithms.PopInitialization.Gene import Gene
 from .LocalSearchEngine import LocalSearchEngine
 from ..PopInitialization.Population import Population
 from ParameterSearch.ParameterData import ParameterData
@@ -75,8 +75,6 @@ class CrossOverOperator:
         return chromosomes
 
 
-
-
     def mate(self, parentChromosomes, offspring_result = 2):
         """
         """
@@ -118,7 +116,7 @@ class CrossOverOperator:
     def setOffsprings(self):
         """
         """
-
+        
         for i in [0, 1]:
             self.searchOffspring(i)
 
@@ -127,19 +125,19 @@ class CrossOverOperator:
         """
         """
 
-        target = self.parentChromosomes[0] if offspringIndex ==  1 else self.parentChromosomes[1]
+        target = self.parentChromosomes[0] if offspringIndex == 1 else self.parentChromosomes[1]
 
         queue = [self.parentChromosomes[offspringIndex]]
         while len(queue) > 0:
             chromosome = queue[-1]
             # offspring = chromosome
             self.offsprings[offspringIndex] = chromosome
-            queue = queue[:-1]
+            queue = queue[:-1] 
 
             if isinstance(chromosome, PseudoChromosome):
                 chromosome = LocalSearchEngine.switchItems(chromosome.value)
 
-            for period in range(InputDataInstance.instance.nPeriods):
+            for period in reversed(range(InputDataInstance.instance.nPeriods)):
 
                 item = target.stringIdentifier[period] - 1
                 if item >= 0 and target.stringIdentifier[period] != chromosome.stringIdentifier[period]:
@@ -147,7 +145,7 @@ class CrossOverOperator:
                     periodGeneLowerLimit, periodGeneUpperLimit = Chromosome.geneLowerUpperLimit(chromosome, periodGene)
 
                     if LocalSearchEngine.areItemsSwitchable(chromosome, periodGene, period, periodGeneLowerLimit, periodGeneUpperLimit):
-                        print("yeaaaaaaaaaaaaaaaaaaaaaah")
+                        # print("yeaaaaaaaaaaaaaaaaaaaaaah")
 
                         mStringIdentifier = LocalSearchEngine.mutationStringIdentifier(chromosome.stringIdentifier, periodGene.period, period)
                         inPool = True
@@ -183,5 +181,3 @@ class CrossOverOperator:
                         pass
 
         # return offspring
-
-

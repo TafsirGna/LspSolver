@@ -1,12 +1,12 @@
 #!/usr/bin/python3.5
 # -*-coding: utf-8 -*
 
-from collections import defaultdict
+# from collections import defaultdict
 import concurrent.futures
-import multiprocessing
-from queue import Queue
-import threading
-import uuid
+# import multiprocessing
+# from queue import Queue
+# import threading
+# import uuid
 from LspAlgorithms.GeneticAlgorithms.GAOperators.LocalSearchEngine import LocalSearchEngine
 from LspAlgorithms.GeneticAlgorithms.LspRuntimeMonitor import LspRuntimeMonitor
 from ..PopInitialization.PopInitializer import PopInitializer
