@@ -123,15 +123,33 @@ It is assumed that the production period is short enough to produce only one ite
 
     Be \emph{xT} the production planning which represents a potential solution to the problem. It is a table of size \emph{NT}. A possible solution to the problem is $ xT = (2, 1, 2, 0, 1) $ with a cost of $ q(2, 1) + q(1, 2) + q(2, 1) + 2 \* h(2) = 15 $. The optimal solution is : $ xT = (2, 1, 0, 1, 2) $ with a cost of $ q(2, 1) + q(1, 2) + h(1) = 10 $.
 
+\section{Genetic Algorithms}
+Genetic algorithms are stochastic search algorithms designed to mimic the natural evolution of living species and reproduction mecanisms. They have been proposed for the first time by John Holland [15] in 1970. One of the main principles of these algorithms is the concept of the "\emph{survival of the fittest}" which states that one individual whose features fit the best with the environement is more likely to survive. Emulating the process of natural evolution, Genetic Algorithms induce the random exchange of genetic material among individuals of the same population.
+This section exposes its implementation in the context of optimization problems with concepts such as \emph{Initialization}, \emph{Selection}, \emph{Crossover} or \emph{Mutation}.
+ 
+\subsection{Initialization}
+The initialization process consists of creating the first population which is a set of individuals (potential solutions). There are several strategies when creating the initial population. The initialization can be mainly random or heuristic [?]. Random initialization means that solutions which are usually a sequence of numbers, are "seeded" without any logic driving the process whilst respecting all constraints set by the problem. 
+%Some researches [?] have found that it can help inscrease diversity compared to heuristic initialization and allows to seed individuals in regions of the search space that would have been overlooked otherwise. \\ 
+Heuristic initialisation, on the opposite is a deterministic method of initializing the population using heuristics to determine the best potential solutions close enough to the optimal solutions. \\
+The design of the initialization process plays a significant role in the the overall success of the implementation of genetic algorithms.
 
+\subsection{Selection}
 
+\subsection{Crossover}
+
+\subsection{Mutation}
+
+\subsection{Termination}
+\\
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Our Method}
 In this section, we explain what genetic algorithms are, how they work in pratice and expose our method based on this category of algorithms in solving a Discrete Lot Sizing Problem.
 
-\subsection{Genetic Algorithms}
-Genetic algorithms are algorithms designed to mimic the natural eveolution of living species and reproduction mecanisms. They have been proposed for the first time by John Holland [15] in 1970. One of the main principles of these algorithms is the concept of the "\emph{survival of the fittest}" whiche states that one individu whose features fit the best with the environement is more likely to survive. 
+\subsection{The Mathematical Model}
+
+
+\
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Experimental results \protect\footnotemark}
