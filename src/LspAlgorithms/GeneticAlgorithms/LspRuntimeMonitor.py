@@ -72,7 +72,7 @@ class LspRuntimeMonitor:
         """
 
         if not os.path.exists(LspRuntimeMonitor.outputFolderPath):
-            os.mkdir(LspRuntimeMonitor.outputFolderPath)
+            os.makedirs(LspRuntimeMonitor.outputFolderPath)
 
         now = datetime.now()
         f = open(LspRuntimeMonitor.outputFolderPath+"/"+str(datetime.timestamp(now))+".txt", "w")

@@ -62,8 +62,7 @@ class GeneticAlgorithm:
 		population = Population(primeThreadIdentifier)
 
 		# crossing over
-		chromosomes = CrossOverOperator().process(population)
-		population.chromosomes = chromosomes
+		CrossOverOperator().process(population)
 
 		# applying mutation
 		# MutationOperator().process(population)

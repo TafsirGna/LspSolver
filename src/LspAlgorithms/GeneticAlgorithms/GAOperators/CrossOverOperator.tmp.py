@@ -86,6 +86,7 @@ class CrossOverOperator:
 
             print("chromosomes length : ", len(chromosomes), Population.popSizes[population.threadIdentifier])
 
+        population.chromosomes = chromosomes
         return chromosomes
 
 
