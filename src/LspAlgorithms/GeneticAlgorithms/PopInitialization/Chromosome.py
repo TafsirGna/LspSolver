@@ -5,6 +5,7 @@ from collections import defaultdict
 import threading
 import numpy as np
 import copy
+from LspAlgorithms.GeneticAlgorithms.LspRuntimeMonitor import LspRuntimeMonitor
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.Gene import Gene
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 import concurrent.futures
@@ -38,7 +39,26 @@ class Chromosome(object):
 				count += 1
 
 		return count
-		
+
+	@classmethod
+	def addToPop(cls, threadIdentifier, chromosome):
+		"""
+		"""
+
+		Chromosome.popByThread[threadIdentifier]["content"][chromosome.stringIdentifier] = chromosome
+		Chromosome.pool["content"][chromosome.stringIdentifier] = set({threadIdentifier})
+		Chromosome.insertInSortedList(Chromosome.popByThread[threadIdentifier]["sortedList"], chromosome, LspRuntimeMonitor.instance.sortedListLength[threadIdentifier])
+
+
+	@classmethod
+	def copyToThread(cls, threadIdentifier, chromosome):
+		"""
+		"""
+
+		Chromosome.popByThread[threadIdentifier]["content"][chromosome.stringIdentifier] = chromosome
+		(Chromosome.pool["content"][chromosome.stringIdentifier]).add(threadIdentifier)
+		Chromosome.insertInSortedList(Chromosome.popByThread[threadIdentifier]["sortedList"], chromosome, LspRuntimeMonitor.instance.sortedListLength[threadIdentifier])
+
 
 	@classmethod
 	def insertInSortedList(cls, sortedList, chromosome, sortedListLength):

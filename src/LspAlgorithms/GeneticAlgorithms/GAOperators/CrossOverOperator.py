@@ -131,7 +131,7 @@ class CrossOverOperator:
         print("Begiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiinnnnnnn", self.parentChromosomes[offspringIndex], target)
 
         queue = [self.parentChromosomes[offspringIndex]]
-        currentPeriod = InputDataInstance.instance.nPeriods - 1
+        currentPeriod = InputDataInstance.instance.nPeriods
         while len(queue) > 0:
             chromosome = queue[-1]
             # offspring = chromosome
@@ -142,10 +142,9 @@ class CrossOverOperator:
                 chromosome = LocalSearchEngine.switchItems(chromosome.value)
 
             period = None
-            for period in reversed(range(currentPeriod + 1)):
+            for period in reversed(range(currentPeriod)):
 
                 print("mmmmmmmmmmmmmmmmmmmmmmmmmmm : ", period, chromosome)
-
                 item = target.stringIdentifier[period] - 1
                 if item >= 0 and target.stringIdentifier[period] != chromosome.stringIdentifier[period]:
                     periodGene = chromosome.dnaArray[target.genesByPeriod[period][0]][target.genesByPeriod[period][1]]
@@ -162,33 +161,39 @@ class CrossOverOperator:
                                 inPool =  False
 
                         if inPool:
-                            result = Chromosome.popByThread[Chromosome.pool["content"][mStringIdentifier]]["content"][mStringIdentifier]
                             # print("Resultiiiiiiii : ", result)
-                            if result < chromosome:
-                                queue.append(result)
+                            popChromosome = None
+                            if self.threadIdentifier not in Chromosome.pool["content"][mStringIdentifier]:
+                                Chromosome.copyToThread(self.threadIdentifier, popChromosome)
+                            popChromosome = Chromosome.popByThread[self.threadIdentifier]["content"][mStringIdentifier]
+
+                            if popChromosome < chromosome:
+                                queue.append(popChromosome)
                                 break
 
                         else:
                             evaluationData = LocalSearchEngine.evaluateItemsSwitch(chromosome, periodGene, period)
-                            with LocalSearchEngine.evaluationDataPool["lock"]:
-                                LocalSearchEngine.evaluationDataPool["content"][(chromosome.stringIdentifier, periodGene.period, period)] = evaluationData
-
                             pseudoChromosome = PseudoChromosome(evaluationData)
+
+                            popChromosome = None
                             with Chromosome.pool["lock"]:
                                 if mStringIdentifier not in Chromosome.pool["content"]:
-                                    Chromosome.pool["content"][mStringIdentifier] = self.threadIdentifier
-                                    Chromosome.popByThread[self.threadIdentifier]["content"][mStringIdentifier] = pseudoChromosome
-                                    Chromosome.insertInSortedList(Chromosome.popByThread[self.threadIdentifier]["sortedList"], pseudoChromosome, LspRuntimeMonitor.instance.sortedListLength[self.threadIdentifier])
+                                    Chromosome.addToPop(self.threadIdentifier, pseudoChromosome)
+                                else:
+                                    popChromosome = Chromosome.popByThread[Chromosome.pool["content"][mStringIdentifier]]["content"][mStringIdentifier]
 
-                            if evaluationData["variance"] > 0:
-                                # self.result = pseudoChromosome
-                                # LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][chromosome.stringIdentifier]["genes"] = selectedGenes
-                                # LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][chromosome.stringIdentifier]["results"][mStringIdentifier] = pseudoChromosome.cost
-                                queue.append(pseudoChromosome)
-                                break
-
+                            if popChromosome is None:
+                                if evaluationData["variance"] > 0:
+                                    # LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][chromosome.stringIdentifier]["genes"] = selectedGenes
+                                    # LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][chromosome.stringIdentifier]["results"][mStringIdentifier] = pseudoChromosome.cost
+                                    queue.append(pseudoChromosome)
+                                    break
+                            else:
+                                if popChromosome < chromosome:
+                                    queue.append(popChromosome)
+                                    break
                     else:
                         pass
 
-            currentPeriod = period - 1
+            currentPeriod = period
         # return offspring

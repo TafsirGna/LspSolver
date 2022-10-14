@@ -65,7 +65,7 @@ class PopInitializer:
 
         for chromosome in chromosomes:
             with Chromosome.pool["lock"]:
-                Chromosome.pool["content"][chromosome.stringIdentifier] = self.primeThreadIdentifiers[popIndex]
+                Chromosome.pool["content"][chromosome.stringIdentifier] = set({self.primeThreadIdentifiers[popIndex]})
             
             #
             Chromosome.popByThread[self.primeThreadIdentifiers[popIndex]]["content"][chromosome.stringIdentifier] = chromosome

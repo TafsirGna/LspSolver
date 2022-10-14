@@ -17,7 +17,6 @@ class LocalSearchEngine:
 
     genericGeneIndices = None
     localSearchMemory = {"lock": threading.Lock(), "content": defaultdict(lambda: None)}
-    evaluationDataPool = {"lock": threading.Lock(), "content": dict()}
 
     def __init__(self) -> None:
         """
@@ -140,8 +139,6 @@ class LocalSearchEngine:
 
             if not inPool:
                 evaluationData = LocalSearchEngine.evaluateItemsSwitch(chromosome, periodGene, altPeriod)
-                with LocalSearchEngine.evaluationDataPool["lock"]:
-                    LocalSearchEngine.evaluationDataPool["content"][(chromosome.stringIdentifier, periodGene.period, altPeriod)] = evaluationData
 
                 if strategy == "population":
                         results.append(LocalSearchEngine.switchItems(evaluationData))
@@ -150,9 +147,7 @@ class LocalSearchEngine:
                     pseudoChromosome = PseudoChromosome(evaluationData)
                     with Chromosome.pool["lock"]:
                         if mStringIdentifier not in Chromosome.pool["content"]:
-                            Chromosome.pool["content"][mStringIdentifier] = args["threadId"] # {"threadId": args["threadId"], "value": pseudoChromosome}
-                            Chromosome.popByThread[args["threadId"]]["content"][mStringIdentifier] = pseudoChromosome
-                            Chromosome.insertInSortedList(Chromosome.popByThread[args["threadId"]]["sortedList"], pseudoChromosome, LspRuntimeMonitor.instance.sortedListLength[args["threadId"]])
+                            Chromosome.addToPop(args["threadId"], pseudoChromosome)
 
                     if evaluationData["variance"] > 0:
                         # self.result = pseudoChromosome
