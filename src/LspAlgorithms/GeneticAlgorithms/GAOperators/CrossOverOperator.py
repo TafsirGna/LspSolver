@@ -37,16 +37,16 @@ class CrossOverOperator:
 
         chromosomes = list()
         self.threadIdentifier = population.threadIdentifier
-        # self.population = population
+        self.population = population
 
         while len(chromosomes) < Population.popSizes[population.threadIdentifier]:
 
             chromosomeA, chromosomeB = population.selectionOperator.select()
 
             if isinstance(chromosomeA, PseudoChromosome):
-                chromosomeA = LocalSearchEngine.switchItems(chromosomeA.value)
+                chromosomeA = LocalSearchEngine.switchItems(chromosomeA.value, population.threadIdentifier)
             if isinstance(chromosomeB, PseudoChromosome):
-                chromosomeB = LocalSearchEngine.switchItems(chromosomeB.value)
+                chromosomeB = LocalSearchEngine.switchItems(chromosomeB.value, population.threadIdentifier)
 
             chromosomeC, chromosomeD = None, None
 
@@ -99,8 +99,8 @@ class CrossOverOperator:
                                 (CrossOverOperator.crossOverMemory["content"][((self.parentChromosomes[1]).stringIdentifier, (self.parentChromosomes[0]).stringIdentifier)] if CrossOverOperator.crossOverMemory["content"][((self.parentChromosomes[1]).stringIdentifier, (self.parentChromosomes[0]).stringIdentifier)] is not None else None)
         if  memoryResult is not None:
             print("Retrieving crossover results : ", memoryResult)
-            for offspring in memoryResult:
-                LocalSearchEngine().process(offspring, "simple_mutation", {"threadId": self.threadIdentifier})
+            # for offspring in memoryResult:
+            #     LocalSearchEngine().process(offspring, "simple_mutation", {"threadId": self.threadIdentifier})
             return memoryResult
 
         self.setOffsprings()
@@ -139,7 +139,7 @@ class CrossOverOperator:
             queue = queue[:-1] 
 
             if isinstance(chromosome, PseudoChromosome):
-                chromosome = LocalSearchEngine.switchItems(chromosome.value)
+                chromosome = LocalSearchEngine.switchItems(chromosome.value, self.population.threadIdentifier)
 
             period = None
             for period in reversed(range(currentPeriod)):

@@ -1,7 +1,7 @@
 from collections import defaultdict
 import multiprocessing as mp
 import numpy as np
-from LspAlgorithms.GeneticAlgorithms.PopInitialization import Chromosome
+from LspAlgorithms.GeneticAlgorithms.PopInitialization.Chromosome import Chromosome
 from ParameterSearch.ParameterData import ParameterData
 from queue import Queue
 import concurrent.futures
@@ -72,14 +72,17 @@ class SelectionOperator:
         result = None
 
         if self.strategy == "roulette_wheel":
-            result = self.selectApproach2()
+            result = self.rouletteWheelSelect()
 
         return result
 
 
-    def selectApproach2(self):
+    def rouletteWheelSelect(self):
         """
         """
         # print("*************** : ",  len(self.population.chromosomes), len(self.rouletteProbabilities))
 
-        return np.random.choice(self.population.chromosomes, p=self.rouletteProbabilities), np.random.choice(self.population.chromosomes, p=self.rouletteProbabilities)
+        chromosomeA, chromosomeB = np.random.choice(self.population.chromosomes, p=self.rouletteProbabilities), np.random.choice(self.population.chromosomes, p=self.rouletteProbabilities)
+        chromosomeA, chromosomeB = Chromosome.popByThread[self.population.threadIdentifier]["content"][chromosomeA.stringIdentifier], Chromosome.popByThread[self.population.threadIdentifier]["content"][chromosomeB.stringIdentifier]
+
+        return chromosomeA, chromosomeB

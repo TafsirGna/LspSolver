@@ -54,7 +54,7 @@ class LocalSearchEngine:
         """
 
         if isinstance(chromosome, PseudoChromosome):
-            chromosome = LocalSearchEngine.switchItems(chromosome.value)
+            chromosome = LocalSearchEngine.switchItems(chromosome.value, args["threadId"])
 
         results = []
         selectedGenes = None
@@ -141,7 +141,7 @@ class LocalSearchEngine:
                 evaluationData = LocalSearchEngine.evaluateItemsSwitch(chromosome, periodGene, altPeriod)
 
                 if strategy == "population":
-                        results.append(LocalSearchEngine.switchItems(evaluationData))
+                        results.append(LocalSearchEngine.switchItems(evaluationData), args["threadId"])
 
                 if strategy == "simple_mutation":
                     pseudoChromosome = PseudoChromosome(evaluationData)
@@ -201,7 +201,7 @@ class LocalSearchEngine:
 
 
     @classmethod
-    def switchItems(cls, evaluationData):
+    def switchItems(cls, evaluationData, threadIdentifier):
         """ 
         """
 
@@ -304,6 +304,10 @@ class LocalSearchEngine:
         #         # mutation.genesByPeriod, " --- ", c.genesByPeriod, "\n", 
         #         mutation.dnaArray, c.dnaArray)
 
+
+        if mutation.stringIdentifier in Chromosome.popByThread[threadIdentifier]["content"]:
+            if isinstance(Chromosome.popByThread[threadIdentifier]["content"][mutation.stringIdentifier], PseudoChromosome):
+                Chromosome.popByThread[threadIdentifier]["content"][mutation.stringIdentifier] = mutation
 
         print("Switch done")
         return mutation
