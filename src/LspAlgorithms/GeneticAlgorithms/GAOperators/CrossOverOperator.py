@@ -127,7 +127,6 @@ class CrossOverOperator:
         """
 
         target = self.parentChromosomes[0] if offspringIndex == 1 else self.parentChromosomes[1]
-
         print("Begiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiinnnnnnn", self.parentChromosomes[offspringIndex], target)
 
         queue = [self.parentChromosomes[offspringIndex]]
@@ -141,20 +140,22 @@ class CrossOverOperator:
             if isinstance(chromosome, PseudoChromosome):
                 chromosome = LocalSearchEngine.switchItems(chromosome.value, self.population.threadIdentifier)
 
+            genesByPeriod = sorted([period for period in target.genesByPeriod])
+
             period = None
-            for period in reversed(range(currentPeriod)):
+            for period in reversed(genesByPeriod):
 
                 print("mmmmmmmmmmmmmmmmmmmmmmmmmmm : ", period, chromosome)
-                item = target.stringIdentifier[period] - 1
-                if item >= 0 and target.stringIdentifier[period] != chromosome.stringIdentifier[period]:
-                    periodGene = chromosome.dnaArray[target.genesByPeriod[period][0]][target.genesByPeriod[period][1]]
-                    periodGeneLowerLimit, periodGeneUpperLimit = Chromosome.geneLowerUpperLimit(chromosome, periodGene)
-                    print("Different values !!!!!!!!!!!!!!!!! ", periodGene, "------", item, period)
+                targetGene = target.dnaArray[target.genesByPeriod[period][0]][target.genesByPeriod[period][1]]
+                gene = chromosome.dnaArray[targetGene.item][targetGene.position]
 
-                    if LocalSearchEngine.areItemsSwitchable(chromosome, periodGene, period, periodGeneLowerLimit, periodGeneUpperLimit):
+                if targetGene.period != gene.period:
+                    print("Different values !!!!!!!!!!!!!!!!! ", gene)
+
+                    if LocalSearchEngine.areItemsSwitchable(chromosome, gene, targetGene.period):
                         print("Switchable !!!!!!!!!!!!!!!!!!! ")
 
-                        mStringIdentifier = LocalSearchEngine.mutationStringIdentifier(chromosome.stringIdentifier, periodGene.period, period)
+                        mStringIdentifier = LocalSearchEngine.mutationStringIdentifier(chromosome.stringIdentifier, gene.period, targetGene.period)
                         inPool = True
                         with Chromosome.pool["lock"]:
                             if mStringIdentifier not in Chromosome.pool["content"]:
@@ -172,7 +173,7 @@ class CrossOverOperator:
                                 break
 
                         else:
-                            evaluationData = LocalSearchEngine.evaluateItemsSwitch(chromosome, periodGene, period)
+                            evaluationData = LocalSearchEngine.evaluateItemsSwitch(chromosome, gene, targetGene.period)
                             pseudoChromosome = PseudoChromosome(evaluationData)
 
                             popChromosome = None

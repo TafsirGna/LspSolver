@@ -26,7 +26,7 @@ class Chromosome(object):
 		self.dnaArray = [[None for _ in indices] for indices in InputDataInstance.instance.demandsArrayZipped]
 		self.stringIdentifier = []
 		self.genesByPeriod = defaultdict(lambda: None)
-		self.sortedGenesByCost = None
+		# self.sortedGenesByCost = None
 
 
 	@classmethod

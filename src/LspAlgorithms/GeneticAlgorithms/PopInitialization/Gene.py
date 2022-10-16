@@ -41,10 +41,10 @@ class Gene:
 
 
 
-    # def __lt__(self, gene):
-    #     """
-    #     """
-    #     return self.cost < gene.cost
+    def __lt__(self, gene):
+        """
+        """
+        return self.cost < gene.cost
 
     def __eq__(self, gene):
         """

@@ -129,7 +129,7 @@ class LocalSearchEngine:
         """
         """
 
-        if LocalSearchEngine.areItemsSwitchable(chromosome, periodGene, altPeriod, periodGeneLowerLimit, periodGeneUpperLimit):
+        if LocalSearchEngine.areItemsSwitchable(chromosome, periodGene, altPeriod, (periodGeneLowerLimit, periodGeneUpperLimit)):
 
             mStringIdentifier = LocalSearchEngine.mutationStringIdentifier(chromosome.stringIdentifier, periodGene.period, altPeriod)
             inPool = True
@@ -171,9 +171,11 @@ class LocalSearchEngine:
 
 
     @classmethod
-    def areItemsSwitchable(cls, chromosome, periodGene, altPeriod, periodGeneLowerLimit, periodGeneUpperLimit):
+    def areItemsSwitchable(cls, chromosome, periodGene, altPeriod, periodGeneLimits = None):
         """
         """
+
+        periodGeneLowerLimit, periodGeneUpperLimit = periodGeneLimits if periodGeneLimits is not None else Chromosome.geneLowerUpperLimit(chromosome, periodGene)
 
         if chromosome.stringIdentifier[altPeriod] > 0: 
             altPeriodGene = chromosome.dnaArray[(chromosome.genesByPeriod[altPeriod])[0]][(chromosome.genesByPeriod[altPeriod])[1]]
