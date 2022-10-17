@@ -65,7 +65,7 @@ class GeneticAlgorithm:
 		CrossOverOperator().process(population)
 
 		# applying mutation
-		# MutationOperator().process(population)
+		MutationOperator().process(population)
 
 		if self.generationIndex > 0:
 			self.idleGenCounters[primeThreadIdentifier] = self.idleGenCounters[primeThreadIdentifier] + 1 if (Chromosome.popByThread[primeThreadIdentifier]["sortedList"]["list"][0]).cost == LspRuntimeMonitor.instance.popsData[primeThreadIdentifier]["min"][-1] else 1

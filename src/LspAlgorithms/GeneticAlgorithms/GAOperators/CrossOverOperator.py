@@ -192,8 +192,6 @@ class CrossOverOperator:
 
                             if popChromosome is None:
                                 if evaluationData["variance"] > 0:
-                                    # LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][chromosome.stringIdentifier]["genes"] = selectedGenes
-                                    # LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][chromosome.stringIdentifier]["results"][mStringIdentifier] = pseudoChromosome.cost
                                     queue.append(pseudoChromosome)
                                     break
                             else:
@@ -208,10 +206,10 @@ class CrossOverOperator:
                 with LocalSearchEngine.localSearchMemory["lock"]:
                     if LocalSearchEngine.localSearchMemory["content"]["simple_mutation"] is None:
                         LocalSearchEngine.localSearchMemory["content"]["simple_mutation"] = dict()
-                    if (chromosome.stringIdentifier, gene.period, targetGene.period) in LocalSearchEngine.localSearchMemory["content"]["simple_mutation"]:
-                        (LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][(chromosome.stringIdentifier, gene.period, targetGene.period)]).add(self.threadIdentifier)
+                    if localSearchMemoryKey in LocalSearchEngine.localSearchMemory["content"]["simple_mutation"]:
+                        (LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][localSearchMemoryKey]).add(self.threadIdentifier)
                     else:
-                        LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][(chromosome.stringIdentifier, gene.period, targetGene.period)] = set({self.threadIdentifier})
+                        LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][localSearchMemoryKey] = set({self.threadIdentifier})
 
 
         if (self.offsprings[offspringIndex]).stringIdentifier in Chromosome.popByThread[self.threadIdentifier]["content"]:

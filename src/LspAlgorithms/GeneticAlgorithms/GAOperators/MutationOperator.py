@@ -30,5 +30,6 @@ class MutationOperator:
             chromosome = random.choice(population.chromosomes)
             print("picked chromosome : ", chromosome)
             if chromosome.stringIdentifier not in chromosomes:
-                (LocalSearchEngine()).process(chromosome, "simple_mutation", {"threadId": population.threadIdentifier})
-                chromosomes.add(chromosome.stringIdentifier)
+                result = (LocalSearchEngine()).process(chromosome, "random", {"threadId": population.threadIdentifier})
+                if result is not None:
+                    chromosomes.add(chromosome.stringIdentifier)
