@@ -28,6 +28,9 @@ class CrossOverOperator:
         # self.population = None        
         self.threadIdentifier = 1
 
+        if LocalSearchEngine.localSearchMemory["content"]["simple_mutation"] is None:
+            LocalSearchEngine.localSearchMemory["content"]["simple_mutation"] = dict()
+
         # self._stopSearchEvents = {0: threading.Event(), 1: threading.Event()}
 
 
@@ -152,10 +155,13 @@ class CrossOverOperator:
                     print("Different values !!!!!!!!!!!!!!!!! ", gene)
 
                     with LocalSearchEngine.localSearchMemory["lock"]:
-                        if LocalSearchEngine.localSearchMemory["content"]["simple_mutation"] is not None and (chromosome.stringIdentifier, gene.period, targetGene.period) in LocalSearchEngine.localSearchMemory["content"]["simple_mutation"]:
+                        if (chromosome.stringIdentifier, gene.period, targetGene.period) in LocalSearchEngine.localSearchMemory["content"]["simple_mutation"]:
                             if self.threadIdentifier not in LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][(chromosome.stringIdentifier, gene.period, targetGene.period)]:
-                                popChromosome = list(LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][(chromosome.stringIdentifier, gene.period, targetGene.period)])[0]
+                                threadIdentifier = list(LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][(chromosome.stringIdentifier, gene.period, targetGene.period)])[0]
+                                mStringIdentifier = LocalSearchEngine.mutationStringIdentifier(chromosome.stringIdentifier, gene.period, targetGene.period)
+                                popChromosome = Chromosome.popByThread[threadIdentifier]["content"][mStringIdentifier]
                                 Chromosome.copyToThread(self.threadIdentifier, popChromosome)
+                                LocalSearchEngine.registerMove((chromosome.stringIdentifier, gene.period, targetGene.period), self.threadIdentifier)
                             continue
 
                     if LocalSearchEngine.areItemsSwitchable(chromosome, gene, targetGene.period):
@@ -199,13 +205,7 @@ class CrossOverOperator:
                         
 
             if len(queue) > 0:
-                with LocalSearchEngine.localSearchMemory["lock"]:
-                    if LocalSearchEngine.localSearchMemory["content"]["simple_mutation"] is None:
-                        LocalSearchEngine.localSearchMemory["content"]["simple_mutation"] = dict()
-                    if localSearchMemoryKey in LocalSearchEngine.localSearchMemory["content"]["simple_mutation"]:
-                        (LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][localSearchMemoryKey]).add(self.threadIdentifier)
-                    else:
-                        LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][localSearchMemoryKey] = set({self.threadIdentifier})
+                LocalSearchEngine.registerMove(localSearchMemoryKey, self.threadIdentifier)
 
 
         if (self.offsprings[offspringIndex]).stringIdentifier in Chromosome.popByThread[self.threadIdentifier]["content"]:

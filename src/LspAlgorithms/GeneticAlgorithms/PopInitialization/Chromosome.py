@@ -47,6 +47,7 @@ class Chromosome(object):
 		"""
 
 		Chromosome.popByThread[threadIdentifier]["content"][chromosome.stringIdentifier] = chromosome
+		# with Chromosome.pool["lock"]:
 		Chromosome.pool["content"][chromosome.stringIdentifier] = set({threadIdentifier})
 		Chromosome.insertInSortedList(Chromosome.popByThread[threadIdentifier]["sortedList"], chromosome, LspRuntimeMonitor.instance.sortedListLength[threadIdentifier])
 
@@ -55,10 +56,11 @@ class Chromosome(object):
 	def copyToThread(cls, threadIdentifier, chromosome):
 		"""
 		"""
-
-		Chromosome.popByThread[threadIdentifier]["content"][chromosome.stringIdentifier] = chromosome
-		(Chromosome.pool["content"][chromosome.stringIdentifier]).add(threadIdentifier)
-		Chromosome.insertInSortedList(Chromosome.popByThread[threadIdentifier]["sortedList"], chromosome, LspRuntimeMonitor.instance.sortedListLength[threadIdentifier])
+		if chromosome.stringIdentifier not in Chromosome.popByThread[threadIdentifier]["content"]:
+			Chromosome.popByThread[threadIdentifier]["content"][chromosome.stringIdentifier] = chromosome
+			with Chromosome.pool["lock"]:
+				(Chromosome.pool["content"][chromosome.stringIdentifier]).add(threadIdentifier)
+			Chromosome.insertInSortedList(Chromosome.popByThread[threadIdentifier]["sortedList"], chromosome, LspRuntimeMonitor.instance.sortedListLength[threadIdentifier])
 
 
 	@classmethod

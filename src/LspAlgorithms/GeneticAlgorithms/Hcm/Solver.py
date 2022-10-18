@@ -33,7 +33,7 @@ class GeneticAlgorithm:
 
 		for threadIdentifier in Chromosome.popByThread:
 			popChampion = Chromosome.popByThread[threadIdentifier]["sortedList"]["list"][0]
-			LocalSearchEngine().refine(popChampion)
+			LocalSearchEngine().refine(popChampion, threadIdentifier)
 
 
 	def applyGA(self, primeThreadIdentifiers):
