@@ -3,8 +3,8 @@ import threading
 import copy
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.Chromosome import Chromosome
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.PseudoChromosome import PseudoChromosome
-from ParameterSearch.ParameterData import ParameterData
-import concurrent.futures
+# from ParameterSearch.ParameterData import ParameterData
+# import concurrent.futures
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 import random
 import numpy as np
@@ -29,7 +29,7 @@ class LocalSearchEngine:
         # self._stopSearchEvents = threading.Event()
 
 
-    def process(self, chromosome, strategy = "simple_mutation", args = None):
+    def process(self, chromosome, strategy = "random", args = None):
         """Process the given chromosome in order to return a mutated version
         """
 
@@ -75,14 +75,14 @@ class LocalSearchEngine:
 
                 # print(backwardPeriod, forwardPeriod)
                 if backwardPeriod is not None :
-                    result = self.handleAltPeriod(chromosome, strategy, periodGene, backwardPeriod, periodGeneLowerLimit, periodGeneUpperLimit, results, selectedGenes, args)
+                    result = self.handleAltPeriod(chromosome, strategy, periodGene, backwardPeriod, periodGeneLowerLimit, periodGeneUpperLimit, results, args)
                     if result == "RETURN":
                         return None
                     elif result == "SET_ALT_PERIOD_NONE":
                         backwardPeriod = None
 
                 if forwardPeriod is not None :
-                    result = self.handleAltPeriod(chromosome, strategy, periodGene, forwardPeriod, periodGeneLowerLimit, periodGeneUpperLimit, results, selectedGenes, args)
+                    result = self.handleAltPeriod(chromosome, strategy, periodGene, forwardPeriod, periodGeneLowerLimit, periodGeneUpperLimit, results, args)
                     if result == "RETURN":
                         return None
                     elif result == "SET_ALT_PERIOD_NONE":
@@ -95,10 +95,7 @@ class LocalSearchEngine:
 
             selectedGenes.remove(periodGene)
         
-        if strategy == "simple_mutation":
-            # if len(results) > 0:
-            #     pick = np.random.choice(results)
-            #     self.result = pick if isinstance(pick, Chromosome) else LocalSearchEngine.switchItems(pick.value)
+        if strategy == "refinement":
             self.result = chromosome
         elif strategy == "population":
             self.result = list(set(results))
@@ -106,17 +103,16 @@ class LocalSearchEngine:
         print("Search ended")
 
 
-    def handleAltPeriod(self, chromosome, strategy, periodGene, altPeriod, periodGeneLowerLimit, periodGeneUpperLimit, results, selectedGenes, args):
+    def handleAltPeriod(self, chromosome, strategy, periodGene, altPeriod, periodGeneLowerLimit, periodGeneUpperLimit, results, args):
         """
         """
 
-        if strategy == "random":
-            with LocalSearchEngine.localSearchMemory["lock"]:
-                if (chromosome.stringIdentifier, periodGene.period, altPeriod) in LocalSearchEngine.localSearchMemory["content"]["simple_mutation"]:
-                    if args["threadId"] not in LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][(chromosome.stringIdentifier, periodGene.period, altPeriod)]:
-                        popChromosome = list(LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][(chromosome.stringIdentifier, periodGene.period, altPeriod)])[0]
-                        Chromosome.copyToThread(args["threadId"], popChromosome)
-                    return
+        with LocalSearchEngine.localSearchMemory["lock"]:
+            if (chromosome.stringIdentifier, periodGene.period, altPeriod) in LocalSearchEngine.localSearchMemory["content"]["simple_mutation"]:
+                if args["threadId"] not in LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][(chromosome.stringIdentifier, periodGene.period, altPeriod)]:
+                    popChromosome = list(LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][(chromosome.stringIdentifier, periodGene.period, altPeriod)])[0]
+                    Chromosome.copyToThread(args["threadId"], popChromosome)
+                return
 
         if LocalSearchEngine.areItemsSwitchable(chromosome, periodGene, altPeriod, (periodGeneLowerLimit, periodGeneUpperLimit)):
 
@@ -129,21 +125,24 @@ class LocalSearchEngine:
             if not inPool:
                 evaluationData = LocalSearchEngine.evaluateItemsSwitch(chromosome, periodGene, altPeriod)
 
+                pseudoChromosome = None
                 if strategy == "population":
-                    results.append(LocalSearchEngine.switchItems(evaluationData), args["threadId"])
+                    # TODO
+                    pseudoChromosome = LocalSearchEngine.switchItems(evaluationData)
+                    results.append(pseudoChromosome)
 
-                pseudoChromosome = PseudoChromosome(evaluationData)
-                if strategy == "simple_mutation":
+                if strategy == "refinement":
+                    pseudoChromosome = PseudoChromosome(evaluationData)
                     with Chromosome.pool["lock"]:
                         if mStringIdentifier not in Chromosome.pool["content"]:
                             Chromosome.addToPop(args["threadId"], pseudoChromosome)
 
                     if evaluationData["variance"] > 0:
-                        # self.result = pseudoChromosome
                         self.searchIndividu(pseudoChromosome, strategy, args)
                         return "RETURN"
                 
                 if strategy == "random":
+                    pseudoChromosome = PseudoChromosome(evaluationData)
                     # inserting in the thread population
                     Chromosome.popByThread[args["threadId"]]["content"][mStringIdentifier] = pseudoChromosome
 
@@ -163,6 +162,8 @@ class LocalSearchEngine:
 
                     self.result = pseudoChromosome
                     return "RETURN"
+            else:
+                pass
         else:
             return "SET_ALT_PERIOD_NONE"
 
@@ -200,7 +201,7 @@ class LocalSearchEngine:
 
 
     @classmethod
-    def switchItems(cls, evaluationData, threadIdentifier):
+    def switchItems(cls, evaluationData, threadIdentifier = None):
         """ 
         """
 
@@ -304,9 +305,10 @@ class LocalSearchEngine:
         #         mutation.dnaArray, c.dnaArray)
 
 
-        if mutation.stringIdentifier in Chromosome.popByThread[threadIdentifier]["content"]:
-            if isinstance(Chromosome.popByThread[threadIdentifier]["content"][mutation.stringIdentifier], PseudoChromosome):
-                Chromosome.popByThread[threadIdentifier]["content"][mutation.stringIdentifier] = mutation
+        if threadIdentifier is not None: # strategy is not population
+            if mutation.stringIdentifier in Chromosome.popByThread[threadIdentifier]["content"]:
+                if isinstance(Chromosome.popByThread[threadIdentifier]["content"][mutation.stringIdentifier], PseudoChromosome):
+                    Chromosome.popByThread[threadIdentifier]["content"][mutation.stringIdentifier] = mutation
 
         print("Switch done")
         return mutation
@@ -431,3 +433,10 @@ class LocalSearchEngine:
         print("Evaluation result : ", chromosome, periodGene.period, altPeriod, " ---> ", evaluationData)
 
         return evaluationData        
+
+
+    def refine(self, chromosome):
+        """
+        """
+
+        # (LocalSearchEngine()).process(chromosome, "refinement")

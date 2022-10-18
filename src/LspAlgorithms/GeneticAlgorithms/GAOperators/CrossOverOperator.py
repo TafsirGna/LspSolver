@@ -170,34 +170,30 @@ class CrossOverOperator:
 
                         if inPool:
                             # print("Resultiiiiiiii : ", result)
-                            popChromosome = None
                             if self.threadIdentifier not in Chromosome.pool["content"][mStringIdentifier]:
                                 Chromosome.copyToThread(self.threadIdentifier, popChromosome)
-                            popChromosome = Chromosome.popByThread[self.threadIdentifier]["content"][mStringIdentifier]
-
-                            if popChromosome < chromosome:
-                                queue.append(popChromosome)
-                                break
+                                popChromosome = Chromosome.popByThread[self.threadIdentifier]["content"][mStringIdentifier]
+                                if popChromosome < chromosome:
+                                    queue.append(popChromosome)
+                                    break
+                            else:
+                                continue
 
                         else:
                             evaluationData = LocalSearchEngine.evaluateItemsSwitch(chromosome, gene, targetGene.period)
                             pseudoChromosome = PseudoChromosome(evaluationData)
 
-                            popChromosome = None
                             with Chromosome.pool["lock"]:
                                 if mStringIdentifier not in Chromosome.pool["content"]:
                                     Chromosome.addToPop(self.threadIdentifier, pseudoChromosome)
                                 else:
-                                    popChromosome = Chromosome.popByThread[Chromosome.pool["content"][mStringIdentifier]]["content"][mStringIdentifier]
+                                    popChromosome = Chromosome.popByThread[list(Chromosome.pool["content"][mStringIdentifier])[0]]["content"][mStringIdentifier]
+                                    Chromosome.copyToThread(self.threadIdentifier, popChromosome)
+                                    continue
 
-                            if popChromosome is None:
-                                if evaluationData["variance"] > 0:
-                                    queue.append(pseudoChromosome)
-                                    break
-                            else:
-                                if popChromosome < chromosome:
-                                    queue.append(popChromosome)
-                                    break
+                            if evaluationData["variance"] > 0:
+                                queue.append(pseudoChromosome)
+                                break
                     else:
                         pass
                         

@@ -27,6 +27,14 @@ class GeneticAlgorithm:
 
 		self.popInitializer = PopInitializer()
 
+	def boostProcess(self):
+		"""
+		"""
+
+		for threadIdentifier in Chromosome.popByThread:
+			popChampion = Chromosome.popByThread[threadIdentifier]["sortedList"]["list"][0]
+			LocalSearchEngine().refine(popChampion)
+
 
 	def applyGA(self, primeThreadIdentifiers):
 		"""
@@ -34,6 +42,8 @@ class GeneticAlgorithm:
 
 		self.generationIndex = 0
 		self.idleGenCounters = dict({primeThreadIdentifier: 1 for primeThreadIdentifier in primeThreadIdentifiers})
+
+		self.boostProcess()
 
 		while True:
 			

@@ -73,7 +73,7 @@ class PopInitializer:
 
 
         LspRuntimeMonitor.instance.sortedListLength[self.primeThreadIdentifiers[popIndex]] = (Population.popSizes[self.primeThreadIdentifiers[popIndex]] - Population.popEntropySizes[self.primeThreadIdentifiers[popIndex]])
-        # Population.mutatedPoolSize[self.primeThreadIdentifiers[popIndex]] = int(len(Chromosome.pool["content"]) * ParameterData.instance.mutationRate)
+        Population.mutatedPoolSize[self.primeThreadIdentifiers[popIndex]] = int(len(Chromosome.pool["content"]) * ParameterData.instance.mutationRate)
 
 
 class PopInitializerSmallInstanceApproach:
@@ -106,7 +106,7 @@ class PopInitializerSmallInstanceApproach:
         """
         """
 
-        threadID = uuid.uuid4()
+        # threadID = uuid.uuid4()
 
         queue = list(queue)
 
@@ -190,7 +190,8 @@ class PopInitializerBigInstanceApproach:
         """ Uniform cost search
         """
 
-        threadID = uuid.uuid4()
+        # threadID = uuid.uuid4()
+        
         queue = list(queue)
 
         for node in queue:

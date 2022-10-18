@@ -24,6 +24,8 @@ class MutationOperator:
         """
 
         chromosomes = set()
+        print("toto", len(chromosomes), Population.mutatedPoolSize[population.threadIdentifier], len(chromosomes) < Population.mutatedPoolSize[population.threadIdentifier])
+
         while len(chromosomes) < Population.mutatedPoolSize[population.threadIdentifier]:
             
             # print("population's chromosomes : ", population.chromosomes)
