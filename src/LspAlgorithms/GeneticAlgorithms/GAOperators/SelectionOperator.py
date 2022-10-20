@@ -15,9 +15,10 @@ class SelectionOperator:
         """
 
         self.population = population
+        self.chromosomes = list(self.population.chromosomes)
         self.strategy = strategy
         if self.strategy == "roulette_wheel":
-            self.rouletteProbabilities = [0] * len(self.population.chromosomes)
+            self.rouletteProbabilities = [0] * len(self.chromosomes)
             self.setRouletteProbabilities()
 
 
@@ -25,7 +26,7 @@ class SelectionOperator:
         """
         """
 
-        maxCost = self.population.chromosomes[-1].cost + 1
+        maxCost = self.population.worst.cost + 1
         totalFitness = 0
         fitnessArray = []
         for chromosome in slice:
@@ -42,7 +43,7 @@ class SelectionOperator:
         """
 
         nThreads = ParameterData.instance.nReplicaSubThreads
-        slices = np.array_split(self.population.chromosomes, nThreads)
+        slices = np.array_split(self.chromosomes, nThreads)
 
         processes = []
         resultQueues = [Queue()] * nThreads
@@ -61,7 +62,7 @@ class SelectionOperator:
         self.rouletteProbabilities = [float(fitness/totalFitness) for fitness in fitnessArray]
 
         print("**************************")
-        print("Roulette : ", self.population.chromosomes, " \n ", self.rouletteProbabilities)
+        print("Roulette : ", self.chromosomes, " \n ", self.rouletteProbabilities)
         print("++++++++++++++++++++++++++")
 
 
@@ -80,9 +81,9 @@ class SelectionOperator:
     def rouletteWheelSelect(self):
         """
         """
-        # print("*************** : ",  len(self.population.chromosomes), len(self.rouletteProbabilities))
+        # print("*************** : ",  len(self.chromosomes), len(self.rouletteProbabilities))
 
-        chromosomeA, chromosomeB = np.random.choice(self.population.chromosomes, p=self.rouletteProbabilities), np.random.choice(self.population.chromosomes, p=self.rouletteProbabilities)
+        chromosomeA, chromosomeB = np.random.choice(self.chromosomes, p=self.rouletteProbabilities), np.random.choice(self.chromosomes, p=self.rouletteProbabilities)
         chromosomeA, chromosomeB = Chromosome.popByThread[self.population.threadIdentifier]["content"][chromosomeA.stringIdentifier], Chromosome.popByThread[self.population.threadIdentifier]["content"][chromosomeB.stringIdentifier]
 
         return chromosomeA, chromosomeB

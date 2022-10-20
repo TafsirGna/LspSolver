@@ -35,3 +35,7 @@ class MutationOperator:
                 result = (LocalSearchEngine()).process(chromosome, "random", {"threadId": population.threadIdentifier})
                 if result is not None:
                     chromosomes.add(chromosome.stringIdentifier)
+
+                    # updating the population
+                    population.remove(chromosome)
+                    population.add(result)

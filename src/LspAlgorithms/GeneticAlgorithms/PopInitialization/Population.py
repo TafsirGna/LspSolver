@@ -16,34 +16,32 @@ class Population:
     mutatedPoolSize = defaultdict(lambda: 0)
     popEntropySizes = defaultdict(lambda: 0)
 
-    def __init__(self, threadIdentifier) -> None:
+    def __init__(self, threadIdentifier, chromosomes) -> None:
         """
         """
 
         self.threadIdentifier = threadIdentifier
 
-        self.setChromosomes()
-        
+        self.best, self.worst = None, None
+        self.setChromosomes(chromosomes)
+
         self.selectionOperator = SelectionOperator(self)
+        # instances = np.array_split(instances, ParameterData.instance.nReplicaThreads)
 
-    # instances = np.array_split(instances, ParameterData.instance.nReplicaThreads)
+    def boostChampion(self):
+        """ Boosting the quality of the best chromosomes in the population
+        """
 
+        LocalSearchEngine().refine(self.best, self.threadIdentifier)
 
-    def setChromosomes(self):
+    def setChromosomes(self, chromosomes):
         """
         """
 
-        diffSet = set((Chromosome.popByThread[self.threadIdentifier]["content"]).values()).difference(set(Chromosome.popByThread[self.threadIdentifier]["sortedList"]["list"]))
-        # print("°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°° : ", len(diffSet), Population.popEntropySizes[self.threadIdentifier])
-        diffSet = random.sample(diffSet, Population.popEntropySizes[self.threadIdentifier])
-        self.chromosomes = list(Chromosome.popByThread[self.threadIdentifier]["sortedList"]["list"])
-
-        for chromosome in diffSet:
-            bisect.insort_left(self.chromosomes, chromosome)
-
-        # print("----------------------------------- : ", len(self.chromosomes), len(Chromosome.popByThread[self.threadIdentifier]["sortedList"]["list"]))
-
-
+        self.chromosomes = chromosomes
+        self.best = min(self.chromosomes)
+        self.worst = max(self.chromosomes)
+        
     def localSearch(self):
         """
         """

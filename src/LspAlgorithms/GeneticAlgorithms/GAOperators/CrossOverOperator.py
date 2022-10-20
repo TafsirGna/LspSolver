@@ -38,7 +38,7 @@ class CrossOverOperator:
         """
         """
 
-        chromosomes = list()
+        chromosomes = set()
         self.threadIdentifier = population.threadIdentifier
         self.population = population
 
@@ -65,13 +65,13 @@ class CrossOverOperator:
             if chromosomeC is None:
                 print("chromosomeC None")
             else:
-                chromosomes.append(chromosomeC)
+                chromosomes.add(chromosomeC)
 
             if len(chromosomes) < Population.popSizes[population.threadIdentifier]:
                 if chromosomeD is None:
                     print("chromosomeD None")
                 else:
-                    chromosomes.append(chromosomeD)
+                    chromosomes.add(chromosomeD)
 
             print("chromosomes length : ", len(chromosomes), Population.popSizes[population.threadIdentifier])
 

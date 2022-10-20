@@ -1,12 +1,8 @@
 #!/usr/bin/python3.5
 # -*-coding: utf-8 -*
 
-# from collections import defaultdict
+from collections import defaultdict
 import concurrent.futures
-# import multiprocessing
-# from queue import Queue
-# import threading
-# import uuid
 from LspAlgorithms.GeneticAlgorithms.GAOperators.LocalSearchEngine import LocalSearchEngine
 from LspAlgorithms.GeneticAlgorithms.LspRuntimeMonitor import LspRuntimeMonitor
 from ..PopInitialization.PopInitializer import PopInitializer
@@ -26,14 +22,7 @@ class GeneticAlgorithm:
 		"""
 
 		self.popInitializer = PopInitializer()
-
-	def boostProcess(self):
-		"""
-		"""
-
-		for threadIdentifier in Chromosome.popByThread:
-			popChampion = Chromosome.popByThread[threadIdentifier]["sortedList"]["list"][0]
-			LocalSearchEngine().refine(popChampion, threadIdentifier)
+		self.popChromosomes = defaultdict(lambda: set())
 
 
 	def applyGA(self, primeThreadIdentifiers):
@@ -43,7 +32,8 @@ class GeneticAlgorithm:
 		self.generationIndex = 0
 		self.idleGenCounters = dict({primeThreadIdentifier: 1 for primeThreadIdentifier in primeThreadIdentifiers})
 
-		self.boostProcess()
+		for primeThreadIdentifier in primeThreadIdentifiers:
+			self.popChromosomes[primeThreadIdentifier] = set((Chromosome.popByThread[primeThreadIdentifier]["content"]).values())
 
 		while True:
 			
@@ -69,25 +59,31 @@ class GeneticAlgorithm:
 			return
 
 		# building population
-		population = Population(primeThreadIdentifier)
+		population = Population(primeThreadIdentifier, self.popChromosomes[primeThreadIdentifier])
+
+		if self.generationIndex == 0:
+			population.boostChampion()
+
+		if self.generationIndex > 0:
+			self.idleGenCounters[primeThreadIdentifier] = self.idleGenCounters[primeThreadIdentifier] + 1 if population.best.cost == LspRuntimeMonitor.instance.popsData[primeThreadIdentifier]["min"][-1] else 1
+
+		# Stats
+		LspRuntimeMonitor.instance.popsData[primeThreadIdentifier]["min"].append(population.best.cost)
 
 		# crossing over
 		CrossOverOperator().process(population)
 
 		# applying mutation
-		MutationOperator().process(population)
-
-		if self.generationIndex > 0:
-			self.idleGenCounters[primeThreadIdentifier] = self.idleGenCounters[primeThreadIdentifier] + 1 if (Chromosome.popByThread[primeThreadIdentifier]["sortedList"]["list"][0]).cost == LspRuntimeMonitor.instance.popsData[primeThreadIdentifier]["min"][-1] else 1
+		# MutationOperator().process(population)
 
 		# if self.idleGenCounters[primeThreadIdentifier] > 1:
 		# 	population.localSearch()
 
-		# Stats
-		LspRuntimeMonitor.instance.popsData[primeThreadIdentifier]["min"].append((Chromosome.popByThread[primeThreadIdentifier]["sortedList"]["list"][0]).cost)
 		# print("Miiiiiiiiiiiinnnnnnnnnnnn : ", population.chromosomes[0].cost, self.idleGenCounters[primeThreadIdentifier])
 
-		LspRuntimeMonitor.instance.output("Population --> " + str((Chromosome.popByThread[primeThreadIdentifier]["sortedList"]["identifiers"])))
+		self.popChromosomes[primeThreadIdentifier] = population.chromosomes
+
+		LspRuntimeMonitor.instance.output("Population --> " + str((Chromosome.popByThread[primeThreadIdentifier]["content"])))
 
 
 	def terminateProcess(self):

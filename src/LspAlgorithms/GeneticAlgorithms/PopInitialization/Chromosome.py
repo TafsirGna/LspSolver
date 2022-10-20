@@ -16,7 +16,7 @@ class Chromosome(object):
 
 	pool = dict({"lock": threading.Lock(), "content": dict()})
 	# localOptima = {"lock": threading.Lock(), "content": set()}
-	popByThread = defaultdict(lambda: dict({"content": dict(), "sortedList": {"list": list(), "identifiers": set()}}))
+	popByThread = defaultdict(lambda: dict({"content": dict()}))
 
 	def __init__(self):
 		"""
@@ -49,7 +49,7 @@ class Chromosome(object):
 		Chromosome.popByThread[threadIdentifier]["content"][chromosome.stringIdentifier] = chromosome
 		# with Chromosome.pool["lock"]:
 		Chromosome.pool["content"][chromosome.stringIdentifier] = set({threadIdentifier})
-		Chromosome.insertInSortedList(Chromosome.popByThread[threadIdentifier]["sortedList"], chromosome, LspRuntimeMonitor.instance.sortedListLength[threadIdentifier])
+		# Chromosome.insertInSortedList(Chromosome.popByThread[threadIdentifier]["sortedList"], chromosome, LspRuntimeMonitor.instance.sortedListLength[threadIdentifier])
 
 
 	@classmethod
@@ -60,27 +60,27 @@ class Chromosome(object):
 			Chromosome.popByThread[threadIdentifier]["content"][chromosome.stringIdentifier] = chromosome
 			with Chromosome.pool["lock"]:
 				(Chromosome.pool["content"][chromosome.stringIdentifier]).add(threadIdentifier)
-			Chromosome.insertInSortedList(Chromosome.popByThread[threadIdentifier]["sortedList"], chromosome, LspRuntimeMonitor.instance.sortedListLength[threadIdentifier])
+			# Chromosome.insertInSortedList(Chromosome.popByThread[threadIdentifier]["sortedList"], chromosome, LspRuntimeMonitor.instance.sortedListLength[threadIdentifier])
 
 
-	@classmethod
-	def insertInSortedList(cls, sortedList, chromosome, sortedListLength):
-		"""
-		"""
+	# @classmethod
+	# def insertInSortedList(cls, sortedList, chromosome, sortedListLength):
+	# 	"""
+	# 	"""
 
-		if chromosome.stringIdentifier in sortedList["identifiers"]:
-			return
+	# 	if chromosome.stringIdentifier in sortedList["identifiers"]:
+	# 		return
 
-		if len(sortedList["list"]) >= sortedListLength and (chromosome > sortedList["list"][-1] or chromosome == sortedList["list"][-1]):
-			return
+	# 	if len(sortedList["list"]) >= sortedListLength and (chromosome > sortedList["list"][-1] or chromosome == sortedList["list"][-1]):
+	# 		return
 
-		bisect.insort_left(sortedList["list"], chromosome)
-		(sortedList["identifiers"]).add(chromosome.stringIdentifier)
+	# 	bisect.insort_left(sortedList["list"], chromosome)
+	# 	(sortedList["identifiers"]).add(chromosome.stringIdentifier)
 
-		for item in sortedList["list"][sortedListLength:]:
-			(sortedList["identifiers"]).remove(item.stringIdentifier)
+	# 	for item in sortedList["list"][sortedListLength:]:
+	# 		(sortedList["identifiers"]).remove(item.stringIdentifier)
 
-		sortedList["list"] = sortedList["list"][:sortedListLength]
+	# 	sortedList["list"] = sortedList["list"][:sortedListLength]
 
 	@classmethod
 	def feasible(cls, chromosome):
