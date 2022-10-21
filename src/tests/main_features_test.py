@@ -33,6 +33,7 @@ class TestMainFeatures:
     def test_feasability(self):
         """
         """
+
         self.setUpInput()
 
 
@@ -46,6 +47,16 @@ class TestMainFeatures:
 
         assert 0
 
+
+    def test_distance(self):
+        """
+        """
+
+        self.setUpInput()
+        cA, cB = Chromosome.createFromIdentifier(stringIdentifier=(0, 1, 2, 2, 0, 2, 3, 1)), Chromosome.createFromIdentifier(stringIdentifier=(0, 0, 2, 2, 1, 2, 3, 1))
+        print("The distance between these two chromosomes : ", cA, cB, " ---> ", Chromosome.distanceMeasure(cA, cB))
+
+        assert 0
 
     def test_localSearch(self):
         """

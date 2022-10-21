@@ -208,7 +208,7 @@ class CrossOverOperator:
                 LocalSearchEngine.registerMove(localSearchMemoryKey, self.threadIdentifier)
 
 
-        if (self.offsprings[offspringIndex]).stringIdentifier in Chromosome.popByThread[self.threadIdentifier]["content"]:
-            self.offsprings[offspringIndex] = None
+        # if (self.offsprings[offspringIndex]).stringIdentifier in Chromosome.popByThread[self.threadIdentifier]["content"]:
+        #     self.offsprings[offspringIndex] = None
 
         # return offspring

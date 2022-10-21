@@ -3,7 +3,7 @@
 
 from collections import defaultdict
 import concurrent.futures
-from LspAlgorithms.GeneticAlgorithms.GAOperators.LocalSearchEngine import LocalSearchEngine
+# from LspAlgorithms.GeneticAlgorithms.GAOperators.LocalSearchEngine import LocalSearchEngine
 from LspAlgorithms.GeneticAlgorithms.LspRuntimeMonitor import LspRuntimeMonitor
 from ..PopInitialization.PopInitializer import PopInitializer
 from ..PopInitialization.Population import Population
@@ -83,7 +83,7 @@ class GeneticAlgorithm:
 
 		self.popChromosomes[primeThreadIdentifier] = population.chromosomes
 
-		LspRuntimeMonitor.instance.output("Population --> " + str((Chromosome.popByThread[primeThreadIdentifier]["content"])))
+		LspRuntimeMonitor.instance.output("Population --> " + str(population.chromosomes))
 
 
 	def terminateProcess(self):
@@ -91,6 +91,7 @@ class GeneticAlgorithm:
 		"""
 
 		# Determine if it's to be terminated or not
+		# the process only stop when n generations have passed whithout any improvement to the quality of the best chromosome in the population
 		for idleGenCounter in self.idleGenCounters.values():
 			if idleGenCounter < ParameterData.instance.nIdleGenerations:
 				return False

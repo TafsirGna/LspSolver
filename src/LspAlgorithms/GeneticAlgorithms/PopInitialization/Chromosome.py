@@ -3,8 +3,9 @@
 
 from collections import defaultdict
 import threading
-import numpy as np
+# import numpy as np
 import copy
+import math
 from LspAlgorithms.GeneticAlgorithms.LspRuntimeMonitor import LspRuntimeMonitor
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.Gene import Gene
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
@@ -36,10 +37,9 @@ class Chromosome(object):
 
 		count = 0
 		for period in range(InputDataInstance.instance.nPeriods):
-			if chromosomeA.stringIdentifier[period] != chromosomeB.stringIdentifier[period]:
-				count += 1
+			count += (chromosomeA.stringIdentifier[period] - chromosomeB.stringIdentifier[period]) ** 2
 
-		return count
+		return math.sqrt(count)
 
 	@classmethod
 	def addToPop(cls, threadIdentifier, chromosome):
