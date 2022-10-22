@@ -32,13 +32,17 @@ class Population:
         """ Boosting the quality of the best chromosomes in the population
         """
 
-        LocalSearchEngine().refine(self.best, self.threadIdentifier)
+        result = LocalSearchEngine().refine(self.best, self.threadIdentifier)
+        if result != self.best:
+            self.chromosomes.remove(self.best)
+            self.chromosomes.add(result)
+            self.best = result
 
     def setChromosomes(self, chromosomes):
         """
         """
 
-        self.chromosomes = chromosomes
+        self.chromosomes = set(chromosomes)
         self.best = min(self.chromosomes)
         self.worst = max(self.chromosomes)
         

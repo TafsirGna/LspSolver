@@ -30,6 +30,7 @@ class LspRuntimeMonitor:
         self.popsData = defaultdict(lambda: {"min": [], "max": [], "mean": [], "std": []})
         self.outputString = ""
         self.timeLength = 0
+        self.newInstanceAdded = None
 
         self.start()
 

@@ -49,7 +49,6 @@ class Chromosome(object):
 		Chromosome.popByThread[threadIdentifier]["content"][chromosome.stringIdentifier] = chromosome
 		# with Chromosome.pool["lock"]:
 		Chromosome.pool["content"][chromosome.stringIdentifier] = set({threadIdentifier})
-		# Chromosome.insertInSortedList(Chromosome.popByThread[threadIdentifier]["sortedList"], chromosome, LspRuntimeMonitor.instance.sortedListLength[threadIdentifier])
 
 
 	@classmethod
@@ -60,7 +59,6 @@ class Chromosome(object):
 			Chromosome.popByThread[threadIdentifier]["content"][chromosome.stringIdentifier] = chromosome
 			with Chromosome.pool["lock"]:
 				(Chromosome.pool["content"][chromosome.stringIdentifier]).add(threadIdentifier)
-			# Chromosome.insertInSortedList(Chromosome.popByThread[threadIdentifier]["sortedList"], chromosome, LspRuntimeMonitor.instance.sortedListLength[threadIdentifier])
 
 
 	# @classmethod
