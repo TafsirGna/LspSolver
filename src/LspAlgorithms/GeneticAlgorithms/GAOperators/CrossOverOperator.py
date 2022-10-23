@@ -113,7 +113,6 @@ class CrossOverOperator:
         """
 
         threadIdentifier = self.population.threadIdentifier if self.population is not None else 1
-
         target = self.parentChromosomes[0] if offspringIndex == 1 else self.parentChromosomes[1]
         print("Begiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiinnnnnnn", self.parentChromosomes[offspringIndex], target)
 
@@ -128,7 +127,6 @@ class CrossOverOperator:
                 chromosome = LocalSearchEngine.switchItems(chromosome.value, self.population.threadIdentifier)
 
             genesByPeriod = sorted([period for period in target.genesByPeriod])
-
             localSearchMemoryKey = None
             for period in reversed(genesByPeriod):
 
@@ -136,7 +134,8 @@ class CrossOverOperator:
                 targetGene = target.dnaArray[target.genesByPeriod[period][0]][target.genesByPeriod[period][1]]
                 gene = chromosome.dnaArray[targetGene.item][targetGene.position]
 
-                if targetGene.period != gene.period:
+                if targetGene.cost < gene.cost:
+                    
                     print("Different values !!!!!!!!!!!!!!!!! ", gene)
                     localSearchMemoryKey = (chromosome.stringIdentifier, gene.period, targetGene.period)
                     mStringIdentifier = None
@@ -202,5 +201,9 @@ class CrossOverOperator:
 
             if len(queue) > 0:
                 LocalSearchEngine.registerMove(localSearchMemoryKey, threadIdentifier)
+
+        if not LspRuntimeMonitor.instance.newInstanceAdded[self.population.threadIdentifier] \
+            and self.offsprings[offspringIndex] not in self.population.chromosomes:
+            LspRuntimeMonitor.instance.newInstanceAdded[self.population.threadIdentifier] = True
 
         # return offspring

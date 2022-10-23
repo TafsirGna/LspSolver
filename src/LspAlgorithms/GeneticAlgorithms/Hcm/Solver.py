@@ -39,10 +39,10 @@ class GeneticAlgorithm:
 		while True:
 			
 			# check whether to stop or not
-			if self.generationIndex == 20:
+			if self.generationIndex == 30:
 				break
 
-			LspRuntimeMonitor.newInstanceAdded = dict({primeThreadIdentifier: False for primeThreadIdentifier in primeThreadIdentifiers})
+			LspRuntimeMonitor.instance.newInstanceAdded = dict({primeThreadIdentifier: False for primeThreadIdentifier in primeThreadIdentifiers})
 
 			with concurrent.futures.ThreadPoolExecutor() as executor:
 				print(list(executor.map(self.processGenPop, primeThreadIdentifiers)))
@@ -93,8 +93,17 @@ class GeneticAlgorithm:
 		"""
 		"""
 
-		# First approach: Stop when no new better instance
+		# Second approach: Stop when no new instance
+		added = False
+		for newInst in LspRuntimeMonitor.instance.newInstanceAdded.values():
+			if newInst:
+				added = True 
+				break
+		
+		if not added:
+			return True
 
+		# First approach: Stop when no new better instance
 		# Determine if it's to be terminated or not
 		# the process only stop when n generations have passed whithout any improvement to the quality of the best chromosome in the population
 		for idleGenCounter in self.idleGenCounters.values():
@@ -102,13 +111,7 @@ class GeneticAlgorithm:
 				return False
 		return True
 
-		# Second approach: Stop when no new instance
-		# for newInst in LspRuntimeMonitor.instance.newInstanceAdded.values():
-		# 	if newInst:
-		# 		return False
-		# return True
-
-	
+		
 
 	def solve(self):
 		"""
