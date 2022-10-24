@@ -8,7 +8,6 @@ from LspAlgorithms.GeneticAlgorithms.PopInitialization.PseudoChromosome import P
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 import random
 import numpy as np
-# from ..PopInitialization.Population import Population
 from LspAlgorithms.GeneticAlgorithms.LspRuntimeMonitor import LspRuntimeMonitor
 
 class LocalSearchEngine:
@@ -56,43 +55,7 @@ class LocalSearchEngine:
         while len(selectedGenes) > 0:
             periodGene = random.choice(selectedGenes)
 
-            # print("gene : ", periodGene)
-            periodGeneLowerLimit, periodGeneUpperLimit = Chromosome.geneLowerUpperLimit(chromosome, periodGene)
-            
-            increment = 1
-            backwardPeriod, forwardPeriod = periodGene.period, periodGene.period
-            while True:
-                if forwardPeriod is not None:
-                    forwardPeriod = periodGene.period + increment
-                if backwardPeriod is not None:
-                    backwardPeriod = periodGene.period - increment
-
-                if backwardPeriod is not None and backwardPeriod < 0:
-                    backwardPeriod = None
-
-                if forwardPeriod is not None and forwardPeriod > InputDataInstance.instance.nPeriods - 1:
-                    forwardPeriod = None
-
-                # print(backwardPeriod, forwardPeriod)
-
-                if forwardPeriod is not None :
-                    result = LocalSearchEngine.handleAltPeriod(self, chromosome, strategy, periodGene, forwardPeriod, periodGeneLowerLimit, periodGeneUpperLimit, results, args)
-                    if result == "RETURN":
-                        return None
-                    elif result == "SET_ALT_PERIOD_NONE":
-                        forwardPeriod = None
-
-                if backwardPeriod is not None :
-                    result = LocalSearchEngine.handleAltPeriod(self, chromosome, strategy, periodGene, backwardPeriod, periodGeneLowerLimit, periodGeneUpperLimit, results, args)
-                    if result == "RETURN":
-                        return None
-                    elif result == "SET_ALT_PERIOD_NONE":
-                        backwardPeriod = None
-
-                if backwardPeriod is None and forwardPeriod is None:
-                    break
-
-                increment += 1     
+            self.improveGene(chromosome, periodGene, strategy, results, args)     
 
             selectedGenes.remove(periodGene)
         
@@ -104,8 +67,50 @@ class LocalSearchEngine:
         print("Search ended")
 
 
-    @classmethod
-    def handleAltPeriod(cls, classObject, chromosome, strategy, periodGene, altPeriod, periodGeneLowerLimit, periodGeneUpperLimit, results, args):
+    def improveGene(self, chromosome, periodGene, strategy, results, args):
+        """
+        """
+
+        # print("gene : ", periodGene)
+        periodGeneLowerLimit, periodGeneUpperLimit = Chromosome.geneLowerUpperLimit(chromosome, periodGene)
+        
+        increment = 1
+        backwardPeriod, forwardPeriod = periodGene.period, periodGene.period
+        while True:
+            if forwardPeriod is not None:
+                forwardPeriod = periodGene.period + increment
+            if backwardPeriod is not None:
+                backwardPeriod = periodGene.period - increment
+
+            if backwardPeriod is not None and backwardPeriod < 0:
+                backwardPeriod = None
+
+            if forwardPeriod is not None and forwardPeriod > InputDataInstance.instance.nPeriods - 1:
+                forwardPeriod = None
+
+            # print(backwardPeriod, forwardPeriod)
+
+            if forwardPeriod is not None :
+                result = self.handleAltPeriod(chromosome, strategy, periodGene, forwardPeriod, periodGeneLowerLimit, periodGeneUpperLimit, results, args)
+                if result == "RETURN":
+                    return None
+                elif result == "SET_ALT_PERIOD_NONE":
+                    forwardPeriod = None
+
+            if backwardPeriod is not None :
+                result = self.handleAltPeriod(chromosome, strategy, periodGene, backwardPeriod, periodGeneLowerLimit, periodGeneUpperLimit, results, args)
+                if result == "RETURN":
+                    return None
+                elif result == "SET_ALT_PERIOD_NONE":
+                    backwardPeriod = None
+
+            if backwardPeriod is None and forwardPeriod is None:
+                break
+
+            increment += 1
+
+
+    def handleAltPeriod(self, chromosome, strategy, periodGene, altPeriod, periodGeneLowerLimit, periodGeneUpperLimit, results, args):
         """
         """
 
@@ -128,13 +133,18 @@ class LocalSearchEngine:
                     if isinstance(popChromosome, Chromosome):
                         return
                     # else
+                    if strategy == "positive":
+                        if popChromosome < chromosome:
+                            self.result = popChromosome
+                            return "RETURN"
+
                     if strategy == "refinement":
                         if popChromosome < chromosome:
-                            classObject.searchVicinity(popChromosome, strategy, args)
+                            self.searchVicinity(popChromosome, strategy, args)
                             return "RETURN"
 
                     if strategy == "random":
-                        classObject.result = popChromosome
+                        self.result = popChromosome
                         return "RETURN"
 
 
@@ -151,45 +161,38 @@ class LocalSearchEngine:
             if not inPool:
                 evaluationData = LocalSearchEngine.evaluateItemsSwitch(chromosome, periodGene, altPeriod)
 
-                pseudoChromosome = None
                 if strategy == "population":
-                    # TODO
-                    pseudoChromosome = LocalSearchEngine.switchItems(evaluationData)
-                    results.add(pseudoChromosome)
-
-                if strategy == "refinement":
+                    chromosome = LocalSearchEngine.switchItems(evaluationData)
+                    results.add(chromosome)
+                else:
                     pseudoChromosome = PseudoChromosome(evaluationData)
-                    with Chromosome.pool["lock"]:
-                        if mStringIdentifier not in Chromosome.pool["content"]:
-                            Chromosome.addToPop(args["threadId"], pseudoChromosome)
-
+                    Chromosome.addToPop(args["threadId"], pseudoChromosome)
                     LocalSearchEngine.registerMove(localSearchMemoryKey, args["threadId"])
 
+                if strategy == "positive":
                     if evaluationData["variance"] > 0:
-                        classObject.searchVicinity(pseudoChromosome, strategy, args)
+                        self.result = pseudoChromosome
+                        return "RETURN"
+
+                if strategy == "refinement":
+                    if evaluationData["variance"] > 0:
+                        self.searchVicinity(pseudoChromosome, strategy, args)
                         return "RETURN"
                 
                 if strategy == "random":
-                    pseudoChromosome = PseudoChromosome(evaluationData)
-                    # inserting in the thread population
-                    Chromosome.popByThread[args["threadId"]]["content"][mStringIdentifier] = pseudoChromosome
-
-                    # registering the insertion in the global pool
-                    with Chromosome.pool["lock"]:
-                        if mStringIdentifier not in Chromosome.pool["content"]:
-                            Chromosome.pool["content"][mStringIdentifier] = set({args["threadId"]})
-                        else:                            
-                            (Chromosome.pool["content"][mStringIdentifier]).add(args["threadId"])
-
-                    LocalSearchEngine.registerMove(localSearchMemoryKey, args["threadId"])
-
-                    classObject.result = pseudoChromosome
+                    self.result = pseudoChromosome
                     return "RETURN"
             else:
                 if strategy != "population":
                     if args["threadId"] not in Chromosome.pool["content"][mStringIdentifier]:
-                        popChromosome = Chromosome.popByThread[list(Chromosome.pool["content"][mStringIdentifier])[0]]["content"][mStringIdentifier]
+                        popChromosome = None
+                        for threadIdentifier in Chromosome.pool["content"][mStringIdentifier]:
+                            popChromosome = Chromosome.popByThread[threadIdentifier]["content"][mStringIdentifier]
+                            if isinstance(popChromosome, Chromosome):
+                                break
                         Chromosome.copyToThread(args["threadId"], popChromosome)
+                        # if isinstance(popChromosome, Chromosome):
+                        #     pass
 
                     LocalSearchEngine.registerMove(localSearchMemoryKey, args["threadId"])
         else:

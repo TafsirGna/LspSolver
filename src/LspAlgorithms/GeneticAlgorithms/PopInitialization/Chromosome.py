@@ -46,9 +46,13 @@ class Chromosome(object):
 		"""
 		"""
 
-		Chromosome.popByThread[threadIdentifier]["content"][chromosome.stringIdentifier] = chromosome
-		# with Chromosome.pool["lock"]:
-		Chromosome.pool["content"][chromosome.stringIdentifier] = set({threadIdentifier})
+		if chromosome.stringIdentifier not in Chromosome.pool["content"]:
+			Chromosome.popByThread[threadIdentifier]["content"][chromosome.stringIdentifier] = chromosome
+			# TODO
+			# with Chromosome.pool["lock"]:
+			Chromosome.pool["content"][chromosome.stringIdentifier] = set({threadIdentifier})
+		else:
+			Chromosome.copyToThread(threadIdentifier, popChromosome)
 
 
 	@classmethod

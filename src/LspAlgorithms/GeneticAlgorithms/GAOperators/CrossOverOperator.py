@@ -127,80 +127,21 @@ class CrossOverOperator:
                 chromosome = LocalSearchEngine.switchItems(chromosome.value, self.population.threadIdentifier)
 
             genesByPeriod = sorted([period for period in target.genesByPeriod])
-            localSearchMemoryKey = None
             for period in reversed(genesByPeriod):
 
-                print("mmmmmmmmmmmmmmmmmmmmmmmmmmm : ", period, chromosome)
+                print("crossing over : ", period, chromosome)
                 targetGene = target.dnaArray[target.genesByPeriod[period][0]][target.genesByPeriod[period][1]]
                 gene = chromosome.dnaArray[targetGene.item][targetGene.position]
 
                 if targetGene.cost < gene.cost:
-                    
+
                     print("Different values !!!!!!!!!!!!!!!!! ", gene)
-                    localSearchMemoryKey = (chromosome.stringIdentifier, gene.period, targetGene.period)
-                    mStringIdentifier = None
 
-                    with LocalSearchEngine.localSearchMemory["lock"]:
-                        if localSearchMemoryKey in LocalSearchEngine.localSearchMemory["content"]["simple_mutation"]:
-                            if threadIdentifier not in LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][localSearchMemoryKey]:
-                                mStringIdentifier = LocalSearchEngine.mutationStringIdentifier(chromosome.stringIdentifier, gene.period, targetGene.period)
-                                popChromosome = None
-                                for threadIdentifier in LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][localSearchMemoryKey]:
-                                    popChromosome = Chromosome.popByThread[threadIdentifier]["content"][mStringIdentifier]
-                                    if isinstance(popChromosome, Chromosome):
-                                        break
-                                Chromosome.copyToThread(threadIdentifier, popChromosome)
-                                # LocalSearchEngine.registerMove(memKey, threadIdentifier)
-
-                                if isinstance(popChromosome, Chromosome):
-                                    continue
-                                # else is instance of PseudoChromosome 
-                                queue.append(popChromosome)
-                                break
-
-                    if LocalSearchEngine.areItemsSwitchable(chromosome, gene, targetGene.period):
-                        print("Switchable !!!!!!!!!!!!!!!!!!! ")
-
-                        if mStringIdentifier is None:
-                            mStringIdentifier = LocalSearchEngine.mutationStringIdentifier(chromosome.stringIdentifier, gene.period, targetGene.period)
-
-                        inPool = True
-                        with Chromosome.pool["lock"]:
-                            if mStringIdentifier not in Chromosome.pool["content"]:
-                                inPool =  False
-
-                        if inPool:
-                            # print("Resultiiiiiiii : ", result)
-                            if threadIdentifier not in Chromosome.pool["content"][mStringIdentifier]:
-                                Chromosome.copyToThread(threadIdentifier, popChromosome)
-                                popChromosome = Chromosome.popByThread[threadIdentifier]["content"][mStringIdentifier]
-                                if popChromosome < chromosome:
-                                    queue.append(popChromosome)
-                                    break
-                            else:
-                                continue
-
-                        else:
-                            evaluationData = LocalSearchEngine.evaluateItemsSwitch(chromosome, gene, targetGene.period)
-                            pseudoChromosome = PseudoChromosome(evaluationData)
-
-                            with Chromosome.pool["lock"]:
-                                if mStringIdentifier not in Chromosome.pool["content"]:
-                                    Chromosome.addToPop(threadIdentifier, pseudoChromosome)
-                                else:
-                                    popChromosome = Chromosome.popByThread[list(Chromosome.pool["content"][mStringIdentifier])[0]]["content"][mStringIdentifier]
-                                    Chromosome.copyToThread(threadIdentifier, popChromosome)
-                                    continue
-
-                            if evaluationData["variance"] > 0:
-                                queue.append(pseudoChromosome)
-                                break
-                    else:
-                        pass
-                        
-
-            if len(queue) > 0:
-                LocalSearchEngine.registerMove(localSearchMemoryKey, threadIdentifier)
+                    localSearchEngine = LocalSearchEngine()
+                    localSearchEngine.improveGene(chromosome, gene, "positive", None, {"threadId": threadIdentifier})                        
+                    if localSearchEngine.result is not None:
+                        queue.append(localSearchEngine.result)
+                        break
 
         if not LspRuntimeMonitor.instance.newInstanceAdded[self.population.threadIdentifier] \
             and self.offsprings[offspringIndex] not in self.population.chromosomes:
