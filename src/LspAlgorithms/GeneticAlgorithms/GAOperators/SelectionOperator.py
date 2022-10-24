@@ -16,10 +16,12 @@ class SelectionOperator:
 
         self.population = population
         self.chromosomes = list(self.population.chromosomes)
-        self.strategy = strategy
-        if self.strategy == "roulette_wheel":
-            self.rouletteProbabilities = [0] * len(self.chromosomes)
-            self.setRouletteProbabilities()
+
+        self.rouletteProbabilities = [0] * len(self.chromosomes)
+        self.setRouletteProbabilities()
+        
+        # the index tracking the current position of the cursor on the list 
+        self.currentIndex = 0
 
 
     def fitnessCalculationTask(self, slice, resultQueue):
@@ -45,7 +47,7 @@ class SelectionOperator:
         nThreads = ParameterData.instance.nReplicaSubThreads
         slices = np.array_split(self.chromosomes, nThreads)
 
-        processes = []
+        # processes = []
         resultQueues = [Queue()] * nThreads
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -70,20 +72,23 @@ class SelectionOperator:
         """
         """
 
-        result = None
-
-        if self.strategy == "roulette_wheel":
-            result = self.rouletteWheelSelect()
-
-        return result
+        return self.rouletteWheelSelect()
 
 
     def rouletteWheelSelect(self):
         """
         """
-        # print("*************** : ",  len(self.chromosomes), len(self.rouletteProbabilities))
 
-        chromosomeA, chromosomeB = np.random.choice(self.chromosomes, p=self.rouletteProbabilities), np.random.choice(self.chromosomes, p=self.rouletteProbabilities)
-        chromosomeA, chromosomeB = Chromosome.popByThread[self.population.threadIdentifier]["content"][chromosomeA.stringIdentifier], Chromosome.popByThread[self.population.threadIdentifier]["content"][chromosomeB.stringIdentifier]
+        if self.currentIndex >= len(self.chromosomes): # very much less likely to happen but you dunno
+            return None, None
 
+        chromosomeA = self.chromosomes[self.currentIndex]
+        chromosomeB = np.random.choice(self.chromosomes, p=self.rouletteProbabilities)
+        while chromosomeB == chromosomeA:
+            chromosomeB = np.random.choice(self.chromosomes, p=self.rouletteProbabilities)
+
+        self.currentIndex += 1
         return chromosomeA, chromosomeB
+
+        # chromosomeA, chromosomeB = np.random.choice(self.chromosomes, p=self.rouletteProbabilities), np.random.choice(self.chromosomes, p=self.rouletteProbabilities)
+        # return chromosomeA, chromosomeB

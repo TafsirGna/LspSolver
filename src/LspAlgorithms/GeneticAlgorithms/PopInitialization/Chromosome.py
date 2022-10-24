@@ -52,7 +52,7 @@ class Chromosome(object):
 			# with Chromosome.pool["lock"]:
 			Chromosome.pool["content"][chromosome.stringIdentifier] = set({threadIdentifier})
 		else:
-			Chromosome.copyToThread(threadIdentifier, popChromosome)
+			Chromosome.copyToThread(threadIdentifier, chromosome)
 
 
 	@classmethod
@@ -63,26 +63,6 @@ class Chromosome(object):
 			Chromosome.popByThread[threadIdentifier]["content"][chromosome.stringIdentifier] = chromosome
 			with Chromosome.pool["lock"]:
 				(Chromosome.pool["content"][chromosome.stringIdentifier]).add(threadIdentifier)
-
-
-	# @classmethod
-	# def insertInSortedList(cls, sortedList, chromosome, sortedListLength):
-	# 	"""
-	# 	"""
-
-	# 	if chromosome.stringIdentifier in sortedList["identifiers"]:
-	# 		return
-
-	# 	if len(sortedList["list"]) >= sortedListLength and (chromosome > sortedList["list"][-1] or chromosome == sortedList["list"][-1]):
-	# 		return
-
-	# 	bisect.insort_left(sortedList["list"], chromosome)
-	# 	(sortedList["identifiers"]).add(chromosome.stringIdentifier)
-
-	# 	for item in sortedList["list"][sortedListLength:]:
-	# 		(sortedList["identifiers"]).remove(item.stringIdentifier)
-
-	# 	sortedList["list"] = sortedList["list"][:sortedListLength]
 
 	@classmethod
 	def feasible(cls, chromosome):

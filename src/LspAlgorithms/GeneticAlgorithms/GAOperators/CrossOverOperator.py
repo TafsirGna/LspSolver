@@ -3,9 +3,6 @@ import random
 import threading
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.Chromosome import Chromosome
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
-# import concurrent.futures
-# import copy
-# from LspAlgorithms.GeneticAlgorithms.PopInitialization.Gene import Gene
 from .LocalSearchEngine import LocalSearchEngine
 from ..PopInitialization.Population import Population
 from ParameterSearch.ParameterData import ParameterData
@@ -16,8 +13,6 @@ from LspAlgorithms.GeneticAlgorithms.LspRuntimeMonitor import LspRuntimeMonitor
 class CrossOverOperator:
     """
     """
-
-    # crossOverMemory = {"lock": threading.Lock(), "content": defaultdict(lambda: None)}
 
     def __init__(self) -> None:
         """
@@ -49,35 +44,22 @@ class CrossOverOperator:
             if isinstance(chromosomeB, PseudoChromosome):
                 chromosomeB = LocalSearchEngine.switchItems(chromosomeB.value, population.threadIdentifier)
 
-            chromosomeC, chromosomeD = None, None
+            chromosomeC = chromosomeA
 
             if (random.random() <= ParameterData.instance.crossOverRate):
                 try:
-                    chromosomeC, chromosomeD = self.mate([chromosomeA, chromosomeB])
+                    chromosomeC = self.mate([chromosomeA, chromosomeB])
                 except Exception as e:
                     raise e
-            else:
-                # print("No crossover")
-                chromosomeC, chromosomeD = chromosomeA, chromosomeB
 
-            if chromosomeC is None:
-                print("chromosomeC None")
-            else:
-                chromosomes.add(chromosomeC)
-
-            if len(chromosomes) < Population.popSizes[population.threadIdentifier]:
-                if chromosomeD is None:
-                    print("chromosomeD None")
-                else:
-                    chromosomes.add(chromosomeD)
-
+            chromosomes.add(chromosomeC)
             print("chromosomes length : ", len(chromosomes), Population.popSizes[population.threadIdentifier])
 
         population.chromosomes = chromosomes
         return chromosomes
 
 
-    def mate(self, parentChromosomes, offspring_result = 2):
+    def mate(self, parentChromosomes, offspring_result = 1):
         """
         """
 
@@ -85,10 +67,7 @@ class CrossOverOperator:
 
         if offspring_result not in [1, 2]:
             # TODO: throw an error
-            return None, None
-
-        if self.parentChromosomes[0] == self.parentChromosomes[1]:
-            return (self.parentChromosomes[0], self.parentChromosomes[1])
+            return None
 
         # print("Crossover : ", self.parentChromosomes, self.parentChromosomes[0].dnaArray, self.parentChromosomes[1].dnaArray)
         print("Crossover : ", self.parentChromosomes)
@@ -97,15 +76,16 @@ class CrossOverOperator:
 
         print("Cross Over result : ", [self.parentChromosomes, self.offsprings])
 
-        return tuple(self.offsprings.values())
+        # return tuple(self.offsprings.values())
+        return self.offsprings[0]
 
 
     def setOffsprings(self):
         """
         """
         
-        for i in [0, 1]:
-            self.searchOffspring(i)
+        # for i in [0, 1]:
+        self.searchOffspring(0)
 
 
     def searchOffspring(self, offspringIndex):
@@ -114,7 +94,7 @@ class CrossOverOperator:
 
         threadIdentifier = self.population.threadIdentifier if self.population is not None else 1
         target = self.parentChromosomes[0] if offspringIndex == 1 else self.parentChromosomes[1]
-        print("Begiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiinnnnnnn", self.parentChromosomes[offspringIndex], target)
+        print("Begin **********************", self.parentChromosomes[offspringIndex], target)
 
         queue = [self.parentChromosomes[offspringIndex]]
         while len(queue) > 0:
@@ -126,22 +106,17 @@ class CrossOverOperator:
             if isinstance(chromosome, PseudoChromosome):
                 chromosome = LocalSearchEngine.switchItems(chromosome.value, self.population.threadIdentifier)
 
-            genesByPeriod = sorted([period for period in target.genesByPeriod])
-            for period in reversed(genesByPeriod):
+            sortedGenes = sorted([gene for itemGenes in chromosome.dnaArray for gene in itemGenes])
 
-                print("crossing over : ", period, chromosome)
-                targetGene = target.dnaArray[target.genesByPeriod[period][0]][target.genesByPeriod[period][1]]
-                gene = chromosome.dnaArray[targetGene.item][targetGene.position]
+            for gene in reversed(sortedGenes):
 
-                if targetGene.cost < gene.cost:
+                print("crossing over : ", gene.period, chromosome)
 
-                    print("Different values !!!!!!!!!!!!!!!!! ", gene)
-
-                    localSearchEngine = LocalSearchEngine()
-                    localSearchEngine.improveGene(chromosome, gene, "positive", None, {"threadId": threadIdentifier})                        
-                    if localSearchEngine.result is not None:
-                        queue.append(localSearchEngine.result)
-                        break
+                localSearchEngine = LocalSearchEngine()
+                localSearchEngine.improveGene(chromosome, gene, "positive", None, {"threadId": threadIdentifier})                        
+                if localSearchEngine.result is not None:
+                    queue.append(localSearchEngine.result)
+                    break
 
         if not LspRuntimeMonitor.instance.newInstanceAdded[self.population.threadIdentifier] \
             and self.offsprings[offspringIndex] not in self.population.chromosomes:
