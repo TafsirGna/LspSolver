@@ -107,16 +107,18 @@ class CrossOverOperator:
                 chromosome = LocalSearchEngine.switchItems(chromosome.value, self.population.threadIdentifier)
 
             sortedGenes = sorted([gene for itemGenes in chromosome.dnaArray for gene in itemGenes])
+            # random.shuffle(sortedGenes)
 
             for gene in reversed(sortedGenes):
 
-                print("crossing over : ", gene.period, chromosome)
-
-                localSearchEngine = LocalSearchEngine()
-                localSearchEngine.improveGene(chromosome, gene, "positive", None, {"threadId": threadIdentifier})                        
-                if localSearchEngine.result is not None:
-                    queue.append(localSearchEngine.result)
-                    break
+                targetGene = target.dnaArray[gene.item][gene.position]
+                if gene.period != targetGene.period:
+                    print("crossing over : ", gene.period, chromosome)
+                    localSearchEngine = LocalSearchEngine()
+                    localSearchEngine.improveGene(chromosome, gene, "positive", None, {"threadId": threadIdentifier})                        
+                    if localSearchEngine.result is not None:
+                        queue.append(localSearchEngine.result)
+                        break
 
         if not LspRuntimeMonitor.instance.newInstanceAdded[self.population.threadIdentifier] \
             and self.offsprings[offspringIndex] not in self.population.chromosomes:

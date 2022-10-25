@@ -184,8 +184,8 @@ class LocalSearchEngine:
                     return "RETURN"
             else:
                 if strategy != "population":
+                    popChromosome = None
                     if args["threadId"] not in Chromosome.pool["content"][mStringIdentifier]:
-                        popChromosome = None
                         for threadIdentifier in Chromosome.pool["content"][mStringIdentifier]:
                             popChromosome = Chromosome.popByThread[threadIdentifier]["content"][mStringIdentifier]
                             if isinstance(popChromosome, Chromosome):
@@ -193,6 +193,26 @@ class LocalSearchEngine:
                         Chromosome.copyToThread(args["threadId"], popChromosome)
                         # if isinstance(popChromosome, Chromosome):
                         #     pass
+                    else:
+                        popChromosome = Chromosome.popByThread[args["threadId"]]["content"][mStringIdentifier]
+                        if isinstance(popChromosome, Chromosome):
+                            return
+                        # else
+                        if strategy == "positive":
+                            if popChromosome < chromosome:
+                                print("iiiiiiiiiiiiiiiinnnnnnnnnnnnnnnnnnn ")
+                                self.result = popChromosome
+                                return "RETURN"
+
+                        if strategy == "refinement":
+                            if popChromosome < chromosome:
+                                self.searchVicinity(popChromosome, strategy, args)
+                                return "RETURN"
+
+                        if strategy == "random":
+                            self.result = popChromosome
+                            return "RETURN"
+
 
                     LocalSearchEngine.registerMove(localSearchMemoryKey, args["threadId"])
         else:
