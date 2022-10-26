@@ -23,19 +23,19 @@ class MutationOperator:
         """ Got to apply mutation corresponding to the set mutation rate
         """
 
-        chromosomes = set()
-        print("toto", len(chromosomes), Population.mutatedPoolSize[population.threadIdentifier], len(chromosomes) < Population.mutatedPoolSize[population.threadIdentifier])
+        selected = set()
+        chromosomes = list(population.chromosomes)
 
-        while len(chromosomes) < Population.mutatedPoolSize[population.threadIdentifier]:
+        while len(selected) < Population.mutatedPoolSize[population.threadIdentifier]:
             
             # print("population's chromosomes : ", population.chromosomes)
-            chromosome = random.choice(population.chromosomes)
+            chromosome = random.choice(chromosomes)
             print("picked chromosome : ", chromosome)
-            if chromosome.stringIdentifier not in chromosomes:
+            if chromosome.stringIdentifier not in selected:
                 result = (LocalSearchEngine()).process(chromosome, "random", {"threadId": population.threadIdentifier})
                 if result is not None:
-                    chromosomes.add(chromosome.stringIdentifier)
+                    selected.add(chromosome.stringIdentifier)
 
                     # updating the population
-                    population.remove(chromosome)
-                    population.add(result)
+                    population.chromosomes.remove(chromosome)
+                    population.chromosomes.add(result)

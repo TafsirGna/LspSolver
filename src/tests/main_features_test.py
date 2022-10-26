@@ -64,7 +64,7 @@ class TestMainFeatures:
 
         self.setUpInput()
 
-        c = Chromosome.createFromIdentifier(stringIdentifier=(4, 4, 2, 5, 5, 5, 2, 1, 3, 2, 1, 3, 2, 1, 1, 3, 3, 2, 2, 4))
+        c = Chromosome.createFromIdentifier(stringIdentifier=(4, 4, 1, 2, 5, 5, 5, 2, 3, 2, 1, 3, 2, 2, 1, 3, 4, 1, 3, 2))
         # c = Chromosome.createFromIdentifier(stringIdentifier=(0, 2, 2, 3, 0, 1, 2, 1))
         # (0, 0, 0, 9, 10, 8, 7, 5, 6, 4, 4, 2, 1, 1, 3)
         print("Input : ", c)
@@ -78,9 +78,9 @@ class TestMainFeatures:
         """
         """
 
-        inputFile = "data/input/clspInst02.data"
+        # inputFile = "data/input/clspInst02.data"
         # inputFile = "data/input/pigment15b.dzn"
-        # inputFile = "data/input/instancesWith20periods/1"
+        inputFile = "data/input/instancesWith20periods/1"
         # inputFile = "data/input/ps-200-10-80.dzn"
         # LspRuntimeMonitor.verbose = True
         inputDataReader = InputDataReader()
