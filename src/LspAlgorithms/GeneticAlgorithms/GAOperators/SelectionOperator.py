@@ -22,6 +22,7 @@ class SelectionOperator:
         
         # the index tracking the current position of the cursor on the list 
         self.currentIndex = 0
+        self.selectedPool = set()
 
 
     def fitnessCalculationTask(self, slice, resultQueue):
@@ -83,11 +84,20 @@ class SelectionOperator:
             return None, None
 
         chromosomeA = self.chromosomes[self.currentIndex]
+        while chromosomeA in self.selectedPool:
+            self.currentIndex += 1
+            chromosomeA = self.chromosomes[self.currentIndex]
+
         chromosomeB = np.random.choice(self.chromosomes, p=self.rouletteProbabilities)
         while chromosomeB == chromosomeA:
             chromosomeB = np.random.choice(self.chromosomes, p=self.rouletteProbabilities)
 
         self.currentIndex += 1
+
+        # adding selected chromosomes to the selectedpool property
+        self.selectedPool.add(chromosomeA)
+        self.selectedPool.add(chromosomeA)
+
         return chromosomeA, chromosomeB
 
         # chromosomeA, chromosomeB = np.random.choice(self.chromosomes, p=self.rouletteProbabilities), np.random.choice(self.chromosomes, p=self.rouletteProbabilities)

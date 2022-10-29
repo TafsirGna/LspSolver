@@ -44,15 +44,16 @@ class CrossOverOperator:
             if isinstance(chromosomeB, PseudoChromosome):
                 chromosomeB = LocalSearchEngine.switchItems(chromosomeB.value, population.threadIdentifier)
 
-            chromosomeC = chromosomeA
+            chromosomeC, chromosomeD = chromosomeA, chromosomeB
 
             if (random.random() <= ParameterData.instance.crossOverRate):
                 try:
-                    chromosomeC = self.mate([chromosomeA, chromosomeB])
+                    chromosomeC, chromosomeD = self.mate([chromosomeA, chromosomeB])
                 except Exception as e:
                     raise e
 
             chromosomes.add(chromosomeC)
+            chromosomes.add(chromosomeD)
             print("chromosomes length : ", len(chromosomes), Population.popSizes[population.threadIdentifier])
 
         population.chromosomes = chromosomes
@@ -67,7 +68,7 @@ class CrossOverOperator:
 
         if offspring_result not in [1, 2]:
             # TODO: throw an error
-            return None
+            return None, None
 
         # print("Crossover : ", self.parentChromosomes, self.parentChromosomes[0].dnaArray, self.parentChromosomes[1].dnaArray)
         print("Crossover : ", self.parentChromosomes)
@@ -76,16 +77,16 @@ class CrossOverOperator:
 
         print("Cross Over result : ", [self.parentChromosomes, self.offsprings])
 
-        # return tuple(self.offsprings.values())
-        return self.offsprings[0]
+        return tuple(self.offsprings.values())
+        # return self.offsprings[0]
 
 
     def setOffsprings(self):
         """
         """
         
-        # for i in [0, 1]:
-        self.searchOffspring(0)
+        for i in [0, 1]:
+            self.searchOffspring(i)
 
 
     def searchOffspring(self, offspringIndex):
@@ -121,7 +122,7 @@ class CrossOverOperator:
                         break
 
         if not LspRuntimeMonitor.instance.newInstanceAdded[self.population.threadIdentifier] \
-            and self.offsprings[offspringIndex] not in self.population.chromosomes:
+            and self.offsprings[offspringIndex] != self.parentChromosomes[offspringIndex]:
             LspRuntimeMonitor.instance.newInstanceAdded[self.population.threadIdentifier] = True
 
         # return offspring

@@ -39,3 +39,6 @@ class MutationOperator:
                     # updating the population
                     population.chromosomes.remove(chromosome)
                     population.chromosomes.add(result)
+
+                    if not LspRuntimeMonitor.instance.newInstanceAdded[self.population.threadIdentifier] :
+                        LspRuntimeMonitor.instance.newInstanceAdded[self.population.threadIdentifier] = True

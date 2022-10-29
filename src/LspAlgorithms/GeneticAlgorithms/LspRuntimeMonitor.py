@@ -31,6 +31,7 @@ class LspRuntimeMonitor:
         self.outputString = ""
         self.timeLength = 0
         self.newInstanceAdded = None
+        self.remainingMutations = None
 
         self.start()
 

@@ -36,13 +36,16 @@ class GeneticAlgorithm:
 		for primeThreadIdentifier in primeThreadIdentifiers:
 			self.popChromosomes[primeThreadIdentifier] = set((Chromosome.popByThread[primeThreadIdentifier]["content"]).values())
 
+		LspRuntimeMonitor.instance.remainingMutations = dict({primeThreadIdentifier: 0 for primeThreadIdentifier in primeThreadIdentifiers})
+
 		while True:
 			
 			# check whether to stop or not
-			if self.generationIndex == 30:
+			if self.generationIndex == 10:
 				break
 
 			LspRuntimeMonitor.instance.newInstanceAdded = dict({primeThreadIdentifier: False for primeThreadIdentifier in primeThreadIdentifiers})
+			self.updateRemainingMutations()
 
 			with concurrent.futures.ThreadPoolExecutor() as executor:
 				print(list(executor.map(self.processGenPop, primeThreadIdentifiers)))
@@ -52,6 +55,17 @@ class GeneticAlgorithm:
 				break
 
 			self.generationIndex += 1
+
+
+
+	def updateRemainingMutations(self):
+		"""
+		"""
+		
+		for primeThreadIdentifier in LspRuntimeMonitor.instance.remainingMutations:
+			LspRuntimeMonitor.instance.remainingMutations[primeThreadIdentifier] += Population.mutatedPoolSize[primeThreadIdentifier]
+
+		print("updating remaining mutations count : ", LspRuntimeMonitor.instance.remainingMutations)
 
 
 	def processGenPop(self, primeThreadIdentifier):
@@ -64,8 +78,8 @@ class GeneticAlgorithm:
 		# building population
 		population = Population(primeThreadIdentifier, self.popChromosomes[primeThreadIdentifier])
 
-		# if self.generationIndex == 0:
-		# 	population.boostChampion()
+		if self.generationIndex == 0:
+			population.boostChampion()
 
 		if self.generationIndex > 0:
 			self.idleGenCounters[primeThreadIdentifier] = self.idleGenCounters[primeThreadIdentifier] + 1 if population.best.cost == LspRuntimeMonitor.instance.popsData[primeThreadIdentifier]["min"][-1] else 1
@@ -106,10 +120,12 @@ class GeneticAlgorithm:
 		# First approach: Stop when no new better instance
 		# Determine if it's to be terminated or not
 		# the process only stop when n generations have passed whithout any improvement to the quality of the best chromosome in the population
-		for idleGenCounter in self.idleGenCounters.values():
-			if idleGenCounter < ParameterData.instance.nIdleGenerations:
-				return False
-		return True
+		# for idleGenCounter in self.idleGenCounters.values():
+		# 	if idleGenCounter < ParameterData.instance.nIdleGenerations:
+		# 		return False
+		# return True
+
+		return False
 
 		
 
