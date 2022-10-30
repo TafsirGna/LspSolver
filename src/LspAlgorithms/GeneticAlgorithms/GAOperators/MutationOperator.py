@@ -19,26 +19,43 @@ class MutationOperator:
         pass
 
 
-    def process(self, population):
-        """ Got to apply mutation corresponding to the set mutation rate
+    def process(self, chromosome, chromosomes, threadIdentifier):
+        """
         """
 
-        selected = set()
-        chromosomes = list(population.chromosomes)
+        result = (LocalSearchEngine()).process(chromosome, "negative", {"threadId": threadIdentifier})
+        if result is not None:
 
-        while len(selected) < Population.mutatedPoolSize[population.threadIdentifier]:
+            # updating the population
+            chromosomes.remove(chromosome)
+            chromosomes.add(result)
+
+            if not LspRuntimeMonitor.instance.newInstanceAdded[threadIdentifier] :
+                LspRuntimeMonitor.instance.newInstanceAdded[threadIdentifier] = True
+
+            LspRuntimeMonitor.instance.remainingMutations[threadIdentifier] -= 1
+
+
+    # def process(self, population):
+    #     """ Got to apply mutation corresponding to the set mutation rate
+    #     """
+
+    #     selected = set()
+    #     chromosomes = list(population.chromosomes)
+
+    #     while len(selected) < Population.mutatedPoolSize[population.threadIdentifier]:
             
-            # print("population's chromosomes : ", population.chromosomes)
-            chromosome = random.choice(chromosomes)
-            print("picked chromosome : ", chromosome)
-            if chromosome.stringIdentifier not in selected:
-                result = (LocalSearchEngine()).process(chromosome, "random", {"threadId": population.threadIdentifier})
-                if result is not None:
-                    selected.add(chromosome.stringIdentifier)
+    #         # print("population's chromosomes : ", population.chromosomes)
+    #         chromosome = random.choice(chromosomes)
+    #         print("picked chromosome : ", chromosome)
+    #         if chromosome.stringIdentifier not in selected:
+    #             result = (LocalSearchEngine()).process(chromosome, "random", {"threadId": population.threadIdentifier})
+    #             if result is not None:
+    #                 selected.add(chromosome.stringIdentifier)
 
-                    # updating the population
-                    population.chromosomes.remove(chromosome)
-                    population.chromosomes.add(result)
+    #                 # updating the population
+    #                 population.chromosomes.remove(chromosome)
+    #                 population.chromosomes.add(result)
 
-                    if not LspRuntimeMonitor.instance.newInstanceAdded[self.population.threadIdentifier] :
-                        LspRuntimeMonitor.instance.newInstanceAdded[self.population.threadIdentifier] = True
+    #                 if not LspRuntimeMonitor.instance.newInstanceAdded[self.population.threadIdentifier] :
+    #                     LspRuntimeMonitor.instance.newInstanceAdded[self.population.threadIdentifier] = True

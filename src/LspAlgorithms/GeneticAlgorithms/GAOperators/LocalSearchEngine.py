@@ -25,6 +25,9 @@ class LocalSearchEngine:
         if LocalSearchEngine.localSearchMemory["content"]["simple_mutation"] is None:
             LocalSearchEngine.localSearchMemory["content"]["simple_mutation"] = dict()
 
+        if LocalSearchEngine.localSearchMemory["content"]["visited_genes"] is None:
+            LocalSearchEngine.localSearchMemory["content"]["visited_genes"] = dict()
+
         # self._stopSearchEvents = threading.Event()
 
 

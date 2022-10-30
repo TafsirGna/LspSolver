@@ -4,6 +4,7 @@ import threading
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.Chromosome import Chromosome
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 from .LocalSearchEngine import LocalSearchEngine
+from .MutationOperator import MutationOperator
 from ..PopInitialization.Population import Population
 from ParameterSearch.ParameterData import ParameterData
 from .LocalSearchEngine import LocalSearchEngine
@@ -24,6 +25,9 @@ class CrossOverOperator:
 
         if LocalSearchEngine.localSearchMemory["content"]["simple_mutation"] is None:
             LocalSearchEngine.localSearchMemory["content"]["simple_mutation"] = dict()
+
+        if LocalSearchEngine.localSearchMemory["content"]["visited_genes"] is None:
+            LocalSearchEngine.localSearchMemory["content"]["visited_genes"] = dict()
 
         # self._stopSearchEvents = {0: threading.Event(), 1: threading.Event()}
 
@@ -53,7 +57,15 @@ class CrossOverOperator:
                     raise e
 
             chromosomes.add(chromosomeC)
+
+            # if len(LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosomeC.stringIdentifier]) == 0 and LspRuntimeMonitor.instance.remainingMutations[threadIdentifier] > 0:
+            #     (MutationOperator()).process(chromosomeC, chromosomes, population.threadIdentifier)
+
             chromosomes.add(chromosomeD)
+
+            # if len(LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosomeD.stringIdentifier]) == 0 and LspRuntimeMonitor.instance.remainingMutations[threadIdentifier] > 0:
+            #     (MutationOperator()).process(chromosomeD, chromosomes, population.threadIdentifier)
+
             print("chromosomes length : ", len(chromosomes), Population.popSizes[population.threadIdentifier])
 
         population.chromosomes = chromosomes
@@ -107,10 +119,15 @@ class CrossOverOperator:
             if isinstance(chromosome, PseudoChromosome):
                 chromosome = LocalSearchEngine.switchItems(chromosome.value, self.population.threadIdentifier)
 
-            sortedGenes = sorted([gene for itemGenes in chromosome.dnaArray for gene in itemGenes])
-            # random.shuffle(sortedGenes)
+            if chromosome.stringIdentifier not in LocalSearchEngine.localSearchMemory["content"]["visited_genes"]:
+                LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosome.stringIdentifier] = [gene for itemGenes in chromosome.dnaArray for gene in itemGenes if gene.cost > 0]
 
-            for gene in reversed(sortedGenes):
+            listGenes = LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosome.stringIdentifier]
+            # listGenes = sorted(listGenes)
+            random.shuffle(listGenes)
+
+            # for gene in reversed(listGenes):
+            for gene in listGenes:
 
                 targetGene = target.dnaArray[gene.item][gene.position]
                 if gene.period != targetGene.period:
@@ -120,6 +137,7 @@ class CrossOverOperator:
                     if localSearchEngine.result is not None:
                         queue.append(localSearchEngine.result)
                         break
+                    (LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosome.stringIdentifier]).remove(gene)
 
         if not LspRuntimeMonitor.instance.newInstanceAdded[self.population.threadIdentifier] \
             and self.offsprings[offspringIndex] != self.parentChromosomes[offspringIndex]:
