@@ -50,21 +50,23 @@ class CrossOverOperator:
 
             chromosomeC, chromosomeD = chromosomeA, chromosomeB
 
+            crossedOver = False
             if (random.random() <= ParameterData.instance.crossOverRate):
                 try:
                     chromosomeC, chromosomeD = self.mate([chromosomeA, chromosomeB])
+                    crossedOver = True
                 except Exception as e:
                     raise e
 
             chromosomes.add(chromosomeC)
 
-            # if len(LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosomeC.stringIdentifier]) == 0 and LspRuntimeMonitor.instance.remainingMutations[threadIdentifier] > 0:
-            #     (MutationOperator()).process(chromosomeC, chromosomes, population.threadIdentifier)
+            if crossedOver and len(LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosomeC.stringIdentifier]) == 0 and LspRuntimeMonitor.instance.remainingMutations[population.threadIdentifier] > 0:
+                (MutationOperator()).process(chromosomeC, chromosomes, population.threadIdentifier)
 
             chromosomes.add(chromosomeD)
 
-            # if len(LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosomeD.stringIdentifier]) == 0 and LspRuntimeMonitor.instance.remainingMutations[threadIdentifier] > 0:
-            #     (MutationOperator()).process(chromosomeD, chromosomes, population.threadIdentifier)
+            if crossedOver and len(LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosomeD.stringIdentifier]) == 0 and LspRuntimeMonitor.instance.remainingMutations[population.threadIdentifier] > 0:
+                (MutationOperator()).process(chromosomeD, chromosomes, population.threadIdentifier)
 
             print("chromosomes length : ", len(chromosomes), Population.popSizes[population.threadIdentifier])
 
@@ -143,4 +145,5 @@ class CrossOverOperator:
             and self.offsprings[offspringIndex] != self.parentChromosomes[offspringIndex]:
             LspRuntimeMonitor.instance.newInstanceAdded[self.population.threadIdentifier] = True
 
+        print(" xxxxxxxx : ", self.offsprings[offspringIndex])
         # return offspring

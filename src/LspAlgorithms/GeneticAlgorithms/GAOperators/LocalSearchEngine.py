@@ -52,9 +52,11 @@ class LocalSearchEngine:
 
         results = set()
         selectedGenes = [gene for itemGenes in chromosome.dnaArray for gene in itemGenes]
+        # random.shuffle(selectedGenes)
 
         # print("Searching individu !!!")
         # print("selected : ", selectedGenes)
+        # for periodGene in selectedGenes:
         while len(selectedGenes) > 0:
             periodGene = random.choice(selectedGenes)
 
@@ -134,14 +136,14 @@ class LocalSearchEngine:
         """
         """
 
-        mStringIdentifier = None
+        mStringIdentifier = LocalSearchEngine.mutationStringIdentifier(chromosome.stringIdentifier, periodGene.period, altPeriod)
 
         localSearchMemoryKey = (chromosome.stringIdentifier, periodGene.period, altPeriod)
         # making sure the process doesn't take a path already taken before
         with LocalSearchEngine.localSearchMemory["lock"]:
             if localSearchMemoryKey in LocalSearchEngine.localSearchMemory["content"]["simple_mutation"]:
                 if args["threadId"] not in LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][localSearchMemoryKey]:
-                    mStringIdentifier = LocalSearchEngine.mutationStringIdentifier(chromosome.stringIdentifier, periodGene.period, altPeriod)
+                    
                     popChromosome = None
                     for threadIdentifier in LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][localSearchMemoryKey]:
                         popChromosome = Chromosome.popByThread[threadIdentifier]["content"][mStringIdentifier]
@@ -153,18 +155,15 @@ class LocalSearchEngine:
                     if isinstance(popChromosome, Chromosome):
                         return
                     # else
-                    if strategy == "positive":
-                        if popChromosome < chromosome:
-                            self.result = popChromosome
-                            return "RETURN"
+                    if self.onSelectedStrategy(strategy, chromosome, popChromosome, args) == "RETURN":
+                        return "RETURN"
 
-                    if strategy == "refinement":
-                        if popChromosome < chromosome:
-                            self.searchVicinity(popChromosome, strategy, args)
-                            return "RETURN"
+                else:
+                    popChromosome = Chromosome.popByThread[args["threadId"]]["content"][mStringIdentifier]
+                    if isinstance(popChromosome, Chromosome):
+                        return
 
-                    if strategy == "random":
-                        self.result = popChromosome
+                    if self.onSelectedStrategy(strategy, chromosome, popChromosome, args) == "RETURN":
                         return "RETURN"
 
 
@@ -218,27 +217,39 @@ class LocalSearchEngine:
                         if isinstance(popChromosome, Chromosome):
                             return
                         # else
-                        if strategy == "positive":
-                            if popChromosome < chromosome:
-                                print("iiiiiiiiiiiiiiiinnnnnnnnnnnnnnnnnnn ")
-                                self.result = popChromosome
-                                return "RETURN"
 
-                        if strategy == "refinement":
-                            if popChromosome < chromosome:
-                                self.searchVicinity(popChromosome, strategy, args)
-                                return "RETURN"
-
-                        if strategy == "random":
-                            self.result = popChromosome
+                        if self.onSelectedStrategy(strategy, chromosome, popChromosome, args) == "RETURN":
                             return "RETURN"
-
 
                     LocalSearchEngine.registerMove(localSearchMemoryKey, args["threadId"])
 
         # else:
         #     return "SET_ALT_PERIOD_NONE"
 
+
+
+    def onSelectedStrategy(self, strategy, chromosome, popChromosome, args):
+        """
+        """
+
+        if strategy == "positive":
+            if popChromosome < chromosome:
+                self.result = popChromosome
+                return "RETURN"
+
+        if strategy == "refinement":
+            if popChromosome < chromosome:
+                self.searchVicinity(popChromosome, strategy, args)
+                return "RETURN"
+
+        if strategy == "random":
+            self.result = popChromosome
+            return "RETURN"
+
+        if strategy == "inexplored":
+            if isinstance(popChromosome, PseudoChromosome):
+                self.result = popChromosome
+            return "RETURN"
 
     @classmethod
     def registerMove(cls, localSearchMemoryKey, threadIdentifier):
