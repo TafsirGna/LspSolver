@@ -78,8 +78,8 @@ class GeneticAlgorithm:
 		# building population
 		population = Population(primeThreadIdentifier, self.popChromosomes[primeThreadIdentifier])
 
-		if self.generationIndex == 0:
-			population.boostChampion()
+		# if self.generationIndex == 0:
+		# 	population.boostChampion()
 
 		if self.generationIndex > 0:
 			self.idleGenCounters[primeThreadIdentifier] = self.idleGenCounters[primeThreadIdentifier] + 1 if population.best.cost == LspRuntimeMonitor.instance.popsData[primeThreadIdentifier]["min"][-1] else 1

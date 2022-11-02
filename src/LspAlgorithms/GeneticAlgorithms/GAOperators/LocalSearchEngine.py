@@ -84,14 +84,11 @@ class LocalSearchEngine:
 
         periodGeneLowerLimit, periodGeneUpperLimit = Chromosome.geneLowerUpperLimit(chromosome, periodGene)
         periods = list(range(periodGeneLowerLimit, periodGeneUpperLimit))
-        periods = reversed(periods)
-        # random.shuffle(periods)
+        # periods = reversed(periods)
+        random.shuffle(periods)
 
         for period in periods:
             if period == periodGene.period:
-                continue
-
-            if strategy == "crossover" and period == args["altPeriod"]:
                 continue
 
             result = self.handleAltPeriod(chromosome, strategy, periodGene, period, periodGeneLowerLimit, periodGeneUpperLimit, results, args)

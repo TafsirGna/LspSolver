@@ -51,8 +51,8 @@ class Population:
         """
 
         for chromosome in self.chromosomes:
-            result = (LocalSearchEngine().process(chromosome, "simple_mutation", {"threadId": self.threadIdentifier}))
-            if result < chromosome:
+            result = (LocalSearchEngine().process(chromosome, "crossover", {"threadId": self.threadIdentifier}))
+            if result is not None and result < chromosome:
                 break
 
 
