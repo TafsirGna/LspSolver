@@ -90,9 +90,6 @@ class GeneticAlgorithm:
 		# crossing over
 		CrossOverOperator().process(population)
 
-		# applying mutation
-		# MutationOperator().process(population)
-
 		# if self.idleGenCounters[primeThreadIdentifier] > 1:
 		# 	population.localSearch()
 

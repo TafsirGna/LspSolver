@@ -60,13 +60,13 @@ class CrossOverOperator:
 
             chromosomes.add(chromosomeC)
 
-            if crossedOver and len(LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosomeC.stringIdentifier]) == 0 and LspRuntimeMonitor.instance.remainingMutations[population.threadIdentifier] > 0:
-                (MutationOperator()).process(chromosomeC, chromosomes, population.threadIdentifier)
+            # if crossedOver and len(LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosomeC.stringIdentifier]) == 0 and LspRuntimeMonitor.instance.remainingMutations[population.threadIdentifier] > 0:
+            #     (MutationOperator()).process(chromosomeC, chromosomes, population.threadIdentifier)
 
             chromosomes.add(chromosomeD)
 
-            if crossedOver and len(LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosomeD.stringIdentifier]) == 0 and LspRuntimeMonitor.instance.remainingMutations[population.threadIdentifier] > 0:
-                (MutationOperator()).process(chromosomeD, chromosomes, population.threadIdentifier)
+            # if crossedOver and len(LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosomeD.stringIdentifier]) == 0 and LspRuntimeMonitor.instance.remainingMutations[population.threadIdentifier] > 0:
+            #     (MutationOperator()).process(chromosomeD, chromosomes, population.threadIdentifier)
 
             print("chromosomes length : ", len(chromosomes), Population.popSizes[population.threadIdentifier])
 
@@ -135,7 +135,7 @@ class CrossOverOperator:
                 if gene.period != targetGene.period:
                     print("crossing over : ", gene.period, chromosome)
                     localSearchEngine = LocalSearchEngine()
-                    localSearchEngine.improveGene(chromosome, gene, "positive", None, {"threadId": threadIdentifier})                        
+                    localSearchEngine.improveGene(chromosome, gene, "crossover", None, {"threadId": threadIdentifier, "altPeriod": targetGene.period})                        
                     if localSearchEngine.result is not None:
                         queue.append(localSearchEngine.result)
                         break

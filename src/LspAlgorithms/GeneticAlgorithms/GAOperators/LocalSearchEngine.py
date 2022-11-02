@@ -78,58 +78,70 @@ class LocalSearchEngine:
         """
 
         # print("gene : ", periodGene)
+        # if strategy == "crossover":
+        #     self.improveGeneCrossOverStrategy(chromosome, periodGene, strategy, results, args)
+        #     return None
+
         periodGeneLowerLimit, periodGeneUpperLimit = Chromosome.geneLowerUpperLimit(chromosome, periodGene)
         periods = list(range(periodGeneLowerLimit, periodGeneUpperLimit))
         periods = reversed(periods)
         # random.shuffle(periods)
 
         for period in periods:
+            if period == periodGene.period:
+                continue
+
+            if strategy == "crossover" and period == args["altPeriod"]:
+                continue
+
             result = self.handleAltPeriod(chromosome, strategy, periodGene, period, periodGeneLowerLimit, periodGeneUpperLimit, results, args)
             if result == "RETURN":
                 return None
 
 
-    # def improveGene(self, chromosome, periodGene, strategy, results, args):
-    #     """
-    #     """
+    def improveGeneCrossOverStrategy(self, chromosome, periodGene, strategy, results, args):
+        """
+        """
 
-    #     # print("gene : ", periodGene)
-    #     periodGeneLowerLimit, periodGeneUpperLimit = Chromosome.geneLowerUpperLimit(chromosome, periodGene)
+        # print("gene : ", periodGene)
+        periodGeneLowerLimit, periodGeneUpperLimit = Chromosome.geneLowerUpperLimit(chromosome, periodGene)
         
-    #     increment = 1
-    #     backwardPeriod, forwardPeriod = periodGene.period, periodGene.period
-    #     while True:
-    #         if forwardPeriod is not None:
-    #             forwardPeriod = periodGene.period + increment
-    #         if backwardPeriod is not None:
-    #             backwardPeriod = periodGene.period - increment
+        increment = 0
+        backwardPeriod, forwardPeriod = args["altPeriod"], args["altPeriod"]
+        while True:
+            if forwardPeriod is not None:
+                forwardPeriod = args["altPeriod"] + increment
+            if backwardPeriod is not None:
+                backwardPeriod = args["altPeriod"] - increment
 
-    #         if backwardPeriod is not None and backwardPeriod < 0:
-    #             backwardPeriod = None
+            if backwardPeriod is not None and backwardPeriod < 0:
+                backwardPeriod = None
 
-    #         if forwardPeriod is not None and forwardPeriod > InputDataInstance.instance.nPeriods - 1:
-    #             forwardPeriod = None
+            if forwardPeriod is not None and forwardPeriod > InputDataInstance.instance.nPeriods - 1:
+                forwardPeriod = None
 
-    #         # print(backwardPeriod, forwardPeriod)
+            # print(backwardPeriod, forwardPeriod)
 
-    #         if forwardPeriod is not None :
-    #             result = self.handleAltPeriod(chromosome, strategy, periodGene, forwardPeriod, periodGeneLowerLimit, periodGeneUpperLimit, results, args)
-    #             if result == "RETURN":
-    #                 return None
-    #             elif result == "SET_ALT_PERIOD_NONE":
-    #                 forwardPeriod = None
+            if forwardPeriod is not None :
+                if forwardPeriod != periodGene.period:
+                    result = self.handleAltPeriod(chromosome, strategy, periodGene, forwardPeriod, periodGeneLowerLimit, periodGeneUpperLimit, results, args)
+                    if result == "RETURN":
+                        return None
+                    elif result == "SET_ALT_PERIOD_NONE":
+                        forwardPeriod = None
 
-    #         if backwardPeriod is not None :
-    #             result = self.handleAltPeriod(chromosome, strategy, periodGene, backwardPeriod, periodGeneLowerLimit, periodGeneUpperLimit, results, args)
-    #             if result == "RETURN":
-    #                 return None
-    #             elif result == "SET_ALT_PERIOD_NONE":
-    #                 backwardPeriod = None
+            if backwardPeriod is not None :
+                if backwardPeriod != periodGene.period:
+                    result = self.handleAltPeriod(chromosome, strategy, periodGene, backwardPeriod, periodGeneLowerLimit, periodGeneUpperLimit, results, args)
+                    if result == "RETURN":
+                        return None
+                    elif result == "SET_ALT_PERIOD_NONE":
+                        backwardPeriod = None
 
-    #         if backwardPeriod is None and forwardPeriod is None:
-    #             break
+            if backwardPeriod is None and forwardPeriod is None:
+                break
 
-    #         increment += 1
+            increment += 1
 
 
     def handleAltPeriod(self, chromosome, strategy, periodGene, altPeriod, periodGeneLowerLimit, periodGeneUpperLimit, results, args):
@@ -188,7 +200,7 @@ class LocalSearchEngine:
                     Chromosome.addToPop(args["threadId"], pseudoChromosome)
                     LocalSearchEngine.registerMove(localSearchMemoryKey, args["threadId"])
 
-                if strategy == "positive":
+                if strategy == "crossover":
                     if evaluationData["variance"] > 0:
                         self.result = pseudoChromosome
                         return "RETURN"
@@ -223,8 +235,8 @@ class LocalSearchEngine:
 
                     LocalSearchEngine.registerMove(localSearchMemoryKey, args["threadId"])
 
-        # else:
-        #     return "SET_ALT_PERIOD_NONE"
+        else:
+            return "SET_ALT_PERIOD_NONE"
 
 
 
@@ -232,7 +244,7 @@ class LocalSearchEngine:
         """
         """
 
-        if strategy == "positive":
+        if strategy == "crossover":
             if popChromosome < chromosome:
                 self.result = popChromosome
                 return "RETURN"
