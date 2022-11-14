@@ -50,11 +50,11 @@ class CrossOverOperator:
 
             chromosomeC, chromosomeD = chromosomeA, chromosomeB
 
-            crossedOver = False
+            # crossedOver = False
             if (random.random() <= ParameterData.instance.crossOverRate):
                 try:
                     chromosomeC, chromosomeD = self.mate([chromosomeA, chromosomeB])
-                    crossedOver = True
+                    # crossedOver = True
                 except Exception as e:
                     raise e
 
@@ -63,9 +63,17 @@ class CrossOverOperator:
             # if crossedOver and len(LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosomeC.stringIdentifier]) == 0 and LspRuntimeMonitor.instance.remainingMutations[population.threadIdentifier] > 0:
             #     (MutationOperator()).process(chromosomeC, chromosomes, population.threadIdentifier)
 
+            # another way for mutation
+            # if (random.random() <= ParameterData.instance.mutationRate):
+            #     (MutationOperator()).process(chromosomeC, chromosomes, population.threadIdentifier)
+
             chromosomes.add(chromosomeD)
 
             # if crossedOver and len(LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosomeD.stringIdentifier]) == 0 and LspRuntimeMonitor.instance.remainingMutations[population.threadIdentifier] > 0:
+            #     (MutationOperator()).process(chromosomeD, chromosomes, population.threadIdentifier)
+
+            # another way for mutation
+            # if (random.random() <= ParameterData.instance.mutationRate):
             #     (MutationOperator()).process(chromosomeD, chromosomes, population.threadIdentifier)
 
             print("chromosomes length : ", len(chromosomes), Population.popSizes[population.threadIdentifier])
@@ -132,14 +140,17 @@ class CrossOverOperator:
             for gene in listGenes:
 
                 targetGene = target.dnaArray[gene.item][gene.position]
-                if gene.period != targetGene.period:
-                    print("crossing over : ", gene.period, chromosome)
-                    localSearchEngine = LocalSearchEngine()
-                    localSearchEngine.improveGene(chromosome, gene, "crossover", None, {"threadId": threadIdentifier, "altPeriod": targetGene.period})                        
-                    if localSearchEngine.result is not None:
-                        queue.append(localSearchEngine.result)
-                        break
-                    (LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosome.stringIdentifier]).remove(gene)
+
+                # TODO
+                # if gene.period != targetGene.period:
+
+                print("crossing over : ", gene.period, chromosome)
+                localSearchEngine = LocalSearchEngine()
+                localSearchEngine.improveGene(chromosome, gene, "crossover", None, {"threadId": threadIdentifier, "altPeriod": targetGene.period, "target": target})                        
+                if localSearchEngine.result is not None:
+                    queue.append(localSearchEngine.result)
+                    break
+                (LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosome.stringIdentifier]).remove(gene)
 
         if not LspRuntimeMonitor.instance.newInstanceAdded[self.population.threadIdentifier] \
             and self.offsprings[offspringIndex] != self.parentChromosomes[offspringIndex]:

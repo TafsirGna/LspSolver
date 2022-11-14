@@ -36,10 +36,28 @@ class Chromosome(object):
 		"""
 
 		count = 0
-		for period in range(InputDataInstance.instance.nPeriods):
-			count += (chromosomeA.stringIdentifier[period] - chromosomeB.stringIdentifier[period]) ** 2
+		for item in range(InputDataInstance.instance.nItems):
+			for position in range(len(InputDataInstance.instance.demandsArrayZipped[item])):
+				count += (((chromosomeA.dnaArray[item][position]).period - \
+					(chromosomeB.dnaArray[item][position]).period) * InputDataInstance.instance.stockingCostsArray[item]) ** 2
 
 		return math.sqrt(count)
+
+	@classmethod
+	def gettingCloser(cls, chromosome, target, gene, altPeriod):
+		"""
+		"""
+
+		variance = abs(gene.period - (target.dnaArray[gene.item][gene.position]).period) * InputDataInstance.instance.stockingCostsArray[gene.item]
+		variance -= abs(altPeriod - (target.dnaArray[gene.item][gene.position]).period) * InputDataInstance.instance.stockingCostsArray[gene.item]
+	
+		if (chromosome.stringIdentifier[altPeriod] != 0):
+			altPeriodItem = chromosome.genesByPeriod[altPeriod][0]
+			altPeriodPosition = chromosome.genesByPeriod[altPeriod][1]
+			variance += abs(altPeriod - (target.dnaArray[altPeriodItem][altPeriodPosition]).period) * InputDataInstance.instance.stockingCostsArray[altPeriodItem]
+			variance -= abs(gene.period - (target.dnaArray[altPeriodItem][altPeriodPosition]).period) * InputDataInstance.instance.stockingCostsArray[altPeriodItem]
+
+		return (variance > 0)
 
 	@classmethod
 	def addToPop(cls, threadIdentifier, chromosome):
