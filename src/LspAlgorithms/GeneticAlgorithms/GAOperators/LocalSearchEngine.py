@@ -91,6 +91,11 @@ class LocalSearchEngine:
             if period == periodGene.period:
                 continue
 
+            if not Chromosome.gettingCloser(chromosome, args["target"], periodGene, period):
+                print("not getting closer *** ")
+                continue
+            print("yes getting closer *** ")
+
             result = self.handleAltPeriod(chromosome, strategy, periodGene, period, periodGeneLowerLimit, periodGeneUpperLimit, results, args)
             if result == "RETURN":
                 return None
@@ -178,10 +183,6 @@ class LocalSearchEngine:
 
         if LocalSearchEngine.areItemsSwitchable(chromosome, periodGene, altPeriod, (periodGeneLowerLimit, periodGeneUpperLimit)):
 
-            if strategy == "crossover":
-                if not Chromosome.gettingCloser(chromosome, args["target"], periodGene, altPeriod):
-                    return "RETURN"
-
             if mStringIdentifier is None:
                 mStringIdentifier = LocalSearchEngine.mutationStringIdentifier(chromosome.stringIdentifier, periodGene.period, altPeriod)
 
@@ -236,8 +237,8 @@ class LocalSearchEngine:
 
                     LocalSearchEngine.registerMove(localSearchMemoryKey, args["threadId"])
 
-        else:
-            return "SET_ALT_PERIOD_NONE"
+        # else:
+        #     return "SET_ALT_PERIOD_NONE"
 
 
 

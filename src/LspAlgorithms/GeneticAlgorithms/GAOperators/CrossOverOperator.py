@@ -60,6 +60,9 @@ class CrossOverOperator:
 
             chromosomes.add(chromosomeC)
 
+            if chromosomeC > chromosomeA:
+                print("Waaaaaaaaaaaaaaaaaaack A-C")
+
             # if crossedOver and len(LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosomeC.stringIdentifier]) == 0 and LspRuntimeMonitor.instance.remainingMutations[population.threadIdentifier] > 0:
             #     (MutationOperator()).process(chromosomeC, chromosomes, population.threadIdentifier)
 
@@ -68,6 +71,9 @@ class CrossOverOperator:
             #     (MutationOperator()).process(chromosomeC, chromosomes, population.threadIdentifier)
 
             chromosomes.add(chromosomeD)
+
+            if chromosomeD > chromosomeB:
+                print("Waaaaaaaaaaaaaaaaaaack B-C")
 
             # if crossedOver and len(LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosomeD.stringIdentifier]) == 0 and LspRuntimeMonitor.instance.remainingMutations[population.threadIdentifier] > 0:
             #     (MutationOperator()).process(chromosomeD, chromosomes, population.threadIdentifier)

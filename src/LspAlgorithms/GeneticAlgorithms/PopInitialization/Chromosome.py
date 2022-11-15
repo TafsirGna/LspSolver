@@ -48,14 +48,14 @@ class Chromosome(object):
 		"""
 		"""
 
-		variance = abs(gene.period - (target.dnaArray[gene.item][gene.position]).period) * InputDataInstance.instance.stockingCostsArray[gene.item]
-		variance -= abs(altPeriod - (target.dnaArray[gene.item][gene.position]).period) * InputDataInstance.instance.stockingCostsArray[gene.item]
+		variance = (abs(gene.period - (target.dnaArray[gene.item][gene.position]).period) - abs(altPeriod - (target.dnaArray[gene.item][gene.position]).period)) \
+			* InputDataInstance.instance.stockingCostsArray[gene.item]
 	
-		if (chromosome.stringIdentifier[altPeriod] != 0):
+		if (chromosome.stringIdentifier[altPeriod] > 0):
 			altPeriodItem = chromosome.genesByPeriod[altPeriod][0]
 			altPeriodPosition = chromosome.genesByPeriod[altPeriod][1]
-			variance += abs(altPeriod - (target.dnaArray[altPeriodItem][altPeriodPosition]).period) * InputDataInstance.instance.stockingCostsArray[altPeriodItem]
-			variance -= abs(gene.period - (target.dnaArray[altPeriodItem][altPeriodPosition]).period) * InputDataInstance.instance.stockingCostsArray[altPeriodItem]
+			variance += (abs(altPeriod - (target.dnaArray[altPeriodItem][altPeriodPosition]).period) - abs(gene.period - (target.dnaArray[altPeriodItem][altPeriodPosition]).period)) \
+				* InputDataInstance.instance.stockingCostsArray[chromosome.genesByPeriod[altPeriod][0]]
 
 		return (variance > 0)
 
