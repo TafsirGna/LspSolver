@@ -52,17 +52,11 @@ class LocalSearchEngine:
 
         results = set()
         selectedGenes = [gene for itemGenes in chromosome.dnaArray for gene in itemGenes]
-        # random.shuffle(selectedGenes)
+        random.shuffle(selectedGenes)
 
-        # print("Searching individu !!!")
         # print("selected : ", selectedGenes)
-        # for periodGene in selectedGenes:
-        while len(selectedGenes) > 0:
-            periodGene = random.choice(selectedGenes)
-
-            self.improveGene(chromosome, periodGene, strategy, results, args)     
-
-            selectedGenes.remove(periodGene)
+        for periodGene in selectedGenes:
+            self.improveGene(chromosome, periodGene, strategy, results, args)  
         
         if strategy == "refinement":
             self.result = chromosome
@@ -77,24 +71,19 @@ class LocalSearchEngine:
         """
         """
 
-        # print("gene : ", periodGene)
-        # if strategy == "crossover":
-        #     self.improveGeneCrossOverStrategy(chromosome, periodGene, strategy, results, args)
-        #     return None
-
         periodGeneLowerLimit, periodGeneUpperLimit = Chromosome.geneLowerUpperLimit(chromosome, periodGene)
         periods = list(range(periodGeneLowerLimit, periodGeneUpperLimit))
-        # periods = reversed(periods)
         random.shuffle(periods)
 
         for period in periods:
             if period == periodGene.period:
                 continue
 
-            if not Chromosome.gettingCloser(chromosome, args["target"], periodGene, period):
-                print("not getting closer *** ")
-                continue
-            print("yes getting closer *** ")
+            # if strategy == "crossover":
+            #     if not Chromosome.gettingCloser(chromosome, args["target"], periodGene, period):
+            #         print("not getting closer *** ")
+            #         continue
+            #     print("yes getting closer *** ")
 
             result = self.handleAltPeriod(chromosome, strategy, periodGene, period, periodGeneLowerLimit, periodGeneUpperLimit, results, args)
             if result == "RETURN":
@@ -183,6 +172,10 @@ class LocalSearchEngine:
 
         if LocalSearchEngine.areItemsSwitchable(chromosome, periodGene, altPeriod, (periodGeneLowerLimit, periodGeneUpperLimit)):
 
+            # trying to craft a heuristic
+            if not LocalSearchEngine.isSwitchInteresting(chromosome, periodGene, altPeriod):
+                return
+
             if mStringIdentifier is None:
                 mStringIdentifier = LocalSearchEngine.mutationStringIdentifier(chromosome.stringIdentifier, periodGene.period, altPeriod)
 
@@ -261,8 +254,8 @@ class LocalSearchEngine:
             return "RETURN"
 
         if strategy == "inexplored":
-            if isinstance(popChromosome, PseudoChromosome):
-                self.result = popChromosome
+            # if isinstance(popChromosome, PseudoChromosome):
+            self.result = popChromosome
             return "RETURN"
 
     @classmethod
@@ -298,16 +291,35 @@ class LocalSearchEngine:
         return False
 
 
-    def isSwitchInteresting(self, chromosome, periodGene, altPeriod):
-        """
+    @classmethod
+    def isSwitchInteresting(cls, chromosome, periodGene, altPeriod):
+        """Simply, checking if the new production cost when switch done is lower than the current one
         """
 
-        if chromosome.stringIdentifier[altPeriod] == 0 and altPeriod < periodGene.period:
-            nextGene0 = Chromosome.nextProdGene(altPeriod, chromosome.dnaArray, chromosome.stringIdentifier)
-            if nextGene0 is not None and nextGene0 == periodGene:
-                return False
+        newCost = 0
 
-        return True
+        if chromosome.stringIdentifier[altPeriod] == 0:
+            prevGene0 = Chromosome.prevProdGene(altPeriod, chromosome.dnaArray, chromosome.stringIdentifier)  
+            # new changeover cost
+            if prevGene0 is not None:
+                newCost += InputDataInstance.instance.changeOverCostsArray[prevGene0.item][periodGene.item]
+        else:
+            altPeriodGene = chromosome.dnaArray[chromosome.genesByPeriod[altPeriod][0]][chromosome.genesByPeriod[altPeriod][1]]
+            # new changeover cost
+            if altPeriodGene.prevGene is not None:
+                newCost += InputDataInstance.instance.changeOverCostsArray[altPeriodGene.prevGene[0]][periodGene.item]
+                
+        # new stocking cost
+        newCost += (InputDataInstance.instance.demandsArrayZipped[periodGene.item][periodGene.position] - altPeriod) * InputDataInstance.instance.stockingCostsArray[periodGene.item]
+
+        return (newCost < periodGene.cost)
+
+        # if chromosome.stringIdentifier[altPeriod] == 0 and altPeriod < periodGene.period:
+        #     nextGene0 = Chromosome.nextProdGene(altPeriod, chromosome.dnaArray, chromosome.stringIdentifier)
+        #     if nextGene0 is not None and nextGene0 == periodGene:
+        #         return False
+
+        # return True
 
 
     @classmethod

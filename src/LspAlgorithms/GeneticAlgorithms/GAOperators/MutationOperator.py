@@ -24,6 +24,7 @@ class MutationOperator:
         """
 
         result = (LocalSearchEngine()).process(chromosome, "inexplored", {"threadId": threadIdentifier})
+        
         if result is not None:
 
             # updating the population

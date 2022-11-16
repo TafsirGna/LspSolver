@@ -96,7 +96,9 @@ class SelectionOperator:
 
         # adding selected chromosomes to the selectedpool property
         self.selectedPool.add(chromosomeA)
-        self.selectedPool.add(chromosomeB)
+
+        if chromosomeB not in self.selectedPool:
+            self.selectedPool.add(chromosomeB)
 
         return chromosomeA, chromosomeB
 

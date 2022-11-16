@@ -50,36 +50,41 @@ class CrossOverOperator:
 
             chromosomeC, chromosomeD = chromosomeA, chromosomeB
 
-            # crossedOver = False
+            crossedOver = False
             if (random.random() <= ParameterData.instance.crossOverRate):
                 try:
                     chromosomeC, chromosomeD = self.mate([chromosomeA, chromosomeB])
-                    # crossedOver = True
+                    crossedOver = True
                 except Exception as e:
                     raise e
 
-            chromosomes.add(chromosomeC)
+            if crossedOver and chromosomeC == chromosomeA:
+                # TODO
+                pass
 
-            if chromosomeC > chromosomeA:
-                print("Waaaaaaaaaaaaaaaaaaack A-C")
+            # mutation
+            # if (random.random() <= ParameterData.instance.mutationRate):
+            #     result = (LocalSearchEngine()).process(chromosomeC, "inexplored", {"threadId": population.threadIdentifier})
+            #     chromosomeC = chromosomeC if result is None else result
+
+            chromosomes.add(chromosomeC)
 
             # if crossedOver and len(LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosomeC.stringIdentifier]) == 0 and LspRuntimeMonitor.instance.remainingMutations[population.threadIdentifier] > 0:
             #     (MutationOperator()).process(chromosomeC, chromosomes, population.threadIdentifier)
 
-            # another way for mutation
+
+            if crossedOver and chromosomeD == chromosomeB:
+                # TODO
+                pass
+
+            # mutation
             # if (random.random() <= ParameterData.instance.mutationRate):
-            #     (MutationOperator()).process(chromosomeC, chromosomes, population.threadIdentifier)
+            #     result = (LocalSearchEngine()).process(chromosomeC, "inexplored", {"threadId": population.threadIdentifier})
+            #     chromosomeD = chromosomeD if result is None else result
 
             chromosomes.add(chromosomeD)
 
-            if chromosomeD > chromosomeB:
-                print("Waaaaaaaaaaaaaaaaaaack B-C")
-
             # if crossedOver and len(LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosomeD.stringIdentifier]) == 0 and LspRuntimeMonitor.instance.remainingMutations[population.threadIdentifier] > 0:
-            #     (MutationOperator()).process(chromosomeD, chromosomes, population.threadIdentifier)
-
-            # another way for mutation
-            # if (random.random() <= ParameterData.instance.mutationRate):
             #     (MutationOperator()).process(chromosomeD, chromosomes, population.threadIdentifier)
 
             print("chromosomes length : ", len(chromosomes), Population.popSizes[population.threadIdentifier])
@@ -139,20 +144,15 @@ class CrossOverOperator:
                 LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosome.stringIdentifier] = [gene for itemGenes in chromosome.dnaArray for gene in itemGenes if gene.cost > 0]
 
             listGenes = LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosome.stringIdentifier]
-            # listGenes = sorted(listGenes)
             random.shuffle(listGenes)
 
             # for gene in reversed(listGenes):
             for gene in listGenes:
 
-                targetGene = target.dnaArray[gene.item][gene.position]
-
-                # TODO
-                # if gene.period != targetGene.period:
-
                 print("crossing over : ", gene.period, chromosome)
                 localSearchEngine = LocalSearchEngine()
-                localSearchEngine.improveGene(chromosome, gene, "crossover", None, {"threadId": threadIdentifier, "altPeriod": targetGene.period, "target": target})                        
+                # improving the current gene respective of the target chromosome
+                localSearchEngine.improveGene(chromosome, gene, "crossover", None, {"threadId": threadIdentifier, "target": target})                        
                 if localSearchEngine.result is not None:
                     queue.append(localSearchEngine.result)
                     break
