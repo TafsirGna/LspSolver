@@ -155,15 +155,24 @@ class LocalSearchEngine:
                     Chromosome.copyToThread(args["threadId"], popChromosome)
                     LocalSearchEngine.registerMove(localSearchMemoryKey, args["threadId"])
 
-                    if isinstance(popChromosome, Chromosome):
+                    # if isinstance(popChromosome, Chromosome):
+                    #     return
+
+                    if popChromosome.stringIdentifier in LocalSearchEngine.localSearchMemory["content"]["visited_genes"] \
+                        and len(LocalSearchEngine.localSearchMemory["content"]["visited_genes"][popChromosome.stringIdentifier]) == 0:
                         return
+
                     # else
                     if self.onSelectedStrategy(strategy, chromosome, popChromosome, args) == "RETURN":
                         return "RETURN"
 
                 else:
                     popChromosome = Chromosome.popByThread[args["threadId"]]["content"][mStringIdentifier]
-                    if isinstance(popChromosome, Chromosome):
+                    # if isinstance(popChromosome, Chromosome):
+                    #     return
+
+                    if popChromosome.stringIdentifier in LocalSearchEngine.localSearchMemory["content"]["visited_genes"] \
+                        and len(LocalSearchEngine.localSearchMemory["content"]["visited_genes"][popChromosome.stringIdentifier]) == 0:
                         return
 
                     if self.onSelectedStrategy(strategy, chromosome, popChromosome, args) == "RETURN":
@@ -217,12 +226,15 @@ class LocalSearchEngine:
                             if isinstance(popChromosome, Chromosome):
                                 break
                         Chromosome.copyToThread(args["threadId"], popChromosome)
-                        # if isinstance(popChromosome, Chromosome):
-                        #     pass
                     else:
                         popChromosome = Chromosome.popByThread[args["threadId"]]["content"][mStringIdentifier]
-                        if isinstance(popChromosome, Chromosome):
+                        # if isinstance(popChromosome, Chromosome):
+                        #     return
+
+                        if popChromosome.stringIdentifier in LocalSearchEngine.localSearchMemory["content"]["visited_genes"] \
+                            and len(LocalSearchEngine.localSearchMemory["content"]["visited_genes"][popChromosome.stringIdentifier]) == 0:
                             return
+
                         # else
 
                         if self.onSelectedStrategy(strategy, chromosome, popChromosome, args) == "RETURN":
@@ -254,7 +266,6 @@ class LocalSearchEngine:
             return "RETURN"
 
         if strategy == "inexplored":
-            # if isinstance(popChromosome, PseudoChromosome):
             self.result = popChromosome
             return "RETURN"
 
@@ -300,26 +311,36 @@ class LocalSearchEngine:
 
         if chromosome.stringIdentifier[altPeriod] == 0:
             prevGene0 = Chromosome.prevProdGene(altPeriod, chromosome.dnaArray, chromosome.stringIdentifier)  
+            # nextGene0 = Chromosome.nextProdGene(altPeriod, chromosome.dnaArray, chromosome.stringIdentifier)
             # new changeover cost
             if prevGene0 is not None:
-                newCost += InputDataInstance.instance.changeOverCostsArray[prevGene0.item][periodGene.item]
+                if not (prevGene0.item == periodGene.item and prevGene0.position == periodGene.position): 
+                    newCost += InputDataInstance.instance.changeOverCostsArray[prevGene0.item][periodGene.item]
         else:
             altPeriodGene = chromosome.dnaArray[chromosome.genesByPeriod[altPeriod][0]][chromosome.genesByPeriod[altPeriod][1]]
-            # new changeover cost
-            if altPeriodGene.prevGene is not None:
-                newCost += InputDataInstance.instance.changeOverCostsArray[altPeriodGene.prevGene[0]][periodGene.item]
+            # if (periodGene.prevGene is not None and periodGene.prevGene[0] == altPeriodGene.item and periodGene.prevGene[1] == altPeriodGene.position):
+            #     newCost += InputDataInstance.instance.changeOverCostsArray[altPeriodGene.prevGene[0]][periodGene.item]
+            if (altPeriodGene.prevGene is not None and altPeriodGene.prevGene[0] == periodGene.item and altPeriodGene.prevGene[1] == periodGene.position):
+                newCost += InputDataInstance.instance.changeOverCostsArray[altPeriodGene.item][periodGene.item]
+            else:
+                # new changeover cost
+                if altPeriodGene.prevGene is not None:
+                    newCost += InputDataInstance.instance.changeOverCostsArray[altPeriodGene.prevGene[0]][periodGene.item]
                 
         # new stocking cost
         newCost += (InputDataInstance.instance.demandsArrayZipped[periodGene.item][periodGene.position] - altPeriod) * InputDataInstance.instance.stockingCostsArray[periodGene.item]
 
+        # # BEGIN TEST
+
+        # chromi = Chromosome.createFromIdentifier(LocalSearchEngine.mutationStringIdentifier(chromosome.stringIdentifier, periodGene.period, altPeriod))
+        # if (newCost != (chromi.dnaArray[periodGene.item][periodGene.position]).cost):
+        #     print("Eureeeeeeeeeeeeeekaaaaaaaaaaa ! ", (chromi.dnaArray[periodGene.item][periodGene.position]).cost)
+
+        # # END TEST
+
+        # print("is Switch Interesting ? : ", chromosome, " | ", periodGene.period, " | ", periodGene.item, " | ", altPeriod, " | ", newCost, " | ", periodGene.cost)
+
         return (newCost < periodGene.cost)
-
-        # if chromosome.stringIdentifier[altPeriod] == 0 and altPeriod < periodGene.period:
-        #     nextGene0 = Chromosome.nextProdGene(altPeriod, chromosome.dnaArray, chromosome.stringIdentifier)
-        #     if nextGene0 is not None and nextGene0 == periodGene:
-        #         return False
-
-        # return True
 
 
     @classmethod
