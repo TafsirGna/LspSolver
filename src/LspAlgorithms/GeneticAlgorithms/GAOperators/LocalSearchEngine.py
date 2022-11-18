@@ -55,9 +55,10 @@ class LocalSearchEngine:
         for periodGene in selectedGenes:
             self.improveGene(chromosome, periodGene, strategy, results, args)  
         
-        if strategy == "refinement":
-            self.result = chromosome
-        elif strategy == "population":
+        # if strategy == "refinement":
+        #     self.result = chromosome
+        
+        if strategy == "population":
             self.result = list(results)
 
         print("Search ended")
@@ -160,7 +161,7 @@ class LocalSearchEngine:
 
             # if popChromosome > chromosome:
             #     return
-
+                
             if popChromosome.stringIdentifier in LocalSearchEngine.localSearchMemory["content"]["visited_genes"] \
                 and len(LocalSearchEngine.localSearchMemory["content"]["visited_genes"][popChromosome.stringIdentifier]) == 0:
                 return
@@ -191,10 +192,10 @@ class LocalSearchEngine:
                         self.result = pseudoChromosome
                         return "RETURN"
 
-                if strategy == "refinement":
-                    if evaluationData["variance"] > 0:
-                        self.searchVicinity(pseudoChromosome, strategy, args)
-                        return "RETURN"
+                # if strategy == "refinement":
+                #     if evaluationData["variance"] > 0:
+                #         self.searchVicinity(pseudoChromosome, strategy, args)
+                #         return "RETURN"
                 
                 if strategy == "random":
                     self.result = pseudoChromosome
@@ -214,16 +215,12 @@ class LocalSearchEngine:
                 self.result = popChromosome
                 return "RETURN"
 
-        if strategy == "refinement":
-            if popChromosome < chromosome:
-                self.searchVicinity(popChromosome, strategy, args)
-                return "RETURN"
+        # if strategy == "refinement":
+        #     if popChromosome < chromosome:
+        #         self.searchVicinity(popChromosome, strategy, args)
+        #         return "RETURN"
 
-        if strategy == "random":
-            self.result = popChromosome
-            return "RETURN"
-
-        if strategy == "inexplored":
+        if strategy == "random" or strategy == "inexplored":
             self.result = popChromosome
             return "RETURN"
 
@@ -524,8 +521,8 @@ class LocalSearchEngine:
         return evaluationData        
 
 
-    def refine(self, chromosome, threadIdentifier):
-        """
-        """
+    # def refine(self, chromosome, threadIdentifier):
+    #     """
+    #     """
 
-        return (LocalSearchEngine()).process(chromosome, "refinement", {"threadId": threadIdentifier})
+    #     return (LocalSearchEngine()).process(chromosome, "refinement", {"threadId": threadIdentifier})

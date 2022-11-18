@@ -64,25 +64,11 @@ class CrossOverOperator:
             #     result = (LocalSearchEngine()).process(chromosomeC, "inexplored", {"threadId": population.threadIdentifier})
             #     chromosomeC = chromosomeC if result is None else result
 
-            self.newChromosomes.add(chromosomeC)
-
             # if crossedOver and len(LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosomeC.stringIdentifier]) == 0 and LspRuntimeMonitor.instance.remainingMutations[population.threadIdentifier] > 0:
-            #     (MutationOperator()).process(chromosomeC, chromosomes, population.threadIdentifier)
+            if crossedOver and chromosomeC == chromosomeA:
+                chromosomeC = (MutationOperator()).process(chromosomeC, self.newChromosomes, population.threadIdentifier)
 
-
-            # if crossedOver and chromosomeD == chromosomeB:
-            #     # TODO
-            #     pass
-
-            # # mutation
-            # # if (random.random() <= ParameterData.instance.mutationRate):
-            # #     result = (LocalSearchEngine()).process(chromosomeC, "inexplored", {"threadId": population.threadIdentifier})
-            # #     chromosomeD = chromosomeD if result is None else result
-
-            # self.newChromosomes.add(chromosomeD)
-
-            # # if crossedOver and len(LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosomeD.stringIdentifier]) == 0 and LspRuntimeMonitor.instance.remainingMutations[population.threadIdentifier] > 0:
-            # #     (MutationOperator()).process(chromosomeD, chromosomes, population.threadIdentifier)
+            self.newChromosomes.add(chromosomeC)
 
             print("chromosomes length : ", len(self.newChromosomes), Population.popSizes[population.threadIdentifier])
 
@@ -120,55 +106,6 @@ class CrossOverOperator:
             self.searchOffspring(i)
 
 
-    # def searchOffspring(self, offspringIndex):
-    #     """
-    #     """
-
-    #     threadIdentifier = self.population.threadIdentifier if self.population is not None else 1
-    #     target = self.parentChromosomes[0] if offspringIndex == 1 else self.parentChromosomes[1]
-    #     print("Begin **********************", self.parentChromosomes[offspringIndex], target)
-
-    #     queue = [self.parentChromosomes[offspringIndex]]
-    #     while len(queue) > 0:
-    #         chromosome = queue[-1]
-    #         # offspring = chromosome
-    #         self.offsprings[offspringIndex] = chromosome
-    #         queue = queue[:-1] 
-
-    #         if isinstance(chromosome, PseudoChromosome):
-    #             chromosome = LocalSearchEngine.switchItems(chromosome.value, self.population.threadIdentifier)
-
-    #         with LocalSearchEngine.localSearchMemory["lock"]:
-    #             if chromosome.stringIdentifier not in LocalSearchEngine.localSearchMemory["content"]["visited_genes"]:
-    #                     LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosome.stringIdentifier] = [gene for itemGenes in chromosome.dnaArray for gene in itemGenes if gene.cost > 0]
-    #                     random.shuffle(LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosome.stringIdentifier])  
-
-    #         for gene in LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosome.stringIdentifier]:
-
-    #             print("crossing over : ", gene.period, chromosome)
-    #             localSearchEngine = LocalSearchEngine()
-    #             # improving the current gene respective of the target chromosome
-    #             localSearchEngine.improveGene(chromosome, gene, "crossover", None, {"threadId": threadIdentifier, "target": target})                        
-    #             if localSearchEngine.result is not None:
-    #                 queue.append(localSearchEngine.result)
-    #                 break
-
-    #             with LocalSearchEngine.localSearchMemory["lock"]:
-    #                 (LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosome.stringIdentifier]).remove(gene)
-
-    #     # TO REVIEW
-    #     # if self.offsprings[offspringIndex] in self.newChromosomes:
-    #     #     self.offsprings[offspringIndex] = self.parentChromosomes[offspringIndex]
-
-    #     if not LspRuntimeMonitor.instance.newInstanceAdded[self.population.threadIdentifier] \
-    #         and self.offsprings[offspringIndex] != self.parentChromosomes[offspringIndex]:
-    #         LspRuntimeMonitor.instance.newInstanceAdded[self.population.threadIdentifier] = True
-
-    #     print(" xxxxxxxx : ", self.offsprings[offspringIndex])
-    #     # return offspring
-
-
-
     def searchOffspring(self, offspringIndex):
         """
         """
@@ -182,7 +119,7 @@ class CrossOverOperator:
         self.searchRecursiveOffspring(offspringIndex, self.parentChromosomes[offspringIndex], target, threadIdentifier)
 
 
-    def searchRecursiveOffspring(self, offspringIndex, chromosome, target, threadIdentifier):
+    def searchRecursiveOffspring(self, offspringIndex, chromosome, target, threadIdentifier, depthIndex = 0):
         """
         """
 
@@ -206,7 +143,7 @@ class CrossOverOperator:
             # improving the current gene respective of the target chromosome
             localSearchEngine.improveGene(chromosome, gene, "crossover", None, {"threadId": threadIdentifier, "target": target})                        
             if localSearchEngine.result is not None:
-                self.searchRecursiveOffspring(offspringIndex, localSearchEngine.result, target, threadIdentifier)
+                self.searchRecursiveOffspring(offspringIndex, localSearchEngine.result, target, threadIdentifier, depthIndex + 1)
                 if self._stopOffspringSearchEvent.is_set():
                     return
                 self.offsprings[offspringIndex] = chromosome
@@ -215,10 +152,11 @@ class CrossOverOperator:
             (LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosome.stringIdentifier]).remove(gene)
             random.shuffle(LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosome.stringIdentifier])
 
-        
-        if self.offsprings[offspringIndex] not in self.newChromosomes:
+        if self.offsprings[offspringIndex] == self.parentChromosomes[offspringIndex]:
+            return
+
+        if self.offsprings[offspringIndex] not in self.newChromosomes and self.offsprings[offspringIndex] not in self.population.chromosomes:
             self._stopOffspringSearchEvent.set()
 
-        if not LspRuntimeMonitor.instance.newInstanceAdded[threadIdentifier] \
-            and self.offsprings[offspringIndex] != self.parentChromosomes[offspringIndex]:
-            LspRuntimeMonitor.instance.newInstanceAdded[threadIdentifier] = True
+            if not LspRuntimeMonitor.instance.newInstanceAdded[threadIdentifier]:
+                LspRuntimeMonitor.instance.newInstanceAdded[threadIdentifier] = True
