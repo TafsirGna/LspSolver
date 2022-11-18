@@ -23,9 +23,6 @@ class CrossOverOperator:
         self.offsprings = {0: None, 1: None}
         self.population = None 
 
-        if LocalSearchEngine.localSearchMemory["content"]["simple_mutation"] is None:
-            LocalSearchEngine.localSearchMemory["content"]["simple_mutation"] = dict()
-
         if LocalSearchEngine.localSearchMemory["content"]["visited_genes"] is None:
             LocalSearchEngine.localSearchMemory["content"]["visited_genes"] = dict()
 
@@ -48,12 +45,12 @@ class CrossOverOperator:
             if isinstance(chromosomeB, PseudoChromosome):
                 chromosomeB = LocalSearchEngine.switchItems(chromosomeB.value, population.threadIdentifier)
 
-            chromosomeC, chromosomeD = chromosomeA, chromosomeB
+            chromosomeC = chromosomeA
 
             crossedOver = False
             if (random.random() <= ParameterData.instance.crossOverRate):
                 try:
-                    chromosomeC, chromosomeD = self.mate([chromosomeA, chromosomeB])
+                    chromosomeC = self.mate([chromosomeA, chromosomeB])
                     crossedOver = True
                 except Exception as e:
                     raise e
@@ -73,19 +70,19 @@ class CrossOverOperator:
             #     (MutationOperator()).process(chromosomeC, chromosomes, population.threadIdentifier)
 
 
-            if crossedOver and chromosomeD == chromosomeB:
-                # TODO
-                pass
+            # if crossedOver and chromosomeD == chromosomeB:
+            #     # TODO
+            #     pass
 
-            # mutation
-            # if (random.random() <= ParameterData.instance.mutationRate):
-            #     result = (LocalSearchEngine()).process(chromosomeC, "inexplored", {"threadId": population.threadIdentifier})
-            #     chromosomeD = chromosomeD if result is None else result
+            # # mutation
+            # # if (random.random() <= ParameterData.instance.mutationRate):
+            # #     result = (LocalSearchEngine()).process(chromosomeC, "inexplored", {"threadId": population.threadIdentifier})
+            # #     chromosomeD = chromosomeD if result is None else result
 
-            self.newChromosomes.add(chromosomeD)
+            # self.newChromosomes.add(chromosomeD)
 
-            # if crossedOver and len(LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosomeD.stringIdentifier]) == 0 and LspRuntimeMonitor.instance.remainingMutations[population.threadIdentifier] > 0:
-            #     (MutationOperator()).process(chromosomeD, chromosomes, population.threadIdentifier)
+            # # if crossedOver and len(LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosomeD.stringIdentifier]) == 0 and LspRuntimeMonitor.instance.remainingMutations[population.threadIdentifier] > 0:
+            # #     (MutationOperator()).process(chromosomeD, chromosomes, population.threadIdentifier)
 
             print("chromosomes length : ", len(self.newChromosomes), Population.popSizes[population.threadIdentifier])
 
@@ -110,15 +107,16 @@ class CrossOverOperator:
 
         print("Cross Over result : ", [self.parentChromosomes, self.offsprings])
 
-        return tuple(self.offsprings.values())
-        # return self.offsprings[0]
+        # return tuple(self.offsprings.values())
+        return self.offsprings[0]
 
 
     def setOffsprings(self):
         """
         """
         
-        for i in [0, 1]:
+        # for i in [0, 1]:
+        for i in [0]:
             self.searchOffspring(i)
 
 
@@ -188,6 +186,8 @@ class CrossOverOperator:
         """
         """
 
+        print("oooooooooooooooooo : ",chromosome)
+
         if isinstance(chromosome, PseudoChromosome):
             chromosome = LocalSearchEngine.switchItems(chromosome.value, threadIdentifier)
 
@@ -213,6 +213,7 @@ class CrossOverOperator:
 
             # with LocalSearchEngine.localSearchMemory["lock"]:
             (LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosome.stringIdentifier]).remove(gene)
+            random.shuffle(LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosome.stringIdentifier])
 
         
         if self.offsprings[offspringIndex] not in self.newChromosomes:

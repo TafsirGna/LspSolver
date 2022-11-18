@@ -80,13 +80,13 @@ class SelectionOperator:
         """
         """
 
-        if self.currentIndex >= len(self.chromosomes): # very much less likely to happen but you dunno
-            return None, None
+        # if self.currentIndex >= len(self.chromosomes): # very much less likely to happen but you dunno
+        #     return None, None
 
         chromosomeA = self.chromosomes[self.currentIndex]
-        while chromosomeA in self.selectedPool:
-            self.currentIndex += 1
-            chromosomeA = self.chromosomes[self.currentIndex]
+        # while chromosomeA in self.selectedPool:
+        #     self.currentIndex += 1
+        #     chromosomeA = self.chromosomes[self.currentIndex]
 
         chromosomeB = np.random.choice(self.chromosomes, p=self.rouletteProbabilities)
         while chromosomeB == chromosomeA:
@@ -95,10 +95,10 @@ class SelectionOperator:
         self.currentIndex += 1
 
         # adding selected chromosomes to the selectedpool property
-        self.selectedPool.add(chromosomeA)
+        # self.selectedPool.add(chromosomeA)
 
-        if chromosomeB not in self.selectedPool:
-            self.selectedPool.add(chromosomeB)
+        # if chromosomeB not in self.selectedPool:
+        #     self.selectedPool.add(chromosomeB)
 
         return chromosomeA, chromosomeB
 

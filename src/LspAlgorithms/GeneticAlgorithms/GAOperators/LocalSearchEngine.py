@@ -22,9 +22,6 @@ class LocalSearchEngine:
 
         self.result = None
 
-        if LocalSearchEngine.localSearchMemory["content"]["simple_mutation"] is None:
-            LocalSearchEngine.localSearchMemory["content"]["simple_mutation"] = dict()
-
         if LocalSearchEngine.localSearchMemory["content"]["visited_genes"] is None:
             LocalSearchEngine.localSearchMemory["content"]["visited_genes"] = dict()
 
@@ -89,6 +86,8 @@ class LocalSearchEngine:
             if result == "RETURN":
                 return None
 
+            random.shuffle(periods)
+
 
     # def improveGeneCrossOverStrategy(self, chromosome, periodGene, strategy, results, args):
     #     """
@@ -141,59 +140,43 @@ class LocalSearchEngine:
 
         mStringIdentifier = LocalSearchEngine.mutationStringIdentifier(chromosome.stringIdentifier, periodGene.period, altPeriod)
 
-        localSearchMemoryKey = (chromosome.stringIdentifier, periodGene.period, altPeriod)
         # making sure the process doesn't take a path already taken before
-        with LocalSearchEngine.localSearchMemory["lock"]:
-            if localSearchMemoryKey in LocalSearchEngine.localSearchMemory["content"]["simple_mutation"]:
-                if args["threadId"] not in LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][localSearchMemoryKey]:
-                    
-                    popChromosome = None
-                    for threadIdentifier in LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][localSearchMemoryKey]:
-                        popChromosome = Chromosome.popByThread[threadIdentifier]["content"][mStringIdentifier]
-                        if isinstance(popChromosome, Chromosome):
-                            break
-                    Chromosome.copyToThread(args["threadId"], popChromosome)
-                    LocalSearchEngine.registerMove(localSearchMemoryKey, args["threadId"])
+        inPool = True
+        with Chromosome.pool["lock"]:
+            if mStringIdentifier not in Chromosome.pool["content"]:
+                inPool = False
 
-                    # if isinstance(popChromosome, Chromosome):
-                    #     return
+        if inPool:
+            #     if strategy != "population":
+            popChromosome = None
+            if args["threadId"] not in Chromosome.pool["content"][mStringIdentifier]:
+                for threadIdentifier in Chromosome.pool["content"][mStringIdentifier]:
+                    popChromosome = Chromosome.popByThread[threadIdentifier]["content"][mStringIdentifier]
+                    if isinstance(popChromosome, Chromosome):
+                        break
+                Chromosome.copyToThread(args["threadId"], popChromosome)
 
-                    if popChromosome.stringIdentifier in LocalSearchEngine.localSearchMemory["content"]["visited_genes"] \
-                        and len(LocalSearchEngine.localSearchMemory["content"]["visited_genes"][popChromosome.stringIdentifier]) == 0:
-                        return
+            popChromosome = Chromosome.popByThread[args["threadId"]]["content"][mStringIdentifier]
 
-                    # else
-                    if self.onSelectedStrategy(strategy, chromosome, popChromosome, args) == "RETURN":
-                        return "RETURN"
+            # if popChromosome > chromosome:
+            #     return
 
-                else:
-                    popChromosome = Chromosome.popByThread[args["threadId"]]["content"][mStringIdentifier]
-                    # if isinstance(popChromosome, Chromosome):
-                    #     return
-
-                    if popChromosome.stringIdentifier in LocalSearchEngine.localSearchMemory["content"]["visited_genes"] \
-                        and len(LocalSearchEngine.localSearchMemory["content"]["visited_genes"][popChromosome.stringIdentifier]) == 0:
-                        return
-
-                    if self.onSelectedStrategy(strategy, chromosome, popChromosome, args) == "RETURN":
-                        return "RETURN"
-
-
-        if LocalSearchEngine.areItemsSwitchable(chromosome, periodGene, altPeriod, (periodGeneLowerLimit, periodGeneUpperLimit)):
-
-            # trying to craft a heuristic
-            if not LocalSearchEngine.isSwitchInteresting(chromosome, periodGene, altPeriod):
+            if popChromosome.stringIdentifier in LocalSearchEngine.localSearchMemory["content"]["visited_genes"] \
+                and len(LocalSearchEngine.localSearchMemory["content"]["visited_genes"][popChromosome.stringIdentifier]) == 0:
                 return
 
-            if mStringIdentifier is None:
-                mStringIdentifier = LocalSearchEngine.mutationStringIdentifier(chromosome.stringIdentifier, periodGene.period, altPeriod)
+            # else
+            if self.onSelectedStrategy(strategy, chromosome, popChromosome, args) == "RETURN":
+                return "RETURN"
 
-            inPool = True
-            with Chromosome.pool["lock"]:
-                if mStringIdentifier not in Chromosome.pool["content"]:
-                    inPool = False
+        else:
 
-            if not inPool:
+            if LocalSearchEngine.areItemsSwitchable(chromosome, periodGene, altPeriod, (periodGeneLowerLimit, periodGeneUpperLimit)):
+
+                # trying to craft a heuristic
+                if not LocalSearchEngine.isSwitchInteresting(chromosome, periodGene, altPeriod):
+                    return
+
                 evaluationData = LocalSearchEngine.evaluateItemsSwitch(chromosome, periodGene, altPeriod)
 
                 if strategy == "population":
@@ -202,7 +185,6 @@ class LocalSearchEngine:
                 else:
                     pseudoChromosome = PseudoChromosome(evaluationData)
                     Chromosome.addToPop(args["threadId"], pseudoChromosome)
-                    LocalSearchEngine.registerMove(localSearchMemoryKey, args["threadId"])
 
                 if strategy == "crossover":
                     if evaluationData["variance"] > 0:
@@ -217,30 +199,6 @@ class LocalSearchEngine:
                 if strategy == "random":
                     self.result = pseudoChromosome
                     return "RETURN"
-            else:
-                if strategy != "population":
-                    popChromosome = None
-                    if args["threadId"] not in Chromosome.pool["content"][mStringIdentifier]:
-                        for threadIdentifier in Chromosome.pool["content"][mStringIdentifier]:
-                            popChromosome = Chromosome.popByThread[threadIdentifier]["content"][mStringIdentifier]
-                            if isinstance(popChromosome, Chromosome):
-                                break
-                        Chromosome.copyToThread(args["threadId"], popChromosome)
-                    else:
-                        popChromosome = Chromosome.popByThread[args["threadId"]]["content"][mStringIdentifier]
-                        # if isinstance(popChromosome, Chromosome):
-                        #     return
-
-                        if popChromosome.stringIdentifier in LocalSearchEngine.localSearchMemory["content"]["visited_genes"] \
-                            and len(LocalSearchEngine.localSearchMemory["content"]["visited_genes"][popChromosome.stringIdentifier]) == 0:
-                            return
-
-                        # else
-
-                        if self.onSelectedStrategy(strategy, chromosome, popChromosome, args) == "RETURN":
-                            return "RETURN"
-
-                    LocalSearchEngine.registerMove(localSearchMemoryKey, args["threadId"])
 
         # else:
         #     return "SET_ALT_PERIOD_NONE"
@@ -268,18 +226,6 @@ class LocalSearchEngine:
         if strategy == "inexplored":
             self.result = popChromosome
             return "RETURN"
-
-    @classmethod
-    def registerMove(cls, localSearchMemoryKey, threadIdentifier):
-        """
-        """
-
-        # recording the current mutation in the localsearchmemory
-        with LocalSearchEngine.localSearchMemory["lock"]:
-            if localSearchMemoryKey in LocalSearchEngine.localSearchMemory["content"]["simple_mutation"]:
-                (LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][localSearchMemoryKey]).add(threadIdentifier)
-            else:
-                LocalSearchEngine.localSearchMemory["content"]["simple_mutation"][localSearchMemoryKey] = set({threadIdentifier})
 
 
     @classmethod
