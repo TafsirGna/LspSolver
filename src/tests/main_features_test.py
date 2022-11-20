@@ -54,7 +54,7 @@ class TestMainFeatures:
 
         self.setUpInput()
         # cA, cB = Chromosome.createFromIdentifier(stringIdentifier=(0, 1, 2, 2, 0, 2, 3, 1)), Chromosome.createFromIdentifier(stringIdentifier=(0, 0, 2, 2, 1, 2, 3, 1))
-        cA, cB = Chromosome.createFromIdentifier(stringIdentifier=(2, 2, 2, 5, 5, 4, 1, 1, 3, 5, 1, 3, 3, 4, 2, 2, 2, 4, 1, 3)), Chromosome.createFromIdentifier(stringIdentifier=(1, 5, 5, 5, 2, 4, 1, 2, 3, 2, 1, 3, 3, 2, 2, 2, 4, 1, 3, 4))
+        cA, cB = (2, 2, 2, 5, 5, 4, 1, 1, 3, 5, 1, 3, 3, 4, 2, 2, 2, 4, 1, 3), Chromosome.createFromIdentifier(stringIdentifier=(1, 5, 5, 5, 2, 4, 1, 2, 3, 2, 1, 3, 3, 2, 2, 2, 4, 1, 3, 4))
         print("The distance between these two chromosomes : ", cA, cB, " ---> ", Chromosome.distanceMeasure(cA, cB))
 
         assert 0

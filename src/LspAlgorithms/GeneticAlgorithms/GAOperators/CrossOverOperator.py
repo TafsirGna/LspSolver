@@ -60,13 +60,15 @@ class CrossOverOperator:
                 pass
 
             # mutation
-            # if (random.random() <= ParameterData.instance.mutationRate):
-            #     result = (LocalSearchEngine()).process(chromosomeC, "inexplored", {"threadId": population.threadIdentifier})
-            #     chromosomeC = chromosomeC if result is None else result
+            if (random.random() <= ParameterData.instance.mutationRate):
+                result = (LocalSearchEngine()).process(chromosomeC, "random", {"threadId": population.threadIdentifier})
+                chromosomeC = chromosomeC if result is None else result
 
+            # prevents local optima
             # if crossedOver and len(LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosomeC.stringIdentifier]) == 0 and LspRuntimeMonitor.instance.remainingMutations[population.threadIdentifier] > 0:
-            if crossedOver and chromosomeC == chromosomeA:
-                chromosomeC = (MutationOperator()).process(chromosomeC, self.newChromosomes, population.threadIdentifier)
+            # if crossedOver and chromosomeC == chromosomeA:
+            #     result = (LocalSearchEngine()).process(chromosomeC, "random", {"threadId": population.threadIdentifier})
+            #     chromosomeC = chromosomeC if result is None else result
 
             self.newChromosomes.add(chromosomeC)
 

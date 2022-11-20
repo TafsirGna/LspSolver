@@ -24,7 +24,7 @@ class MutationOperator:
         """
 
         if LspRuntimeMonitor.instance.remainingMutations[threadIdentifier] > 0:
-            result = (LocalSearchEngine()).process(chromosome, "inexplored", {"threadId": threadIdentifier})
+            result = (LocalSearchEngine()).process(chromosome, "random", {"threadId": threadIdentifier})
             if result is not None:
                 LspRuntimeMonitor.instance.newInstanceAdded[threadIdentifier] = True if not LspRuntimeMonitor.instance.newInstanceAdded[threadIdentifier] else False
                 LspRuntimeMonitor.instance.remainingMutations[threadIdentifier] -= 1

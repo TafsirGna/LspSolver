@@ -31,31 +31,35 @@ class Chromosome(object):
 
 
 	@classmethod
-	def distanceMeasure(cls, chromosomeA, chromosomeB):
+	def distanceMeasure(cls, stringIdentifier, target):
 		"""
 		"""
 
-		count = 0
-		for item in range(InputDataInstance.instance.nItems):
-			for position in range(len(InputDataInstance.instance.demandsArrayZipped[item])):
-				count += (((chromosomeA.dnaArray[item][position]).period - \
-					(chromosomeB.dnaArray[item][position]).period) * InputDataInstance.instance.stockingCostsArray[item]) ** 2
+		distance = 0
+		itemGenesPositions = [0] * InputDataInstance.instance.nItems
 
-		return math.sqrt(count)
+		for period in range(InputDataInstance.instance.nPeriods):
+			item = stringIdentifier[period] - 1
+
+			if item >= 0:
+				position = itemGenesPositions[item]
+				distance += ((period - (target.dnaArray[item][position]).period) * InputDataInstance.instance.stockingCostsArray[item]) ** 2
+
+				itemGenesPositions[item] += 1
+
+		return math.sqrt(distance)
 
 	@classmethod
 	def gettingCloser(cls, chromosome, target, gene, altPeriod):
 		"""
 		"""
 
-		variance = (abs(gene.period - (target.dnaArray[gene.item][gene.position]).period) - abs(altPeriod - (target.dnaArray[gene.item][gene.position]).period)) \
-			* InputDataInstance.instance.stockingCostsArray[gene.item]
-	
-		if (chromosome.stringIdentifier[altPeriod] > 0):
-			altPeriodItem = chromosome.genesByPeriod[altPeriod][0]
-			altPeriodPosition = chromosome.genesByPeriod[altPeriod][1]
-			variance += (abs(altPeriod - (target.dnaArray[altPeriodItem][altPeriodPosition]).period) - abs(gene.period - (target.dnaArray[altPeriodItem][altPeriodPosition]).period)) \
-				* InputDataInstance.instance.stockingCostsArray[chromosome.genesByPeriod[altPeriod][0]]
+		# second calculus
+		stringIdentifier = list(chromosome.stringIdentifier)
+		stringIdentifier[gene.period], stringIdentifier[altPeriod] = stringIdentifier[altPeriod], stringIdentifier[gene.period]
+
+		variance = Chromosome.distanceMeasure(chromosome.stringIdentifier, target)
+		variance -= Chromosome.distanceMeasure(stringIdentifier, target)
 
 		return (variance > 0)
 

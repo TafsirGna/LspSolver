@@ -25,8 +25,6 @@ class LocalSearchEngine:
         if LocalSearchEngine.localSearchMemory["content"]["visited_genes"] is None:
             LocalSearchEngine.localSearchMemory["content"]["visited_genes"] = dict()
 
-        # self._stopSearchEvents = threading.Event()
-
 
     def process(self, chromosome, strategy = "random", args = None):
         """Process the given chromosome in order to return a mutated version
@@ -77,15 +75,15 @@ class LocalSearchEngine:
             if period == periodGene.period:
                 continue
 
-            # if strategy == "crossover":
-            #     if not Chromosome.gettingCloser(chromosome, args["target"], periodGene, period):
-            #         print("not getting closer *** ")
-            #         continue
-            #     print("yes getting closer *** ")
+            if strategy == "crossover":
+                if not Chromosome.gettingCloser(chromosome, args["target"], periodGene, period):
+                    print("not getting closer *** ")
+                    continue
+                print("yes getting closer *** ")
 
             result = self.handleAltPeriod(chromosome, strategy, periodGene, period, periodGeneLowerLimit, periodGeneUpperLimit, results, args)
             if result == "RETURN":
-                return None
+                return
 
             random.shuffle(periods)
 
@@ -220,7 +218,7 @@ class LocalSearchEngine:
         #         self.searchVicinity(popChromosome, strategy, args)
         #         return "RETURN"
 
-        if strategy == "random" or strategy == "inexplored":
+        if strategy == "random":
             self.result = popChromosome
             return "RETURN"
 
@@ -519,10 +517,3 @@ class LocalSearchEngine:
         print("Evaluation result : ", chromosome, periodGene.period, altPeriod, " ---> ", evaluationData)
 
         return evaluationData        
-
-
-    # def refine(self, chromosome, threadIdentifier):
-    #     """
-    #     """
-
-    #     return (LocalSearchEngine()).process(chromosome, "refinement", {"threadId": threadIdentifier})
