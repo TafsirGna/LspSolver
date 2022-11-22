@@ -23,8 +23,8 @@ class CrossOverOperator:
         self.offsprings = {0: None, 1: None}
         self.population = None 
 
-        if LocalSearchEngine.localSearchMemory["content"]["visited_genes"] is None:
-            LocalSearchEngine.localSearchMemory["content"]["visited_genes"] = dict()
+        if LocalSearchEngine.localSearchMemory["content"]["left_genes"] is None:
+            LocalSearchEngine.localSearchMemory["content"]["left_genes"] = dict()
 
         # self._stopSearchEvents = {0: threading.Event(), 1: threading.Event()}
 
@@ -59,13 +59,8 @@ class CrossOverOperator:
                 # TODO
                 pass
 
-            # mutation
-            if (random.random() <= ParameterData.instance.mutationRate):
-                result = (LocalSearchEngine()).process(chromosomeC, "random", {"threadId": population.threadIdentifier})
-                chromosomeC = chromosomeC if result is None else result
-
             # prevents local optima
-            # if crossedOver and len(LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosomeC.stringIdentifier]) == 0 and LspRuntimeMonitor.instance.remainingMutations[population.threadIdentifier] > 0:
+            # if crossedOver and len(LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosomeC.stringIdentifier]) == 0 and LspRuntimeMonitor.instance.remainingMutations[population.threadIdentifier] > 0:
             # if crossedOver and chromosomeC == chromosomeA:
             #     result = (LocalSearchEngine()).process(chromosomeC, "random", {"threadId": population.threadIdentifier})
             #     chromosomeC = chromosomeC if result is None else result
@@ -133,11 +128,15 @@ class CrossOverOperator:
         self.offsprings[offspringIndex] = chromosome
 
         with LocalSearchEngine.localSearchMemory["lock"]:
-            if chromosome.stringIdentifier not in LocalSearchEngine.localSearchMemory["content"]["visited_genes"]:
-                LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosome.stringIdentifier] = [gene for itemGenes in chromosome.dnaArray for gene in itemGenes if gene.cost > 0]
-                random.shuffle(LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosome.stringIdentifier])
+            if chromosome.stringIdentifier not in LocalSearchEngine.localSearchMemory["content"]["left_genes"]:
+                LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier] = dict({(gene.item, gene.position): set() for itemGenes in chromosome.dnaArray for gene in itemGenes if gene.cost > 0})
 
-        for gene in LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosome.stringIdentifier]:
+        listItems = list(LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier])
+        random.shuffle(listItems)
+
+        for (geneItem, genePosition) in listItems:
+
+            gene = chromosome.dnaArray[geneItem][genePosition]
 
             print("crossing over : ", gene.period, chromosome)
             localSearchEngine = LocalSearchEngine()
@@ -151,8 +150,9 @@ class CrossOverOperator:
                 self.offsprings[offspringIndex] = chromosome
 
             # with LocalSearchEngine.localSearchMemory["lock"]:
-            (LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosome.stringIdentifier]).remove(gene)
-            random.shuffle(LocalSearchEngine.localSearchMemory["content"]["visited_genes"][chromosome.stringIdentifier])
+            if len(LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier][(geneItem, genePosition)]) == 0:
+                del LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier][(geneItem, genePosition)]
+                # (LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier]).pop((geneItem, genePosition), None)
 
         if self.offsprings[offspringIndex] == self.parentChromosomes[offspringIndex]:
             return

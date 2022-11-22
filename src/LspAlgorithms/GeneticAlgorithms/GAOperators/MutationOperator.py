@@ -32,3 +32,28 @@ class MutationOperator:
 
         return chromosome
 
+
+    def processPop(self, population):
+        """
+        """
+
+
+        pickedOnes = set()
+        chromosomes = list(population.chromosomes)
+
+        while len(pickedOnes) < Population.mutatedPoolSize[population.threadIdentifier]:
+
+            # print("population's chromosomes : ", population.chromosomes)
+            chromosome = random.choice(chromosomes)
+            print("picked chromosome : ", chromosome)
+            if chromosome.stringIdentifier not in pickedOnes:
+                result = (LocalSearchEngine()).process(chromosome, "random", {"threadId": population.threadIdentifier})
+                if result is not None:
+                    pickedOnes.add(chromosome.stringIdentifier)
+
+                    # updating the population
+                    population.chromosomes.remove(chromosome)
+                    population.chromosomes.add(result)
+
+                    if not LspRuntimeMonitor.instance.newInstanceAdded[population.threadIdentifier] :
+                        LspRuntimeMonitor.instance.newInstanceAdded[population.threadIdentifier] = True

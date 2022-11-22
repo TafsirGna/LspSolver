@@ -9,7 +9,7 @@ from ..PopInitialization.PopInitializer import PopInitializer
 from ..PopInitialization.Population import Population
 from ..PopInitialization.Chromosome import Chromosome
 from ..GAOperators.CrossOverOperator import CrossOverOperator
-# from ..GAOperators.MutationOperator import MutationOperator
+from ..GAOperators.MutationOperator import MutationOperator
 from ParameterSearch.ParameterData import ParameterData
 
 
@@ -92,6 +92,8 @@ class GeneticAlgorithm:
 
 		# if self.idleGenCounters[primeThreadIdentifier] > 1:
 		# 	population.localSearch()
+
+		MutationOperator().processPop(population)
 
 		# print("Miiiiiiiiiiiinnnnnnnnnnnn : ", population.chromosomes[0].cost, self.idleGenCounters[primeThreadIdentifier])
 

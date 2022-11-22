@@ -22,8 +22,11 @@ class LocalSearchEngine:
 
         self.result = None
 
-        if LocalSearchEngine.localSearchMemory["content"]["visited_genes"] is None:
-            LocalSearchEngine.localSearchMemory["content"]["visited_genes"] = dict()
+        if LocalSearchEngine.localSearchMemory["content"]["left_genes"] is None:
+            LocalSearchEngine.localSearchMemory["content"]["left_genes"] = dict()
+
+        if LocalSearchEngine.localSearchMemory["content"]["switch_quality"] is None:
+            LocalSearchEngine.localSearchMemory["content"]["switch_quality"] = dict()
 
 
     def process(self, chromosome, strategy = "random", args = None):
@@ -46,12 +49,21 @@ class LocalSearchEngine:
             chromosome = LocalSearchEngine.switchItems(chromosome.value, args["threadId"])
 
         results = set()
-        selectedGenes = [gene for itemGenes in chromosome.dnaArray for gene in itemGenes]
-        random.shuffle(selectedGenes)
+
+        with LocalSearchEngine.localSearchMemory["lock"]:
+            if chromosome.stringIdentifier not in LocalSearchEngine.localSearchMemory["content"]["left_genes"]:
+                LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier] = dict({(gene.item, gene.position): set() for itemGenes in chromosome.dnaArray for gene in itemGenes if gene.cost > 0})
+
+        listItems = list(LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier])
+        random.shuffle(listItems)
 
         # print("selected : ", selectedGenes)
-        for periodGene in selectedGenes:
-            self.improveGene(chromosome, periodGene, strategy, results, args)  
+        for (geneItem, genePosition) in listItems:
+            gene = chromosome.dnaArray[geneItem][genePosition]
+            self.improveGene(chromosome, gene, strategy, results, args)  
+
+            if len(LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier][(geneItem, genePosition)]) == 0:
+                del LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier][(geneItem, genePosition)]
         
         # if strategy == "refinement":
         #     self.result = chromosome
@@ -67,12 +79,18 @@ class LocalSearchEngine:
         """
         """
 
+        periods = []
+
         periodGeneLowerLimit, periodGeneUpperLimit = Chromosome.geneLowerUpperLimit(chromosome, periodGene)
-        periods = list(range(periodGeneLowerLimit, periodGeneUpperLimit))
+        if len(LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier][(periodGene.item, periodGene.position)]) == 0:
+            LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier][(periodGene.item, periodGene.position)] = set(range(periodGeneLowerLimit, periodGeneUpperLimit))
+
+        periods = list(LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier][(periodGene.item, periodGene.position)])
         random.shuffle(periods)
 
         for period in periods:
             if period == periodGene.period:
+                (LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier][(periodGene.item, periodGene.position)]).remove(period)
                 continue
 
             if strategy == "crossover":
@@ -83,9 +101,9 @@ class LocalSearchEngine:
 
             result = self.handleAltPeriod(chromosome, strategy, periodGene, period, periodGeneLowerLimit, periodGeneUpperLimit, results, args)
             if result == "RETURN":
+                # if period in LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier][(periodGene.item, periodGene.position)]:
+                (LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier][(periodGene.item, periodGene.position)]).remove(period)
                 return
-
-            random.shuffle(periods)
 
 
     # def improveGeneCrossOverStrategy(self, chromosome, periodGene, strategy, results, args):
@@ -160,8 +178,8 @@ class LocalSearchEngine:
             # if popChromosome > chromosome:
             #     return
                 
-            if popChromosome.stringIdentifier in LocalSearchEngine.localSearchMemory["content"]["visited_genes"] \
-                and len(LocalSearchEngine.localSearchMemory["content"]["visited_genes"][popChromosome.stringIdentifier]) == 0:
+            if popChromosome.stringIdentifier in LocalSearchEngine.localSearchMemory["content"]["left_genes"] \
+                and len(LocalSearchEngine.localSearchMemory["content"]["left_genes"][popChromosome.stringIdentifier]) == 0:
                 return
 
             # else
@@ -228,6 +246,9 @@ class LocalSearchEngine:
         """
         """
 
+        if (chromosome.stringIdentifier, periodGene.period, altPeriod) in LocalSearchEngine.localSearchMemory["content"]["switch_quality"]:
+            return True
+
         periodGeneLowerLimit, periodGeneUpperLimit = periodGeneLimits if periodGeneLimits is not None else Chromosome.geneLowerUpperLimit(chromosome, periodGene)
 
         if chromosome.stringIdentifier[altPeriod] > 0: 
@@ -247,6 +268,9 @@ class LocalSearchEngine:
     def isSwitchInteresting(cls, chromosome, periodGene, altPeriod):
         """Simply, checking if the new production cost when switch done is lower than the current one
         """
+
+        if (chromosome.stringIdentifier, periodGene.period, altPeriod) in LocalSearchEngine.localSearchMemory["content"]["switch_quality"]:
+            return LocalSearchEngine.localSearchMemory["content"]["switch_quality"][(chromosome.stringIdentifier, periodGene.period, altPeriod)]
 
         newCost = 0
 
@@ -281,7 +305,10 @@ class LocalSearchEngine:
 
         # print("is Switch Interesting ? : ", chromosome, " | ", periodGene.period, " | ", periodGene.item, " | ", altPeriod, " | ", newCost, " | ", periodGene.cost)
 
-        return (newCost < periodGene.cost)
+        result = (newCost < periodGene.cost)
+        LocalSearchEngine.localSearchMemory["content"]["switch_quality"][(chromosome.stringIdentifier, periodGene.period, altPeriod)] = result
+
+        return result
 
 
     @classmethod
