@@ -13,6 +13,7 @@ class Gene:
         self.position = position
         self.prevGene = prevGene
         self.nextGene = None
+        self.lowerPeriodLimit, self.upperPeriodLimit = None, None
 
         self.changeOverCost = 0
         self.stockingCost = 0

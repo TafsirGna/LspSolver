@@ -31,35 +31,60 @@ class Chromosome(object):
 
 
 	@classmethod
-	def distanceMeasure(cls, stringIdentifier, target):
+	def distanceMeasure(cls, stringIdentifier, target, gene_distances_dict):
 		"""
 		"""
 
 		distance = 0
 		itemGenesPositions = [0] * InputDataInstance.instance.nItems
 
-		for period in range(InputDataInstance.instance.nPeriods):
-			item = stringIdentifier[period] - 1
+		for period1 in range(InputDataInstance.instance.nPeriods):
+			item = stringIdentifier[period1] - 1
 
 			if item >= 0:
 				position = itemGenesPositions[item]
-				distance += ((period - (target.dnaArray[item][position]).period) * InputDataInstance.instance.stockingCostsArray[item]) ** 2
+				period2 = (target.dnaArray[item][position]).period
+				if (item, period1, period2) not in gene_distances_dict:
+					d = ((period1 - period2) * InputDataInstance.instance.stockingCostsArray[item]) ** 2
+					distance += d
+					gene_distances_dict[(item, period1, period2)] = d
+					gene_distances_dict[(item, period2, period1)] = d
+				else:
+					distance += gene_distances_dict[(item, period1, period2)]
 
 				itemGenesPositions[item] += 1
 
 		return math.sqrt(distance)
 
 	@classmethod
-	def gettingCloser(cls, chromosome, target, gene, altPeriod):
+	def gettingCloser(cls, chromosome, target, gene, altPeriod, chromosome_distances_dict, gene_distances_dict):
 		"""
 		"""
 
 		# second calculus
 		stringIdentifier = list(chromosome.stringIdentifier)
 		stringIdentifier[gene.period], stringIdentifier[altPeriod] = stringIdentifier[altPeriod], stringIdentifier[gene.period]
+		stringIdentifier = tuple(stringIdentifier)
 
-		variance = Chromosome.distanceMeasure(chromosome.stringIdentifier, target)
-		variance -= Chromosome.distanceMeasure(stringIdentifier, target)
+		distance1 = 0
+		if (chromosome.stringIdentifier, target.stringIdentifier) not in chromosome_distances_dict:
+			distance1 = Chromosome.distanceMeasure(chromosome.stringIdentifier, target, gene_distances_dict)
+			chromosome_distances_dict[(chromosome.stringIdentifier, target.stringIdentifier)] = distance1
+			chromosome_distances_dict[(target.stringIdentifier, chromosome.stringIdentifier)] = distance1
+		else:
+			distance1 = chromosome_distances_dict[(chromosome.stringIdentifier, target.stringIdentifier)]
+
+		variance = distance1
+
+		distance2 = 0
+		if (stringIdentifier, target.stringIdentifier) not in chromosome_distances_dict:
+			distance2 = Chromosome.distanceMeasure(stringIdentifier, target, gene_distances_dict)
+			chromosome_distances_dict[(stringIdentifier, target.stringIdentifier)] = distance2
+			chromosome_distances_dict[(target.stringIdentifier, stringIdentifier)] = distance2
+		else:
+			distance2 = chromosome_distances_dict[(stringIdentifier, target.stringIdentifier)]
+
+		variance -= distance2
 
 		return (variance > 0)
 

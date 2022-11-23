@@ -28,6 +28,12 @@ class LocalSearchEngine:
         if LocalSearchEngine.localSearchMemory["content"]["switch_quality"] is None:
             LocalSearchEngine.localSearchMemory["content"]["switch_quality"] = dict()
 
+        if LocalSearchEngine.localSearchMemory["content"]["chromosome_distances"] is None:
+            LocalSearchEngine.localSearchMemory["content"]["chromosome_distances"] = dict()
+
+        if LocalSearchEngine.localSearchMemory["content"]["gene_distances"] is None:
+            LocalSearchEngine.localSearchMemory["content"]["gene_distances"] = dict()
+
 
     def process(self, chromosome, strategy = "random", args = None):
         """Process the given chromosome in order to return a mutated version
@@ -94,7 +100,7 @@ class LocalSearchEngine:
                 continue
 
             if strategy == "crossover":
-                if not Chromosome.gettingCloser(chromosome, args["target"], periodGene, period):
+                if not Chromosome.gettingCloser(chromosome, args["target"], periodGene, period, LocalSearchEngine.localSearchMemory["content"]["chromosome_distances"], LocalSearchEngine.localSearchMemory["content"]["gene_distances"]):
                     print("not getting closer *** ")
                     continue
                 print("yes getting closer *** ")
