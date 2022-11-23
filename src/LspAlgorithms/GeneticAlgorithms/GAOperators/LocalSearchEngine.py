@@ -15,6 +15,7 @@ class LocalSearchEngine:
     """
 
     localSearchMemory = {"lock": threading.Lock(), "content": defaultdict(lambda: None)}
+    lowUpLimits = dict()
 
     def __init__(self) -> None:
         """
@@ -58,7 +59,7 @@ class LocalSearchEngine:
 
         with LocalSearchEngine.localSearchMemory["lock"]:
             if chromosome.stringIdentifier not in LocalSearchEngine.localSearchMemory["content"]["left_genes"]:
-                LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier] = dict({(gene.item, gene.position): set() for itemGenes in chromosome.dnaArray for gene in itemGenes if gene.cost > 0})
+                LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier] = dict({(gene.item, gene.position): set() for itemGenes in chromosome.dnaArray for gene in itemGenes})
 
         listItems = list(LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier])
         random.shuffle(listItems)
@@ -87,7 +88,13 @@ class LocalSearchEngine:
 
         periods = []
 
-        periodGeneLowerLimit, periodGeneUpperLimit = Chromosome.geneLowerUpperLimit(chromosome, periodGene)
+        periodGeneLowerLimit, periodGeneUpperLimit = None, None
+        if (chromosome.stringIdentifier, periodGene.period) not in LocalSearchEngine.lowUpLimits:
+            periodGeneLowerLimit, periodGeneUpperLimit = Chromosome.geneLowerUpperLimit(chromosome, periodGene)
+            LocalSearchEngine.lowUpLimits[(chromosome.stringIdentifier, periodGene.period)] = (periodGeneLowerLimit, periodGeneUpperLimit)
+        else:
+            periodGeneLowerLimit, periodGeneUpperLimit = LocalSearchEngine.lowUpLimits[(chromosome.stringIdentifier, periodGene.period)]
+
         if len(LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier][(periodGene.item, periodGene.position)]) == 0:
             LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier][(periodGene.item, periodGene.position)] = set(range(periodGeneLowerLimit, periodGeneUpperLimit))
 
@@ -105,7 +112,7 @@ class LocalSearchEngine:
                     continue
                 print("yes getting closer *** ")
 
-            result = self.handleAltPeriod(chromosome, strategy, periodGene, period, periodGeneLowerLimit, periodGeneUpperLimit, results, args)
+            result = self.handleAltPeriod(chromosome, strategy, periodGene, period, results, args)
             if result == "RETURN":
                 # if period in LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier][(periodGene.item, periodGene.position)]:
                 (LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier][(periodGene.item, periodGene.position)]).remove(period)
@@ -157,7 +164,7 @@ class LocalSearchEngine:
     #         increment += 1
 
 
-    def handleAltPeriod(self, chromosome, strategy, periodGene, altPeriod, periodGeneLowerLimit, periodGeneUpperLimit, results, args):
+    def handleAltPeriod(self, chromosome, strategy, periodGene, altPeriod, results, args):
         """
         """
 
@@ -194,7 +201,7 @@ class LocalSearchEngine:
 
         else:
 
-            if LocalSearchEngine.areItemsSwitchable(chromosome, periodGene, altPeriod, (periodGeneLowerLimit, periodGeneUpperLimit)):
+            if LocalSearchEngine.areItemsSwitchable(chromosome, periodGene, altPeriod):
 
                 # trying to craft a heuristic
                 if not LocalSearchEngine.isSwitchInteresting(chromosome, periodGene, altPeriod):
@@ -248,18 +255,29 @@ class LocalSearchEngine:
 
 
     @classmethod
-    def areItemsSwitchable(cls, chromosome, periodGene, altPeriod, periodGeneLimits = None):
+    def areItemsSwitchable(cls, chromosome, periodGene, altPeriod):
         """
         """
 
         if (chromosome.stringIdentifier, periodGene.period, altPeriod) in LocalSearchEngine.localSearchMemory["content"]["switch_quality"]:
             return True
 
-        periodGeneLowerLimit, periodGeneUpperLimit = periodGeneLimits if periodGeneLimits is not None else Chromosome.geneLowerUpperLimit(chromosome, periodGene)
+        periodGeneLowerLimit, periodGeneUpperLimit = None, None
+        if (chromosome.stringIdentifier, periodGene.period) not in LocalSearchEngine.lowUpLimits:
+            periodGeneLowerLimit, periodGeneUpperLimit = Chromosome.geneLowerUpperLimit(chromosome, periodGene)
+            LocalSearchEngine.lowUpLimits[(chromosome.stringIdentifier, periodGene.period)] = (periodGeneLowerLimit, periodGeneUpperLimit)
+        else:
+            periodGeneLowerLimit, periodGeneUpperLimit = LocalSearchEngine.lowUpLimits[(chromosome.stringIdentifier, periodGene.period)]
 
         if chromosome.stringIdentifier[altPeriod] > 0: 
             altPeriodGene = chromosome.dnaArray[(chromosome.genesByPeriod[altPeriod])[0]][(chromosome.genesByPeriod[altPeriod])[1]]
-            altPeriodGeneLowerLimit, altPeriodGeneUpperLimit = Chromosome.geneLowerUpperLimit(chromosome, altPeriodGene)
+
+            altPeriodGeneLowerLimit, altPeriodGeneUpperLimit = None, None
+            if (chromosome.stringIdentifier, altPeriodGene.period) not in LocalSearchEngine.lowUpLimits:
+                altPeriodGeneLowerLimit, altPeriodGeneUpperLimit = Chromosome.geneLowerUpperLimit(chromosome, altPeriodGene)
+                LocalSearchEngine.lowUpLimits[(chromosome.stringIdentifier, altPeriodGene.period)] = (altPeriodGeneLowerLimit, altPeriodGeneUpperLimit)
+            else:
+                altPeriodGeneLowerLimit, altPeriodGeneUpperLimit = LocalSearchEngine.lowUpLimits[(chromosome.stringIdentifier, altPeriodGene.period)]
 
             if (periodGeneLowerLimit <= altPeriod and altPeriod < periodGeneUpperLimit) and (altPeriodGeneLowerLimit <= periodGene.period and periodGene.period < altPeriodGeneUpperLimit):
                 return True

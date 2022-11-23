@@ -4,7 +4,7 @@ import threading
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.Chromosome import Chromosome
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 from .LocalSearchEngine import LocalSearchEngine
-from .MutationOperator import MutationOperator
+# from .MutationOperator import MutationOperator
 from ..PopInitialization.Population import Population
 from ParameterSearch.ParameterData import ParameterData
 from .LocalSearchEngine import LocalSearchEngine
@@ -129,7 +129,7 @@ class CrossOverOperator:
 
         with LocalSearchEngine.localSearchMemory["lock"]:
             if chromosome.stringIdentifier not in LocalSearchEngine.localSearchMemory["content"]["left_genes"]:
-                LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier] = dict({(gene.item, gene.position): set() for itemGenes in chromosome.dnaArray for gene in itemGenes if gene.cost > 0})
+                LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier] = dict({(gene.item, gene.position): set() for itemGenes in chromosome.dnaArray for gene in itemGenes})
 
         listItems = list(LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier])
         random.shuffle(listItems)
