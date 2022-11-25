@@ -12,6 +12,7 @@ class ParameterData:
 
         self.popSize = 30
         self.mutationRate = 0.05
+        self.mutationDepth = 3
         self.crossOverRate = 0.8
         # self.elitePercentage = 0.01
         self.nReplicaThreads = 1

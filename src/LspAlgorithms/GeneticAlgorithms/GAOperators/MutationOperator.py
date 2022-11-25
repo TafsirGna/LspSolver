@@ -19,41 +19,40 @@ class MutationOperator:
         pass
 
 
-    def process(self, chromosome, chromosomes, threadIdentifier):
+    def process(self, chromosome, threadIdentifier):
         """
         """
 
-        if LspRuntimeMonitor.instance.remainingMutations[threadIdentifier] > 0:
-            result = (LocalSearchEngine()).process(chromosome, "random", {"threadId": threadIdentifier})
-            if result is not None:
-                LspRuntimeMonitor.instance.newInstanceAdded[threadIdentifier] = True if not LspRuntimeMonitor.instance.newInstanceAdded[threadIdentifier] else False
-                LspRuntimeMonitor.instance.remainingMutations[threadIdentifier] -= 1
-                return result
+        # queue = [chromosome]
+        # while len(queue):
 
-        return chromosome
-
+        result = (LocalSearchEngine()).process(chromosome, "random", {"threadId": threadIdentifier})
+        return result
+        
 
     def processPop(self, population):
         """
         """
-
-
-        pickedOnes = set()
+        
         chromosomes = list(population.chromosomes)
+        random.shuffle(chromosomes)
 
-        while len(pickedOnes) < Population.mutatedPoolSize[population.threadIdentifier]:
+        counter = 0
+        for chromosome in chromosomes:
 
             # print("population's chromosomes : ", population.chromosomes)
-            chromosome = random.choice(chromosomes)
             print("picked chromosome : ", chromosome)
-            if chromosome.stringIdentifier not in pickedOnes:
-                result = (LocalSearchEngine()).process(chromosome, "random", {"threadId": population.threadIdentifier})
-                if result is not None:
-                    pickedOnes.add(chromosome.stringIdentifier)
 
-                    # updating the population
-                    population.chromosomes.remove(chromosome)
-                    population.chromosomes.add(result)
+            result = self.process(chromosome, population.threadIdentifier)
+            if result is not None:
+                counter += 1
 
-                    if not LspRuntimeMonitor.instance.newInstanceAdded[population.threadIdentifier] :
-                        LspRuntimeMonitor.instance.newInstanceAdded[population.threadIdentifier] = True
+                # updating the population
+                population.chromosomes.remove(chromosome)
+                population.chromosomes.add(result)
+
+                if not LspRuntimeMonitor.instance.newInstanceAdded[population.threadIdentifier] :
+                    LspRuntimeMonitor.instance.newInstanceAdded[population.threadIdentifier] = True
+
+            if result and counter >= Population.mutatedPoolSize[population.threadIdentifier]:
+                break

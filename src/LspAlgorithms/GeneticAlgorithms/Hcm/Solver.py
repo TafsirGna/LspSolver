@@ -36,7 +36,7 @@ class GeneticAlgorithm:
 		for primeThreadIdentifier in primeThreadIdentifiers:
 			self.popChromosomes[primeThreadIdentifier] = set((Chromosome.popByThread[primeThreadIdentifier]["content"]).values())
 
-		LspRuntimeMonitor.instance.remainingMutations = dict({primeThreadIdentifier: 0 for primeThreadIdentifier in primeThreadIdentifiers})
+		# LspRuntimeMonitor.instance.remainingMutations = dict({primeThreadIdentifier: 0 for primeThreadIdentifier in primeThreadIdentifiers})
 
 		while True:
 			
@@ -45,7 +45,7 @@ class GeneticAlgorithm:
 				break
 
 			LspRuntimeMonitor.instance.newInstanceAdded = dict({primeThreadIdentifier: False for primeThreadIdentifier in primeThreadIdentifiers})
-			self.updateRemainingMutations()
+			# self.updateRemainingMutations()
 
 			with concurrent.futures.ThreadPoolExecutor() as executor:
 				print(list(executor.map(self.processGenPop, primeThreadIdentifiers)))
@@ -58,14 +58,14 @@ class GeneticAlgorithm:
 
 
 
-	def updateRemainingMutations(self):
-		"""
-		"""
+	# def updateRemainingMutations(self):
+	# 	"""
+	# 	"""
 		
-		for primeThreadIdentifier in LspRuntimeMonitor.instance.remainingMutations:
-			LspRuntimeMonitor.instance.remainingMutations[primeThreadIdentifier] += Population.mutatedPoolSize[primeThreadIdentifier]
+	# 	for primeThreadIdentifier in LspRuntimeMonitor.instance.remainingMutations:
+	# 		LspRuntimeMonitor.instance.remainingMutations[primeThreadIdentifier] += Population.mutatedPoolSize[primeThreadIdentifier]
 
-		print("updating remaining mutations count : ", LspRuntimeMonitor.instance.remainingMutations)
+	# 	print("updating remaining mutations count : ", LspRuntimeMonitor.instance.remainingMutations)
 
 
 	def processGenPop(self, primeThreadIdentifier):

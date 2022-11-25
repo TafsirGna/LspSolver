@@ -97,14 +97,12 @@ class LocalSearchEngine:
 
         if len(LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier][(periodGene.item, periodGene.position)]) == 0:
             LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier][(periodGene.item, periodGene.position)] = set(range(periodGeneLowerLimit, periodGeneUpperLimit))
+            (LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier][(periodGene.item, periodGene.position)]).remove(periodGene.period)
 
         periods = list(LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier][(periodGene.item, periodGene.position)])
         random.shuffle(periods)
 
         for period in periods:
-            if period == periodGene.period:
-                (LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier][(periodGene.item, periodGene.position)]).remove(period)
-                continue
 
             if strategy == "crossover":
                 if not Chromosome.gettingCloser(chromosome, args["target"], periodGene, period, LocalSearchEngine.localSearchMemory["content"]["chromosome_distances"], LocalSearchEngine.localSearchMemory["content"]["gene_distances"]):
@@ -173,84 +171,56 @@ class LocalSearchEngine:
         # making sure the process doesn't take a path already taken before
         inPool = True
         with Chromosome.pool["lock"]:
-            if mStringIdentifier not in Chromosome.pool["content"]:
-                inPool = False
+            inPool = False if mStringIdentifier not in Chromosome.pool["content"] else True
 
         if inPool:
-            #     if strategy != "population":
-            popChromosome = None
-            if args["threadId"] not in Chromosome.pool["content"][mStringIdentifier]:
-                for threadIdentifier in Chromosome.pool["content"][mStringIdentifier]:
-                    popChromosome = Chromosome.popByThread[threadIdentifier]["content"][mStringIdentifier]
-                    if isinstance(popChromosome, Chromosome):
-                        break
-                Chromosome.copyToThread(args["threadId"], popChromosome)
+            return None
 
-            popChromosome = Chromosome.popByThread[args["threadId"]]["content"][mStringIdentifier]
-
-            # if popChromosome > chromosome:
-            #     return
-                
-            if popChromosome.stringIdentifier in LocalSearchEngine.localSearchMemory["content"]["left_genes"] \
-                and len(LocalSearchEngine.localSearchMemory["content"]["left_genes"][popChromosome.stringIdentifier]) == 0:
-                return
-
-            # else
-            if self.onSelectedStrategy(strategy, chromosome, popChromosome, args) == "RETURN":
-                return "RETURN"
-
-        else:
+        else:   
 
             if LocalSearchEngine.areItemsSwitchable(chromosome, periodGene, altPeriod):
 
                 # trying to craft a heuristic
-                if not LocalSearchEngine.isSwitchInteresting(chromosome, periodGene, altPeriod):
-                    return
+                if not (args and "closer_anyway" in args):
+                    if not LocalSearchEngine.isSwitchInteresting(chromosome, periodGene, altPeriod):
+                        return
+                else:
+                    print("tesssssssssssss")
 
                 evaluationData = LocalSearchEngine.evaluateItemsSwitch(chromosome, periodGene, altPeriod)
 
-                if strategy == "population":
-                    chromosome = LocalSearchEngine.switchItems(evaluationData)
-                    results.add(chromosome)
-                else:
-                    pseudoChromosome = PseudoChromosome(evaluationData)
-                    Chromosome.addToPop(args["threadId"], pseudoChromosome)
+                if self.onSelectedStrategy(strategy, chromosome, evaluationData, results, args) == "RETURN":
+                    return "RETURN"
 
-                if strategy == "crossover":
-                    if evaluationData["variance"] > 0:
-                        self.result = pseudoChromosome
-                        return "RETURN"
 
-                # if strategy == "refinement":
-                #     if evaluationData["variance"] > 0:
-                #         self.searchVicinity(pseudoChromosome, strategy, args)
-                #         return "RETURN"
-                
-                if strategy == "random":
+    def onSelectedStrategy(self, strategy, chromosome, result, results, args):
+        """
+        """
+
+        evaluationData = result
+        if strategy == "population":
+            chromosome = LocalSearchEngine.switchItems(evaluationData)
+            results.add(chromosome)
+        else:
+            pseudoChromosome = PseudoChromosome(evaluationData)
+            Chromosome.addToPop(args["threadId"], pseudoChromosome)
+
+        if strategy == "crossover":
+            if (args and "closer_anyway" in args):
+                self.result = pseudoChromosome
+                return "RETURN"
+            else:
+                if evaluationData["variance"] >= 0:
                     self.result = pseudoChromosome
                     return "RETURN"
 
-        # else:
-        #     return "SET_ALT_PERIOD_NONE"
-
-
-
-    def onSelectedStrategy(self, strategy, chromosome, popChromosome, args):
-        """
-        """
-
-        if strategy == "crossover":
-            if popChromosome < chromosome:
-                self.result = popChromosome
-                return "RETURN"
-
         # if strategy == "refinement":
-        #     if popChromosome < chromosome:
-        #         self.searchVicinity(popChromosome, strategy, args)
+        #     if evaluationData["variance"] > 0:
+        #         self.searchVicinity(pseudoChromosome, strategy, args)
         #         return "RETURN"
-
+        
         if strategy == "random":
-            self.result = popChromosome
+            self.result = pseudoChromosome
             return "RETURN"
 
 
