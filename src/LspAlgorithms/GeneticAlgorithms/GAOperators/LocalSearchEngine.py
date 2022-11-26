@@ -71,9 +71,9 @@ class LocalSearchEngine:
 
             if len(LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier][(geneItem, genePosition)]) == 0:
                 del LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier][(geneItem, genePosition)]
-        
-        # if strategy == "refinement":
-        #     self.result = chromosome
+
+            if strategy == "random" and self.result is not None:
+                return 
         
         if strategy == "population":
             self.result = list(results)
@@ -103,12 +103,6 @@ class LocalSearchEngine:
         random.shuffle(periods)
 
         for period in periods:
-
-            if strategy == "crossover":
-                if not Chromosome.gettingCloser(chromosome, args["target"], periodGene, period, LocalSearchEngine.localSearchMemory["content"]["chromosome_distances"], LocalSearchEngine.localSearchMemory["content"]["gene_distances"]):
-                    print("not getting closer *** ")
-                    continue
-                print("yes getting closer *** ")
 
             result = self.handleAltPeriod(chromosome, strategy, periodGene, period, results, args)
             if result == "RETURN":
@@ -180,12 +174,17 @@ class LocalSearchEngine:
 
             if LocalSearchEngine.areItemsSwitchable(chromosome, periodGene, altPeriod):
 
-                # trying to craft a heuristic
-                if not (args and "closer_anyway" in args):
-                    if not LocalSearchEngine.isSwitchInteresting(chromosome, periodGene, altPeriod):
+                if strategy == "crossover":
+                    if "closer_anyway" not in args:
+                        if not LocalSearchEngine.isSwitchInteresting(chromosome, periodGene, altPeriod):
+                            return
+                    else:
+                        print("tesssssssssssss")
+
+                    if not Chromosome.gettingCloser(chromosome, args["target"], periodGene, altPeriod, LocalSearchEngine.localSearchMemory["content"]["chromosome_distances"], LocalSearchEngine.localSearchMemory["content"]["gene_distances"]):
+                        print("not getting closer *** ")
                         return
-                else:
-                    print("tesssssssssssss")
+                    print("yes getting closer *** ")
 
                 evaluationData = LocalSearchEngine.evaluateItemsSwitch(chromosome, periodGene, altPeriod)
 
@@ -213,11 +212,6 @@ class LocalSearchEngine:
                 if evaluationData["variance"] >= 0:
                     self.result = pseudoChromosome
                     return "RETURN"
-
-        # if strategy == "refinement":
-        #     if evaluationData["variance"] > 0:
-        #         self.searchVicinity(pseudoChromosome, strategy, args)
-        #         return "RETURN"
         
         if strategy == "random":
             self.result = pseudoChromosome

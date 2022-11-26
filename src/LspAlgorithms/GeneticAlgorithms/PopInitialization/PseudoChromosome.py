@@ -17,6 +17,9 @@ class PseudoChromosome(object):
 	def __lt__(self, chromosome):
 		return self.cost < chromosome.cost
 
+	def __le__(self, chromosome):
+		return self.cost <= chromosome.cost
+
 	def __eq__(self, chromosome):
 		return self.stringIdentifier == chromosome.stringIdentifier
 

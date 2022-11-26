@@ -44,13 +44,13 @@ class Chromosome(object):
 			if item >= 0:
 				position = itemGenesPositions[item]
 				period2 = (target.dnaArray[item][position]).period
-				if (item, period1, period2) not in gene_distances_dict:
+				if (item, period1, period2) in gene_distances_dict:
+					distance += gene_distances_dict[(item, period1, period2)]
+				else:
 					d = ((period1 - period2) * InputDataInstance.instance.stockingCostsArray[item]) ** 2
 					distance += d
 					gene_distances_dict[(item, period1, period2)] = d
 					gene_distances_dict[(item, period2, period1)] = d
-				else:
-					distance += gene_distances_dict[(item, period1, period2)]
 
 				itemGenesPositions[item] += 1
 
@@ -61,28 +61,27 @@ class Chromosome(object):
 		"""
 		"""
 
-		# second calculus
 		stringIdentifier = list(chromosome.stringIdentifier)
 		stringIdentifier[gene.period], stringIdentifier[altPeriod] = stringIdentifier[altPeriod], stringIdentifier[gene.period]
 		stringIdentifier = tuple(stringIdentifier)
 
 		distance1 = 0
-		if (chromosome.stringIdentifier, target.stringIdentifier) not in chromosome_distances_dict:
+		if (chromosome.stringIdentifier, target.stringIdentifier) in chromosome_distances_dict:
+			distance1 = chromosome_distances_dict[(chromosome.stringIdentifier, target.stringIdentifier)]
+		else:
 			distance1 = Chromosome.distanceMeasure(chromosome.stringIdentifier, target, gene_distances_dict)
 			chromosome_distances_dict[(chromosome.stringIdentifier, target.stringIdentifier)] = distance1
 			chromosome_distances_dict[(target.stringIdentifier, chromosome.stringIdentifier)] = distance1
-		else:
-			distance1 = chromosome_distances_dict[(chromosome.stringIdentifier, target.stringIdentifier)]
 
 		variance = distance1
 
 		distance2 = 0
-		if (stringIdentifier, target.stringIdentifier) not in chromosome_distances_dict:
+		if (stringIdentifier, target.stringIdentifier) in chromosome_distances_dict:
+			distance2 = chromosome_distances_dict[(stringIdentifier, target.stringIdentifier)]
+		else:
 			distance2 = Chromosome.distanceMeasure(stringIdentifier, target, gene_distances_dict)
 			chromosome_distances_dict[(stringIdentifier, target.stringIdentifier)] = distance2
 			chromosome_distances_dict[(target.stringIdentifier, stringIdentifier)] = distance2
-		else:
-			distance2 = chromosome_distances_dict[(stringIdentifier, target.stringIdentifier)]
 
 		variance -= distance2
 
@@ -237,6 +236,9 @@ class Chromosome(object):
 
 	def __lt__(self, chromosome):
 		return self.cost < chromosome.cost
+
+	def __le__(self, chromosome):
+		return self.cost <= chromosome.cost
 
 	def __repr__(self):
 		return "{} : {}".format(self.stringIdentifier, self.cost)
