@@ -85,7 +85,7 @@ class Chromosome(object):
 
 		variance -= distance2
 
-		return (variance > 0)
+		return (variance >= 0)
 
 	@classmethod
 	def addToPop(cls, threadIdentifier, chromosome):

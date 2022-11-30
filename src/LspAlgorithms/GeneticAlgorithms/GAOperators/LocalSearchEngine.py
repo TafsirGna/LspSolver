@@ -293,7 +293,7 @@ class LocalSearchEngine:
 
         # print("is Switch Interesting ? : ", chromosome, " | ", periodGene.period, " | ", periodGene.item, " | ", altPeriod, " | ", newCost, " | ", periodGene.cost)
 
-        result = (newCost < periodGene.cost)
+        result = (newCost <= periodGene.cost)
         LocalSearchEngine.localSearchMemory["content"]["switch_quality"][(chromosome.stringIdentifier, periodGene.period, altPeriod)] = result
 
         return result

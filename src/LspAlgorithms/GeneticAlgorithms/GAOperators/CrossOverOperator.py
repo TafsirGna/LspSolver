@@ -103,7 +103,7 @@ class CrossOverOperator:
 
 
 
-    def crossOverCloser(self, chromosome, target, threadIdentifier):
+    def crossOverCloser(self, chromosome, target, threadIdentifier, depthIndex = 0):
         """
         """
 
@@ -137,9 +137,11 @@ class CrossOverOperator:
                     self._stopOffspringSearchEvent.set()
                     return
 
-                self.crossOverCloser(localSearchEngine.result, target, threadIdentifier)
+                self.crossOverCloser(localSearchEngine.result, target, threadIdentifier, depthIndex + 1)
                 if self._stopOffspringSearchEvent.is_set():
                     return
+
+        self._stopOffspringSearchEvent.set()
 
 
     def searchOffspring(self):
@@ -199,7 +201,7 @@ class CrossOverOperator:
                 self.offsprings[0] = chromosome
 
         if self.offsprings[0] == self.parentChromosomes[0]:
-            # self.escapeLocalOptimum(chromosome, target, threadIdentifier)
+            self.escapeLocalOptimum(chromosome, target, threadIdentifier)
             return
 
         self._stopOffspringSearchEvent.set()
