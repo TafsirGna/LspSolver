@@ -23,9 +23,6 @@ class MutationOperator:
         """
         """
 
-        # queue = [chromosome]
-        # while len(queue):
-
         result = (LocalSearchEngine()).process(chromosome, "random", {"threadId": threadIdentifier})
         return result
         

@@ -100,9 +100,10 @@ class LocalSearchEngine:
             (LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier][(periodGene.item, periodGene.position)]).remove(periodGene.period)
 
         periods = list(LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier][(periodGene.item, periodGene.position)])
-        random.shuffle(periods)
+        # random.shuffle(periods)
 
-        for period in periods:
+
+        for index, period in enumerate(reversed(periods)):
 
             result = self.handleAltPeriod(chromosome, strategy, periodGene, period, results, args)
             if result == "RETURN":
@@ -116,7 +117,13 @@ class LocalSearchEngine:
     #     """
 
     #     # print("gene : ", periodGene)
-    #     periodGeneLowerLimit, periodGeneUpperLimit = Chromosome.geneLowerUpperLimit(chromosome, periodGene)
+    #     periodGeneLowerLimit, periodGeneUpperLimit = None, None
+    #     if (chromosome.stringIdentifier, periodGene.period) not in LocalSearchEngine.lowUpLimits:
+    #         periodGeneLowerLimit, periodGeneUpperLimit = Chromosome.geneLowerUpperLimit(chromosome, periodGene)
+    #         LocalSearchEngine.lowUpLimits[(chromosome.stringIdentifier, periodGene.period)] = (periodGeneLowerLimit, periodGeneUpperLimit)
+    #     else:
+    #         periodGeneLowerLimit, periodGeneUpperLimit = LocalSearchEngine.lowUpLimits[(chromosome.stringIdentifier, periodGene.period)]
+        
         
     #     increment = 0
     #     backwardPeriod, forwardPeriod = args["altPeriod"], args["altPeriod"]
@@ -174,9 +181,11 @@ class LocalSearchEngine:
 
             if LocalSearchEngine.areItemsSwitchable(chromosome, periodGene, altPeriod):
 
+                interestingResult = None
                 if strategy == "crossover":
                     if "closer_anyway" not in args:
-                        if not LocalSearchEngine.isSwitchInteresting(chromosome, periodGene, altPeriod):
+                        interestingResult = LocalSearchEngine.isSwitchInteresting(chromosome, periodGene, altPeriod)
+                        if not interestingResult[0]:
                             return
                     else:
                         print("tesssssssssssss")
@@ -186,7 +195,7 @@ class LocalSearchEngine:
                         return
                     print("yes getting closer *** ")
 
-                evaluationData = LocalSearchEngine.evaluateItemsSwitch(chromosome, periodGene, altPeriod)
+                evaluationData = LocalSearchEngine.evaluateItemsSwitch(chromosome, periodGene, altPeriod) if interestingResult is None else interestingResult[1]
 
                 if self.onSelectedStrategy(strategy, chromosome, evaluationData, results, args) == "RETURN":
                     return "RETURN"
@@ -260,40 +269,56 @@ class LocalSearchEngine:
         if (chromosome.stringIdentifier, periodGene.period, altPeriod) in LocalSearchEngine.localSearchMemory["content"]["switch_quality"]:
             return LocalSearchEngine.localSearchMemory["content"]["switch_quality"][(chromosome.stringIdentifier, periodGene.period, altPeriod)]
 
-        newCost = 0
 
-        if chromosome.stringIdentifier[altPeriod] == 0:
-            prevGene0 = Chromosome.prevProdGene(altPeriod, chromosome.dnaArray, chromosome.stringIdentifier)  
-            # nextGene0 = Chromosome.nextProdGene(altPeriod, chromosome.dnaArray, chromosome.stringIdentifier)
-            # new changeover cost
-            if prevGene0 is not None:
-                if not (prevGene0.item == periodGene.item and prevGene0.position == periodGene.position): 
-                    newCost += InputDataInstance.instance.changeOverCostsArray[prevGene0.item][periodGene.item]
-        else:
-            altPeriodGene = chromosome.dnaArray[chromosome.genesByPeriod[altPeriod][0]][chromosome.genesByPeriod[altPeriod][1]]
-            # if (periodGene.prevGene is not None and periodGene.prevGene[0] == altPeriodGene.item and periodGene.prevGene[1] == altPeriodGene.position):
-            #     newCost += InputDataInstance.instance.changeOverCostsArray[altPeriodGene.prevGene[0]][periodGene.item]
-            if (altPeriodGene.prevGene is not None and altPeriodGene.prevGene[0] == periodGene.item and altPeriodGene.prevGene[1] == periodGene.position):
-                newCost += InputDataInstance.instance.changeOverCostsArray[altPeriodGene.item][periodGene.item]
-            else:
-                # new changeover cost
-                if altPeriodGene.prevGene is not None:
-                    newCost += InputDataInstance.instance.changeOverCostsArray[altPeriodGene.prevGene[0]][periodGene.item]
+
+
+
+
+        # newCost = 0
+
+        # if chromosome.stringIdentifier[altPeriod] == 0:
+        #     prevGene0 = Chromosome.prevProdGene(altPeriod, chromosome.dnaArray, chromosome.stringIdentifier)  
+        #     # nextGene0 = Chromosome.nextProdGene(altPeriod, chromosome.dnaArray, chromosome.stringIdentifier)
+        #     # new changeover cost
+        #     if prevGene0 is not None:
+        #         if not (prevGene0.item == periodGene.item and prevGene0.position == periodGene.position): 
+        #             newCost += InputDataInstance.instance.changeOverCostsArray[prevGene0.item][periodGene.item]
+        # else:
+        #     altPeriodGene = chromosome.dnaArray[chromosome.genesByPeriod[altPeriod][0]][chromosome.genesByPeriod[altPeriod][1]]
+        #     # if (periodGene.prevGene is not None and periodGene.prevGene[0] == altPeriodGene.item and periodGene.prevGene[1] == altPeriodGene.position):
+        #     #     newCost += InputDataInstance.instance.changeOverCostsArray[altPeriodGene.prevGene[0]][periodGene.item]
+        #     if (altPeriodGene.prevGene is not None and altPeriodGene.prevGene[0] == periodGene.item and altPeriodGene.prevGene[1] == periodGene.position):
+        #         newCost += InputDataInstance.instance.changeOverCostsArray[altPeriodGene.item][periodGene.item]
+        #     else:
+        #         # new changeover cost
+        #         if altPeriodGene.prevGene is not None:
+        #             newCost += InputDataInstance.instance.changeOverCostsArray[altPeriodGene.prevGene[0]][periodGene.item]
                 
-        # new stocking cost
-        newCost += (InputDataInstance.instance.demandsArrayZipped[periodGene.item][periodGene.position] - altPeriod) * InputDataInstance.instance.stockingCostsArray[periodGene.item]
+        # # new stocking cost
+        # newCost += (InputDataInstance.instance.demandsArrayZipped[periodGene.item][periodGene.position] - altPeriod) * InputDataInstance.instance.stockingCostsArray[periodGene.item]
 
-        # # BEGIN TEST
+        # # # BEGIN TEST
 
-        # chromi = Chromosome.createFromIdentifier(LocalSearchEngine.mutationStringIdentifier(chromosome.stringIdentifier, periodGene.period, altPeriod))
-        # if (newCost != (chromi.dnaArray[periodGene.item][periodGene.position]).cost):
-        #     print("Eureeeeeeeeeeeeeekaaaaaaaaaaa ! ", (chromi.dnaArray[periodGene.item][periodGene.position]).cost)
+        # # chromi = Chromosome.createFromIdentifier(LocalSearchEngine.mutationStringIdentifier(chromosome.stringIdentifier, periodGene.period, altPeriod))
+        # # if (newCost != (chromi.dnaArray[periodGene.item][periodGene.position]).cost):
+        # #     print("Eureeeeeeeeeeeeeekaaaaaaaaaaa ! ", (chromi.dnaArray[periodGene.item][periodGene.position]).cost)
 
-        # # END TEST
+        # # # END TEST
 
-        # print("is Switch Interesting ? : ", chromosome, " | ", periodGene.period, " | ", periodGene.item, " | ", altPeriod, " | ", newCost, " | ", periodGene.cost)
+        # # print("is Switch Interesting ? : ", chromosome, " | ", periodGene.period, " | ", periodGene.item, " | ", altPeriod, " | ", newCost, " | ", periodGene.cost)
 
-        result = (newCost <= periodGene.cost)
+        # result = (newCost <= periodGene.cost)
+
+
+
+
+
+
+        evaluationData = LocalSearchEngine.evaluateItemsSwitch(chromosome, periodGene, altPeriod)
+        result = ((evaluationData["variance"] >= 0), None if (evaluationData["variance"] < 0) else evaluationData)
+
+
+
         LocalSearchEngine.localSearchMemory["content"]["switch_quality"][(chromosome.stringIdentifier, periodGene.period, altPeriod)] = result
 
         return result

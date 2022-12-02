@@ -115,7 +115,9 @@ class CrossOverOperator:
                 LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier] = dict({(gene.item, gene.position): set() for itemGenes in chromosome.dnaArray for gene in itemGenes})
 
         listItems = list(LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier])
-        random.shuffle(listItems)
+        # random.shuffle(listItems)
+
+        possiblePaths = []
 
         for (geneItem, genePosition) in listItems:
 
@@ -134,12 +136,22 @@ class CrossOverOperator:
             if localSearchEngine.result is not None:
                 if localSearchEngine.result <= self.offsprings[0]:
                     self.offsprings[0] = localSearchEngine.result
+
+                    if not LspRuntimeMonitor.instance.newInstanceAdded[threadIdentifier]:
+                        LspRuntimeMonitor.instance.newInstanceAdded[threadIdentifier] = True
+
                     self._stopOffspringSearchEvent.set()
                     return
 
-                self.crossOverCloser(localSearchEngine.result, target, threadIdentifier, depthIndex + 1)
-                if self._stopOffspringSearchEvent.is_set():
-                    return
+                possiblePaths.append(localSearchEngine.result)
+
+        possiblePaths.sort()
+
+        for possiblePath in possiblePaths:
+
+            self.crossOverCloser(possiblePath, target, threadIdentifier, depthIndex + 1)
+            if self._stopOffspringSearchEvent.is_set():
+                return
 
         self._stopOffspringSearchEvent.set()
 
