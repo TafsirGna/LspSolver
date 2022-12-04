@@ -31,7 +31,7 @@ class Chromosome(object):
 
 
 	@classmethod
-	def distanceMeasure(cls, stringIdentifier, target, gene_distances_dict):
+	def dumbDistanceMeasure(cls, stringIdentifier, target):
 		"""
 		"""
 
@@ -44,44 +44,73 @@ class Chromosome(object):
 			if item >= 0:
 				position = itemGenesPositions[item]
 				period2 = (target.dnaArray[item][position]).period
-				if (item, period1, period2) in gene_distances_dict:
-					distance += gene_distances_dict[(item, period1, period2)]
-				else:
-					d = ((period1 - period2) * InputDataInstance.instance.stockingCostsArray[item]) ** 2
-					distance += d
-					gene_distances_dict[(item, period1, period2)] = d
-					gene_distances_dict[(item, period2, period1)] = d
+				distance += ((period1 - period2) * InputDataInstance.instance.stockingCostsArray[item]) ** 2
 
 				itemGenesPositions[item] += 1
 
 		return math.sqrt(distance)
 
+
 	@classmethod
-	def gettingCloser(cls, chromosome, target, gene, altPeriod, chromosome_distances_dict, gene_distances_dict):
+	def distanceMeasure(cls, chromosomeInput, target, chromosome_distances_dict):
 		"""
 		"""
+
+		distance = 0
+		stringIdentifier = None
+
+		if isinstance(chromosomeInput, Chromosome):
+
+			stringIdentifier = chromosomeInput.stringIdentifier
+			for itemGenes in chromosomeInput.dnaArray:
+				for gene in itemGenes:
+					distance += ((gene.period - (target.dnaArray[gene.item][gene.position]).period) * InputDataInstance.instance.stockingCostsArray[gene.item]) ** 2
+
+		else:
+			stringIdentifier = chromosomeInput["stringIdentifier"]
+
+			distance = chromosome_distances_dict[((chromosomeInput["chromosome"]).stringIdentifier, target.stringIdentifier)]
+			distance = distance ** 2
+			distance -= (((chromosomeInput["gene"]).period - (target.dnaArray[(chromosomeInput["gene"]).item][(chromosomeInput["gene"]).position]).period) * InputDataInstance.instance.stockingCostsArray[(chromosomeInput["gene"]).item]) ** 2
+			distance += ((chromosomeInput["altPeriod"] - (target.dnaArray[(chromosomeInput["gene"]).item][(chromosomeInput["gene"]).position]).period) * InputDataInstance.instance.stockingCostsArray[(chromosomeInput["gene"]).item]) ** 2
+
+			if (chromosomeInput["chromosome"]).stringIdentifier[chromosomeInput["altPeriod"]] != 0:
+				distance -= ((chromosomeInput["altPeriod"] - (target.dnaArray[((chromosomeInput["chromosome"]).genesByPeriod[chromosomeInput["altPeriod"]])[0]][((chromosomeInput["chromosome"]).genesByPeriod[chromosomeInput["altPeriod"]])[1]]).period) * InputDataInstance.instance.stockingCostsArray[((chromosomeInput["chromosome"]).genesByPeriod[chromosomeInput["altPeriod"]])[0]]) ** 2
+				distance += (((chromosomeInput["gene"]).period - (target.dnaArray[((chromosomeInput["chromosome"]).genesByPeriod[chromosomeInput["altPeriod"]])[0]][((chromosomeInput["chromosome"]).genesByPeriod[chromosomeInput["altPeriod"]])[1]]).period) * InputDataInstance.instance.stockingCostsArray[((chromosomeInput["chromosome"]).genesByPeriod[chromosomeInput["altPeriod"]])[0]]) ** 2
+			
+		result = math.sqrt(distance)
+
+		chromosome_distances_dict[(stringIdentifier, target.stringIdentifier)] = result
+		chromosome_distances_dict[(target.stringIdentifier, stringIdentifier)] = result
+
+		return result
+
+	@classmethod
+	def gettingCloser(cls, chromosome, target, gene, altPeriod, chromosome_distances_dict):
+		"""
+		"""
+
+		distance1 = 0
+		if (chromosome.stringIdentifier, target.stringIdentifier) in chromosome_distances_dict:
+			# print("flelo 1")
+			distance1 = chromosome_distances_dict[(chromosome.stringIdentifier, target.stringIdentifier)]
+		else:
+			distance1 = Chromosome.distanceMeasure(chromosome, target, chromosome_distances_dict)
+
+		variance = distance1
+
+		distance2 = 0
 
 		stringIdentifier = list(chromosome.stringIdentifier)
 		stringIdentifier[gene.period], stringIdentifier[altPeriod] = stringIdentifier[altPeriod], stringIdentifier[gene.period]
 		stringIdentifier = tuple(stringIdentifier)
 
-		distance1 = 0
-		if (chromosome.stringIdentifier, target.stringIdentifier) in chromosome_distances_dict:
-			distance1 = chromosome_distances_dict[(chromosome.stringIdentifier, target.stringIdentifier)]
-		else:
-			distance1 = Chromosome.distanceMeasure(chromosome.stringIdentifier, target, gene_distances_dict)
-			chromosome_distances_dict[(chromosome.stringIdentifier, target.stringIdentifier)] = distance1
-			chromosome_distances_dict[(target.stringIdentifier, chromosome.stringIdentifier)] = distance1
-
-		variance = distance1
-
-		distance2 = 0
 		if (stringIdentifier, target.stringIdentifier) in chromosome_distances_dict:
+			# print("flelo 2")
 			distance2 = chromosome_distances_dict[(stringIdentifier, target.stringIdentifier)]
 		else:
-			distance2 = Chromosome.distanceMeasure(stringIdentifier, target, gene_distances_dict)
-			chromosome_distances_dict[(stringIdentifier, target.stringIdentifier)] = distance2
-			chromosome_distances_dict[(target.stringIdentifier, stringIdentifier)] = distance2
+			chromosomeInput = {"stringIdentifier": stringIdentifier, "gene": gene, "altPeriod": altPeriod, "chromosome": chromosome}
+			distance2 = Chromosome.distanceMeasure(chromosomeInput, target, chromosome_distances_dict)
 
 		variance -= distance2
 

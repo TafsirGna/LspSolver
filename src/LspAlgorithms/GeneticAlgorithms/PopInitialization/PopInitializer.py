@@ -60,19 +60,13 @@ class PopInitializer:
         """
 
         Population.popSizes[self.primeThreadIdentifiers[popIndex]] = len(chromosomes)
-        # Population.popEntropySizes[self.primeThreadIdentifiers[popIndex]] = int(len(chromosomes) * ParameterData.instance.popEntropy)
-        # sortedListLength = Population.popSizes[self.primeThreadIdentifiers[popIndex]] - Population.popEntropySizes[self.primeThreadIdentifiers[popIndex]]
 
         for chromosome in chromosomes:
             with Chromosome.pool["lock"]:
                 Chromosome.pool["content"][chromosome.stringIdentifier] = set({self.primeThreadIdentifiers[popIndex]})
 
-            #
             Chromosome.popByThread[self.primeThreadIdentifiers[popIndex]]["content"][chromosome.stringIdentifier] = chromosome
-            # Chromosome.insertInSortedList(Chromosome.popByThread[self.primeThreadIdentifiers[popIndex]]["sortedList"], chromosome, sortedListLength)
 
-
-        # LspRuntimeMonitor.instance.sortedListLength[self.primeThreadIdentifiers[popIndex]] = (Population.popSizes[self.primeThreadIdentifiers[popIndex]] - Population.popEntropySizes[self.primeThreadIdentifiers[popIndex]])
         Population.mutatedPoolSize[self.primeThreadIdentifiers[popIndex]] = int(len(Chromosome.pool["content"]) * ParameterData.instance.mutationRate)
 
 
