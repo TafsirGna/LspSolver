@@ -88,18 +88,29 @@ class CrossOverOperator:
         """
         """
         
-        # for i in [0, 1]:
         # for i in [0]:
         self.searchOffspring()
 
 
-    def escapeLocalOptimum(self, chromosome, target, threadIdentifier):
+    def directionalDeepSearch(self, chromosome, target, threadIdentifier):
         """
         """
 
         self._stopOffspringSearchEvent = threading.Event()
 
         self.crossOverCloser(chromosome, target, threadIdentifier)
+
+    
+    def nearNeighborSearch(self, chromosome, threadIdentifier):
+        """
+        """
+
+        result = (LocalSearchEngine()).process(chromosome, "near_positive", {"threadId": threadIdentifier})
+        if result is not None:
+            self.offsprings[0] = result
+            return 
+
+        self.directionalDeepSearch(chromosome, self.parentChromosomes[1], threadIdentifier)
 
 
 
@@ -173,8 +184,6 @@ class CrossOverOperator:
         """
         """
 
-        print("oooooooooooooooooo : ",chromosome)
-
         if isinstance(chromosome, PseudoChromosome):
             chromosome = LocalSearchEngine.switchItems(chromosome.value, threadIdentifier)
 
@@ -213,7 +222,7 @@ class CrossOverOperator:
                 self.offsprings[0] = chromosome
 
         if self.offsprings[0] == self.parentChromosomes[0]:
-            self.escapeLocalOptimum(chromosome, target, threadIdentifier)
+            self.nearNeighborSearch(chromosome, threadIdentifier)
             return
 
         self._stopOffspringSearchEvent.set()

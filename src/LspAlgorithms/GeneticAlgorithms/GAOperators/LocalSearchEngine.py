@@ -72,7 +72,7 @@ class LocalSearchEngine:
             if len(LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier][(geneItem, genePosition)]) == 0:
                 del LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier][(geneItem, genePosition)]
 
-            if strategy == "random" and self.result is not None:
+            if strategy in ["random", "near_positive"] and self.result is not None:
                 return 
         
         if strategy == "population":
@@ -104,7 +104,7 @@ class LocalSearchEngine:
         # random.shuffle(periods)
 
 
-        for index, period in enumerate(reversed(periods)):
+        for _, period in enumerate(reversed(periods)):
 
             result = self.handleAltPeriod(chromosome, strategy, periodGene, period, results, args)
             if result == "RETURN":
@@ -195,6 +195,10 @@ class LocalSearchEngine:
                             return
                     # else:
                     #     print("tesssssssssssss")
+                elif strategy == "near_positive":
+                    interestingResult = LocalSearchEngine.isSwitchInteresting(chromosome, periodGene, altPeriod)
+                    if not interestingResult[0]:
+                        return
 
                 evaluationData = LocalSearchEngine.evaluateItemsSwitch(chromosome, periodGene, altPeriod) if interestingResult is None else interestingResult[1]
 
@@ -223,7 +227,7 @@ class LocalSearchEngine:
                     self.result = pseudoChromosome
                     return "RETURN"
         
-        if strategy == "random":
+        if strategy in ["random", "near_positive"]:
             self.result = pseudoChromosome
             return "RETURN"
 
@@ -336,7 +340,7 @@ class LocalSearchEngine:
         """ 
         """
 
-        print("Switching item : ", evaluationData)
+        # print("Switching item : ", evaluationData)
 
         chromosome = evaluationData["chromosome"]
         mutation = Chromosome()
@@ -461,7 +465,7 @@ class LocalSearchEngine:
         """
         """
 
-        print("Evaluating : --- ", chromosome, periodGene.period, altPeriod, chromosome.dnaArray)
+        # print("Evaluating : --- ", chromosome, periodGene.period, altPeriod, chromosome.dnaArray)
 
         evaluationData = {"chromosome": chromosome, "variance": periodGene.cost, "periodGene": {}, "altPeriodGene": {}, "altPeriod": altPeriod, "period": periodGene.period}
         evaluationData["newStringIdentifier"] = LocalSearchEngine.mutationStringIdentifier(chromosome.stringIdentifier, periodGene.period, altPeriod)
@@ -561,6 +565,6 @@ class LocalSearchEngine:
 
         evaluationData["variance"] -= evaluationData["periodGene"]["stockingCost"] + evaluationData["periodGene"]["changeOverCost"]
 
-        print("Evaluation result : ", chromosome, periodGene.period, altPeriod, " ---> ", evaluationData)
+        # print("Evaluation result : ", chromosome, periodGene.period, altPeriod, " ---> ", evaluationData)
 
         return evaluationData        

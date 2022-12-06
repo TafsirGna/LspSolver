@@ -72,32 +72,26 @@ class GeneticAlgorithm:
 		"""
 		"""
 
-		if self.idleGenCounters[primeThreadIdentifier] >= ParameterData.instance.nIdleGenerations:
-			return
+		# if self.idleGenCounters[primeThreadIdentifier] >= ParameterData.instance.nIdleGenerations:
+		# 	return
 
 		# building population
 		population = Population(primeThreadIdentifier, self.popChromosomes[primeThreadIdentifier])
 
-		# if self.generationIndex == 0:
-		# 	population.boostChampion()
-
-		if self.generationIndex > 0:
-			self.idleGenCounters[primeThreadIdentifier] = self.idleGenCounters[primeThreadIdentifier] + 1 if population.best.cost == LspRuntimeMonitor.instance.popsData[primeThreadIdentifier]["min"][-1] else 1
-
-		# Stats
-		LspRuntimeMonitor.instance.popsData[primeThreadIdentifier]["min"].append(population.best.cost)
-
 		# crossing over
 		CrossOverOperator().process(population)
-
-		# if self.idleGenCounters[primeThreadIdentifier] > 1:
-		# 	population.localSearch()
 
 		MutationOperator().processPop(population)
 
 		# print("Miiiiiiiiiiiinnnnnnnnnnnn : ", population.chromosomes[0].cost, self.idleGenCounters[primeThreadIdentifier])
 
 		self.popChromosomes[primeThreadIdentifier] = set(population.chromosomes)
+
+		# Stats
+		LspRuntimeMonitor.instance.popsData[primeThreadIdentifier]["min"].append((min(population.chromosomes)).cost)
+
+		# if self.generationIndex > 0:
+		# 	self.idleGenCounters[primeThreadIdentifier] = self.idleGenCounters[primeThreadIdentifier] + 1 if population.best.cost == LspRuntimeMonitor.instance.popsData[primeThreadIdentifier]["min"][-1] else 1
 
 		LspRuntimeMonitor.instance.output("Population --> " + str(population.chromosomes))
 
