@@ -47,11 +47,11 @@ class CrossOverOperator:
 
             chromosomeC = chromosomeA
 
-            crossedOver = False
+            # crossedOver = False
             if (random.random() <= ParameterData.instance.crossOverRate):
                 try:
                     chromosomeC = self.mate([chromosomeA, chromosomeB])
-                    crossedOver = True
+                    # crossedOver = True
                 except Exception as e:
                     raise e                
 

@@ -36,16 +36,13 @@ class GeneticAlgorithm:
 		for primeThreadIdentifier in primeThreadIdentifiers:
 			self.popChromosomes[primeThreadIdentifier] = set((Chromosome.popByThread[primeThreadIdentifier]["content"]).values())
 
-		# LspRuntimeMonitor.instance.remainingMutations = dict({primeThreadIdentifier: 0 for primeThreadIdentifier in primeThreadIdentifiers})
-
 		while True:
 			
 			# check whether to stop or not
-			if self.generationIndex == 12:
-				break
+			# if self.generationIndex == 12:
+			# 	break
 
 			LspRuntimeMonitor.instance.newInstanceAdded = dict({primeThreadIdentifier: False for primeThreadIdentifier in primeThreadIdentifiers})
-			# self.updateRemainingMutations()
 
 			with concurrent.futures.ThreadPoolExecutor() as executor:
 				print(list(executor.map(self.processGenPop, primeThreadIdentifiers)))
@@ -57,23 +54,12 @@ class GeneticAlgorithm:
 			self.generationIndex += 1
 
 
-
-	# def updateRemainingMutations(self):
-	# 	"""
-	# 	"""
-		
-	# 	for primeThreadIdentifier in LspRuntimeMonitor.instance.remainingMutations:
-	# 		LspRuntimeMonitor.instance.remainingMutations[primeThreadIdentifier] += Population.mutatedPoolSize[primeThreadIdentifier]
-
-	# 	print("updating remaining mutations count : ", LspRuntimeMonitor.instance.remainingMutations)
-
-
 	def processGenPop(self, primeThreadIdentifier):
 		"""
 		"""
 
-		# if self.idleGenCounters[primeThreadIdentifier] >= ParameterData.instance.nIdleGenerations:
-		# 	return
+		if self.idleGenCounters[primeThreadIdentifier] >= ParameterData.instance.nIdleGenerations:
+			return
 
 		# building population
 		population = Population(primeThreadIdentifier, self.popChromosomes[primeThreadIdentifier])
@@ -87,11 +73,12 @@ class GeneticAlgorithm:
 
 		self.popChromosomes[primeThreadIdentifier] = set(population.chromosomes)
 
-		# Stats
-		LspRuntimeMonitor.instance.popsData[primeThreadIdentifier]["min"].append((min(population.chromosomes)).cost)
+		bestCost = (min(population.chromosomes)).cost
+		if self.generationIndex > 0:
+			self.idleGenCounters[primeThreadIdentifier] = self.idleGenCounters[primeThreadIdentifier] + 1 if bestCost >= LspRuntimeMonitor.instance.popsData[primeThreadIdentifier]["min"][-1] else 1
 
-		# if self.generationIndex > 0:
-		# 	self.idleGenCounters[primeThreadIdentifier] = self.idleGenCounters[primeThreadIdentifier] + 1 if population.best.cost == LspRuntimeMonitor.instance.popsData[primeThreadIdentifier]["min"][-1] else 1
+		# Stats
+		LspRuntimeMonitor.instance.popsData[primeThreadIdentifier]["min"].append(bestCost)
 
 		LspRuntimeMonitor.instance.output("Population --> " + str(population.chromosomes))
 
@@ -100,7 +87,7 @@ class GeneticAlgorithm:
 		"""
 		"""
 
-		# Second approach: Stop when no new instance
+		# First approach: Stop when no new instance
 		added = False
 		for newInst in LspRuntimeMonitor.instance.newInstanceAdded.values():
 			if newInst:
@@ -110,15 +97,15 @@ class GeneticAlgorithm:
 		if not added:
 			return True
 
-		# First approach: Stop when no new better instance
+		# Second approach: Stop when no new better instance
 		# Determine if it's to be terminated or not
 		# the process only stop when n generations have passed whithout any improvement to the quality of the best chromosome in the population
-		# for idleGenCounter in self.idleGenCounters.values():
-		# 	if idleGenCounter < ParameterData.instance.nIdleGenerations:
-		# 		return False
-		# return True
+		for idleGenCounter in self.idleGenCounters.values():
+			if idleGenCounter < ParameterData.instance.nIdleGenerations:
+				return False
+		return True
 
-		return False
+		# return False
 
 		
 
