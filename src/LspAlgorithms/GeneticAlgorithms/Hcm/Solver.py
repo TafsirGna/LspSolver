@@ -75,7 +75,7 @@ class GeneticAlgorithm:
 
 		bestCost = (min(population.chromosomes)).cost
 		if self.generationIndex > 0:
-			self.idleGenCounters[primeThreadIdentifier] = self.idleGenCounters[primeThreadIdentifier] + 1 if bestCost >= LspRuntimeMonitor.instance.popsData[primeThreadIdentifier]["min"][-1] else 1
+			self.idleGenCounters[primeThreadIdentifier] = self.idleGenCounters[primeThreadIdentifier] + 1 if bestCost >= min(LspRuntimeMonitor.instance.popsData[primeThreadIdentifier]["min"]) else 1
 
 		# Stats
 		LspRuntimeMonitor.instance.popsData[primeThreadIdentifier]["min"].append(bestCost)

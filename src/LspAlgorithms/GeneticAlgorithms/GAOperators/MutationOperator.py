@@ -1,4 +1,4 @@
-from LspAlgorithms.GeneticAlgorithms.PopInitialization.Chromosome import Chromosome
+# from LspAlgorithms.GeneticAlgorithms.PopInitialization.Chromosome import Chromosome
 from .LocalSearchEngine import LocalSearchEngine
 from LspAlgorithms.GeneticAlgorithms.LspRuntimeMonitor import LspRuntimeMonitor
 from ParameterSearch.ParameterData import ParameterData

@@ -1,8 +1,8 @@
-from collections import defaultdict
+# from collections import defaultdict
 import random
 import threading
-from LspAlgorithms.GeneticAlgorithms.PopInitialization.Chromosome import Chromosome
-from LspInputDataReading.LspInputDataInstance import InputDataInstance
+# from LspAlgorithms.GeneticAlgorithms.PopInitialization.Chromosome import Chromosome
+# from LspInputDataReading.LspInputDataInstance import InputDataInstance
 from .LocalSearchEngine import LocalSearchEngine
 # from .MutationOperator import MutationOperator
 from ..PopInitialization.Population import Population
@@ -20,7 +20,7 @@ class CrossOverOperator:
         """
 
         self.parentChromosomes = None
-        self.offsprings = {0: None, 1: None}
+        self.offspring = None
         self.population = None 
 
         if LocalSearchEngine.localSearchMemory["content"]["left_genes"] is None:
@@ -36,7 +36,8 @@ class CrossOverOperator:
         self.newChromosomes = set()
         self.population = population
 
-        while len(self.newChromosomes) < Population.popSizes[population.threadIdentifier]:
+        popSize = Population.popSizes[population.threadIdentifier]
+        while len(self.newChromosomes) < popSize:
 
             chromosomeA, chromosomeB = population.selectionOperator.select()
 
@@ -55,9 +56,10 @@ class CrossOverOperator:
                 except Exception as e:
                     raise e                
 
+            
             self.newChromosomes.add(chromosomeC)
 
-            print("chromosomes length : ", len(self.newChromosomes), Population.popSizes[population.threadIdentifier])
+            print("chromosomes length : ", len(self.newChromosomes), popSize)
 
         population.chromosomes = self.newChromosomes
         return self.newChromosomes
@@ -71,25 +73,16 @@ class CrossOverOperator:
 
         if offspring_result not in [1, 2]:
             # TODO: throw an error
-            return None, None
+            return None
 
         # print("Crossover : ", self.parentChromosomes, self.parentChromosomes[0].dnaArray, self.parentChromosomes[1].dnaArray)
         print("Crossover : ", self.parentChromosomes)
 
-        self.setOffsprings()
-
-        print("Cross Over result : ", [self.parentChromosomes, self.offsprings])
-
-        # return tuple(self.offsprings.values())
-        return self.offsprings[0]
-
-
-    def setOffsprings(self):
-        """
-        """
-        
-        # for i in [0]:
         self.searchOffspring()
+
+        print("Cross Over result : ", [self.parentChromosomes, self.offspring])
+
+        return self.offspring
 
 
     def directionalDeepSearch(self, chromosome, target, threadIdentifier):
@@ -107,7 +100,7 @@ class CrossOverOperator:
 
         result = (LocalSearchEngine()).process(chromosome, "near_positive", {"threadId": threadIdentifier})
         if result is not None:
-            self.offsprings[0] = result
+            self.offspring = result
             return 
 
         self.directionalDeepSearch(chromosome, self.parentChromosomes[1], threadIdentifier)
@@ -145,8 +138,8 @@ class CrossOverOperator:
                 del LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier][(geneItem, genePosition)]
 
             if localSearchEngine.result is not None:
-                if localSearchEngine.result <= self.offsprings[0]:
-                    self.offsprings[0] = localSearchEngine.result
+                if localSearchEngine.result <= self.offspring:
+                    self.offspring = localSearchEngine.result
 
                     if not LspRuntimeMonitor.instance.newInstanceAdded[threadIdentifier]:
                         LspRuntimeMonitor.instance.newInstanceAdded[threadIdentifier] = True
@@ -187,7 +180,7 @@ class CrossOverOperator:
         if isinstance(chromosome, PseudoChromosome):
             chromosome = LocalSearchEngine.switchItems(chromosome.value, threadIdentifier)
 
-        self.offsprings[0] = chromosome
+        self.offspring = chromosome
 
         with LocalSearchEngine.localSearchMemory["lock"]:
             if chromosome.stringIdentifier not in LocalSearchEngine.localSearchMemory["content"]["left_genes"]:
@@ -200,8 +193,8 @@ class CrossOverOperator:
 
             gene = chromosome.dnaArray[geneItem][genePosition]
 
-            if gene.cost == 0:
-                continue
+            # if gene.cost == 0:
+            #     continue
 
             print("crossing over : ", gene.period, chromosome)
             localSearchEngine = LocalSearchEngine()
@@ -219,9 +212,9 @@ class CrossOverOperator:
 
                 if self._stopOffspringSearchEvent.is_set():
                     return
-                self.offsprings[0] = chromosome
+                self.offspring = chromosome
 
-        if self.offsprings[0] == self.parentChromosomes[0]:
+        if self.offspring == self.parentChromosomes[0]:
             self.nearNeighborSearch(chromosome, threadIdentifier)
             return
 
