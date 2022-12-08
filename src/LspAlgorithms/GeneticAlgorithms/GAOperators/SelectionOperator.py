@@ -21,8 +21,9 @@ class SelectionOperator:
         self.setRouletteProbabilities()
         
         # the index tracking the current position of the cursor on the list 
-        self.currentIndex = 0
-        self.selectedPool = set()
+        # self.currentIndex = 0
+        self.counter = 0
+        self.indices = list(range(len(self.chromosomes)))
 
 
     def fitnessCalculationTask(self, slice, resultQueue):
@@ -83,24 +84,17 @@ class SelectionOperator:
         # if self.currentIndex >= len(self.chromosomes): # very much less likely to happen but you dunno
         #     return None, None
 
-        chromosomeA = self.chromosomes[self.currentIndex]
-        # while chromosomeA in self.selectedPool:
-        #     self.currentIndex += 1
-        #     chromosomeA = self.chromosomes[self.currentIndex]
+        randomIndex = np.random.choice(self.indices)
+
+        chromosomeA = self.chromosomes[randomIndex]
 
         chromosomeB = np.random.choice(self.chromosomes, p=self.rouletteProbabilities)
         while chromosomeB == chromosomeA:
             chromosomeB = np.random.choice(self.chromosomes, p=self.rouletteProbabilities)
 
-        self.currentIndex += 1
+        # self.currentIndex += 1
 
-        # adding selected chromosomes to the selectedpool property
-        # self.selectedPool.add(chromosomeA)
-
-        # if chromosomeB not in self.selectedPool:
-        #     self.selectedPool.add(chromosomeB)
+        self.indices.remove(randomIndex)
+        self.counter += 1
 
         return chromosomeA, chromosomeB
-
-        # chromosomeA, chromosomeB = np.random.choice(self.chromosomes, p=self.rouletteProbabilities), np.random.choice(self.chromosomes, p=self.rouletteProbabilities)
-        # return chromosomeA, chromosomeB
