@@ -84,6 +84,10 @@ class SelectionOperator:
         # if self.currentIndex >= len(self.chromosomes): # very much less likely to happen but you dunno
         #     return None, None
 
+        if self.counter >= len(self.chromosomes): # very much less likely to happen but you dunno
+            self.indices = list(range(len(self.chromosomes)))
+            self.counter = 0
+
         randomIndex = np.random.choice(self.indices)
 
         chromosomeA = self.chromosomes[randomIndex]

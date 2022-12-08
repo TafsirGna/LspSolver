@@ -10,6 +10,7 @@ from ParameterSearch.ParameterData import ParameterData
 from .LocalSearchEngine import LocalSearchEngine
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.PseudoChromosome import PseudoChromosome
 from LspAlgorithms.GeneticAlgorithms.LspRuntimeMonitor import LspRuntimeMonitor
+import numpy as np
 
 class CrossOverOperator:
     """
@@ -35,6 +36,7 @@ class CrossOverOperator:
 
         self.newChromosomes = set()
         self.population = population
+        prevPopMean = np.mean([chromosome.cost for chromosome in population.chromosomes])
 
         popSize = Population.popSizes[population.threadIdentifier]
         while len(self.newChromosomes) < popSize:
@@ -56,8 +58,8 @@ class CrossOverOperator:
                 except Exception as e:
                     raise e                
 
-            
-            self.newChromosomes.add(chromosomeC)
+            if chromosomeC != chromosomeA or (chromosomeC == chromosomeA and chromosomeC.cost < prevPopMean):
+                self.newChromosomes.add(chromosomeC)
 
             print("chromosomes length : ", len(self.newChromosomes), popSize)
 
