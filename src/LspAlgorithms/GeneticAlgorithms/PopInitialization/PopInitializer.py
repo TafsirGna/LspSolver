@@ -103,9 +103,30 @@ class PopInitializerSmallInstanceApproach:
         # threadID = uuid.uuid4()
 
         queue = list(queue)
+        queue.sort()
+        prevSavedPeriod = (queue[0]).period
 
         while len(queue) > 0:
             # print("len : ", queue)
+
+            # here, I want to sort all queue's elements of the same period before starting processing them 
+            if (queue[0]).period != prevSavedPeriod:
+                with self.initPoolSizeData["lock"]:
+                    poolSize = self.initPoolSizeData["size"]
+
+                if poolSize < PopInitializer.initPoolExpectedSize:
+                    period = (queue[0]).period
+                    for index, element in enumerate(queue):
+                        if element.period != period:
+                            lastIndex = index
+                    lastIndex = len(queue) - 1
+
+                    sameLevelNodes = queue[0:lastIndex]
+                    sameLevelNodes.sort()
+                    queue[0:lastIndex] = sameLevelNodes
+                    
+                prevSavedPeriod = (queue[0]).period
+
             node = queue[0]
             # print("nooode : ", node)
             queue = queue[1:]

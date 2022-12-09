@@ -36,7 +36,7 @@ class CrossOverOperator:
 
         self.newChromosomes = set()
         self.population = population
-        prevPopMean = np.mean([chromosome.cost for chromosome in population.chromosomes])
+        # prevPopMean = np.mean([chromosome.cost for chromosome in population.chromosomes])
 
         popSize = Population.popSizes[population.threadIdentifier]
         while len(self.newChromosomes) < popSize:
@@ -58,8 +58,8 @@ class CrossOverOperator:
                 except Exception as e:
                     raise e                
 
-            if chromosomeC != chromosomeA or (chromosomeC == chromosomeA and chromosomeC.cost < prevPopMean):
-                self.newChromosomes.add(chromosomeC)
+            # if chromosomeC != chromosomeA or (chromosomeC == chromosomeA and chromosomeC.cost < prevPopMean):
+            self.newChromosomes.add(chromosomeC)
 
             print("chromosomes length : ", len(self.newChromosomes), popSize)
 
