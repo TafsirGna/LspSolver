@@ -80,7 +80,7 @@ class CrossOverOperator:
         # print("Crossover : ", self.parentChromosomes, self.parentChromosomes[0].dnaArray, self.parentChromosomes[1].dnaArray)
         print("Crossover : ", self.parentChromosomes)
 
-        self.searchOffspring()
+        self.searchOffspring(self.parentChromosomes[0], self.parentChromosomes[1])
 
         print("Cross Over result : ", [self.parentChromosomes, self.offspring])
 
@@ -94,19 +94,6 @@ class CrossOverOperator:
         self._stopOffspringSearchEvent = threading.Event()
 
         self.crossOverCloser(chromosome, target, threadIdentifier)
-
-    
-    def nearNeighborSearch(self, chromosome, threadIdentifier):
-        """
-        """
-
-        result = (LocalSearchEngine()).process(chromosome, "near_positive", {"threadId": threadIdentifier})
-        if result is not None:
-            self.offspring = result
-            return 
-
-        self.directionalDeepSearch(chromosome, self.parentChromosomes[1], threadIdentifier)
-
 
 
     def crossOverCloser(self, chromosome, target, threadIdentifier, depthIndex = 0):
@@ -162,17 +149,16 @@ class CrossOverOperator:
         self._stopOffspringSearchEvent.set()
 
 
-    def searchOffspring(self):
+    def searchOffspring(self, chromosome, target):
         """
         """
 
         self._stopOffspringSearchEvent = threading.Event()
 
-        target = self.parentChromosomes[1]
         threadIdentifier = self.population.threadIdentifier if self.population is not None else 1
-        print("Begin **********************", self.parentChromosomes[0])
+        print("Begin **********************", chromosome)
 
-        self.searchRecursiveOffspring(self.parentChromosomes[0], target, threadIdentifier)
+        self.searchRecursiveOffspring(chromosome, target, threadIdentifier)
 
 
     def searchRecursiveOffspring(self, chromosome, target, threadIdentifier, depthIndex = 0):
@@ -217,7 +203,11 @@ class CrossOverOperator:
                 self.offspring = chromosome
 
         if self.offspring == self.parentChromosomes[0]:
-            self.nearNeighborSearch(chromosome, threadIdentifier)
+            result = (LocalSearchEngine()).process(chromosome, "near_positive", {"threadId": threadIdentifier})
+            if result is not None:
+                self.searchRecursiveOffspring(result, target, threadIdentifier, depthIndex + 1)
+            else:
+                self.directionalDeepSearch(chromosome, target, threadIdentifier)
             return
 
         self._stopOffspringSearchEvent.set()
