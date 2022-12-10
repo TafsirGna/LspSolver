@@ -40,11 +40,11 @@ class LocalSearchEngine:
         """Process the given chromosome in order to return a mutated version
         """
 
-        print("mutatiooon", strategy, chromosome, chromosome.dnaArray if (isinstance(chromosome, Chromosome)) else None)
+        # print("mutatiooon", strategy, chromosome, chromosome.dnaArray if (isinstance(chromosome, Chromosome)) else None)
 
         self.searchVicinity(chromosome, strategy, args)
 
-        print("Mutation results : ", strategy, chromosome, self.result)
+        # print("Mutation results : ", strategy, chromosome, self.result)
         return self.result
 
 
@@ -78,7 +78,7 @@ class LocalSearchEngine:
         if strategy == "population":
             self.result = list(results)
 
-        print("Search ended")
+        # print("Search ended")
 
 
 
@@ -188,9 +188,9 @@ class LocalSearchEngine:
                 interestingResult = None
                 if strategy == "crossover":
                     if not Chromosome.gettingCloser(chromosome, args["target"], periodGene, altPeriod, LocalSearchEngine.localSearchMemory["content"]["chromosome_distances"]):
-                        print("not getting closer *** ")
+                        # print("not getting closer *** ")
                         return
-                    print("yes getting closer *** ")
+                    # print("yes getting closer *** ")
 
                     if "closer_anyway" not in args:
                         interestingResult = LocalSearchEngine.isSwitchInteresting(chromosome, periodGene, altPeriod)
@@ -453,7 +453,7 @@ class LocalSearchEngine:
                 if isinstance(Chromosome.popByThread[threadIdentifier]["content"][mutation.stringIdentifier], PseudoChromosome):
                     Chromosome.popByThread[threadIdentifier]["content"][mutation.stringIdentifier] = mutation
 
-        print("Switch done")
+        # print("Switch done")
         return mutation
 
 

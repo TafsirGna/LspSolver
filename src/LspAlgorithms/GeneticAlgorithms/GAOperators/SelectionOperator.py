@@ -65,9 +65,9 @@ class SelectionOperator:
 
         self.rouletteProbabilities = [float(fitness/totalFitness) for fitness in fitnessArray]
 
-        print("**************************")
-        print("Roulette : ", self.chromosomes, " \n ", self.rouletteProbabilities)
-        print("++++++++++++++++++++++++++")
+        # print("**************************")
+        # print("Roulette : ", self.chromosomes, " \n ", self.rouletteProbabilities)
+        # print("++++++++++++++++++++++++++")
 
 
     def select(self):

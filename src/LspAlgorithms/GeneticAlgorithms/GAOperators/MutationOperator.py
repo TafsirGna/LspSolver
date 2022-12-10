@@ -38,7 +38,7 @@ class MutationOperator:
         for chromosome in chromosomes:
 
             # print("population's chromosomes : ", population.chromosomes)
-            print("picked chromosome : ", chromosome)
+            # print("picked chromosome : ", chromosome)
 
             result = self.process(chromosome, population.threadIdentifier)
             if result is not None:

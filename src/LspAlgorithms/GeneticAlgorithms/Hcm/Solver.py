@@ -80,7 +80,7 @@ class GeneticAlgorithm:
 		# Stats
 		LspRuntimeMonitor.instance.popsData[primeThreadIdentifier]["min"].append(bestCost)
 
-		LspRuntimeMonitor.instance.output("Population --> " + str(population.chromosomes))
+		# LspRuntimeMonitor.instance.output("Population --> " + str(population.chromosomes))
 
 
 	def terminateProcess(self):
