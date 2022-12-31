@@ -1,6 +1,3 @@
-#!/usr/bin/python3.5
-# -*-coding: utf-8 -*
-
 from collections import defaultdict
 import threading
 # import numpy as np
@@ -10,14 +7,12 @@ from LspAlgorithms.GeneticAlgorithms.LspRuntimeMonitor import LspRuntimeMonitor
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.Gene import Gene
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 import concurrent.futures
-import bisect
 from ParameterSearch.ParameterData import ParameterData
 
 class Chromosome(object):
 
-	pool = dict({"lock": threading.Lock(), "content": dict()})
-	# localOptima = {"lock": threading.Lock(), "content": set()}
-	popByThread = defaultdict(lambda: dict({"content": dict()}))
+	pool = None
+	popByThread = None
 
 	def __init__(self):
 		"""
