@@ -59,9 +59,12 @@ for _ in range(nIterations):
 	globalData["mins"].append(min(mins))
 	globalData["timeLengths"].append(LspRuntimeMonitor.instance.timeLength)
 
+	if (len(globalData["mins"]) == 1) or (len(globalData["mins"]) > 1 and globalData["mins"][-1] < globalData["min"]):
+		globalData["min"] = globalData["mins"][-1]
+		globalData["timeLength"] = globalData["timeLengths"][-1]
+
 	if not args.stats:
 		LspRuntimeMonitor.instance.report()
-
 
 print("Global Data : ", globalData)
 file = LspRuntimeMonitor.outputFolderPath+"/"+"stats_data.csv"

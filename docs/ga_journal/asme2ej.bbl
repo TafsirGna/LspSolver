@@ -1,0 +1,95 @@
+\begin{thebibliography}{10}
+
+\bibitem{ratheil_stocking_paper}
+Houndji, V.~R., Pierre~Schaus, L.~W., and Deville, Y., 2014.
+\newblock ``The stockingcost constraint''.
+\newblock {\em International conference on principles and practice of
+  constraint programming}, p.~382–397.
+
+\bibitem{ceschia_opthub}
+Ceschia, S., 2017.
+\newblock Bibliothèque d’instances psp.
+\newblock opthub.uniud.it.
+
+\bibitem{wolsey_mip_paper}
+Yves~Pochet, L. A.~W., 2006.
+\newblock ``Production planning by mixed integer programming''.
+\newblock {\em Springer Science and Business Media}.
+
+\bibitem{gent_walsh_paper}
+Gent, I.~P., and Walsh, T., 1999.
+\newblock ``Csplib : a benchmark library fr constraints''.
+\newblock {\em Springer}, p.~480–481.
+
+\bibitem{mendes_paper}
+J.~F.~Gonçalves, J. J. d. M.~M., and Resende, M. G.~C., 2005.
+\newblock ``A hybrid genetic algorithm for the job shop scheduling problem''.
+\newblock {\em European journal of operational research}, p.~77–95.
+
+\bibitem{non_binary_paper}
+Mirshekarian, S., and Süer, G., 2018.
+\newblock ``Experimental study of seeding in genetic algorithms with non-binary
+  genetic representation''.
+\newblock {\em Journal of Intelligent Manufacturing, {\bf 29}}, 10.
+
+\bibitem{miller_paper}
+Miller, A.~J., and Wolsey, L.~A., 2003.
+\newblock ``Tight mip formulation for multi-item discrete lot-sizing
+  problems''.
+\newblock {\em Operations Research}, p.~557–565.
+
+\bibitem{gicquel_paper}
+Céline~Gicquel, M.~M., and Dallery, Y., 2009.
+\newblock ``On the discrete lot-sizing and scheduling problem with
+  sequence-dependent changeover times''.
+\newblock {\em Operations Research Letters}, p.~32–36.
+
+\bibitem{wolsey2_paper}
+Wolsey, L.~A., 2002.
+\newblock ``Solving multi-item lot-sizing problems with an mip solver using
+  classification and reformulation''.
+\newblock {\em Management Science, {\bf 48(12)}}, p.~1587–1602.
+
+\bibitem{gicquel2_paper}
+Céline~Gicquel, Nicolas~Miègeville, M.~M., and Dallery, Y., 2009.
+\newblock ``Discrete lot sizing and scheduling using product decomposition into
+  attributes''.
+\newblock {\em Computers and Operations Research}, p.~2690–2698.
+
+\bibitem{ceschia_sa_paper}
+S.~Ceschia, L. D.~G., and Schaerf, A., 2016.
+\newblock ``Solving discrete lot-sizing and scheduling by simulated
+  annealing''.
+
+\bibitem{houndji_paper}
+Houndji, V.~R., 2013.
+\newblock Deux problèmes de planification de production : Formulations et
+  résolution par programmation en nombres entiers et par programmation par
+  contraintes.
+
+\bibitem{john_h_paper}
+Holland, J.~H., 1992.
+\newblock ``Adaptation in natural and artificial systems : an introductory
+  analysis with applications to biology, control, and artificial
+  intelligence''.
+\newblock {\em MIT press}.
+
+\bibitem{jh_paper}
+Holland, J., 1992.
+\newblock {Computer programs that "evolve" in ways that resemble natural
+  selection can solve complex problems even their creators do not fully
+  understand}.
+\newblock See also URL \verb+http://www.abc.edu+.
+
+\bibitem{rWheel_paper}
+Pencheva, T., Atanassov, K., and Shannon, A., 2009.
+\newblock ``Modelling of a roulette wheel selection operator in genetic
+  algorithms using generalized nets''.
+\newblock {\em International Journal Bioautomation, {\bf 13}}, 12.
+
+\bibitem{hCross_paper}
+A.J~Umbarkar, P.~S., 2015.
+\newblock ``Crossover operators in genetic algorithms: a review''.
+\newblock {\em ICTACT Journal on soft computing,, {\bf 29}}, 10.
+
+\end{thebibliography}

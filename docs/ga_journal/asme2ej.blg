@@ -1,0 +1,55 @@
+This is BibTeX, Version 0.99d (TeX Live 2019/Debian)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: asme2ej.aux
+The style file: asmems4.bst
+Database file #1: asme2e.bib
+Warning--I didn't find a database entry for "tab:cpGaResults"
+Warning--I didn't find a database entry for "tab:gaStatsResults"
+Warning--I didn't find a database entry for "tab"
+Warning--I didn't find a database entry for "tab:xx"
+Name 1 in "J. F. Gonçalves, J. J. de Magalhaes Mendes, and Mauricio G. C. Resende" has a comma at the end for entry mendes_paper
+while executing---line 1268 of file asmems4.bst
+Warning--empty journal in ceschia_sa_paper
+Warning--empty note in houndji_paper
+You've used 16 entries,
+            1984 wiz_defined-function locations,
+            580 strings with 6173 characters,
+and the built_in function-call counts, 3648 in all, are:
+= -- 358
+> -- 97
+< -- 0
++ -- 43
+- -- 27
+* -- 151
+:= -- 473
+add.period$ -- 46
+call.type$ -- 16
+change.case$ -- 16
+chr.to.int$ -- 0
+cite$ -- 18
+duplicate$ -- 245
+empty$ -- 338
+format.name$ -- 27
+if$ -- 911
+int.to.chr$ -- 0
+int.to.str$ -- 16
+missing$ -- 13
+newline$ -- 81
+num.names$ -- 16
+pop$ -- 55
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 0
+skip$ -- 214
+stack$ -- 0
+substring$ -- 126
+swap$ -- 152
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 0
+warning$ -- 2
+while$ -- 23
+width$ -- 18
+write$ -- 165
+(There was 1 error message)
