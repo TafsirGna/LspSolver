@@ -3,6 +3,7 @@
 
 from collections import defaultdict
 import concurrent.futures
+from LspAlgorithms.GeneticAlgorithms.GAOperators.LocalSearchEngine import LocalSearchEngine
 # from LspAlgorithms.GeneticAlgorithms.GAOperators.LocalSearchEngine import LocalSearchEngine
 from LspAlgorithms.GeneticAlgorithms.LspRuntimeMonitor import LspRuntimeMonitor
 from ..PopInitialization.PopInitializer import PopInitializer
@@ -11,6 +12,7 @@ from ..PopInitialization.Chromosome import Chromosome
 from ..GAOperators.CrossOverOperator import CrossOverOperator
 from ..GAOperators.MutationOperator import MutationOperator
 from ParameterSearch.ParameterData import ParameterData
+import threading
 
 
 class GeneticAlgorithm:
@@ -20,6 +22,12 @@ class GeneticAlgorithm:
 	def __init__(self):
 		"""
 		"""
+
+		Chromosome.pool = dict({"lock": threading.Lock(), "content": dict()})
+		Chromosome.popByThread = defaultdict(lambda: dict({"content": dict()}))
+
+		LocalSearchEngine.localSearchMemory = {"lock": threading.Lock(), "content": defaultdict(lambda: None)}
+		LocalSearchEngine.lowUpLimits = {"lock": threading.Lock(), "content": defaultdict(lambda: None)}
 
 		self.popInitializer = PopInitializer()
 		self.popChromosomes = defaultdict(lambda: set())

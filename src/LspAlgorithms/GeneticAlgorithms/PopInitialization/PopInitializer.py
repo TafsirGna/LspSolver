@@ -1,6 +1,3 @@
-#!/usr/bin/python3.5
-# -*-coding: utf-8 -*
-
 import threading
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.Population import Population
 from LspAlgorithms.GeneticAlgorithms.LspRuntimeMonitor import LspRuntimeMonitor

@@ -36,7 +36,7 @@ LspRuntimeMonitor.fileName = LspRuntimeMonitor.fileName.replace("/", "_")
 LspRuntimeMonitor.fileName = LspRuntimeMonitor.fileName.replace(".", "_")
 LspRuntimeMonitor.outputFolderPath += LspRuntimeMonitor.fileName
 
-nIterations = 3 if args.stats else 1 
+nIterations = 10 if args.stats else 1 
 globalData = {"mins": [], "timeLengths": []}
 for _ in range(nIterations):
 

@@ -14,8 +14,8 @@ class LocalSearchEngine:
     """
     """
 
-    localSearchMemory = {"lock": threading.Lock(), "content": defaultdict(lambda: None)}
-    lowUpLimits = {"lock": threading.Lock(), "content": defaultdict(lambda: None)}
+    localSearchMemory = None
+    lowUpLimits = None
 
     def __init__(self) -> None:
         """
