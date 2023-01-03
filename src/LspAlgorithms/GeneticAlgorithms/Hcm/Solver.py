@@ -1,6 +1,3 @@
-#!/usr/bin/python3.5
-# -*-coding: utf-8 -*
-
 from collections import defaultdict
 import concurrent.futures
 from LspAlgorithms.GeneticAlgorithms.GAOperators.LocalSearchEngine import LocalSearchEngine

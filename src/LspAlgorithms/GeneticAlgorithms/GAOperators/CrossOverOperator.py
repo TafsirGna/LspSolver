@@ -4,7 +4,6 @@ import threading
 # from LspAlgorithms.GeneticAlgorithms.PopInitialization.Chromosome import Chromosome
 # from LspInputDataReading.LspInputDataInstance import InputDataInstance
 from .LocalSearchEngine import LocalSearchEngine
-# from .MutationOperator import MutationOperator
 from ..PopInitialization.Population import Population
 from ParameterSearch.ParameterData import ParameterData
 from .LocalSearchEngine import LocalSearchEngine
