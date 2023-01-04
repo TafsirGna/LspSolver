@@ -25,25 +25,25 @@ class Chromosome(object):
 		# self.sortedGenesByCost = None
 
 
-	@classmethod
-	def dumbDistanceMeasure(cls, stringIdentifier, target):
-		"""
-		"""
+	# @classmethod
+	# def dumbDistanceMeasure(cls, stringIdentifier, target):
+	# 	"""
+	# 	"""
 
-		distance = 0
-		itemGenesPositions = [0] * InputDataInstance.instance.nItems
+	# 	distance = 0
+	# 	itemGenesPositions = [0] * InputDataInstance.instance.nItems
 
-		for period1 in range(InputDataInstance.instance.nPeriods):
-			item = stringIdentifier[period1] - 1
+	# 	for period1 in range(InputDataInstance.instance.nPeriods):
+	# 		item = stringIdentifier[period1] - 1
 
-			if item >= 0:
-				position = itemGenesPositions[item]
-				period2 = (target.dnaArray[item][position]).period
-				distance += ((period1 - period2) * InputDataInstance.instance.stockingCostsArray[item]) ** 2
+	# 		if item >= 0:
+	# 			position = itemGenesPositions[item]
+	# 			period2 = (target.dnaArray[item][position]).period
+	# 			distance += ((period1 - period2) * InputDataInstance.instance.stockingCostsArray[item]) ** 2
 
-				itemGenesPositions[item] += 1
+	# 			itemGenesPositions[item] += 1
 
-		return math.sqrt(distance)
+	# 	return math.sqrt(distance)
 
 
 	@classmethod
