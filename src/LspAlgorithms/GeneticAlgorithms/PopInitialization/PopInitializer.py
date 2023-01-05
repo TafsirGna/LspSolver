@@ -27,7 +27,7 @@ class PopInitializer:
         self.primeThreadIdentifiers = [uuid.uuid4() for _ in range(ParameterData.instance.nPrimaryThreads)]
 
         if PopInitializer.initPoolExpectedSize is None:
-            PopInitializer.initPoolExpectedSize = initPoolExpectedSize = ParameterData.instance.popSize * ParameterData.instance.nPrimaryThreads
+            PopInitializer.initPoolExpectedSize = ParameterData.instance.popSize * ParameterData.instance.nPrimaryThreads
 
         self.initPool = set()
         
@@ -43,7 +43,6 @@ class PopInitializer:
 
         chromosomes = list(self.initPool)
         chromosomes = np.array_split(chromosomes, ParameterData.instance.nPrimaryThreads)
-        # LspRuntimeMonitor.instance.sortedListLength = defaultdict(lambda: 0)
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
             print(list(executor.map(self.stuffPopThreadTask, list(range(ParameterData.instance.nPrimaryThreads)), chromosomes)))
@@ -64,7 +63,7 @@ class PopInitializer:
 
             Chromosome.popByThread[self.primeThreadIdentifiers[popIndex]]["content"][chromosome.stringIdentifier] = chromosome
 
-        Population.mutatedPoolSize[self.primeThreadIdentifiers[popIndex]] = int(len(Chromosome.pool["content"]) * ParameterData.instance.mutationRate)
+        Population.mutatedPoolSize[self.primeThreadIdentifiers[popIndex]] = int(len(Chromosome.popByThread[self.primeThreadIdentifiers[popIndex]]["content"]) * ParameterData.instance.mutationRate)
 
 
 class PopInitializerSmallInstanceApproach:
@@ -97,11 +96,8 @@ class PopInitializerSmallInstanceApproach:
         """
         """
 
-        # threadID = uuid.uuid4()
-
         queue = list(queue)
-        queue.sort()
-        prevSavedPeriod = (queue[0]).period
+        prevSavedPeriod = InputDataInstance.instance.nPeriods
 
         while len(queue) > 0:
             # print("len : ", queue)
@@ -113,10 +109,10 @@ class PopInitializerSmallInstanceApproach:
 
                 if poolSize < PopInitializer.initPoolExpectedSize:
                     period = (queue[0]).period
+                    lastIndex = len(queue) - 1
                     for index, element in enumerate(queue):
                         if element.period != period:
                             lastIndex = index
-                    lastIndex = len(queue) - 1
 
                     sameLevelNodes = queue[0:lastIndex]
                     sameLevelNodes.sort()
@@ -201,8 +197,6 @@ class PopInitializerBigInstanceApproach:
     def searchPopThreadTask(self, queue):
         """ Uniform cost search
         """
-
-        # threadID = uuid.uuid4()
         
         queue = list(queue)
 
