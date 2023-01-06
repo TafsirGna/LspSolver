@@ -44,7 +44,7 @@ class GeneticAlgorithm:
 		while True:
 			
 			# check whether to stop or not
-			# if self.generationIndex == 12:
+			# if self.generationIndex == 1:
 			# 	break
 
 			LspRuntimeMonitor.instance.newInstanceAdded = dict({primeThreadIdentifier: False for primeThreadIdentifier in primeThreadIdentifiers})

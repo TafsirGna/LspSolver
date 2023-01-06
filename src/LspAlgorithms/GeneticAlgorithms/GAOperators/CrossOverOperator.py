@@ -61,11 +61,6 @@ class CrossOverOperator:
             with self.popLock:
                 chromosomeA, chromosomeB = self.population.selectionOperator.select()
 
-            if isinstance(chromosomeA, PseudoChromosome):
-                chromosomeA = LocalSearchEngine.switchItems(chromosomeA.value, self.population.threadIdentifier)
-            if isinstance(chromosomeB, PseudoChromosome):
-                chromosomeB = LocalSearchEngine.switchItems(chromosomeB.value, self.population.threadIdentifier)
-
             chromosomeC = chromosomeA
 
             # crossedOver = False

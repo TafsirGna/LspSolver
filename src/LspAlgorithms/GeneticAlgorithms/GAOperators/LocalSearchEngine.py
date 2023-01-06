@@ -126,6 +126,10 @@ class LocalSearchEngine:
             inPool = False if mStringIdentifier not in Chromosome.pool["content"] else True
 
         if inPool:
+            # print('happening')
+            if isinstance(Chromosome.popByThread[list(Chromosome.pool["content"][mStringIdentifier])[0]]["content"][mStringIdentifier], PseudoChromosome):
+                pass
+                # print("comment")
             return None
 
         else:   
@@ -152,34 +156,15 @@ class LocalSearchEngine:
 
                 evaluationData = LocalSearchEngine.evaluateItemsSwitch(chromosome, periodGene, altPeriod) if interestingResult is None else interestingResult[1]
 
-                if self.onSelectedStrategy(strategy, chromosome, evaluationData, results, args) == "RETURN":
-                    return "RETURN"
+                if strategy == "population":
+                    chromosome = LocalSearchEngine.switchItems(evaluationData)
+                    results.add(chromosome)
+                else:
+                    pseudoChromosome = PseudoChromosome(evaluationData)
+                    Chromosome.addToPop(args["threadId"], pseudoChromosome)
 
-
-    def onSelectedStrategy(self, strategy, chromosome, result, results, args):
-        """
-        """
-
-        evaluationData = result
-        if strategy == "population":
-            chromosome = LocalSearchEngine.switchItems(evaluationData)
-            results.add(chromosome)
-        else:
-            pseudoChromosome = PseudoChromosome(evaluationData)
-            Chromosome.addToPop(args["threadId"], pseudoChromosome)
-
-        if strategy == "crossover":
-            if (args and "closer_anyway" in args):
-                self.result = pseudoChromosome
-                return "RETURN"
-            else:
-                if evaluationData["variance"] >= 0:
                     self.result = pseudoChromosome
                     return "RETURN"
-        
-        if strategy in ["random", "near_positive"]:
-            self.result = pseudoChromosome
-            return "RETURN"
 
 
     @classmethod
@@ -201,7 +186,6 @@ class LocalSearchEngine:
             if (altPeriodGeneLowerLimit, altPeriodGeneUpperLimit) == (None, None):
                 altPeriodGeneLowerLimit, altPeriodGeneUpperLimit = Chromosome.geneLowerUpperLimit(chromosome, altPeriodGene)
                 (chromosome.dnaArray[altPeriodGene.item][altPeriodGene.position]).lowerPeriodLimit, (chromosome.dnaArray[altPeriodGene.item][altPeriodGene.position]).upperPeriodLimit = altPeriodGeneLowerLimit, altPeriodGeneUpperLimit
-
 
             if (periodGeneLowerLimit <= altPeriod and altPeriod < periodGeneUpperLimit) and (altPeriodGeneLowerLimit <= periodGene.period and periodGene.period < altPeriodGeneUpperLimit):
                 LocalSearchEngine.localSearchMemory["content"]["switchables"][(chromosome.stringIdentifier, periodGene.period, altPeriod)] = True
@@ -409,6 +393,8 @@ class LocalSearchEngine:
             if mutation.stringIdentifier in Chromosome.popByThread[threadIdentifier]["content"]:
                 if isinstance(Chromosome.popByThread[threadIdentifier]["content"][mutation.stringIdentifier], PseudoChromosome):
                     Chromosome.popByThread[threadIdentifier]["content"][mutation.stringIdentifier] = mutation
+        # else:
+        #     print("coco")
 
         # print("Switch done")
         return mutation

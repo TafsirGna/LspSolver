@@ -2,9 +2,11 @@ from collections import defaultdict
 import multiprocessing as mp
 import numpy as np
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.Chromosome import Chromosome
+from LspAlgorithms.GeneticAlgorithms.PopInitialization.PseudoChromosome import PseudoChromosome
 from ParameterSearch.ParameterData import ParameterData
 from queue import Queue
 import concurrent.futures
+from .LocalSearchEngine import LocalSearchEngine
 
 class SelectionOperator:
     """
@@ -21,9 +23,9 @@ class SelectionOperator:
         self.setRouletteProbabilities()
         
         # the index tracking the current position of the cursor on the list 
-        # self.currentIndex = 0
         self.counter = 0
         self.indices = list(range(len(self.chromosomes)))
+        self.staticIndices = list(range(len(self.chromosomes)))
 
 
     def fitnessCalculationTask(self, slice, resultQueue):
@@ -81,24 +83,30 @@ class SelectionOperator:
         """
         """
 
-        # if self.currentIndex >= len(self.chromosomes): # very much less likely to happen but you dunno
-        #     return None, None
-
         if self.counter >= len(self.chromosomes): # very much less likely to happen but you dunno
             self.indices = list(range(len(self.chromosomes)))
             self.counter = 0
 
-        randomIndex = np.random.choice(self.indices)
+        randomIndexA = np.random.choice(self.indices)
 
-        chromosomeA = self.chromosomes[randomIndex]
+        chromosomeA = self.chromosomes[randomIndexA]
 
-        chromosomeB = np.random.choice(self.chromosomes, p=self.rouletteProbabilities)
+        randomIndexB = np.random.choice(self.staticIndices, p=self.rouletteProbabilities)
+        chromosomeB = self.chromosomes[randomIndexB]
         while chromosomeB == chromosomeA:
-            chromosomeB = np.random.choice(self.chromosomes, p=self.rouletteProbabilities)
+            randomIndexB = np.random.choice(self.staticIndices, p=self.rouletteProbabilities)
+            chromosomeB = self.chromosomes[randomIndexB]
 
-        # self.currentIndex += 1
-
-        self.indices.remove(randomIndex)
+        self.indices.remove(randomIndexA)
         self.counter += 1
+
+        if isinstance(chromosomeA, PseudoChromosome):
+            # print("ball A")
+            chromosomeA = LocalSearchEngine.switchItems(chromosomeA.value, self.population.threadIdentifier)
+            self.chromosomes[randomIndexA] = chromosomeA
+        if isinstance(chromosomeB, PseudoChromosome):
+            # print("ball B")
+            chromosomeB = LocalSearchEngine.switchItems(chromosomeB.value, self.population.threadIdentifier)
+            self.chromosomes[randomIndexB] = chromosomeB
 
         return chromosomeA, chromosomeB
