@@ -129,6 +129,7 @@ class Chromosome(object):
 	def copyToThread(cls, threadIdentifier, chromosome):
 		"""
 		"""
+
 		if chromosome.stringIdentifier not in Chromosome.popByThread[threadIdentifier]["content"]:
 			Chromosome.popByThread[threadIdentifier]["content"][chromosome.stringIdentifier] = chromosome
 			with Chromosome.pool["lock"]:

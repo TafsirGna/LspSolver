@@ -127,8 +127,8 @@ class LocalSearchEngine:
 
         if inPool:
             # print('happening')
-            if isinstance(Chromosome.popByThread[list(Chromosome.pool["content"][mStringIdentifier])[0]]["content"][mStringIdentifier], PseudoChromosome):
-                pass
+            # if isinstance(Chromosome.popByThread[list(Chromosome.pool["content"][mStringIdentifier])[0]]["content"][mStringIdentifier], PseudoChromosome):
+            #     pass
                 # print("comment")
             return None
 

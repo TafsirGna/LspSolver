@@ -74,7 +74,10 @@ class CrossOverOperator:
             with self.newPopLock:
                 if len(self.newChromosomes) >= popSize:
                     break
-                # if chromosomeC != chromosomeA or (chromosomeC == chromosomeA and chromosomeC.cost < prevPopMean):
+                
+                # if isinstance(chromosomeC, PseudoChromosome):
+                #     print("roar")
+
                 self.newChromosomes.add(chromosomeC)
 
             # print("chromosomes length : ", len(self.newChromosomes), popSize)

@@ -23,7 +23,6 @@ class SelectionOperator:
         self.setRouletteProbabilities()
         
         # the index tracking the current position of the cursor on the list 
-        self.counter = 0
         self.indices = list(range(len(self.chromosomes)))
         self.staticIndices = list(range(len(self.chromosomes)))
 
@@ -83,9 +82,8 @@ class SelectionOperator:
         """
         """
 
-        if self.counter >= len(self.chromosomes): # very much less likely to happen but you dunno
-            self.indices = list(range(len(self.chromosomes)))
-            self.counter = 0
+        # if len(self.indices) == 0: # very much less likely to happen but you dunno
+        #     self.indices = list(range(len(self.chromosomes)))
 
         randomIndexA = np.random.choice(self.indices)
 
@@ -98,7 +96,6 @@ class SelectionOperator:
             chromosomeB = self.chromosomes[randomIndexB]
 
         self.indices.remove(randomIndexA)
-        self.counter += 1
 
         if isinstance(chromosomeA, PseudoChromosome):
             # print("ball A")

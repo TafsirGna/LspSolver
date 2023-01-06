@@ -73,9 +73,7 @@ class GeneticAlgorithm:
 		CrossOverOperator().process(population)
 
 		MutationOperator().processPop(population)
-
-		# print("Miiiiiiiiiiiinnnnnnnnnnnn : ", population.chromosomes[0].cost, self.idleGenCounters[primeThreadIdentifier])
-
+		
 		self.popChromosomes[primeThreadIdentifier] = set(population.chromosomes)
 
 		bestCost = (min(population.chromosomes)).cost
