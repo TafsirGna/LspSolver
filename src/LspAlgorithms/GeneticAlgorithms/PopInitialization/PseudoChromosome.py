@@ -9,6 +9,7 @@ class PseudoChromosome(object):
 		self.stringIdentifier = value["newStringIdentifier"]
 		self.value = value
 		self.cost = value["chromosome"].cost - value["variance"]
+		# self.original = value["original"]
 
 	def __lt__(self, chromosome):
 		return self.cost < chromosome.cost

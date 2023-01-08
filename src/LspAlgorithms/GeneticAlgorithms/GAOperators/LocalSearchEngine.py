@@ -211,6 +211,7 @@ class LocalSearchEngine:
                 altPeriodGeneLowerLimit, altPeriodGeneUpperLimit = Chromosome.geneLowerUpperLimit(chromosome, altPeriodGene)
                 (chromosome.dnaArray[altPeriodGene.item][altPeriodGene.position]).lowerPeriodLimit, (chromosome.dnaArray[altPeriodGene.item][altPeriodGene.position]).upperPeriodLimit = altPeriodGeneLowerLimit, altPeriodGeneUpperLimit
 
+            # print(" ready : ", periodGeneLowerLimit, altPeriod, altPeriodGeneLowerLimit, periodGene.period)
             if (periodGeneLowerLimit <= altPeriod and altPeriod < periodGeneUpperLimit) and (altPeriodGeneLowerLimit <= periodGene.period and periodGene.period < altPeriodGeneUpperLimit):
                 LocalSearchEngine.localSearchMemory["content"]["switchables"][(chromosome.stringIdentifier, periodGene.period, altPeriod)] = True
                 return True
@@ -539,6 +540,7 @@ class LocalSearchEngine:
             evaluationData["periodGene"]["stockingCost"] = InputDataInstance.instance.stockingCostsArray[periodGene.item] * (InputDataInstance.instance.demandsArrayZipped[periodGene.item][periodGene.position] - altPeriod)
 
         evaluationData["variance"] -= evaluationData["periodGene"]["stockingCost"] + evaluationData["periodGene"]["changeOverCost"]
+        # evaluationData["original"] = chromosome
 
         # print("Evaluation result : ", chromosome, periodGene.period, altPeriod, " ---> ", evaluationData)
 

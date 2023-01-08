@@ -79,9 +79,20 @@ class Chromosome(object):
 			distance -= (((chromosomeInput["gene"]).period - (target.dnaArray[(chromosomeInput["gene"]).item][(chromosomeInput["gene"]).position]).period) * InputDataInstance.instance.stockingCostsArray[(chromosomeInput["gene"]).item]) ** 2
 			distance += ((chromosomeInput["altPeriod"] - (target.dnaArray[(chromosomeInput["gene"]).item][(chromosomeInput["gene"]).position]).period) * InputDataInstance.instance.stockingCostsArray[(chromosomeInput["gene"]).item]) ** 2
 
-			if (chromosomeInput["chromosome"]).stringIdentifier[chromosomeInput["altPeriod"]] != 0:
-				distance -= ((chromosomeInput["altPeriod"] - (target.dnaArray[((chromosomeInput["chromosome"]).genesByPeriod[chromosomeInput["altPeriod"]])[0]][((chromosomeInput["chromosome"]).genesByPeriod[chromosomeInput["altPeriod"]])[1]]).period) * InputDataInstance.instance.stockingCostsArray[((chromosomeInput["chromosome"]).genesByPeriod[chromosomeInput["altPeriod"]])[0]]) ** 2
-				distance += (((chromosomeInput["gene"]).period - (target.dnaArray[((chromosomeInput["chromosome"]).genesByPeriod[chromosomeInput["altPeriod"]])[0]][((chromosomeInput["chromosome"]).genesByPeriod[chromosomeInput["altPeriod"]])[1]]).period) * InputDataInstance.instance.stockingCostsArray[((chromosomeInput["chromosome"]).genesByPeriod[chromosomeInput["altPeriod"]])[0]]) ** 2
+			if (chromosomeInput["chromosome"]).stringIdentifier[chromosomeInput["altPeriod"]] > 0:
+				item = (chromosomeInput["chromosome"]).stringIdentifier[chromosomeInput["altPeriod"]] - 1
+				if isinstance(chromosomeInput["chromosome"], Chromosome):
+					position = ((chromosomeInput["chromosome"]).genesByPeriod[chromosomeInput["altPeriod"]])[1]
+				elif isinstance(chromosomeInput["chromosome"], PseudoChromosome):
+					position = -1
+					for p, i in enumerate((chromosomeInput["chromosome"]).stringIdentifier):
+						if (i - 1) == item:
+							position += 1
+						if p == chromosomeInput["altPeriod"]:
+							break
+
+				distance -= ((chromosomeInput["altPeriod"] - (target.dnaArray[item][position]).period) * InputDataInstance.instance.stockingCostsArray[item]) ** 2
+				distance += (((chromosomeInput["gene"]).period - (target.dnaArray[item][position]).period) * InputDataInstance.instance.stockingCostsArray[item]) ** 2
 			
 		result = math.sqrt(distance)
 
