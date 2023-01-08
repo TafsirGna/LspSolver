@@ -89,27 +89,21 @@ class LocalSearchEngine:
 
         if len(LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier][(periodGene.item, periodGene.position)]) == 0:
 
-            # print("chromosome : ", chromosome, " | ", periodGene)
             (periodGeneLowerLimit, periodGeneUpperLimit) = ((chromosome.dnaArray[periodGene.item][periodGene.position]).lowerPeriodLimit, (chromosome.dnaArray[periodGene.item][periodGene.position]).upperPeriodLimit)
-            # print("Limits : ", (periodGeneLowerLimit, periodGeneUpperLimit), Chromosome.geneLowerUpperLimit(chromosome, periodGene))
             if (periodGeneLowerLimit, periodGeneUpperLimit) == (None, None):
                 periodGeneLowerLimit, periodGeneUpperLimit = Chromosome.geneLowerUpperLimit(chromosome, periodGene)
                 ((chromosome.dnaArray[periodGene.item][periodGene.position]).lowerPeriodLimit, (chromosome.dnaArray[periodGene.item][periodGene.position]).upperPeriodLimit) = (periodGeneLowerLimit, periodGeneUpperLimit)
 
-
             LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier][(periodGene.item, periodGene.position)] = set(range(periodGeneLowerLimit, periodGeneUpperLimit))
-            # print("Period : ", periodGene.period)
             (LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier][(periodGene.item, periodGene.position)]).remove(periodGene.period)
 
         periods = list(LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier][(periodGene.item, periodGene.position)])
         # random.shuffle(periods)
 
-
         for _, period in enumerate(reversed(periods)):
 
             result = self.handleAltPeriod(chromosome, strategy, periodGene, period, results, args)
             if result == "RETURN":
-                # if period in LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier][(periodGene.item, periodGene.position)]:
                 (LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier][(periodGene.item, periodGene.position)]).remove(period)
                 return
 
@@ -121,18 +115,45 @@ class LocalSearchEngine:
         mStringIdentifier = LocalSearchEngine.mutationStringIdentifier(chromosome.stringIdentifier, periodGene.period, altPeriod)
 
         # making sure the process doesn't take a path already taken before
+
+        # tmpChromosome = Chromosome()
+        # tmpChromosome.stringIdentifier = mStringIdentifier
+        # if tmpChromosome in self.population.chromosomes:
         inPool = True
         with Chromosome.pool["lock"]:
             inPool = False if mStringIdentifier not in Chromosome.pool["content"] else True
-
         if inPool:
-            # print('happening')
-            # if isinstance(Chromosome.popByThread[list(Chromosome.pool["content"][mStringIdentifier])[0]]["content"][mStringIdentifier], PseudoChromosome):
-            #     pass
-                # print("comment")
+            # print("booo")
             return None
 
         else:   
+
+            # inPool = True
+            # with Chromosome.pool["lock"]:
+            #     inPool = False if mStringIdentifier not in Chromosome.pool["content"] else True
+
+            # if inPool:
+            #     c = Chromosome.popByThread[list(Chromosome.pool["content"][mStringIdentifier])[0]]["content"][mStringIdentifier]
+            #     if isinstance(c, PseudoChromosome):
+            #         if strategy == "crossover":
+            #             if c < chromosome:
+            #                 if Chromosome.gettingCloser(c, args["target"], periodGene, altPeriod, LocalSearchEngine.localSearchMemory["content"]["chromosome_distances"]):
+            #                     # print("croo")
+            #                     self.result = c 
+            #                     return "RETURN"
+            #             # else:
+            #             #     if "closer_anyway" in args:
+            #             #         self.result = c 
+            #             #         return "RETURN"
+
+            #         elif strategy == "near_positive":
+            #             if c < chromosome:
+            #                 self.result = c
+            #                 return "RETURN"
+            #         elif strategy == "random":
+            #             self.result = c
+            #             return "RETURN"
+            #     return None
 
             if LocalSearchEngine.areItemsSwitchable(chromosome, periodGene, altPeriod):
 
@@ -165,6 +186,9 @@ class LocalSearchEngine:
 
                     self.result = pseudoChromosome
                     return "RETURN"
+
+            else:
+                (LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier][(periodGene.item, periodGene.position)]).remove(altPeriod)
 
 
     @classmethod

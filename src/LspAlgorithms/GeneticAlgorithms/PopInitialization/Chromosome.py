@@ -6,6 +6,7 @@ import math
 from LspAlgorithms.GeneticAlgorithms.LspRuntimeMonitor import LspRuntimeMonitor
 from LspAlgorithms.GeneticAlgorithms.PopInitialization.Gene import Gene
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
+from .PseudoChromosome import PseudoChromosome
 import concurrent.futures
 from ParameterSearch.ParameterData import ParameterData
 
@@ -54,7 +55,16 @@ class Chromosome(object):
 		distance = 0
 		stringIdentifier = None
 
-		if isinstance(chromosomeInput, Chromosome):
+		if isinstance(chromosomeInput, PseudoChromosome):
+			stringIdentifier = chromosomeInput.stringIdentifier
+			itemPositions = [0] * InputDataInstance.instance.nItems
+			for period, item in enumerate(stringIdentifier):
+				if item > 0:
+					item -= 1
+					distance += ((period - (target.dnaArray[item][itemPositions[item]]).period) * InputDataInstance.instance.stockingCostsArray[item]) ** 2
+					itemPositions[item] += 1
+
+		elif isinstance(chromosomeInput, Chromosome):
 
 			stringIdentifier = chromosomeInput.stringIdentifier
 			for itemGenes in chromosomeInput.dnaArray:
@@ -87,7 +97,6 @@ class Chromosome(object):
 
 		distance1 = 0
 		if (chromosome.stringIdentifier, target.stringIdentifier) in chromosome_distances_dict:
-			# print("flelo 1")
 			distance1 = chromosome_distances_dict[(chromosome.stringIdentifier, target.stringIdentifier)]
 		else:
 			distance1 = Chromosome.distanceMeasure(chromosome, target, chromosome_distances_dict)
@@ -101,7 +110,6 @@ class Chromosome(object):
 		stringIdentifier = tuple(stringIdentifier)
 
 		if (stringIdentifier, target.stringIdentifier) in chromosome_distances_dict:
-			# print("flelo 2")
 			distance2 = chromosome_distances_dict[(stringIdentifier, target.stringIdentifier)]
 		else:
 			chromosomeInput = {"stringIdentifier": stringIdentifier, "gene": gene, "altPeriod": altPeriod, "chromosome": chromosome}

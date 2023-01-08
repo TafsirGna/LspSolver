@@ -40,7 +40,10 @@ class MutationOperator:
             # print("population's chromosomes : ", population.chromosomes)
             # print("picked chromosome : ", chromosome)
 
-            result = self.process(chromosome, population.threadIdentifier)
+            # result = self.process(chromosome, population.threadIdentifier)
+            localSearchEngine = LocalSearchEngine()
+            localSearchEngine.population = population
+            result = localSearchEngine.process(chromosome, "random", {"threadId": population.threadIdentifier})
             if result is not None:
                 counter += 1
 

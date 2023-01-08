@@ -82,8 +82,8 @@ class SelectionOperator:
         """
         """
 
-        # if len(self.indices) == 0: # very much less likely to happen but you dunno
-        #     self.indices = list(range(len(self.chromosomes)))
+        if len(self.indices) == 0: # very much less likely to happen but you dunno
+            self.indices = list(range(len(self.chromosomes)))
 
         randomIndexA = np.random.choice(self.indices)
 

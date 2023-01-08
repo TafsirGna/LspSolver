@@ -134,6 +134,7 @@ class CrossOverOperator:
 
             # print("crossing over : ", gene.period, chromosome)
             localSearchEngine = LocalSearchEngine()
+            localSearchEngine.population = self.population
             
             # improving the current gene respective of the target chromosome
             localSearchEngine.improveGene(chromosome, gene, "crossover", None, {"threadId": threadIdentifier, "target": target, "closer_anyway": True})                        
@@ -202,6 +203,7 @@ class CrossOverOperator:
 
             # print("crossing over : ", gene.period, chromosome)
             localSearchEngine = LocalSearchEngine()
+            localSearchEngine.population = self.population
             
             # improving the current gene respective of the target chromosome
             localSearchEngine.improveGene(chromosome, gene, "crossover", None, {"threadId": threadIdentifier, "target": target})                        
@@ -219,7 +221,9 @@ class CrossOverOperator:
                 self.offspring = chromosome
 
         if self.offspring == self.parentChromosomes[0]:
-            result = (LocalSearchEngine()).process(chromosome, "near_positive", {"threadId": threadIdentifier})
+            localSearchEngine = LocalSearchEngine()
+            localSearchEngine.population = self.population
+            result = localSearchEngine.process(chromosome, "near_positive", {"threadId": threadIdentifier})
             if result is not None:
                 self.searchRecursiveOffspring(result, target, threadIdentifier, depthIndex + 1)
             else:
