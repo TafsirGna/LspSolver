@@ -8,7 +8,7 @@ from LspAlgorithms.GeneticAlgorithms.PopInitialization.PseudoChromosome import P
 from LspInputDataReading.LspInputDataInstance import InputDataInstance
 import random
 # import numpy as np
-# from LspAlgorithms.GeneticAlgorithms.LspRuntimeMonitor import LspRuntimeMonitor
+from LspAlgorithms.GeneticAlgorithms.LspRuntimeMonitor import LspRuntimeMonitor
 
 class LocalSearchEngine:
     """
@@ -104,6 +104,7 @@ class LocalSearchEngine:
 
             result = self.handleAltPeriod(chromosome, strategy, periodGene, period, results, args)
             if result == "RETURN":
+                LspRuntimeMonitor.mlData.append([str(chromosome.stringIdentifier), periodGene.period, period, str(InputDataInstance.instance.changeOverCostsArray), str(InputDataInstance.instance.stockingCostsArray), str(InputDataInstance.instance.demandsArray), chromosome.cost, self.result.cost])
                 (LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier][(periodGene.item, periodGene.position)]).remove(period)
                 return
 

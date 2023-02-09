@@ -36,10 +36,18 @@ LspRuntimeMonitor.fileName = LspRuntimeMonitor.fileName.replace("/", "_")
 LspRuntimeMonitor.fileName = LspRuntimeMonitor.fileName.replace(".", "_")
 LspRuntimeMonitor.outputFolderPath += LspRuntimeMonitor.fileName
 
+
+# retrieving the ml data in a dataframe object
+# mlDF = lspLib.getMLDataFrames()
+# print("Printing ML Data : ")
+# mlDF.head(5)
+
+
 nIterations = 10 if args.stats else 1 
 globalData = {"mins": [], "timeLengths": []}
 for _ in range(nIterations):
 
+	LspRuntimeMonitor.mlData = []
 	LspRuntimeMonitor.instance = LspRuntimeMonitor()
 
 	# # I create an instance of the genetic algorithm to be used
@@ -69,3 +77,5 @@ for _ in range(nIterations):
 print("Global Data : ", globalData)
 file = LspRuntimeMonitor.outputFolderPath+"/"+"stats_data.csv"
 lspLib.printGlobalResults(file, globalData)
+
+lspLib.printMLData(LspRuntimeMonitor.mlData)

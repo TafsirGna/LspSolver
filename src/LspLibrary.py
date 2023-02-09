@@ -7,6 +7,7 @@ import os
 import datetime
 import numpy as np
 import csv
+# import pandas as pd
 
 class bcolors:
     HEADER = '\033[95m'
@@ -31,6 +32,26 @@ class bcolors:
 #     """
     
 #     fileStream.write("-"*140+"\n")
+
+
+def printMLData(mlData):
+    """
+    """
+    fieldnames = ['dna', 'index', 'target', 'changeover_costs', 'stocking_costs', 'deadlines', 'cost', 'result_cost']
+    
+    file = "data/ML/dataset.csv"
+
+    if not os.path.isfile(file):
+        with open(file, "w") as csv_file:
+            # print headers
+            writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+            writer.writeheader()
+
+    with open(file, mode='a') as csv_file:
+        writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+        for datum in mlData:
+            writer.writerow({'dna': datum[0], 'index': datum[1], 'target': datum[2], 'changeover_costs': datum[3], 'stocking_costs': datum[4], 'deadlines': datum[5], 'cost': datum[6], 'result_cost': datum[7]})
+
 
 
 def printGlobalResults(file, globalData):
