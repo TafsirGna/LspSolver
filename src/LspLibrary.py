@@ -39,7 +39,7 @@ def printMLData(mlData):
     """
     fieldnames = ['dna', 'index', 'target', 'changeover_costs', 'stocking_costs', 'deadlines', 'cost', 'result_cost']
     
-    file = "data/ML/dataset.csv"
+    file = "data/ML/dataset0.csv"
 
     if not os.path.isfile(file):
         with open(file, "w") as csv_file:

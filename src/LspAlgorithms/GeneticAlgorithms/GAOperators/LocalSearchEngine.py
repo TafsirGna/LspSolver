@@ -104,7 +104,8 @@ class LocalSearchEngine:
 
             result = self.handleAltPeriod(chromosome, strategy, periodGene, period, results, args)
             if result == "RETURN":
-                LspRuntimeMonitor.mlData.append([str(chromosome.stringIdentifier), periodGene.period, period, str(InputDataInstance.instance.changeOverCostsArray), str(InputDataInstance.instance.stockingCostsArray), str(InputDataInstance.instance.demandsArray), chromosome.cost, self.result.cost])
+                if LspRuntimeMonitor.verbose:
+                    LspRuntimeMonitor.mlData.append([str(chromosome.stringIdentifier), periodGene.period, period, str(InputDataInstance.instance.changeOverCostsArray), str(InputDataInstance.instance.stockingCostsArray), str(InputDataInstance.instance.demandsArray), chromosome.cost, self.result.cost])
                 (LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier][(periodGene.item, periodGene.position)]).remove(period)
                 return
 
@@ -123,6 +124,7 @@ class LocalSearchEngine:
         inPool = True
         with Chromosome.pool["lock"]:
             inPool = False if mStringIdentifier not in Chromosome.pool["content"] else True
+
         if inPool:
             # print("booo")
             return None
