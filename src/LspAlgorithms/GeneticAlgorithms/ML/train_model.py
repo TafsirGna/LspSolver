@@ -1,12 +1,9 @@
-# import pandas as pd
+import pandas as pd
 import csv
 
 mlDataFilePath0 = "data/ML/dataset0.csv"
 mlDataFilePath1 = "data/ML/dataset1.csv"
-# mlDF = pd.read_csv(mlDataFilePath)
 
-# # mlDF.head()
-# print(mlDF)
 
 def readDNA(preProcRow, data):
 	"""
@@ -65,6 +62,16 @@ def readDeadlines(preProcRow, data):
 
 
 # 1st step of the preprocessing
+
+# removing duplicated rows
+mlDF = pd.read_csv(mlDataFilePath0)
+
+# mlDF.head()
+mlDF = mlDF.drop_duplicates()
+mlDF.to_csv(mlDataFilePath0, index=False)
+
+# changing data format
+
 with open(mlDataFilePath0) as csv_file:
 	csv_reader = csv.reader(csv_file, delimiter=",")
 	preProcData = []
@@ -90,5 +97,12 @@ with open(mlDataFilePath1, mode='w') as csv_file:
     writer = csv.writer(csv_file, delimiter=',')
     for row in preProcData:
     	writer.writerow(row)
+
+
+mlDF = pd.read_csv(mlDataFilePath1)
+
+# mlDF.head()
+mlDF = mlDF.drop_duplicates()
+print(mlDF.info())
 
 
