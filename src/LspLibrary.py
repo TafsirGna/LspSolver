@@ -21,6 +21,9 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 
+fieldnames = ['dna', 'index', 'target', 'changeover_costs', 'stocking_costs', 'deadlines', 'cost', 'result_cost']
+
+
 
 
 ###
@@ -37,7 +40,6 @@ class bcolors:
 def printMLData(mlData):
     """
     """
-    fieldnames = ['dna', 'index', 'target', 'changeover_costs', 'stocking_costs', 'deadlines', 'cost', 'result_cost']
     
     file = "data/ML/dataset0.csv"
 
@@ -50,7 +52,7 @@ def printMLData(mlData):
     with open(file, mode='a') as csv_file:
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
         for datum in mlData:
-            writer.writerow({'dna': datum[0], 'index': datum[1], 'target': datum[2], 'changeover_costs': datum[3], 'stocking_costs': datum[4], 'deadlines': datum[5], 'cost': datum[6], 'result_cost': datum[7]})
+            writer.writerow({fieldnames[0]: datum[0], fieldnames[1]: datum[1], fieldnames[2]: datum[2], fieldnames[3]: datum[3], fieldnames[4]: datum[4], fieldnames[5]: datum[5], fieldnames[6]: datum[6], fieldnames[7]: datum[7]})
 
 
 

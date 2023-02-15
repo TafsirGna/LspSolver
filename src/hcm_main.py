@@ -8,7 +8,6 @@ from LspInputDataReading.LspInputDataReader import InputDataReader
 from LspAlgorithms.GeneticAlgorithms.LspRuntimeMonitor import LspRuntimeMonitor
 from ParameterSearch.ParameterData import ParameterData
 # import os
-import numpy as np
 import LspLibrary as lspLib
 
 ParameterData.instance = ParameterData()
@@ -47,7 +46,7 @@ nIterations = 10 if args.stats else 1
 globalData = {"mins": [], "timeLengths": []}
 for _ in range(nIterations):
 
-	LspRuntimeMonitor.mlData = []
+	# LspRuntimeMonitor.mlData = []
 	LspRuntimeMonitor.instance = LspRuntimeMonitor()
 
 	# # I create an instance of the genetic algorithm to be used
@@ -78,4 +77,4 @@ print("Global Data : ", globalData)
 file = LspRuntimeMonitor.outputFolderPath+"/"+"stats_data.csv"
 lspLib.printGlobalResults(file, globalData)
 
-lspLib.printMLData(LspRuntimeMonitor.mlData)
+# lspLib.printMLData(LspRuntimeMonitor.mlData)
