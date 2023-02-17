@@ -21,7 +21,7 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 
-fieldnames = ['dna', 'index', 'target', 'changeover_costs', 'stocking_costs', 'deadlines', 'cost', 'result_cost']
+fieldnames = ['dna', 'index', 'target', 'changeover_costs', 'stocking_costs', 'deadlines', 'cost', 'result_cost', "instance_file_root_name"]
 
 
 

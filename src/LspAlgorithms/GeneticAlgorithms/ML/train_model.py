@@ -67,7 +67,7 @@ def readDeadlines(preProcRow, data):
 mlDF = pd.read_csv(mlDataFilePath0)
 
 # mlDF.head()
-mlDF = mlDF.drop_duplicates()
+mlDF = mlDF.drop_duplicates(keep='first')
 mlDF.to_csv(mlDataFilePath0, index=False)
 
 # changing data format
@@ -76,6 +76,7 @@ with open(mlDataFilePath0) as csv_file:
 	csv_reader = csv.reader(csv_file, delimiter=",")
 	preProcData = []
 	index = 0
+	# InstanceIndexChangeOverCost
 	for row in csv_reader:
 		if index > 0:
 			preProcRow = []
@@ -102,7 +103,7 @@ with open(mlDataFilePath1, mode='w') as csv_file:
 mlDF = pd.read_csv(mlDataFilePath1)
 
 # mlDF.head()
-mlDF = mlDF.drop_duplicates()
+mlDF = mlDF.drop_duplicates(keep='first')
 print(mlDF.info())
 
 

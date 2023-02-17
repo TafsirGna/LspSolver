@@ -10,4 +10,4 @@ Thesis Paper/main.pdf
 *.pyc
 env/
 data/output/
-data/ML/dataset1.csv
+data/ML/sets

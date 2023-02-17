@@ -107,7 +107,7 @@ class LocalSearchEngine:
             result = self.handleAltPeriod(chromosome, strategy, periodGene, period, results, args)
             if result == "RETURN":
                 if hasattr(LspRuntimeMonitor, "mlData"):
-                    LspRuntimeMonitor.mlData.loc[0 if pd.isnull(LspRuntimeMonitor.mlData.index.max()) else LspRuntimeMonitor.mlData.index.max() + 1] = [str(chromosome.stringIdentifier), periodGene.period, period, str(InputDataInstance.instance.changeOverCostsArray), str(InputDataInstance.instance.stockingCostsArray), str(InputDataInstance.instance.demandsArray), chromosome.cost, self.result.cost]
+                    LspRuntimeMonitor.mlData.loc[0 if pd.isnull(LspRuntimeMonitor.mlData.index.max()) else LspRuntimeMonitor.mlData.index.max() + 1] = [str(chromosome.stringIdentifier), periodGene.period, period, str(InputDataInstance.instance.changeOverCostsArray), str(InputDataInstance.instance.stockingCostsArray), str(InputDataInstance.instance.demandsArray), chromosome.cost, self.result.cost, LspRuntimeMonitor.instanceFileRootName]
                     # LspRuntimeMonitor.mlData.append([str(chromosome.stringIdentifier), periodGene.period, period, str(InputDataInstance.instance.changeOverCostsArray), str(InputDataInstance.instance.stockingCostsArray), str(InputDataInstance.instance.demandsArray), chromosome.cost, self.result.cost])
                 (LocalSearchEngine.localSearchMemory["content"]["left_genes"][chromosome.stringIdentifier][(periodGene.item, periodGene.position)]).remove(period)
                 return
