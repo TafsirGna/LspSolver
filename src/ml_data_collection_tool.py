@@ -9,8 +9,8 @@ import csv
 import LspLibrary as lspLib
 
 # instanceIndices = [1, 2, 3, 4, 5, 8, 21, 23, 35, 36, 53, 58, 61, 69, 73, 78, 85, 87, 90, 94]
-instanceIndices = [69]
-mlDataPath = "data/ML/"
+instanceIndices = [1]
+mlDataPath = "data/ML/sets/raw/"
 instanceRootPath = "data/input/instancesWith20periods/"
 ParameterData.instance = ParameterData()
 
@@ -40,6 +40,8 @@ for index in reversed(instanceIndices):
         print("--- Processing instance: ", str(index), "trial -> ", trialIndex, " / ", nRows)
         LspRuntimeMonitor.instanceFileRootName = index
         LspRuntimeMonitor.mlData = pd.DataFrame(columns=lspLib.fieldnames) # []
+        LspRuntimeMonitor.mlTestSetFeatures = []
+        LspRuntimeMonitor.mlTestSetLabels = []
         LspRuntimeMonitor.instance = LspRuntimeMonitor()
         
         lspSolver = GeneticAlgorithm()

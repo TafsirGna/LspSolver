@@ -7,6 +7,10 @@ from LspAlgorithms.GeneticAlgorithms.Hcm.Solver import GeneticAlgorithm
 from LspInputDataReading.LspInputDataReader import InputDataReader
 from LspAlgorithms.GeneticAlgorithms.LspRuntimeMonitor import LspRuntimeMonitor
 from ParameterSearch.ParameterData import ParameterData
+from tensorflow import keras
+from sklearn.preprocessing import StandardScaler
+import pandas as pd
+from sklearn.metrics import confusion_matrix, precision_score, recall_score
 # import os
 import LspLibrary as lspLib
 
@@ -35,11 +39,11 @@ LspRuntimeMonitor.fileName = LspRuntimeMonitor.fileName.replace("/", "_")
 LspRuntimeMonitor.fileName = LspRuntimeMonitor.fileName.replace(".", "_")
 LspRuntimeMonitor.outputFolderPath += LspRuntimeMonitor.fileName
 
-
-# retrieving the ml data in a dataframe object
-# mlDF = lspLib.getMLDataFrames()
-# print("Printing ML Data : ")
-# mlDF.head(5)
+# loading the ml model
+LspRuntimeMonitor.mlModel = keras.models.load_model("ga_ml_model.h5")
+# LspRuntimeMonitor.mlConfusionMatrix = [[0, 0], [0, 0]]
+LspRuntimeMonitor.mlTestSetFeatures = []
+LspRuntimeMonitor.mlTestSetLabels = []
 
 
 nIterations = 10 if args.stats else 1 
@@ -73,8 +77,25 @@ for _ in range(nIterations):
 	if not args.stats:
 		LspRuntimeMonitor.instance.report()
 
+# printing confusion matrix
+
+LspRuntimeMonitor.mlTestSetFeatures = pd.DataFrame(LspRuntimeMonitor.mlTestSetFeatures)
+LspRuntimeMonitor.mlTestSetLabels = pd.DataFrame(LspRuntimeMonitor.mlTestSetLabels)
+
+scaler = StandardScaler()
+LspRuntimeMonitor.mlTestSetFeatures = pd.DataFrame(scaler.fit_transform(LspRuntimeMonitor.mlTestSetFeatures))
+
+predictions = LspRuntimeMonitor.mlModel.predict(LspRuntimeMonitor.mlTestSetFeatures)
+predictions = (predictions > .5)
+
+# print(LspRuntimeMonitor.mlModel.evaluate(LspRuntimeMonitor.mlTestSetFeatures, LspRuntimeMonitor.mlTestSetLabels))
+
+print(confusion_matrix(LspRuntimeMonitor.mlTestSetLabels, predictions))
+print(precision_score(LspRuntimeMonitor.mlTestSetLabels, predictions))
+print(recall_score(LspRuntimeMonitor.mlTestSetLabels, predictions))
+
+# print(LspRuntimeMonitor.mlConfusionMatrix)
+
 print("Global Data : ", globalData)
 file = LspRuntimeMonitor.outputFolderPath+"/"+"stats_data.csv"
 lspLib.printGlobalResults(file, globalData)
-
-# lspLib.printMLData(LspRuntimeMonitor.mlData)

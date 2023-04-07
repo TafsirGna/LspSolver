@@ -88,3 +88,132 @@ def printGlobalResults(file, globalData):
     #     values = (min(globalData["mins"]), max(globalData["mins"]), "{:.2f}".format((np.mean(globalData["mins"]))),
     #              "{:.2f}".format(min(globalData["timeLengths"])), "{:.2f}".format(max(globalData["timeLengths"])), "{:.2f}".format(np.mean(globalData["timeLengths"])), datetime.datetime.now())
     #     f.write(("{:{widths[0]}} {:{widths[0]}} {:{widths[0]}} {:{widths[0]}} {:{widths[0]}} {:{widths[0]}} {:{widths[0]}}\n").format(*values, widths=([width]*len(headers))))
+
+
+
+#### ML Code
+
+def readDNA(preProcRow, data):
+	"""
+	"""
+
+	data = data.replace("(", "")
+	data = data.replace(")", "")
+	data = data.split(", ")
+
+	for datum in data:
+		preProcRow.append(int(datum))
+
+	return preProcRow
+
+def readStockingCosts(preProcRow, data):
+	"""
+	"""
+
+	data = data.replace("[", "")
+	data = data.replace("]", "")
+	data = data.split(" ")
+
+	# index = 0
+	for datum in data:
+		if len(datum) > 0:
+			preProcRow.append(int(datum))
+			# index += 1
+	# print(index)
+
+	return preProcRow
+
+def readChangeOverCosts(preProcRow, data):
+	"""
+	"""
+
+	data = data.replace("[", "")
+	data = data.replace("]", "")
+	data = data.split("\n")
+
+	# index = 0
+	for line in data:
+		numbers = line.split(" ")
+		for number in numbers:
+			if len(number) > 0:
+				preProcRow.append(int(number))
+				# index += 1
+	# print(index)
+
+	return preProcRow
+
+def readDeadlines(preProcRow, data):
+	"""
+	"""
+
+	return readChangeOverCosts(preProcRow, data)
+
+
+def extractMLFeatures(row):
+    """
+    """
+
+    preProcRow = []
+    # preProcRow.append(row[8])
+    dna = readDNA(list(preProcRow), row[0])
+
+    row1, row2 = int(row[1]), int(row[2])
+
+    if row1 == row2 - 1:
+        if row1 > 0:
+            preProcRow.append(int(dna[row1 - 1]))
+        else:
+            preProcRow.append(0)
+        preProcRow.append(int(dna[row1]))
+
+        preProcRow.append(int(dna[row2]))
+        if int(row[2]) < (len(dna) - 1):
+            preProcRow.append(int(dna[row2 + 1]))
+        else:
+            preProcRow.append(0)
+    elif row2 == row1 - 1:
+        if row2 > 0:
+            preProcRow.append(int(dna[row2 - 1]))
+        else:
+            preProcRow.append(0)
+        preProcRow.append(int(dna[row2]))
+
+        preProcRow.append(int(dna[row1]))
+        if row1 < (len(dna) - 1):
+            preProcRow.append(int(dna[row1 + 1]))
+        else:
+            preProcRow.append(0)
+    else:
+        for i in [1, 2]:
+            if int(row[i]) > 0:
+                preProcRow.append(int(dna[int(row[i]) - 1]))
+            else:
+                preProcRow.append(0)
+
+            if int(row[i]) < (len(dna) - 1):
+                preProcRow.append(int(dna[int(row[i]) + 1]))
+            else:
+                preProcRow.append(0)
+
+
+    preProcRow.append(int(dna[row1]))
+    preProcRow.append(int(dna[row2]))
+
+    preProcRow.append(row1)
+    preProcRow.append(row2)
+
+    changeOverCosts = readChangeOverCosts(list(preProcRow), row[3])
+
+
+    # readStockingCosts(preProcRow, row[4])
+    deadlines = readDeadlines(list(preProcRow), row[5])
+    preProcRow.append(deadlines[int(dna[row1]) - 1])
+    preProcRow.append(deadlines[int(dna[row2]) - 1])
+
+    dist = abs(row2 - row1)
+    dist = 1 if dist == 1 else 0
+    preProcRow.append(dist)
+
+    preProcRow.append(row[7] > row[6])
+
+    return preProcRow
