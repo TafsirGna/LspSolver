@@ -1,4 +1,4 @@
-#!/usr/bin/python3.5
+#!/usr/bin/python3.6
 # -*-coding: utf-8 -*
 
 # import sys
@@ -8,9 +8,9 @@ from LspInputDataReading.LspInputDataReader import InputDataReader
 from LspAlgorithms.GeneticAlgorithms.LspRuntimeMonitor import LspRuntimeMonitor
 from ParameterSearch.ParameterData import ParameterData
 from tensorflow import keras
-from sklearn.preprocessing import StandardScaler
+# from sklearn.preprocessing import StandardScaler
 import pandas as pd
-from sklearn.metrics import confusion_matrix, precision_score, recall_score
+# from sklearn.metrics import confusion_matrix, precision_score, recall_score
 # import os
 import LspLibrary as lspLib
 
@@ -48,6 +48,7 @@ LspRuntimeMonitor.mlTestSetLabels = []
 
 nIterations = 10 if args.stats else 1 
 globalData = {"mins": [], "timeLengths": []}
+
 for _ in range(nIterations):
 
 	# LspRuntimeMonitor.mlData = []
@@ -65,34 +66,40 @@ for _ in range(nIterations):
 	# Reporting all statistics collected when running the selected algo
 	mins = []
 	for threadId in LspRuntimeMonitor.instance.popsData:
-		mins.append(LspRuntimeMonitor.instance.popsData[threadId]["min"][-1])
+		mins.append(min(LspRuntimeMonitor.instance.popsData[threadId]["min"]))
+		# mins.append(LspRuntimeMonitor.instance.popsData[threadId]["min"][-1])
 
 	globalData["mins"].append(min(mins))
 	globalData["timeLengths"].append(LspRuntimeMonitor.instance.timeLength)
 
-	if (len(globalData["mins"]) == 1) or (len(globalData["mins"]) > 1 and globalData["mins"][-1] < globalData["min"]):
+	if (len(globalData["mins"]) == 1) \
+		or (len(globalData["mins"]) > 1 \
+			and (globalData["mins"][-1] < globalData["min"] \
+				or (globalData["mins"][-1] == globalData["min"] and globalData["timeLengths"][-1] < globalData["timeLength"])
+			)
+		):
 		globalData["min"] = globalData["mins"][-1]
 		globalData["timeLength"] = globalData["timeLengths"][-1]
 
 	if not args.stats:
 		LspRuntimeMonitor.instance.report()
 
-# printing confusion matrix
+# # printing confusion matrix
 
-LspRuntimeMonitor.mlTestSetFeatures = pd.DataFrame(LspRuntimeMonitor.mlTestSetFeatures)
-LspRuntimeMonitor.mlTestSetLabels = pd.DataFrame(LspRuntimeMonitor.mlTestSetLabels)
+# LspRuntimeMonitor.mlTestSetFeatures = pd.DataFrame(LspRuntimeMonitor.mlTestSetFeatures)
+# LspRuntimeMonitor.mlTestSetLabels = pd.DataFrame(LspRuntimeMonitor.mlTestSetLabels)
 
-scaler = StandardScaler()
-LspRuntimeMonitor.mlTestSetFeatures = pd.DataFrame(scaler.fit_transform(LspRuntimeMonitor.mlTestSetFeatures))
+# scaler = StandardScaler()
+# LspRuntimeMonitor.mlTestSetFeatures = pd.DataFrame(scaler.fit_transform(LspRuntimeMonitor.mlTestSetFeatures))
 
-predictions = LspRuntimeMonitor.mlModel.predict(LspRuntimeMonitor.mlTestSetFeatures)
-predictions = (predictions > .5)
+# predictions = LspRuntimeMonitor.mlModel.predict(LspRuntimeMonitor.mlTestSetFeatures)
+# predictions = (predictions > .5)
 
-# print(LspRuntimeMonitor.mlModel.evaluate(LspRuntimeMonitor.mlTestSetFeatures, LspRuntimeMonitor.mlTestSetLabels))
+# # print(LspRuntimeMonitor.mlModel.evaluate(LspRuntimeMonitor.mlTestSetFeatures, LspRuntimeMonitor.mlTestSetLabels))
 
-print(confusion_matrix(LspRuntimeMonitor.mlTestSetLabels, predictions))
-print(precision_score(LspRuntimeMonitor.mlTestSetLabels, predictions))
-print(recall_score(LspRuntimeMonitor.mlTestSetLabels, predictions))
+# print(confusion_matrix(LspRuntimeMonitor.mlTestSetLabels, predictions))
+# print(precision_score(LspRuntimeMonitor.mlTestSetLabels, predictions))
+# print(recall_score(LspRuntimeMonitor.mlTestSetLabels, predictions))
 
 # print(LspRuntimeMonitor.mlConfusionMatrix)
 
