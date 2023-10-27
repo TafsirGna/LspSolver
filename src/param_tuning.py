@@ -26,16 +26,16 @@ LspRuntimeMonitor.mlTestSetLabels = []
 
 tuningData = None
 # Setting the tuning parameters for it to launch
-for pop_size in range(25, 43, 3):
+for pop_size in range(25, 41, 1):
 
     ParameterData.instance.popSize = pop_size
 
-    for mutation_rate in np.arange(0.05, 0.18, 0.3):
+    for mutation_rate in np.arange(0.05, 0.16, 0.1):
 
         mutation_rate = round(mutation_rate, 2)
         ParameterData.instance.mutationRate = mutation_rate
 
-        for crossover_rate in np.arange(0.75, 0.93, 0.03):
+        for crossover_rate in np.arange(0.75, 0.91, 0.01):
 
             crossover_rate = round(crossover_rate, 2)
             ParameterData.instance.crossOverRate = crossover_rate
@@ -65,7 +65,7 @@ for pop_size in range(25, 43, 3):
                 LspRuntimeMonitor.outputFolderPath += LspRuntimeMonitor.fileName
 
 
-                nIterations = 10
+                nIterations = 5
                 globalData = {"mins": [], "timeLengths": []}
                 iterationsData = []
 

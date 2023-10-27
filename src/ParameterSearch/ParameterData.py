@@ -10,9 +10,9 @@ class ParameterData:
         """
         """
 
-        self.popSize = 25
+        self.popSize = 30
         self.mutationRate = 0.05
-        self.crossOverRate = 0.8
+        self.crossOverRate = 0.9
         self.nReplicaThreads = 1
         self.nPrimaryThreads = 1
         self.nMigrants = 1
