@@ -7,7 +7,7 @@ from LspAlgorithms.GeneticAlgorithms.Hcm.Solver import GeneticAlgorithm
 from LspInputDataReading.LspInputDataReader import InputDataReader
 from LspAlgorithms.GeneticAlgorithms.LspRuntimeMonitor import LspRuntimeMonitor
 from ParameterSearch.ParameterData import ParameterData
-from tensorflow import keras
+#from tensorflow import keras
 # from sklearn.preprocessing import StandardScaler
 import pandas as pd
 # from sklearn.metrics import confusion_matrix, precision_score, recall_score
@@ -40,7 +40,7 @@ LspRuntimeMonitor.fileName = LspRuntimeMonitor.fileName.replace(".", "_")
 LspRuntimeMonitor.outputFolderPath += LspRuntimeMonitor.fileName
 
 # loading the ml model
-LspRuntimeMonitor.mlModel = keras.models.load_model("ga_ml_model.h5")
+#LspRuntimeMonitor.mlModel = keras.models.load_model("ga_ml_model.h5")
 # LspRuntimeMonitor.mlConfusionMatrix = [[0, 0], [0, 0]]
 LspRuntimeMonitor.mlTestSetFeatures = []
 LspRuntimeMonitor.mlTestSetLabels = []
