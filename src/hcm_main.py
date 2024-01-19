@@ -44,6 +44,7 @@ LspRuntimeMonitor.outputFolderPath += LspRuntimeMonitor.fileName
 # LspRuntimeMonitor.mlConfusionMatrix = [[0, 0], [0, 0]]
 LspRuntimeMonitor.mlTestSetFeatures = []
 LspRuntimeMonitor.mlTestSetLabels = []
+LspRuntimeMonitor.applyLocalSearch = True # False
 
 
 nIterations = 10 if args.stats else 1 

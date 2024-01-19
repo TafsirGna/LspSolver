@@ -5,7 +5,7 @@ from LspAlgorithms.GeneticAlgorithms.Hcm.Solver import GeneticAlgorithm
 from LspInputDataReading.LspInputDataReader import InputDataReader
 from LspAlgorithms.GeneticAlgorithms.LspRuntimeMonitor import LspRuntimeMonitor
 from ParameterSearch.ParameterData import ParameterData
-import LspLibrary as lspLib
+# import LspLibrary as lspLib
 import numpy as np
 import random
 
@@ -23,19 +23,22 @@ with open("data/param_tuning_instances.txt", "r") as tuning_instances_file:
 # LspRuntimeMonitor.mlConfusionMatrix = [[0, 0], [0, 0]]
 LspRuntimeMonitor.mlTestSetFeatures = []
 LspRuntimeMonitor.mlTestSetLabels = []
+LspRuntimeMonitor.applyLocalSearch = True
 
 tuningData = None
+resultsfileStream = open("param_tuning_results.txt", "w")
+
 # Setting the tuning parameters for it to launch
-for pop_size in range(25, 41, 1):
+for pop_size in range(25, 41, 3):
 
     ParameterData.instance.popSize = pop_size
 
-    for mutation_rate in np.arange(0.05, 0.16, 0.1):
+    for mutation_rate in np.arange(0.05, 0.16, 0.3):
 
         mutation_rate = round(mutation_rate, 2)
         ParameterData.instance.mutationRate = mutation_rate
 
-        for crossover_rate in np.arange(0.75, 0.91, 0.01):
+        for crossover_rate in np.arange(0.75, 0.91, 0.03):
 
             crossover_rate = round(crossover_rate, 2)
             ParameterData.instance.crossOverRate = crossover_rate
@@ -104,11 +107,16 @@ for pop_size in range(25, 41, 1):
                     iterationsData.append(globalData["min"] - tuning_instance_opt)
 
                 iterationsData = sum(iterationsData) / len(iterationsData)
+                iterationsData /= tuning_instance_opt
                 instancesEpochData.append(iterationsData)
 
             instancesEpochData = sum(instancesEpochData) / len(instancesEpochData)
+            
+            resultsfileStream.write(" | ".join((str(instancesEpochData), str(ParameterData.instance.popSize), str(ParameterData.instance.mutationRate), str(ParameterData.instance.crossOverRate))))
 
             if (tuningData is None or (tuningData is not None and instancesEpochData < tuningData[0])):
                 tuningData = (instancesEpochData, ParameterData.instance.popSize, ParameterData.instance.mutationRate, ParameterData.instance.crossOverRate)
 
+resultsfileStream.close()
 print("************** : ", tuningData)
+

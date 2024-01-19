@@ -11,3 +11,4 @@ Thesis Paper/main.pdf
 env/
 data/output/
 data/ML/sets
+.venv/

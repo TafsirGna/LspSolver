@@ -227,7 +227,8 @@ class CrossOverOperator:
             if result is not None:
                 self.searchRecursiveOffspring(result, target, threadIdentifier, depthIndex + 1)
             else:
-                self.directionalDeepSearch(chromosome, target, threadIdentifier)
+                if LspRuntimeMonitor.applyLocalSearch:
+                    self.directionalDeepSearch(chromosome, target, threadIdentifier)
             return
 
         self._stopOffspringSearchEvent.set()
