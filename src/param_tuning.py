@@ -26,14 +26,15 @@ LspRuntimeMonitor.mlTestSetLabels = []
 LspRuntimeMonitor.applyLocalSearch = True
 
 tuningData = None
-resultsfileStream = open("param_tuning_results.txt", "w")
+resultsfileStream = open("param_tuning_results.csv", "w")
+resultsfileStream.write(",".join(("error_rate", "pop_size", "mutation_rate", "crossover_rate")) + "\n")
 
 # Setting the tuning parameters for it to launch
 for pop_size in range(25, 41, 3):
 
     ParameterData.instance.popSize = pop_size
 
-    for mutation_rate in np.arange(0.05, 0.16, 0.3):
+    for mutation_rate in np.arange(0.05, 0.16, 0.03):
 
         mutation_rate = round(mutation_rate, 2)
         ParameterData.instance.mutationRate = mutation_rate
@@ -68,7 +69,7 @@ for pop_size in range(25, 41, 3):
                 LspRuntimeMonitor.outputFolderPath += LspRuntimeMonitor.fileName
 
 
-                nIterations = 5
+                nIterations = 3
                 globalData = {"mins": [], "timeLengths": []}
                 iterationsData = []
 
@@ -112,7 +113,7 @@ for pop_size in range(25, 41, 3):
 
             instancesEpochData = sum(instancesEpochData) / len(instancesEpochData)
             
-            resultsfileStream.write(" | ".join((str(instancesEpochData), str(ParameterData.instance.popSize), str(ParameterData.instance.mutationRate), str(ParameterData.instance.crossOverRate))))
+            resultsfileStream.write(",".join((str(instancesEpochData), str(ParameterData.instance.popSize), str(ParameterData.instance.mutationRate), str(ParameterData.instance.crossOverRate))) + "\n")
 
             if (tuningData is None or (tuningData is not None and instancesEpochData < tuningData[0])):
                 tuningData = (instancesEpochData, ParameterData.instance.popSize, ParameterData.instance.mutationRate, ParameterData.instance.crossOverRate)

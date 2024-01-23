@@ -1,10 +1,1 @@
-data/input/instancesWith20periods/1 1377
-data/input/instancesWith20periods/3 1107
 data/input/instancesWith20periods/8 3117
-data/input/instancesWith20periods/23 1473
-data/input/instancesWith20periods/36 1493
-data/input/instancesWith20periods/58 1384
-data/input/instancesWith20periods/69 1619
-data/input/instancesWith20periods/78 1297
-data/input/instancesWith20periods/85 2113
-data/input/instancesWith20periods/90 2449
